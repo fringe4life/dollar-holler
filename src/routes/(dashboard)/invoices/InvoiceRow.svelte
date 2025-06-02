@@ -1,0 +1,123 @@
+<script lang="ts">
+  import AdditionalOptions from '$lib/components/AdditionalOptions.svelte'
+  import Badge, { type BadgeVariant } from '$lib/components/ui/badge/badge.svelte'
+  import ThreeDots from '$lib/icon/ThreeDots.svelte'
+  import View from '$lib/icon/View.svelte'
+  import { convertDate, isLate } from '$lib/utils/dateHelpers'
+
+  import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
+  import type { MouseEventHandler } from 'svelte/elements'
+  import type { Invoice } from '../../../global'
+  import Send from '$lib/icon/Send.svelte'
+  import Edit from '$lib/icon/Edit.svelte'
+  import Trash from '$lib/icon/Trash.svelte'
+  import Modal from '$lib/components/Modal.svelte'
+
+  let open = $state<boolean>(false)
+
+  let isAdditionalMenuShowing = $state(false)
+  let isOptionsDisabled = $state(false)
+  const { invoice } = $props<{
+    invoice: Invoice
+  }>()
+
+  const onclick: MouseEventHandler<HTMLButtonElement> = () => {
+    isAdditionalMenuShowing = !isAdditionalMenuShowing
+  }
+
+  const getLabel = (label: BadgeVariant, dueDate: string | undefined): BadgeVariant => {
+    if (label === 'draft') {
+      return 'draft'
+    } else if (label === 'sent' && isLate?.(dueDate)) {
+      isOptionsDisabled = true
+      return 'late'
+    } else if (label === 'sent' && !isLate?.(dueDate)) {
+      isOptionsDisabled = true
+      return 'sent'
+    } else if (label === 'paid') {
+      isOptionsDisabled = true
+      return 'paid'
+    }
+  }
+
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {}
+
+  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {}
+
+  const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {}
+
+  const { invoiceStatus, dueDate, invoiceNumber, client, lineItems } = invoice
+
+  const label = getLabel(invoiceStatus, dueDate)
+</script>
+
+<div
+  class="invoice-table invoice-row shadow-tableRow items-center rounded-lg bg-white py-3 lg:py-6"
+>
+  <div class="status">{@render tag(label)}</div>
+  <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>
+  <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
+  <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
+  <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
+    {centsToDollars(sumLineItems(lineItems))}
+  </div>
+  <div
+    class="hover:text-daisyBush viewbutton text-pastelPurple place-self-cen text-smter hidden transition-colors duration-200 lg:block lg:text-lg"
+  >
+    <a href="#" class="flex items-center justify-center"><View /></a>
+  </div>
+  <div
+    class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
+  >
+    <button {onclick} class="flex cursor-pointer items-center justify-center"><ThreeDots /></button>
+    {#if isAdditionalMenuShowing}
+      <AdditionalOptions
+        options={[
+          { label: 'Edit', Icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
+          { label: 'Delete', Icon: Trash, onclick: handleDelete, disabled: false },
+          { label: 'Send', Icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
+        ]}
+      />
+    {/if}
+  </div>
+</div>
+
+{#snippet tag(title: BadgeVariant)}
+  <Badge class="ml-auto lg:ml-0" variant={title}>{title}</Badge>
+{/snippet}
+
+<style>
+  .invoice-row {
+    grid-template-areas:
+      'invoicenumber invoicenumber '
+      'clientname    amount'
+      'duedate       status';
+    @media screen and (width > 1024px) {
+      grid-template-areas: 'status duedate invoicenumber clientname amount viewbutton morebutton';
+    }
+  }
+
+  .status {
+    grid-area: status;
+  }
+  .duedate {
+    grid-area: duedate;
+  }
+  .invoicenumber {
+    grid-area: invoicenumber;
+  }
+  .clientname {
+    grid-area: clientname;
+  }
+
+  .amount {
+    grid-area: amount;
+  }
+
+  .viewbutton {
+    grid-area: viewbutton;
+  }
+  .morebutton {
+    grid-area: morebutton;
+  }
+</style>

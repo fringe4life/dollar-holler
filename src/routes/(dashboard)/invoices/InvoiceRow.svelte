@@ -11,9 +11,9 @@
   import Send from '$lib/icon/Send.svelte'
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'
-  import Modal from '$lib/components/Modal.svelte'
-
-  let open = $state<boolean>(false)
+  import ModalE from '$lib/components/ModalE.svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
+  import { deleteInvoice } from '$lib/stores/InvoiceStore'
 
   let isAdditionalMenuShowing = $state(false)
   let isOptionsDisabled = $state(false)
@@ -40,7 +40,12 @@
     }
   }
 
-  const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {}
+  let open = $state(false)
+
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
+    open = true
+    isAdditionalMenuShowing = false
+  }
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {}
 
@@ -73,9 +78,12 @@
     {#if isAdditionalMenuShowing}
       <AdditionalOptions
         options={[
-          { label: 'Edit', Icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
-          { label: 'Delete', Icon: Trash, onclick: handleDelete, disabled: false },
-          { label: 'Send', Icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
+          // @ts-ignore
+          { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
+          // @ts-ignore
+          { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: false },
+          // @ts-ignore
+          { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
         ]}
       />
     {/if}
@@ -85,6 +93,34 @@
 {#snippet tag(title: BadgeVariant)}
   <Badge class="ml-auto lg:ml-0" variant={title}>{title}</Badge>
 {/snippet}
+
+<ModalE bind:open buttonText="">
+  {#snippet title()}
+    <h2 class="text-daisyBush text-center text-xl font-bold">
+      Are you sure you want to delete this invoice?
+    </h2>
+  {/snippet}
+
+  {#snippet description()}
+    <h2 class="text-daisyBush text-center text-lg font-medium">
+      This will delete the invoice to <span class="text-scarlet">{client.name}</span> for
+      <span class="text-scarlet">{centsToDollars(sumLineItems(lineItems))}?</span>
+    </h2>
+  {/snippet}
+
+  {#snippet children()}
+    <div class="flex justify-center gap-4">
+      <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
+      <Button
+        variant="destructive"
+        onclick={() => {
+          open = false
+          deleteInvoice(invoice)
+        }}>Yes, Delete It.</Button
+      >
+    </div>
+  {/snippet}
+</ModalE>
 
 <style>
   .invoice-row {

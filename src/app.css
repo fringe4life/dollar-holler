@@ -28,10 +28,14 @@
   --color-fog: oklch(86.6% 0.051 311.45);
   --color-white: oklch(100% 0 0);
   --color-prim: oklch(86.75% 0.022 318.96);
+  --color-gray-400: oklch(0.704 0.04 256.788);
+  --color-stone-300: oklch(86.9% 0.005 56.366);
 
   --shadow-tableRow: 0 0 6px oklch(0% 0 none / 0.16);
   --shadow-colored: 0 7px 16px oklch(57.4% 0.189 292 / 0.02);
   --shadow-coloredHover: 0 7px 16px oklch(57.4% 0.189 292 / 0.3);
+
+  --shadow-addInvoice: -4px 0px 44px oklch(0% 0 none / 0.25);
 }
 
 @layer base {
@@ -41,11 +45,59 @@
   svg {
     @apply fill-current;
   }
+  p {
+    text-wrap: pretty;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+  label {
+    @apply font-sansserif text-monsoon block text-base font-bold;
+  }
+
+  input[type='text']:not(.search, .line-item),
+  input[type='number']:not(.line-item),
+  input[type='date'],
+  input[type='password'],
+  input[type='email'] {
+    @apply border-silver font-sansserif h-14 w-full rounded-lg border-2 px-4 text-base;
+  }
+
+  textarea {
+    @apply border-silver font-sansserif h-32 w-full border-2 p-4 text-base;
+  }
+
+  select {
+    @apply border-silver h-14 w-full appearance-none rounded-lg border-2 bg-[url('/images/chevron-down.svg')] bg-[97%_center] bg-no-repeat p-4;
+  }
+
+  input[type='text']:not(.search, .line-item):focus-visible,
+  input[type='number']:not(.line-item):focus-visible,
+  input[type='date']:focus-visible,
+  input[type='password']:focus-visible,
+  input[type='email']:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    @apply border-lavenderIndigo border-2 outline-none;
+  }
 }
 
 @layer components {
   .invoice-table {
     @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[100px_100px_60px_1fr_18ch_32px_32px] lg:px-6;
+  }
+
+  .field {
+    @apply mb-5;
+  }
+
+  .invoice-line-item {
+    @apply grid grid-cols-[1fr_100px_100px_100px_60px] gap-x-5;
   }
 }
 
@@ -157,9 +209,9 @@
 }
 
 @layer base {
-  * {
+  /* * {
     @apply border-border outline-ring/50;
-  }
+  } */
   /* body {
     @apply bg-background text-foreground;
   } */

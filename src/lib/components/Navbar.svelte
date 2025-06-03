@@ -22,7 +22,7 @@
 <!-- mobile nav control -->
 <button
   class={{
-    'fixed top-6 right-6 z-10 transition-colors duration-200 md:hidden': true,
+    'fixed top-6 right-6 z-10 cursor-pointer transition-colors duration-200 md:hidden': true,
     'text-goldenFizz': isNavShowing,
     'text-daisyBush': !isNavShowing
   }}

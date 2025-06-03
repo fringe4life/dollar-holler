@@ -7,3 +7,8 @@ export const loadInvoices = () => {
   invoices.set(data.invoices)
   // invoices.set([])
 }
+
+export const deleteInvoice = (invoice: Invoice) => {
+  invoices.update(prev => prev.filter(i => i.id !== invoice.id))
+  return invoice
+}

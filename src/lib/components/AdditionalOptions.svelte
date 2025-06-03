@@ -6,7 +6,7 @@
   type Props = {
     options: {
       label: string
-      Icon?: (...args: any[]) => Component
+      icon?: new (...args: any[]) => SvelteComponent
       disabled: boolean
       onclick: MouseEventHandler<HTMLButtonElement>
     }[]
@@ -25,8 +25,8 @@
           onclick={option.onclick}
         >
           <View />
-          {#if option.Icon}
-            <option.Icon />
+          {#if option.icon}
+            <option.icon />
           {/if}
           {option.label}
         </button>

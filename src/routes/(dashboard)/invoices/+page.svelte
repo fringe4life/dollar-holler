@@ -8,14 +8,18 @@
   import InvoiceRow from './InvoiceRow.svelte'
   import BlankState from './BlankState.svelte'
   import InvoiceRowHeader from './InvoiceRowHeader.svelte'
-  import Portal from '$lib/components/Portal.svelte'
-  import Modal from '$lib/components/Modal.svelte'
+
+  import ModalE from '$lib/components/ModalE.svelte'
+  import { Button } from '$lib/components/ui/button'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
+  import InvoiceForm from '$lib/components/invoiceForm.svelte'
 
   onMount(() => {
     loadInvoices()
   })
 
-  const amount = centsToDollars(sumInvoices($invoices))
+  // let open = $state(false)
+  let isInvoiceShowingPanel = $state(false)
 </script>
 
 <svelte:head>
@@ -31,11 +35,8 @@
     <div></div>
   {/if}
   <!-- new invoice button -->
-  <div>
-    <button
-      class="after:shadow-coloredHover shadow-colored bg-lavenderIndigo font-sansserif relative translate-y-0 rounded-lg px-10 py-3 text-xl font-black whitespace-nowrap text-white after:absolute after:inset-0 after:rounded-lg after:opacity-0 after:transition-opacity after:duration-200 hover:-translate-1 hover:after:opacity-100"
-      >+ Invoice</button
-    >
+  <div class="z-1">
+    <Button onclick={() => (isInvoiceShowingPanel = true)} size="lg">+ Invoice</Button>
   </div>
 </div>
 <div>
@@ -49,18 +50,22 @@
         <InvoiceRow {invoice} />
       {/each}
     </div>
-    <CircledAmount {amount} label="Total" />
+    <CircledAmount amount={centsToDollars(sumInvoices($invoices))} label="Total" />
   {:else}
     <BlankState />
   {/if}
 </div>
 
-<Modal {open} buttonText="Open sesmae">
+<SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
   {#snippet title()}
-    <h2>Modal title</h2>
+    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">Add an Invoice</h2>
   {/snippet}
 
   {#snippet description()}
-    <h2>Modal title</h2>
+    <h2 class="hidden">""</h2>
   {/snippet}
-</Modal>
+
+  {#snippet children()}
+    <InvoiceForm />
+  {/snippet}
+</SlidePanel>

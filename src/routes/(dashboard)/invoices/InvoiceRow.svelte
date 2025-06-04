@@ -78,11 +78,10 @@
     {#if isAdditionalMenuShowing}
       <AdditionalOptions
         options={[
-          // @ts-ignore
           { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
-          // @ts-ignore
+
           { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: false },
-          // @ts-ignore
+
           { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
         ]}
       />

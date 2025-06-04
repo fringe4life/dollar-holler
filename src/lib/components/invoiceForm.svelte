@@ -1,29 +1,46 @@
 <script lang="ts">
   import Trash from '$lib/icon/Trash.svelte'
+  import type { MouseEventHandler } from 'svelte/elements'
   import type { LineItem } from '../../global'
   import LineItemRows from '../../routes/(dashboard)/invoices/LineItemRows.svelte'
   import Button from './ui/button/button.svelte'
 
-  const blankLineItem: LineItem[] = [
+  const blankLineItem: Omit<LineItem, 'id'> = {
+    description: '',
+    amount: 0,
+    quantity: 0
+  }
+
+  let lineItems: LineItem[] = $state([
     {
-      id: '1',
+      id: crypto.randomUUID(),
       description: 'big job',
       amount: 30,
       quantity: 5
     },
     {
-      id: '2',
+      id: crypto.randomUUID(),
       description: 'little job',
       amount: 30000,
       quantity: 5
     },
     {
-      id: '3',
+      id: crypto.randomUUID(),
       description: 'just right job',
       amount: 300000,
       quantity: 50
     }
-  ]
+  ])
+
+  const addLineItem: MouseEventHandler<HTMLButtonElement> &
+    MouseEventHandler<HTMLAnchorElement> = () => {
+    lineItems = [...lineItems, { ...blankLineItem, id: crypto.randomUUID() }]
+  }
+
+  const removeLineItem = (id: string) => {
+    console.log(id)
+    lineItems = lineItems.filter(lineItem => lineItem.id !== id)
+  }
 </script>
 
 <form class="grid grid-cols-6 gap-x-5">
@@ -60,7 +77,7 @@
   </div>
   <!-- line items -->
   <div class="field col-span-6">
-    <LineItemRows lineItems={blankLineItem} />
+    <LineItemRows {lineItems} {addLineItem} {removeLineItem} />
   </div>
 
   <!-- notes -->

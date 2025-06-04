@@ -1,13 +1,16 @@
 <script lang="ts">
   import CircledAmount from '$lib/components/CircledAmount.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
+  import type { MouseEventHandler } from 'svelte/elements'
   import type { LineItem } from '../../../global'
   import LineItemRow from './LineItemRow.svelte'
 
   type Props = {
     lineItems: LineItem[] | undefined
+    addLineItem: MouseEventHandler<HTMLButtonElement> & MouseEventHandler<HTMLAnchorElement>
+    removeLineItem: (id: string) => void
   }
-  let { lineItems }: Props = $props()
+  let { lineItems, addLineItem, removeLineItem }: Props = $props()
 </script>
 
 <div class="border-daisyBush invoice-line-item border-b-2 pb-2">
@@ -20,13 +23,13 @@
 
 {#if lineItems}
   {#each lineItems as lineItem (lineItem.id)}
-    <LineItemRow {lineItem} />
+    <LineItemRow {lineItem} {removeLineItem} />
   {/each}
 {/if}
 
 <div class="invoice-line-item">
   <div class="col-span-2">
-    <Button variant="textOnly" onclick={() => {}}>+ Line Item</Button>
+    <Button variant="textOnly" onclick={addLineItem}>+ Line Item</Button>
   </div>
   <div class="text-monsoon py-5 text-right font-bold">Subtotal</div>
   <div class="py-5 text-right font-mono">$250.00</div>

@@ -1,12 +1,12 @@
 <script lang="ts">
   import View from '$lib/icon/View.svelte'
-  import type { Component, SvelteComponent } from 'svelte'
+  import type { Component } from 'svelte'
   import type { MouseEventHandler } from 'svelte/elements'
 
   type Props = {
     options: {
       label: string
-      icon?: new (...args: any[]) => SvelteComponent
+      icon?: Component<{ height?: number; width?: number }>
       disabled: boolean
       onclick: MouseEventHandler<HTMLButtonElement>
     }[]
@@ -27,6 +27,7 @@
           <View />
           {#if option.icon}
             <option.icon />
+            <!-- <svelte:element this={option.icon} /> -->
           {/if}
           {option.label}
         </button>

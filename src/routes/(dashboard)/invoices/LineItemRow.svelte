@@ -5,26 +5,62 @@
 
   type Props = {
     lineItem: LineItem
+    removeLineItem: (id: string) => void
   }
-  let { lineItem }: Props = $props()
+  let { lineItem = $bindable(), removeLineItem }: Props = $props()
+
+  let unitPrice = $derived((lineItem.amount / lineItem.quantity).toFixed(2))
+  let amount = $derived((lineItem.quantity * Number(unitPrice)).toFixed(2))
+  $effect(() => {
+    lineItem.amount = Number(amount)
+  })
+  $inspect(lineItem)
 </script>
 
 <div class="invoice-line-item border-fog border-b-2 pb-2">
   <div>
-    <input class="line-item" type="text" name="description" />
+    <input bind:value={lineItem.description} class="line-item" type="text" name="description" />
   </div>
 
   <div>
-    <input class="line-item text-right" type="number" name="unitPrice" step="0.01" min="0" />
+    <input
+      bind:value={unitPrice}
+      class="line-item text-right"
+      type="number"
+      name="unitPrice"
+      step="0.01"
+      min="0"
+      onblur={() => {
+        unitPrice = Number(unitPrice).toFixed(2)
+      }}
+    />
   </div>
   <div>
-    <input class="line-item text-center" type="number" name="quantity" min="0" />
+    <input
+      bind:value={lineItem.quantity}
+      class="line-item text-center"
+      type="number"
+      name="quantity"
+      min="0"
+    />
   </div>
   <div>
-    <input class="line-item text-right" type="number" name="amount" step="0.01" min="0" />
+    <input
+      bind:value={amount}
+      class="line-item text-right"
+      type="number"
+      name="amount"
+      step="0.01"
+      min="0"
+      disabled
+    />
   </div>
   <div class="place-self-center">
-    <Button variant="ghost" class="h-10 w-full text-center"><Trash /></Button>
+    <Button
+      onclick={() => removeLineItem(lineItem.id)}
+      variant="ghost"
+      class="h-10 w-full text-center"><Trash /></Button
+    >
   </div>
 </div>
 
@@ -45,5 +81,9 @@
   input[type='text']:focus,
   input[type='number']:focus {
     @apply border-lavenderIndigo border-solid outline-none;
+  }
+
+  input:is([type='number'], [type='text']):is(:disabled) {
+    @apply border-b-0 bg-transparent px-0;
   }
 </style>

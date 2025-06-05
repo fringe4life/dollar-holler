@@ -16,3 +16,5 @@ export const isLate = (myDate: string | undefined): boolean => {
 export const splitDate = (myDate: string): string[] => {
   return myDate.split('-')
 }
+
+export const today = new Date().toISOString().split('T')[0]

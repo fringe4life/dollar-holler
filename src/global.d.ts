@@ -1,35 +1,36 @@
-import type { BadgeVariant } from '$lib/components/ui/badge'
-
-interface Invoice {
+export interface Invoice {
   client: Client
   createdAt: string
-  dueDate?: string
-  invoiceStatus: BadgeVariant
-  issueDate: string
-  invoiceNumber: number
+  dueDate: string
   id: string
+  invoiceNumber: string
+  invoiceStatus: InvoiceStatus
+  issueDate: string
   lineItems?: LineItem[]
   notes?: string
   subject?: string
   terms?: string
+  discount?: number
 }
 
-interface Client {
-  city: string
-  clientStatus?: ClientStatus
-  email: string
-  id: string
-  name: string
-  street: string
-  state: string
-  zip: string
-}
+export type InvoiceStatus = 'draft' | 'sent' | 'paid'
 
-interface LineItem {
+export interface LineItem {
   amount: number
   description: string
   id: string
   quantity: number
 }
 
-type ClientStatus = 'active' | 'archived'
+export interface Client {
+  clientStatus?: ClientStatus
+  city: string
+  email: string
+  id: string
+  name: string
+  state: string
+  street: string
+  zip: string
+}
+
+export type ClientStatus = 'active' | 'archived'

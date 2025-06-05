@@ -9,7 +9,10 @@ export const sumLineItems = (lineItems: LineItem[] | undefined): number => {
   if (!lineItems) return 0
 
   return lineItems.reduce((acc, cur) => {
-    return (acc += cur.amount * cur.quantity)
+    if (Number.isNaN(cur.amount)) {
+      return acc
+    }
+    return (acc += cur.amount)
   }, 0)
 }
 /**
@@ -20,9 +23,8 @@ export const sumLineItems = (lineItems: LineItem[] | undefined): number => {
 export const centsToDollars = (cents: number): string => {
   return new Intl.NumberFormat('en', {
     style: 'currency',
-    currency: 'NZD'
-    // notation: 'standard'
-  }).format(cents / 100)
+    currency: 'USD'
+  }).format(cents)
 }
 
 /**

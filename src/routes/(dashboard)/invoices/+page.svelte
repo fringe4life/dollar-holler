@@ -9,7 +9,6 @@
   import BlankState from './BlankState.svelte'
   import InvoiceRowHeader from './InvoiceRowHeader.svelte'
 
-  import ModalE from '$lib/components/ModalE.svelte'
   import { Button } from '$lib/components/ui/button'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
@@ -17,8 +16,6 @@
   onMount(() => {
     loadInvoices()
   })
-
-  // let open = $state(false)
   let isInvoiceShowingPanel = $state(false)
 </script>
 
@@ -66,6 +63,10 @@
   {/snippet}
 
   {#snippet children()}
-    <InvoiceForm />
+    <InvoiceForm
+      invoiceEdit={undefined}
+      formState="create"
+      closePanel={() => (isInvoiceShowingPanel = false)}
+    />
   {/snippet}
 </SlidePanel>

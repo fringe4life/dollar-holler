@@ -4,20 +4,20 @@
   import ThreeDots from '$lib/icon/ThreeDots.svelte'
   import View from '$lib/icon/View.svelte'
   import { convertDate, isLate } from '$lib/utils/dateHelpers'
-
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
   import type { Invoice } from '../../../global'
   import Send from '$lib/icon/Send.svelte'
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'
-  import ModalE from '$lib/components/ModalE.svelte'
-  import Button from '$lib/components/ui/button/button.svelte'
-  import { deleteInvoice } from '$lib/stores/InvoiceStore'
+
+  import InvoiceForm from '$lib/components/invoiceForm.svelte'
+  import ConfirmDelete from './ConfirmDelete.svelte'
 
   let isAdditionalMenuShowing = $state(false)
   let isOptionsDisabled = $state(false)
-  const { invoice } = $props<{
+  let { invoice } = $props<{
     invoice: Invoice
   }>()
 
@@ -40,14 +40,18 @@
     }
   }
 
-  let open = $state(false)
+  let open = $state<boolean>(false)
+  let isInvoiceShowingPanel = $state<boolean>(false)
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true
     isAdditionalMenuShowing = false
   }
 
-  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {}
+  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
+    isInvoiceShowingPanel = true
+    isAdditionalMenuShowing = false
+  }
 
   const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {}
 
@@ -69,6 +73,7 @@
   <div
     class="hover:text-daisyBush viewbutton text-pastelPurple place-self-cen text-smter hidden transition-colors duration-200 lg:block lg:text-lg"
   >
+    <!-- svelte-ignore a11y_invalid_attribute -->
     <a href="#" class="flex items-center justify-center"><View /></a>
   </div>
   <div
@@ -93,33 +98,25 @@
   <Badge class="ml-auto lg:ml-0" variant={title}>{title}</Badge>
 {/snippet}
 
-<ModalE bind:open buttonText="">
+<ConfirmDelete bind:open {invoice} />
+
+<SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
   {#snippet title()}
-    <h2 class="text-daisyBush text-center text-xl font-bold">
-      Are you sure you want to delete this invoice?
-    </h2>
+    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">Edit an Invoice</h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="text-daisyBush text-center text-lg font-medium">
-      This will delete the invoice to <span class="text-scarlet">{client.name}</span> for
-      <span class="text-scarlet">{centsToDollars(sumLineItems(lineItems))}?</span>
-    </h2>
+    <h2 class="hidden">""</h2>
   {/snippet}
 
   {#snippet children()}
-    <div class="flex justify-center gap-4">
-      <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
-      <Button
-        variant="destructive"
-        onclick={() => {
-          open = false
-          deleteInvoice(invoice)
-        }}>Yes, Delete It.</Button
-      >
-    </div>
+    <InvoiceForm
+      formState="edit"
+      bind:invoiceEdit={invoice}
+      closePanel={() => (isInvoiceShowingPanel = false)}
+    />
   {/snippet}
-</ModalE>
+</SlidePanel>
 
 <style>
   .invoice-row {

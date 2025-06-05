@@ -1,9 +1,9 @@
-// import type { Invoice } from '../../global'
-// import data from '../../seed.json'
-// export default class Invoices {
-//   invoices = $state<Invoice[]>([])
+import type { Invoice } from '../../global'
+import data from '../../seed.json'
+export default class Invoices {
+  invoices = $state<Invoice[]>([])
 
-//   loadInvoices() {
-//     this.invoices = data.invoices
-//   }
-// }
+  loadInvoices() {
+    this.invoices = data.invoices
+  }
+}

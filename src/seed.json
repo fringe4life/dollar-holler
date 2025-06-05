@@ -1,4 +1,33 @@
 {
+  "clients": [
+    {
+      "street": "123 Street",
+      "city": "Somewhereville",
+      "email": "compressed@example.com",
+      "id": "1",
+      "name": "Compressed.fm",
+      "state": "TN",
+      "zip": "12345"
+    },
+    {
+      "street": "456 Drive",
+      "city": "Nowhere",
+      "email": "everythingsvelte@test.com",
+      "id": "2",
+      "name": "Everything Svelte",
+      "state": "TN",
+      "zip": "67890"
+    },
+    {
+      "street": "789 Boulevard",
+      "city": "Anywhere",
+      "email": "zeal@test.com",
+      "id": "3",
+      "name": "ZEAL",
+      "state": "TN",
+      "zip": "87654"
+    }
+  ],
   "invoices": [
     {
       "client": {
@@ -46,8 +75,8 @@
         "street": "123 Main Street",
         "zip": "12345"
       },
-      "createdAt": "2025-07-01",
-      "dueDate": "2025-07-06",
+      "createdAt": "2022-07-01",
+      "dueDate": "2022-07-06",
       "id": "2",
       "invoiceNumber": "12352",
       "invoiceStatus": "draft",
@@ -80,7 +109,7 @@
       },
       "createdAt": "2022-07-01",
       "dueDate": "2022-10-06",
-      "id": "50",
+      "id": "6",
       "invoiceNumber": "12346",
       "invoiceStatus": "paid",
       "issueDate": "2022-07-01",
@@ -111,7 +140,7 @@
         "zip": "56789"
       },
       "createdAt": "2022-07-01",
-      "dueDate": "2022-6-06",
+      "dueDate": "2022-06-06",
       "id": "7",
       "invoiceNumber": "12347",
       "invoiceStatus": "sent",
@@ -137,7 +166,7 @@
         "zip": "56789"
       },
       "createdAt": "2022-07-06",
-      "dueDate": "2024-10-06",
+      "dueDate": "2022-10-06",
       "id": "5",
       "invoiceNumber": "12348",
       "invoiceStatus": "sent",

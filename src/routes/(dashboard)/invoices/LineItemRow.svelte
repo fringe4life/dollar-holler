@@ -6,8 +6,10 @@
   type Props = {
     lineItem: LineItem
     removeLineItem: (id: string) => void
+    canDelete: boolean
+    isRequired: boolean
   }
-  let { lineItem = $bindable(), removeLineItem }: Props = $props()
+  let { isRequired, lineItem = $bindable(), removeLineItem, canDelete }: Props = $props()
 
   let unitPrice = $derived((lineItem.amount / lineItem.quantity).toFixed(2))
   let amount = $derived((lineItem.quantity * Number(unitPrice)).toFixed(2))
@@ -19,7 +21,13 @@
 
 <div class="invoice-line-item border-fog border-b-2 pb-2">
   <div>
-    <input bind:value={lineItem.description} class="line-item" type="text" name="description" />
+    <input
+      bind:value={lineItem.description}
+      class="line-item"
+      type="text"
+      name="description"
+      required={isRequired}
+    />
   </div>
 
   <div>
@@ -33,6 +41,7 @@
       onblur={() => {
         unitPrice = Number(unitPrice).toFixed(2)
       }}
+      required={isRequired}
     />
   </div>
   <div>
@@ -42,6 +51,7 @@
       type="number"
       name="quantity"
       min="0"
+      required={isRequired}
     />
   </div>
   <div>
@@ -56,11 +66,13 @@
     />
   </div>
   <div class="place-self-center">
-    <Button
-      onclick={() => removeLineItem(lineItem.id)}
-      variant="ghost"
-      class="h-10 w-full text-center"><Trash /></Button
-    >
+    {#if canDelete}
+      <Button
+        onclick={() => removeLineItem(lineItem.id)}
+        variant="ghost"
+        class="h-10 w-full text-center"><Trash /></Button
+      >
+    {/if}
   </div>
 </div>
 

@@ -65,7 +65,7 @@
   input[type='date'],
   input[type='password'],
   input[type='email'] {
-    @apply border-silver font-sansserif h-14 w-full rounded-lg border-2 px-4 text-base;
+    @apply border-silver font-sansserif h-10 w-full rounded-lg border-2 px-4 text-base lg:h-14;
   }
 
   textarea {
@@ -73,7 +73,7 @@
   }
 
   select {
-    @apply border-silver h-14 w-full appearance-none rounded-lg border-2 bg-[url('/images/chevron-down.svg')] bg-[97%_center] bg-no-repeat p-4;
+    @apply border-silver h-10 w-full appearance-none rounded-lg border-2 bg-[url('/images/chevron-down.svg')] bg-[97%_center] bg-no-repeat px-4 lg:h-14 lg:p-4;
   }
 
   input[type='text']:not(.search, .line-item):focus-visible,
@@ -99,7 +99,7 @@
 
 @layer components {
   .invoice-table {
-    @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[100px_100px_60px_1fr_18ch_32px_32px] lg:px-6;
+    @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[100px_100px_60px_1fr_116px_32px_32px] lg:px-6;
   }
 
   .field {
@@ -107,7 +107,36 @@
   }
 
   .invoice-line-item {
-    @apply grid grid-cols-[1fr_100px_100px_100px_60px] gap-x-5;
+    @apply relative grid gap-x-2 sm:grid-cols-[1fr_100px_100px_100px_65px] md:gap-x-5;
+    grid-template-areas:
+      'description description description'
+      'unitPrice   quantity    amount';
+
+    @media screen and (width > 640px) {
+      grid-template-areas: 'description unitPrice quantity amount trash';
+    }
+
+    .description {
+      grid-area: description;
+    }
+    .quantity {
+      grid-area: quantity;
+    }
+    .unitPrice {
+      grid-area: unitPrice;
+    }
+    .amount {
+      grid-area: amount;
+    }
+
+    .trash {
+      grid-area: trash;
+      @apply absolute top-0 right-0 sm:static;
+    }
+
+    .field {
+      @apply mb-6;
+    }
   }
 }
 

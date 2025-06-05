@@ -45,3 +45,17 @@ export const sumInvoices = (invoices: Invoice[] | undefined): number => {
 export const dollarsToCents = (dollars: number): number => {
   return dollars * 100
 }
+
+/**
+ * @abstract provides a displayable version of the total cost of the invoice
+ * @param {Invoice} invoice the invoice to get the total for
+ * @returns {string} a human friendly string to display to the user of the total
+ */
+export const getTotal = (invoice: Invoice): string => {
+  const sum = sumLineItems(invoice.lineItems)
+  const discount = invoice.discount ? sum * (invoice.discount / 100) : 0
+  const final = sum - discount
+  if (isNaN(final)) return '$0.00'
+  console.log({ final })
+  return centsToDollars(final)
+}

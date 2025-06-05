@@ -8,11 +8,12 @@
   type Props = {
     open: boolean
     invoice: Invoice
+    className: string
   }
-  let { invoice, open = $bindable() }: Props = $props()
+  let { invoice, open = $bindable(), className }: Props = $props()
 </script>
 
-<ModalE bind:open buttonText="">
+<ModalE bind:open buttonText="" className="z-450">
   {#snippet title()}
     <h2 class="text-daisyBush text-center text-xl font-bold">
       Are you sure you want to delete this invoice?

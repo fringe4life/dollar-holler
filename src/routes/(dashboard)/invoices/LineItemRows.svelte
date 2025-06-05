@@ -50,7 +50,7 @@
 {/if}
 
 <div class="invoice-line-item">
-  <div class="col-span-2">
+  <div class="col-span-1 sm:col-span-2">
     <Button variant="textOnly" onclick={addLineItem}>+ Line Item</Button>
   </div>
   <div class="text-monsoon py-5 text-right font-bold">Subtotal</div>
@@ -58,7 +58,7 @@
 </div>
 
 <div class="invoice-line-item">
-  <div class="text-monsoon col-span-2 py-5 text-right font-bold">Discount</div>
+  <p class="text-monsoon col-span-1 py-5 text-right font-bold sm:col-span-2">Discount</p>
   <div class="relative">
     <input
       class="line-item focus:border-lavenderIndigo h-10 w-full border-b-2 border-dashed border-b-stone-300 pr-3 text-right focus:border-solid focus:outline-none"
@@ -74,7 +74,7 @@
 </div>
 
 <div class="invoice-line-item">
-  <div class="col-span-6">
+  <div class="col-span-3 sm:col-span-6">
     <CircledAmount amount={total} label="Total." />
   </div>
 </div>
@@ -82,6 +82,6 @@
 <style>
   @reference "../../../app.css";
   .table-header {
-    @apply text-daisyBush text-sm font-bold;
+    @apply text-daisyBush hidden text-sm font-bold sm:block;
   }
 </style>

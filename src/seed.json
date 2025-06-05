@@ -35,11 +35,13 @@
         "clientStatus": "active",
         "email": "compressed@example.com",
         "id": "1",
+
         "name": "Compressed.fm",
         "state": "TN",
         "street": "123 Main Street",
         "zip": "12345"
       },
+      "discount": 10,
       "createdAt": "2022-07-01",
       "dueDate": "2022-07-31",
       "id": "1",

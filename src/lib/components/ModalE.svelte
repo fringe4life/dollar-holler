@@ -10,6 +10,7 @@
     description: Snippet
     contentProps?: WithoutChild<Dialog.ContentProps>
     // ...other component props if you wish to pass them
+    className?: string
   }
 
   let {
@@ -19,6 +20,7 @@
     contentProps,
     title,
     description,
+    className = '',
     ...restProps
   }: Props = $props()
 </script>
@@ -44,10 +46,10 @@
   </Dialog.Trigger> -->
   <Dialog.Portal>
     <Dialog.Overlay
-      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-blueGem/60 fixed inset-0 z-50"
+      class={`data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-blueGem/60 fixed inset-0 ${className ? className : 'z-50'}`}
     />
     <Dialog.Content
-      class="rounded-card-lg bg-background shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid min-h-57.5 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] content-between items-center border px-10 py-7 outline-hidden sm:max-w-122.5  md:w-full"
+      class="rounded-card-lg bg-background shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-500 grid min-h-57.5 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] content-between items-center border px-10 py-7 outline-hidden sm:max-w-122.5  md:w-full"
       {...contentProps}
     >
       <Dialog.Title>

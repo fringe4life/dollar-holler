@@ -16,6 +16,8 @@
   onMount(() => {
     loadInvoices()
   })
+
+  $inspect(invoices)
   let isInvoiceShowingPanel = $state(false)
 </script>
 
@@ -55,7 +57,9 @@
 
 <SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
   {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">Add an Invoice</h2>
+    <h2 class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0">
+      Add an Invoice
+    </h2>
   {/snippet}
 
   {#snippet description()}

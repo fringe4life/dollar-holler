@@ -2,23 +2,34 @@
   import { type VariantProps, tv } from 'tailwind-variants'
 
   export const badgeVariants = tv({
-    base: 'px-3 py-1 whitespace-nowrap capitalize rounded-full font-bold text-center text-md w-20 border focus-visible:border-ring focus-visible:ring-ring/50 ',
+    base: ' whitespace-nowrap capitalize rounded-full font-bold text-center text-md w-20 border focus-visible:border-ring focus-visible:ring-ring/50 ',
     variants: {
       variant: {
         sent: 'text-blueGem bg-robinEggBlue border-robinEggBlue ',
-        // current: 'text-blueGem bg-robinEggBlue border-robinEggBlue ',
         draft: 'text-pastelPurple border-pastelPurple ',
         late: 'border-scarlet bg-scarlet text-goldenFizz focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white',
         paid: 'border-pastelPurple bg-pastelPurple text-white'
-        // archive: 'border-pastelPurple bg-pastelPurple text-white'
+      },
+      size: {
+        default: 'px-3 py-1',
+        small: 'px-2 '
       }
     },
     defaultVariants: {
-      variant: 'draft'
+      variant: 'draft',
+
+      size: 'small'
     }
   })
 
   export type BadgeVariant = VariantProps<typeof badgeVariants>['variant']
+  export type BadgeSize = VariantProps<typeof badgeVariants>['size']
+
+  export type BadgeProps = WithElementRef<HTMLAnchorAttributes> &
+    WithElementRef<HTMLAnchorAttributes> & {
+      variant?: BadgeVariant
+      size?: BadgeSize
+    }
 </script>
 
 <script lang="ts">
@@ -30,11 +41,11 @@
     href,
     class: className,
     variant = 'draft',
+    size = 'small',
+
     children,
     ...restProps
-  }: WithElementRef<HTMLAnchorAttributes> & {
-    variant?: BadgeVariant
-  } = $props()
+  }: BadgeProps = $props()
 </script>
 
 <svelte:element

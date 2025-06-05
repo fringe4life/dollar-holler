@@ -31,13 +31,13 @@
   {#if isNavShowing}
     <Close width={32} height={32} />
   {:else}
-    <Hamburger />
+    <Hamburger width={32} height={32} />
   {/if}
 </button>
 
 <header
   class={{
-    '  bg-daisyBush  fixed inset-0 -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0': true,
+    '  bg-daisyBush  fixed inset-0 -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0 w-full ': true,
     'translate-x-0 ': isNavShowing
   }}
 >

@@ -106,12 +106,10 @@
     zip: ''
   })
 
-  let discount = $state<number>(0)
+  let discount = $derived<number>(invoice.discount || 0)
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
     e.preventDefault()
-    console.log({ invoice })
-    console.log({ newClient })
     if (isNewClient) {
       addClient(newClient as Client)
       invoice.client = newClient as Client
@@ -125,33 +123,36 @@
   }
 
   let open = $state<boolean>(false)
+
+  $effect(() => {
+    invoice.discount = discount
+  })
 </script>
 
-<form class="grid grid-cols-6 gap-x-5" onsubmit={handleSubmit}>
+<form class="grid grid-cols-6 gap-x-2 md:gap-x-5" onsubmit={handleSubmit}>
   <!-- client -->
 
-  <div class="field col-span-4">
+  <div class="field col-span-6 md:col-span-4">
     {#if !isNewClient}
       <label for="client">Client</label>
-      <div class="flex items-end gap-x-5">
+      <div class="flex flex-wrap items-end gap-x-2 sm:flex-nowrap md:gap-x-5">
         <select
+          id="client"
           onchange={() => {
             const selectedClient = $clients.find(client => client.id === invoice.client.id)
-            if (!selectedClient) {
-              invoice.client.name = ''
-            } else {
-              invoice.client.name = selectedClient.name
-            }
+            console.log({ selectedClient })
+            invoice.client.name = selectedClient?.name === undefined ? '' : selectedClient.name
           }}
           name="client"
           required={!isNewClient}
           bind:value={invoice.client.id}
+          class="mb-2 sm:mb-0"
         >
           {#each $clients as { id, name } (id)}
             <option value={id}>{name}</option>
           {/each}
         </select>
-        <p class="text-monsoon text-base leading-14 font-bold">or</p>
+        <p class="text-monsoon text-base leading-9 font-bold lg:leading-14">or</p>
         <Button
           variant="outline"
           onclick={() => {
@@ -163,10 +164,17 @@
       </div>
     {:else}
       <label for="newClient">New Client</label>
-      <div class="flex items-end gap-x-5">
-        <input bind:value={newClient.name} type="text" name="newClient" required={isNewClient} />
+      <div class="flex flex-wrap items-end gap-x-2 sm:flex-nowrap md:gap-x-5">
+        <input
+          class="mb-2 sm:mb-0"
+          bind:value={newClient.name}
+          type="text"
+          name="newClient"
+          required={isNewClient}
+        />
         <Button
           variant="outline"
+          size="sm"
           onclick={() => {
             isNewClient = false
             newClient = {}
@@ -177,7 +185,7 @@
   </div>
 
   <!-- invoiceid -->
-  <div class="field col-span-2">
+  <div class="field -order-1 col-span-6 self-end sm:order-0 sm:col-span-2">
     <label for="invoiceNumber">InvoiceNumber</label>
     <input type="number" name="invoiceNumber" required bind:value={invoice.invoiceNumber} />
   </div>
@@ -222,13 +230,13 @@
   {/if}
 
   <!-- duedate -->
-  <div class="field col-span-2">
-    <label for="dueDate"></label>
+  <div class="field col-span-3 sm:col-span-2">
+    <label for="dueDate">Due Date</label>
     <input required type="date" name="dueDate" min={today} bind:value={invoice.dueDate} />
   </div>
   <!-- issue date -->
-  <div class="field col-span-2 col-start-5">
-    <label for="issueDate"></label>
+  <div class="field col-span-3 sm:col-span-2 md:col-start-5">
+    <label for="issueDate">Issue Date</label>
     <input type="date" name="issueDate" min={today} bind:value={invoice.issueDate} />
   </div>
   <!-- subject -->
@@ -260,7 +268,7 @@
   <div class="field col-span-2">
     <!-- delete button only visible if editing -->
     {#if formState === 'edit'}
-      <Button variant="textOnlyDestructive"><Trash />Delete</Button>
+      <Button variant="textOnlyDestructive" onclick={() => (open = true)}><Trash />Delete</Button>
     {/if}
   </div>
   <div class="field col-span-4 flex justify-end gap-x-5">
@@ -273,4 +281,4 @@
   <option {value}>{name}</option>
 {/snippet}
 
-<ConfirmDelete {invoice} bind:open />
+<ConfirmDelete className="" {invoice} bind:open />

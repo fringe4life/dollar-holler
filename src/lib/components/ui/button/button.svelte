@@ -13,7 +13,7 @@
           'bg-scarlet shadow-xs hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60 text-goldenFizz',
         ghost: '  shadow-xs  text-pastelPurple hover:text-blueGem  ',
         outline:
-          'border-daisyBush border-2 h-14 text-daisyBush hover:bg-daisyBush hover:text-white transition-colors duration-200',
+          'border-daisyBush border-2  text-daisyBush hover:bg-daisyBush hover:text-white transition-colors duration-200',
         textOnlyDestructive: 'bg-transparent px-0 text-scarlet underline hover:no-underline',
         textOnly: 'bg-transparent text-lavenderIndigo no-underline hover:underline',
         secondary:
@@ -22,7 +22,7 @@
       },
       size: {
         default: ' px-5 py-2  has-[>svg]:px-3',
-        sm: 'h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5',
+        sm: 'h-9 lg:h-14 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5',
         lg: 'px-10 py-3 has-[>svg]:px-4',
         icon: 'size-5'
       }

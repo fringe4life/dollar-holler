@@ -19,18 +19,21 @@
   $inspect(lineItem)
 </script>
 
-<div class="invoice-line-item border-fog border-b-2 pb-2">
-  <div>
+<div class="invoice-line-item border-fog border-b-2 py-4 sm:py-2">
+  <div class="description">
+    <label for="description" class="line-item-lable">Description</label>
     <input
       bind:value={lineItem.description}
       class="line-item"
       type="text"
       name="description"
+      id="description"
       required={isRequired}
     />
   </div>
 
-  <div>
+  <div class="unitPrice">
+    <label for="unitPrice" class="line-item-lable text-right">Unit Price</label>
     <input
       bind:value={unitPrice}
       class="line-item text-right"
@@ -44,7 +47,8 @@
       required={isRequired}
     />
   </div>
-  <div>
+  <div class="quantity">
+    <label for="quantity" class="line-item-lable text-center">Qty</label>
     <input
       bind:value={lineItem.quantity}
       class="line-item text-center"
@@ -54,7 +58,8 @@
       required={isRequired}
     />
   </div>
-  <div>
+  <div class="amount">
+    <label for="amount" class="line-item-lable text-right">Amount</label>
     <input
       bind:value={amount}
       class="line-item text-right"
@@ -65,7 +70,7 @@
       disabled
     />
   </div>
-  <div class="place-self-center">
+  <div class="trash place-self-center">
     {#if canDelete}
       <Button
         onclick={() => removeLineItem(lineItem.id)}
@@ -97,5 +102,9 @@
 
   input:is([type='number'], [type='text']):is(:disabled) {
     @apply border-b-0 bg-transparent px-0;
+  }
+
+  .line-item-label {
+    @apply block sm:hidden;
   }
 </style>

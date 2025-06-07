@@ -24,7 +24,8 @@
         default: ' px-5 py-2  has-[>svg]:px-3',
         sm: 'h-9 lg:h-14 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5',
         lg: 'px-10 py-3 has-[>svg]:px-4',
-        icon: 'size-5'
+        icon: 'size-5',
+        short: 'py-1 px-4'
       }
     },
     defaultVariants: {

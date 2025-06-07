@@ -30,7 +30,7 @@
   --color-prim: oklch(86.75% 0.022 318.96);
   --color-gray-400: oklch(0.704 0.04 256.788);
   --color-stone-300: oklch(86.9% 0.005 56.366);
-
+  --color-stone-600: oklch(44.4% 0.011 73.639);
   --shadow-tableRow: 0 0 6px oklch(0% 0 none / 0.16);
   --shadow-colored: 0 7px 16px oklch(57.4% 0.189 292 / 0.02);
   --shadow-coloredHover: 0 7px 16px oklch(57.4% 0.189 292 / 0.3);
@@ -39,6 +39,9 @@
 }
 
 @layer base {
+  button {
+    @apply cursor-pointer;
+  }
   body {
     @apply font-sansserif;
   }
@@ -99,7 +102,7 @@
 
 @layer components {
   .invoice-table {
-    @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[100px_100px_60px_1fr_116px_32px_32px] lg:px-6;
+    @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[min-content_100px_60px_.5fr_auto_32px_32px] lg:px-6;
   }
 
   .field {
@@ -137,6 +140,14 @@
     .field {
       @apply mb-6;
     }
+
+    @media print {
+      grid-template-areas: 'description unitPrice quantity amount trash';
+    }
+  }
+
+  .client-table {
+    @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[100px_1fr_125px_125px_32px_32px] lg:px-6;
   }
 }
 

@@ -33,3 +33,7 @@ export const updateInvoice = (invoiceToUpdate: Invoice) => {
   console.log({ invoiceToUpdate })
   return invoiceToUpdate
 }
+
+export const getInvoiceById = (id: string): Invoice | undefined => {
+  return data.invoices.find(invoice => invoice.id === id) as Invoice | undefined
+}

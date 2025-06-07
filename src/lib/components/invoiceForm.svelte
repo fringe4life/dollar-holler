@@ -11,6 +11,7 @@
   import { today } from '$lib/utils/dateHelpers'
   import { addInvoice, updateInvoice } from '$lib/stores/InvoiceStore'
   import ConfirmDelete from '../../routes/(dashboard)/invoices/ConfirmDelete.svelte'
+  import { toast } from 'svelte-sonner'
 
   type Panel = {
     closePanel: () => void
@@ -116,8 +117,10 @@
     }
     if (formState === 'create') {
       addInvoice(invoice)
+      toast.success('Your invoice was successfully created.')
     } else {
       updateInvoice(invoice)
+      toast.success('Your invoice was successfully updated.')
     }
     closePanel()
   }
@@ -281,4 +284,4 @@
   <option {value}>{name}</option>
 {/snippet}
 
-<ConfirmDelete className="" {invoice} bind:open />
+<ConfirmDelete {invoice} bind:open />

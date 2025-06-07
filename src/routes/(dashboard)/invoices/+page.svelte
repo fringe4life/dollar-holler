@@ -38,6 +38,7 @@
     <Button onclick={() => (isInvoiceShowingPanel = true)} size="lg">+ Invoice</Button>
   </div>
 </div>
+<!-- list of invoices -->
 <div>
   <!-- invoices -->
   {#if !$invoices}

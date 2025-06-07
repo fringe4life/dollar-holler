@@ -55,7 +55,7 @@
 
   const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {}
 
-  const { invoiceStatus, dueDate, invoiceNumber, client, lineItems } = invoice
+  const { id, invoiceStatus, dueDate, invoiceNumber, client, lineItems } = invoice
 
   const label = getLabel(invoiceStatus, dueDate)
 </script>
@@ -63,7 +63,7 @@
 <div
   class="invoice-table invoice-row shadow-tableRow items-center justify-between rounded-lg bg-white py-3 lg:py-6"
 >
-  <div class="status justify-self-end">{@render tag(label)}</div>
+  <div class="status">{@render tag(label)}</div>
   <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>
   <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
   <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
@@ -73,8 +73,7 @@
   <div
     class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
   >
-    <!-- svelte-ignore a11y_invalid_attribute -->
-    <a href="#" class=""><View /></a>
+    <a href={`/invoices/${id}`} class=""><View /></a>
   </div>
   <div
     class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
@@ -98,7 +97,7 @@
   <Badge class="ml-auto lg:ml-0" variant={title} size="small">{title}</Badge>
 {/snippet}
 
-<ConfirmDelete className="" bind:open {invoice} />
+<ConfirmDelete bind:open {invoice} />
 
 <SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
   {#snippet title()}

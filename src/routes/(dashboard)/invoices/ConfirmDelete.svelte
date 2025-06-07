@@ -3,14 +3,14 @@
   import { Button } from '$lib/components/ui/button'
   import { deleteInvoice } from '$lib/stores/InvoiceStore'
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
+  import { toast } from 'svelte-sonner'
   import type { Invoice } from '../../../global'
 
   type Props = {
     open: boolean
     invoice: Invoice
-    className: string
   }
-  let { invoice, open = $bindable(), className }: Props = $props()
+  let { invoice, open = $bindable() }: Props = $props()
 </script>
 
 <ModalE bind:open buttonText="" className="z-450">
@@ -35,6 +35,7 @@
         onclick={() => {
           open = false
           deleteInvoice(invoice)
+          toast.success('Invoice successfully deleted')
         }}>Yes, Delete It.</Button
       >
     </div>

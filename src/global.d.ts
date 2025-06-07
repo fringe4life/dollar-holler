@@ -13,6 +13,15 @@ export interface Invoice {
   discount?: number
 }
 
+export interface Settings {
+  myName: string
+  email: string
+  street: string
+  city: string
+  state: string
+  zip: string
+}
+
 export type InvoiceStatus = 'draft' | 'sent' | 'paid'
 
 export interface LineItem {
@@ -31,6 +40,7 @@ export interface Client {
   state: string
   street: string
   zip: string
+  invoices?: Invoice[]
 }
 
-export type ClientStatus = 'active' | 'archived'
+export type ClientStatus = 'active' | 'archive'

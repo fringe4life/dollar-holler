@@ -8,8 +8,15 @@
     removeLineItem: (id: string) => void
     canDelete: boolean
     isRequired: boolean
+    isEditible: boolean
   }
-  let { isRequired, lineItem = $bindable(), removeLineItem, canDelete }: Props = $props()
+  let {
+    isEditible = true,
+    isRequired,
+    lineItem = $bindable(),
+    removeLineItem,
+    canDelete
+  }: Props = $props()
 
   let unitPrice = $derived((lineItem.amount / lineItem.quantity).toFixed(2))
   let amount = $derived((lineItem.quantity * Number(unitPrice)).toFixed(2))
@@ -21,7 +28,7 @@
 
 <div class="invoice-line-item border-fog border-b-2 py-4 sm:py-2">
   <div class="description">
-    <label for="description" class="line-item-lable">Description</label>
+    <label for="description" class="line-item-label">Description</label>
     <input
       bind:value={lineItem.description}
       class="line-item"
@@ -29,11 +36,12 @@
       name="description"
       id="description"
       required={isRequired}
+      disabled={!isEditible}
     />
   </div>
 
   <div class="unitPrice">
-    <label for="unitPrice" class="line-item-lable text-right">Unit Price</label>
+    <label for="unitPrice" class="line-item-label text-right">Unit Price</label>
     <input
       bind:value={unitPrice}
       class="line-item text-right"
@@ -45,10 +53,11 @@
         unitPrice = Number(unitPrice).toFixed(2)
       }}
       required={isRequired}
+      disabled={!isEditible}
     />
   </div>
   <div class="quantity">
-    <label for="quantity" class="line-item-lable text-center">Qty</label>
+    <label for="quantity" class="line-item-label text-center">Qty</label>
     <input
       bind:value={lineItem.quantity}
       class="line-item text-center"
@@ -56,10 +65,11 @@
       name="quantity"
       min="0"
       required={isRequired}
+      disabled={!isEditible}
     />
   </div>
   <div class="amount">
-    <label for="amount" class="line-item-lable text-right">Amount</label>
+    <label for="amount" class="line-item-label text-right">Amount</label>
     <input
       bind:value={amount}
       class="line-item text-right"
@@ -71,7 +81,7 @@
     />
   </div>
   <div class="trash place-self-center">
-    {#if canDelete}
+    {#if canDelete && isEditible}
       <Button
         onclick={() => removeLineItem(lineItem.id)}
         variant="ghost"
@@ -105,6 +115,6 @@
   }
 
   .line-item-label {
-    @apply block sm:hidden;
+    @apply block sm:hidden print:hidden;
   }
 </style>

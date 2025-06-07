@@ -16,7 +16,7 @@
   "devDependencies": {
     "@eslint/compat": "^1.2.9",
     "@eslint/js": "^9.28.0",
-    "@internationalized/date": "^3.8.1",
+    "@internationalized/date": "^3.8.2",
     "@lucide/svelte": "^0.511.0",
     "@sveltejs/adapter-auto": "^6.0.1",
     "@sveltejs/kit": "^2.21.2",
@@ -32,7 +32,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.4.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
-    "svelte": "^5.33.14",
+    "svelte": "^5.33.15",
     "svelte-check": "^4.2.1",
     "svelte-sonner": "^1.0.4",
     "tailwind-merge": "^3.3.0",
@@ -51,5 +51,8 @@
   },
   "trustedDependencies": [
     "@tailwindcss/oxide"
-  ]
+  ],
+  "dependencies": {
+    "svelte-markdown": "^0.4.1"
+  }
 }

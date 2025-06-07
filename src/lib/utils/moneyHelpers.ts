@@ -29,7 +29,7 @@ export const centsToDollars = (cents: number): string => {
 
 /**
  * @abstract returns the sum of the line items
- * @param {Invoice[]} invoices
+ * @param {Invoice[] | undefined} invoices
  * @returns {number} the sum of all the Invoices
  */
 export const sumInvoices = (invoices: Invoice[] | undefined): number => {

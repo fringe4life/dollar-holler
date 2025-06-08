@@ -7,8 +7,8 @@
   const navItems = [
     { href: '/invoices', title: 'Invoices' },
     { href: '/clients', title: 'Clients' },
-    { href: '#', title: 'Settings' },
-    { href: '#', title: 'Logout' }
+    { href: '/settings', title: 'Settings' },
+    { href: '/logout', title: 'Logout' }
   ]
   const path = $derived(page.url.pathname)
 
@@ -37,7 +37,7 @@
 
 <header
   class={{
-    '  bg-daisyBush  fixed inset-0 -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0 w-full ': true,
+    '  bg-daisyBush fixed inset-0 isolate z-2 w-full -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0 ': true,
     'translate-x-0 ': isNavShowing
   }}
 >

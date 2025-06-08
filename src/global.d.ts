@@ -43,4 +43,4 @@ export interface Client {
   invoices?: Invoice[]
 }
 
-export type ClientStatus = 'active' | 'archive'
+export type ClientStatus = 'active' | 'archive' | 'draft'

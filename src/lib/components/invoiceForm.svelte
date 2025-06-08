@@ -77,7 +77,6 @@
 
   if (formState === 'edit') {
     invoice = invoiceEdit as Invoice
-    console.log('hello')
   }
 
   const addLineItem: MouseEventHandler<HTMLButtonElement> &
@@ -143,7 +142,7 @@
           id="client"
           onchange={() => {
             const selectedClient = $clients.find(client => client.id === invoice.client.id)
-            console.log({ selectedClient })
+            
             invoice.client.name = selectedClient?.name === undefined ? '' : selectedClient.name
           }}
           name="client"

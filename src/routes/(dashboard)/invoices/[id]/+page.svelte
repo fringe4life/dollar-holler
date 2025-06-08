@@ -113,6 +113,7 @@
 
   <!-- line items div wrapper -->
   <div class="col-span-full">
+    // @ts-ignore
     <LineItemRows
       lineItems={invoice?.lineItems}
       isEditible={false}

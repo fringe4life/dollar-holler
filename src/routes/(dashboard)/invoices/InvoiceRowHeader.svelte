@@ -6,7 +6,7 @@
   let tableHeaders = ['Status', 'Due Date', 'ID', 'Client', 'Amount'] as const
 </script>
 
-<div class=" invoice-table hidden justify-between lg:grid">
+<div class=" invoice-table hidden lg:grid">
   {#each tableHeaders as header (header)}
     {@render tableHeader(header, emptyState)}
   {/each}

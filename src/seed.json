@@ -264,12 +264,12 @@
     },
     {
       "client": {
-        "city": "Anywhereville",
+        "city": "Anywhere",
         "email": "zeal@example.com",
         "id": "3",
         "name": "ZEAL",
         "state": "CA",
-        "street": "789 Common Drive",
+        "street": "789 Boulevard",
         "zip": "56789"
       },
       "createdAt": "2022-07-01",

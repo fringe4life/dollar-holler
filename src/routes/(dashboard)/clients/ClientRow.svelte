@@ -10,6 +10,9 @@
   import Trash from '$lib/icon/Trash.svelte'
   import type { MouseEventHandler } from 'svelte/elements'
   import type { Client } from '../../../global'
+  import { centsToDollars, getTotal, sumInvoices } from '$lib/utils/moneyHelpers'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
+  import ClientForm from './ClientForm.svelte'
 
   type Props = {
     client: Client
@@ -17,16 +20,20 @@
 
   let { client = $bindable() }: Props = $props()
 
-  $inspect(client)
+  let isFormShowing = $state<boolean>(false)
+  let open = $state<boolean>(false)
 
   let isAdditionalMenuShowing = $state(false)
   let isOptionsDisabled = $state(false)
-  function handleEdit(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-    throw new Error('Function not implemented.')
+
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
+    open = true
+    isAdditionalMenuShowing = false
   }
 
-  function handleDelete(event: MouseEvent & { currentTarget: EventTarget & HTMLButtonElement }) {
-    throw new Error('Function not implemented.')
+  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
+    isFormShowing = true
+    isAdditionalMenuShowing = false
   }
 
   const handleMenu: MouseEventHandler<HTMLButtonElement> = () => {
@@ -46,33 +53,44 @@
 
   const receivedInvoices = () => {
     // find invoices that have been paid
-    const paidInvoices = client?.invoices.filter(invoice => invoice.invoiceStatus === 'paid')
-
+    const paidInvoices = sumInvoices(
+      client?.invoices?.filter(invoice => invoice.invoiceStatus === 'paid')
+    )
+    return centsToDollars(paidInvoices)
     // get sum of those invoices
   }
 
-  const balanceInvoices = () => {}
+  const balanceInvoices = () => {
+    const paidInvoices = sumInvoices(
+      client?.invoices?.filter(invoice => invoice.invoiceStatus !== 'paid')
+    )
+    return centsToDollars(paidInvoices)
+    // get sum of those invoices
+  }
 </script>
 
 <!-- <svelte:window onclick={() => (isAdditionalMenuShowing = false)} /> -->
 
-<div class="client-table client-row shadow-tableRow rounded-lg bg-white py-3 lg:py-6">
+<div class="client-table client-row shadow-tableRow items-center rounded-lg bg-white py-3 lg:py-6">
   <div class="status">{@render tag(client.clientStatus as string)}</div>
   <div class="clientName truncate text-base font-bold whitespace-nowrap lg:text-xl">
     {client.name}
   </div>
-  <div class="received text-right font-mono text-sm font-bold lg:text-lg">$504.00</div>
-  <div class="text-scarlet balance text-right font-mono text-sm font-bold lg:text-lg">$240.00</div>
+  <div class="received text-right font-mono text-sm font-bold lg:text-lg">
+    {receivedInvoices()}
+  </div>
+  <div class="text-scarlet balance text-right font-mono text-sm font-bold lg:text-lg">
+    {balanceInvoices()}
+  </div>
   <div class="view relative hidden place-self-center lg:block">
-    <a
-      class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
-      href={'/node_modules'}><View /></a
+    <a class="text-pastelPurple hover:text-daisyBush transition-colors duration-200" href={`/clients/${client.id}`}
+      ><View /></a
     >
   </div>
-  <div class="relative hidden place-self-center lg:block">
+  <div class="relative hidden place-self-center lg:grid">
     <button
       onclick={handleMenu}
-      class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
+      class="text-pastelPurple hover:text-daisyBushtransition-colors duration-200"
       ><ThreeDots /></button
     >
     {#if isAdditionalMenuShowing}
@@ -102,6 +120,20 @@
 {#snippet tag(title: string)}
   <Badge class="ml-auto " variant="draft" size="small">{title}</Badge>
 {/snippet}
+
+<SlidePanel bind:open={isFormShowing} buttonText="">
+  {#snippet title()}
+    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">Edit an Invoice</h2>
+  {/snippet}
+
+  {#snippet description()}
+    <h2 class="hidden">""</h2>
+  {/snippet}
+
+  {#snippet children()}
+    <ClientForm formState="edit" bind:edit={client} closePanel={() => (isFormShowing = false)} />
+  {/snippet}
+</SlidePanel>
 
 <style>
   @reference "../../../app.css";

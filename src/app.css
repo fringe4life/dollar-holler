@@ -31,6 +31,7 @@
   --color-gray-400: oklch(0.704 0.04 256.788);
   --color-stone-300: oklch(86.9% 0.005 56.366);
   --color-stone-600: oklch(44.4% 0.011 73.639);
+  --color-lightGray: oklch(69.39% 0.034 309.79);
   --shadow-tableRow: 0 0 6px oklch(0% 0 none / 0.16);
   --shadow-colored: 0 7px 16px oklch(57.4% 0.189 292 / 0.02);
   --shadow-coloredHover: 0 7px 16px oklch(57.4% 0.189 292 / 0.3);
@@ -107,6 +108,10 @@
 
   .field {
     @apply mb-5;
+  }
+
+  .auth-heading {
+    @apply text-goldenFizz mb-4 text-4xl font-black;
   }
 
   .invoice-line-item {

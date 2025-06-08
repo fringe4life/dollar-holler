@@ -29,8 +29,6 @@ export const updateInvoice = (invoiceToUpdate: Invoice) => {
       return i
     })
   )
-  console.log({ invoices })
-  console.log({ invoiceToUpdate })
   return invoiceToUpdate
 }
 

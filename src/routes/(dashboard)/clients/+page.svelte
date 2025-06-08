@@ -5,9 +5,14 @@
   import ClientRow from './ClientRow.svelte'
   import ClientRowHeader from './ClientRowHeader.svelte'
   import { clients, loadClients } from '$lib/stores/clientStore'
+  import BlankState from './BlankState.svelte'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
+  import ClientForm from './ClientForm.svelte'
   onMount(() => {
     loadClients()
   })
+
+  let isFormVisible = $state<boolean>(false)
 </script>
 
 <svelte:head>
@@ -18,14 +23,19 @@
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  <!-- {#if $invoices.length > 0} -->
-  <Search />
-  <!-- {:else} 
+  {#if $clients.length > 0}
+    <Search />
+  {:else}
     <div></div>
-  {/if} -->
+  {/if}
   <!-- new invoice button -->
   <div class="z-1">
-    <Button onclick={() => {}} size="lg">+ Client</Button>
+    <Button
+      onclick={() => {
+        isFormVisible = true
+      }}
+      size="lg">+ Client</Button
+    >
   </div>
 </div>
 
@@ -35,15 +45,31 @@
   {#if !$clients}
     <p>Loading...</p>
   {:else if $clients.length === 0}
-    Blank state
+    <BlankState />
   {:else}
     <!-- client header row -->
     <ClientRowHeader />
     <!-- client rows -->
     <div class="flex flex-col-reverse">
-      {#each $clients as client (client.id)}
-        <ClientRow bind:client />
+      {#each $clients as client, index (client.id)}
+        <ClientRow bind:client={$clients[index]} />
       {/each}
     </div>
   {/if}
 </div>
+
+<SlidePanel bind:open={isFormVisible} buttonText="">
+  {#snippet title()}
+    <h2 class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0">
+      Add an Client
+    </h2>
+  {/snippet}
+
+  {#snippet description()}
+    <h2 class="hidden">""</h2>
+  {/snippet}
+
+  {#snippet children()}
+    <ClientForm edit={undefined} formState="create" closePanel={() => (isFormVisible = false)} />
+  {/snippet}
+</SlidePanel>

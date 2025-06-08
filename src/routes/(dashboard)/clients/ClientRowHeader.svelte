@@ -1,24 +1,32 @@
 <script lang="ts">
   type Props = {
     className?: string
+    emptyState?: boolean
   }
 
-  let { className = '' }: Props = $props()
+  const clientHeaders = ['Status', 'Client', 'Received', 'Balanced']
+
+  let { className = '', emptyState = false }: Props = $props()
 </script>
 
 <div class={`client-table hidden lg:grid ${className}`}>
-  <h3>Status</h3>
-  <h3>Client</h3>
-  <h3 class="text-right">Received</h3>
-  <h3 class="text-right">Balanced</h3>
+  {#each clientHeaders as client (client)}
+    {@render clientHeader(client, emptyState)}
+  {/each}
   <div></div>
   <div></div>
 </div>
 
-<style>
-  @reference "../../../app.css";
+{#snippet clientHeader(title: string, emptyState: boolean = false)}
+  <h3
+    class={{
+      'text-xl leading-snug font-black': true,
+      'text-right': title === 'Received' || title === 'Balanced',
 
-  h3 {
-    @apply text-daisyBush text-xl leading-snug font-black;
-  }
-</style>
+      'text-daisyBush': !emptyState,
+      'text-pastelPurple': emptyState
+    }}
+  >
+    {title}
+  </h3>
+{/snippet}

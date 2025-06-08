@@ -5,7 +5,7 @@
   import View from '$lib/icon/View.svelte'
   import { convertDate, isLate } from '$lib/utils/dateHelpers'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
-  import { getTotal } from '$lib/utils/moneyHelpers'
+  import { centsToDollars, getTotal } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
   import type { Invoice } from '../../../global'
   import Send from '$lib/icon/Send.svelte'
@@ -55,7 +55,7 @@
 
   const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {}
 
-  const { id, invoiceStatus, dueDate, invoiceNumber, client, lineItems } = invoice
+  const { id, invoiceStatus, dueDate, invoiceNumber, client } = invoice
 
   const label = getLabel(invoiceStatus, dueDate)
 </script>
@@ -68,7 +68,7 @@
   <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
   <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
   <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
-    {getTotal(invoice)}
+    {centsToDollars(getTotal(invoice))}
   </div>
   <div
     class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"

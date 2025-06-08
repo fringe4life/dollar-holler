@@ -24,7 +24,7 @@ export const centsToDollars = (cents: number): string => {
   return new Intl.NumberFormat('en', {
     style: 'currency',
     currency: 'USD'
-  }).format(cents)
+  }).format(cents / 100)
 }
 
 /**
@@ -34,7 +34,7 @@ export const centsToDollars = (cents: number): string => {
  */
 export const sumInvoices = (invoices: Invoice[] | undefined): number => {
   if (!invoices) return 0
-  return invoices.reduce((acc, cur) => (acc += sumLineItems(cur.lineItems)), 0)
+  return invoices.reduce((acc, cur) => (acc += getTotal(cur)), 0)
 }
 
 /**
@@ -51,11 +51,14 @@ export const dollarsToCents = (dollars: number): number => {
  * @param {Invoice} invoice the invoice to get the total for
  * @returns {string} a human friendly string to display to the user of the total
  */
-export const getTotal = (invoice: Invoice): string => {
+export const getTotal = (invoice: Invoice | undefined): number => {
+  if (!invoice) {
+    return 0
+  }
+
   const sum = sumLineItems(invoice.lineItems)
   const discount = invoice.discount ? sum * (invoice.discount / 100) : 0
   const final = sum - discount
-  if (isNaN(final)) return '$0.00'
-  console.log({ final })
-  return centsToDollars(final)
+  if (isNaN(final)) return 0
+  return final
 }

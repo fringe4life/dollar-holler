@@ -11,7 +11,6 @@
   import { today } from '$lib/utils/dateHelpers'
   import { addInvoice, updateInvoice } from '$lib/stores/InvoiceStore'
   import ConfirmDelete from '../../routes/(dashboard)/invoices/ConfirmDelete.svelte'
-  import { toast } from 'svelte-sonner'
 
   type Panel = {
     closePanel: () => void
@@ -41,38 +40,15 @@
     quantity: 0
   }
 
-  let invoice = $state<Invoice>({
+  let invoice = $state({
     client: {} as Client,
-    createdAt: '',
-    dueDate: '',
-    id: crypto.randomUUID(),
-    invoiceNumber: '',
-    invoiceStatus: 'draft',
-    issueDate: '',
-    subject: '',
-    terms: '',
-    notes: '',
 
     lineItems: [
       {
-        id: crypto.randomUUID(),
-        description: 'big job',
-        amount: 30,
-        quantity: 5
-      },
-      {
-        id: crypto.randomUUID(),
-        description: 'little job',
-        amount: 30000,
-        quantity: 5
-      },
-      {
-        id: crypto.randomUUID(),
-        description: 'just right job',
-        amount: 300000,
-        quantity: 50
+        ...blankLineItem,
+        id: crypto.randomUUID()
       }
-    ] satisfies LineItem[]
+    ] as LineItem[]
   }) as Invoice
 
   if (formState === 'edit') {
@@ -95,11 +71,10 @@
 
   let isNewClient = $state<boolean>(false)
 
-  let newClient: Partial<Client> = $state({
+  let newClient: Omit<Client, 'id'> = $state({
     clientStatus: 'active',
     city: '',
     email: '',
-    id: '',
     name: '',
     state: '',
     street: '',
@@ -108,18 +83,17 @@
 
   let discount = $derived<number>(invoice.discount || 0)
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
     if (isNewClient) {
-      addClient(newClient as Client)
       invoice.client = newClient as Client
+      const id = await addClient({ ...newClient })
+      invoice.client.id = id
     }
     if (formState === 'create') {
-      addInvoice(invoice)
-      toast.success('Your invoice was successfully created.')
+      await addInvoice({ ...invoice })
     } else {
-      updateInvoice(invoice)
-      toast.success('Your invoice was successfully updated.')
+      await updateInvoice({ ...invoice })
     }
     closePanel()
   }
@@ -142,7 +116,7 @@
           id="client"
           onchange={() => {
             const selectedClient = $clients.find(client => client.id === invoice.client.id)
-            
+
             invoice.client.name = selectedClient?.name === undefined ? '' : selectedClient.name
           }}
           name="client"
@@ -179,7 +153,7 @@
           size="sm"
           onclick={() => {
             isNewClient = false
-            newClient = {}
+            newClient = {} as Omit<Client, 'id'>
           }}>Existing Client</Button
         >
       </div>
@@ -207,7 +181,7 @@
 
       <div class="field col-span-6">
         <label for="street">Street</label>
-        <input bind:value={newClient.email} type="text" name="street" id="street" />
+        <input bind:value={newClient.street} type="text" name="street" id="street" />
       </div>
 
       <div class="field col-span-2">

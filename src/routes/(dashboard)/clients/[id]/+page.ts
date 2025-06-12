@@ -1,9 +1,10 @@
 import { getClientById } from '$lib/stores/clientStore'
 import { error } from '@sveltejs/kit'
 import type { PageLoad } from './$types'
-export const load: PageLoad = ({ params }) => {
+export const load: PageLoad = async ({ params }) => {
   const { id } = params
-  const client = getClientById(id)
+  const client = await getClientById(id)
+  
   if (!client) {
     error(404, {
       message: 'Client not found'

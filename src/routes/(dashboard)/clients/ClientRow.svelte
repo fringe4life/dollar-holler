@@ -10,10 +10,13 @@
   import Trash from '$lib/icon/Trash.svelte'
   import type { MouseEventHandler } from 'svelte/elements'
   import type { Client } from '../../../global'
-  import { centsToDollars, getTotal, sumInvoices } from '$lib/utils/moneyHelpers'
+  import { centsToDollars, sumInvoices } from '$lib/utils/moneyHelpers'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import ClientForm from './ClientForm.svelte'
-
+  import { clickOutside } from '$lib/attachments/clickOutside'
+  import { swipe } from '$lib/actions/swipe'
+  import Cancel from '$lib/icon/Cancel.svelte'
+  import ConfirmClientDelete from './ConfirmClientDelete.svelte'
   type Props = {
     client: Client
   }
@@ -51,69 +54,100 @@
     isAdditionalMenuShowing = false
   }
 
+  const closeOptions = () => {
+    isAdditionalMenuShowing = false
+  }
+
   const receivedInvoices = () => {
     // find invoices that have been paid
-    const paidInvoices = sumInvoices(
-      client?.invoices?.filter(invoice => invoice.invoiceStatus === 'paid')
-    )
+    const paidInvoices = sumInvoices(client?.invoice?.filter(i => i.invoiceStatus === 'paid'))
     return centsToDollars(paidInvoices)
     // get sum of those invoices
   }
 
   const balanceInvoices = () => {
-    const paidInvoices = sumInvoices(
-      client?.invoices?.filter(invoice => invoice.invoiceStatus !== 'paid')
-    )
+    const paidInvoices = sumInvoices(client?.invoice?.filter(i => i.invoiceStatus !== 'paid'))
     return centsToDollars(paidInvoices)
     // get sum of those invoices
   }
+  let triggerReset = $state(false)
 </script>
 
-<!-- <svelte:window onclick={() => (isAdditionalMenuShowing = false)} /> -->
+<div class="relative isolate">
+  <div
+    use:swipe={{ triggerReset }}
+    class="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  >
+    <div class="status">{@render tag(client.clientStatus as string)}</div>
+    <div class="clientName truncate text-base font-bold whitespace-nowrap lg:text-xl">
+      {client.name}
+    </div>
+    <div class="received text-right font-mono text-sm font-bold lg:text-lg">
+      {receivedInvoices()}
+    </div>
+    <div class="text-scarlet balance text-right font-mono text-sm font-bold lg:text-lg">
+      {balanceInvoices()}
+    </div>
+    <div class="view relative hidden place-self-center lg:block">
+      <a
+        class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
+        href={`/clients/${client.id}`}><View /></a
+      >
+    </div>
+    <div class="relative hidden place-self-center lg:grid">
+      <button
+        {@attach isAdditionalMenuShowing && clickOutside(closeOptions)}
+        onclick={handleMenu}
+        class="text-pastelPurple hover:text-daisyBushtransition-colors duration-200"
+        ><ThreeDots /></button
+      >
+      {#if isAdditionalMenuShowing}
+        <AdditionalOptions
+          options={[
+            { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
 
-<div class="client-table client-row shadow-tableRow items-center rounded-lg bg-white py-3 lg:py-6">
-  <div class="status">{@render tag(client.clientStatus as string)}</div>
-  <div class="clientName truncate text-base font-bold whitespace-nowrap lg:text-xl">
-    {client.name}
+            { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: isOptionsDisabled },
+            {
+              label: 'Active',
+              icon: Activate,
+              onclick: handleActivation,
+              disabled: client.clientStatus === 'active'
+            },
+            {
+              label: 'Archive',
+              icon: Archive,
+              onclick: handleArchive,
+              disabled: client.clientStatus === 'archive'
+            }
+          ]}
+        />
+      {/if}
+    </div>
   </div>
-  <div class="received text-right font-mono text-sm font-bold lg:text-lg">
-    {receivedInvoices()}
-  </div>
-  <div class="text-scarlet balance text-right font-mono text-sm font-bold lg:text-lg">
-    {balanceInvoices()}
-  </div>
-  <div class="view relative hidden place-self-center lg:block">
-    <a class="text-pastelPurple hover:text-daisyBush transition-colors duration-200" href={`/clients/${client.id}`}
-      ><View /></a
-    >
-  </div>
-  <div class="relative hidden place-self-center lg:grid">
-    <button
-      onclick={handleMenu}
-      class="text-pastelPurple hover:text-daisyBushtransition-colors duration-200"
-      ><ThreeDots /></button
-    >
-    {#if isAdditionalMenuShowing}
-      <AdditionalOptions
-        options={[
-          { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
 
-          { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: isOptionsDisabled },
-          {
-            label: 'Active',
-            icon: Activate,
-            onclick: handleActivation,
-            disabled: client.clientStatus === 'active'
-          },
-          {
-            label: 'Archive',
-            icon: Archive,
-            onclick: handleArchive,
-            disabled: client.clientStatus === 'archive'
-          }
-        ]}
-      />
+  <!-- revealed on swipe -->
+  <div class="swipe-revealed-actions">
+    <button onclick={() => (triggerReset = true)} class="action-button">
+      <Cancel width={32} height={32} />
+      Cancel
+    </button>
+    {#if client.clientStatus === 'active'}
+      <button onclick={handleArchive} class="action-button">
+        <Archive width={32} height={32} />
+        Archive
+      </button>
     {/if}
+    {#if client.clientStatus === 'archive'}
+      <button onclick={handleActivation} class="action-button">
+        <Activate width={32} height={32} />
+        Activate
+      </button>
+    {/if}
+    <button onclick={handleDelete} class="action-button">
+      <Trash width={32} height={32} />
+      Delete
+    </button>
+    <a class="action-button" href={`/clients/${client.id}`}><View height={32} width={32} /></a>
   </div>
 </div>
 
@@ -134,6 +168,8 @@
     <ClientForm formState="edit" bind:edit={client} closePanel={() => (isFormShowing = false)} />
   {/snippet}
 </SlidePanel>
+
+<ConfirmClientDelete bind:open {client} />
 
 <style>
   @reference "../../../app.css";

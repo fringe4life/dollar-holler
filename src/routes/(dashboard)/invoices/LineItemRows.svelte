@@ -58,7 +58,7 @@
     {/if}
   </div>
   <div class="text-monsoon py-5 text-right font-bold print:col-span-3">Subtotal</div>
-  <div class="py-5 text-right font-mono">{centsToDollars(subTotal)}</div>
+  <div class="py-5 text-right font-mono">{subTotal}</div>
 </div>
 
 <div class="invoice-line-item">

@@ -12,13 +12,27 @@
   import { Button } from '$lib/components/ui/button'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
+  import type { Invoice } from '../../../global'
+  import NoSearchResults from './NoSearchResults.svelte'
 
-  onMount(() => {
-    loadInvoices()
+  let listInvoices: Invoice[] = $state([])
+  onMount(async () => {
+    await loadInvoices()
+    listInvoices = $invoices
   })
 
-  $inspect(invoices)
   let isInvoiceShowingPanel = $state(false)
+
+  const handleSearch = (searchTerms: string): void => {
+    console.log(searchTerms)
+    listInvoices = $invoices.filter(invoice => {
+      return (
+        invoice.client.name.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        invoice.invoiceNumber.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        invoice?.subject?.toLowerCase().includes(searchTerms.toLowerCase())
+      )
+    })
+  }
 </script>
 
 <svelte:head>
@@ -29,7 +43,7 @@
 >
   <!-- search field -->
   {#if $invoices.length > 0}
-    <Search />
+    <Search {handleSearch} />
   {:else}
     <div></div>
   {/if}
@@ -43,14 +57,16 @@
   <!-- invoices -->
   {#if !$invoices}
     <p>Loading...</p>
-  {:else if $invoices.length > 0}
+  {:else if listInvoices.length === 0}
+    <NoSearchResults />
+  {:else if listInvoices.length > 0}
     <InvoiceRowHeader />
     <div class="flex flex-col-reverse">
-      {#each $invoices as invoice (invoice.invoiceNumber)}
+      {#each listInvoices as invoice (invoice.invoiceNumber)}
         <InvoiceRow {invoice} />
       {/each}
     </div>
-    <CircledAmount amount={centsToDollars(sumInvoices($invoices))} label="Total" />
+    <CircledAmount amount={centsToDollars(sumInvoices(listInvoices))} label="Total" />
   {:else}
     <BlankState />
   {/if}

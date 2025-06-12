@@ -11,15 +11,21 @@
   import Send from '$lib/icon/Send.svelte'
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'
-
+  import { clickOutside } from '$lib/attachments/clickOutside'
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
   import ConfirmDelete from './ConfirmDelete.svelte'
+  import { swipe } from '$lib/actions/swipe'
+  import Cancel from '$lib/icon/Cancel.svelte'
 
   let isAdditionalMenuShowing = $state(false)
   let isOptionsDisabled = $state(false)
-  let { invoice } = $props<{
+  let triggerReset = $state(false)
+
+  type Props = {
     invoice: Invoice
-  }>()
+  }
+
+  let { invoice }: Props = $props()
 
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
     isAdditionalMenuShowing = !isAdditionalMenuShowing
@@ -38,6 +44,10 @@
       isOptionsDisabled = true
       return 'paid'
     }
+  }
+
+  const closeOptions = () => {
+    isAdditionalMenuShowing = false
   }
 
   let open = $state<boolean>(false)
@@ -60,36 +70,65 @@
   const label = getLabel(invoiceStatus, dueDate)
 </script>
 
-<div
-  class="invoice-table invoice-row shadow-tableRow items-center justify-between rounded-lg bg-white py-3 lg:py-6"
->
-  <div class="status">{@render tag(label)}</div>
-  <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>
-  <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
-  <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
-  <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
-    {centsToDollars(getTotal(invoice))}
-  </div>
+<div class="relative isolate">
   <div
-    class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
+    use:swipe={{ triggerReset }}
+    class="invoice-table invoice-row shadow-tableRow relative z-5 items-center justify-between rounded-lg bg-white py-3 lg:py-6"
   >
-    <a href={`/invoices/${id}`} class=""><View /></a>
+    <div class="status">{@render tag(label)}</div>
+    <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>
+    <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
+    <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
+    <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
+      {centsToDollars(getTotal(invoice))}
+    </div>
+    <div
+      class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
+    >
+      <a href={`/invoices/${id}`} class=""><View /></a>
+    </div>
+    <div
+      class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
+    >
+      <button
+        {@attach isAdditionalMenuShowing && clickOutside(closeOptions)}
+        {onclick}
+        class="flex cursor-pointer items-center justify-center"><ThreeDots /></button
+      >
+      {#if isAdditionalMenuShowing}
+        <AdditionalOptions
+          options={[
+            { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
+
+            { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: false },
+
+            { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
+          ]}
+        />
+      {/if}
+    </div>
   </div>
-  <div
-    class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
-  >
-    <button {onclick} class="flex cursor-pointer items-center justify-center"><ThreeDots /></button>
-    {#if isAdditionalMenuShowing}
-      <AdditionalOptions
-        options={[
-          { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
-
-          { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: false },
-
-          { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
-        ]}
-      />
+  <!-- revealed on swipe -->
+  <div class="swipe-revealed-actions">
+    <button onclick={() => (triggerReset = true)} class="action-button">
+      <Cancel width={32} height={32} />
+      Cancel
+    </button>
+    {#if isOptionsDisabled}
+      <button onclick={handleEdit} class="action-button">
+        <Edit width={32} height={32} />
+        Edit
+      </button>
+      <button onclick={handleSendInvoice} class="action-button">
+        <Send width={32} height={32} />
+        Send
+      </button>
     {/if}
+    <button onclick={handleDelete} class="action-button">
+      <Trash width={32} height={32} />
+      Delete
+    </button>
+    <a class="action-button" href={`/invoices/${id}`}><View height={32} width={32} /></a>
   </div>
 </div>
 
@@ -118,6 +157,7 @@
 </SlidePanel>
 
 <style>
+  @reference "../../../app.css";
   .invoice-row {
     grid-template-areas:
       'invoicenumber invoicenumber '

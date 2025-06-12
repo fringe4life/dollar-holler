@@ -1,9 +1,10 @@
 import { getInvoiceById } from '$lib/stores/InvoiceStore'
 import { error } from '@sveltejs/kit'
 import type { PageLoad } from './$types'
-export const load: PageLoad = ({ params }) => {
+export const load: PageLoad = async ({ params }) => {
   const { id } = params
-  const invoice = getInvoiceById(id)
+  const invoice = await getInvoiceById(id)
+
   if (!invoice) {
     error(404, {
       message: 'Invoice not found'

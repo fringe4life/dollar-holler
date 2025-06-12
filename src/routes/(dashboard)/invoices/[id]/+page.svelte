@@ -77,19 +77,20 @@
       </p>
     {:else}
       <div class="bg-gallery flex min-h-17 items-center justify-center rounded">
-        <a href="" class="text-stone-600 underline hover:no-underline"
+        <a href="#" class="text-stone-600 underline hover:no-underline"
           >Add your contact information.</a
         >
       </div>
     {/if}
   </div>
-  <div class="col-span-full print:col-span-3 sm:col-span-3">
+  <div class="col-span-full sm:col-span-3 print:col-span-3">
     <div class="label">Bill To:</div>
     <p>
-      <strong>{invoice?.client.name}</strong><br />
-      {invoice?.client.email}<br />
-      {invoice?.client.street}<br />
-      {invoice?.client.state}
+      {#if invoice.client.name}<strong>{invoice.client.name}</strong><br />{/if}
+      {#if invoice.client.name}{invoice.client.email}<br />{/if}
+      {#if invoice.client.street}{invoice.client.street}<br />{/if}
+      {#if invoice.client.state}{invoice.client.state}{/if}
+      {#if invoice.client.zip}{invoice.client.zip}{/if}
     </p>
   </div>
   <div class="col-span-full sm:col-span-2 sm:col-start-5">
@@ -113,7 +114,6 @@
 
   <!-- line items div wrapper -->
   <div class="col-span-full">
-    // @ts-ignore
     <LineItemRows
       lineItems={invoice?.lineItems}
       isEditible={false}

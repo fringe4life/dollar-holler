@@ -8,11 +8,31 @@
   import BlankState from './BlankState.svelte'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import ClientForm from './ClientForm.svelte'
-  onMount(() => {
-    loadClients()
+  import NoSearchResults from '../invoices/NoSearchResults.svelte'
+  import type { Client } from '../../../global'
+
+  let clientList: Client[] = $state([])
+  onMount(async () => {
+    await loadClients()
+    clientList = $clients
   })
 
   let isFormVisible = $state<boolean>(false)
+
+  const handleSearch = (searchTerms: string) => {
+    console.log(searchTerms)
+    clientList = $clients.filter(client => {
+      return (
+        client.city?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        client?.state?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        client?.zip?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        client?.email?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        client?.street?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        client?.clientStatus?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        client.name.toLowerCase().includes(searchTerms.toLowerCase())
+      )
+    })
+  }
 </script>
 
 <svelte:head>
@@ -24,7 +44,7 @@
 >
   <!-- search field -->
   {#if $clients.length > 0}
-    <Search />
+    <Search {handleSearch} />
   {:else}
     <div></div>
   {/if}
@@ -46,12 +66,14 @@
     <p>Loading...</p>
   {:else if $clients.length === 0}
     <BlankState />
+  {:else if clientList.length === 0}
+    <NoSearchResults />
   {:else}
     <!-- client header row -->
     <ClientRowHeader />
     <!-- client rows -->
     <div class="flex flex-col-reverse">
-      {#each $clients as client, index (client.id)}
+      {#each clientList as client, index (client.id)}
         <ClientRow bind:client={$clients[index]} />
       {/each}
     </div>

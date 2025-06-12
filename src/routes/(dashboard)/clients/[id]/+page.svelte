@@ -24,18 +24,18 @@
   }
 
   const getDraft = (): string => {
-    const draftInvoices = data.client.invoices?.filter(invoice => invoice.invoiceStatus === 'draft')
+    const draftInvoices = data.client.invoice?.filter(i => i.invoiceStatus === 'draft')
     return centsToDollars(sumInvoices(draftInvoices))
   }
 
   const getPaid = (): string => {
-    const paidInvoices = data.client.invoices?.filter(invoice => invoice.invoiceStatus === 'paid')
+    const paidInvoices = data.client.invoice?.filter(i => i.invoiceStatus === 'paid')
     return centsToDollars(sumInvoices(paidInvoices))
   }
 
   const getOverdue = (): string => {
-    const overdueInvoices = data.client.invoices?.filter(invoice => {
-      if (isLate(invoice.dueDate) && invoice.invoiceStatus === 'sent') {
+    const overdueInvoices = data.client.invoice?.filter(i => {
+      if (isLate(i.dueDate) && i.invoiceStatus === 'sent') {
         return true
       }
       return false
@@ -44,13 +44,17 @@
   }
 
   const getOustanding = (): string => {
-    const overdueInvoices = data.client.invoices?.filter(invoice => {
-      if (!isLate(invoice.dueDate) && invoice.invoiceStatus === 'sent') {
+    const overdueInvoices = data.client.invoice?.filter(i => {
+      if (!isLate(i.dueDate) && i.invoiceStatus === 'sent') {
         return true
       }
       return false
     })
     return centsToDollars(sumInvoices(overdueInvoices))
+  }
+
+  const handleSearch = async (searchTerms: string) => {
+    console.log(searchTerms)
   }
 </script>
 
@@ -61,8 +65,8 @@
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if data.client.invoices && data.client.invoices.length > 0}
-    <Search />
+  {#if data.client.invoice && data.client.invoice.length > 0}
+    <Search {handleSearch} />
   {:else}
     <div></div>
   {/if}
@@ -99,16 +103,16 @@
 <!-- list of invoices -->
 <div>
   <!-- invoices -->
-  {#if !data.client.invoices}
+  {#if !data.client.invoice}
     <p>Loading...</p>
-  {:else if data.client.invoices.length > 0}
+  {:else if data.client.invoice.length > 0}
     <InvoiceRowHeader />
     <div class="flex flex-col-reverse">
-      {#each data.client.invoices as invoice (invoice.invoiceNumber)}
-        <InvoiceRow {invoice} />
+      {#each data.client.invoice as i (i.invoiceNumber)}
+        <InvoiceRow invoice={i} />
       {/each}
     </div>
-    <CircledAmount amount={centsToDollars(sumInvoices(data.client.invoices))} label="Total" />
+    <CircledAmount amount={centsToDollars(sumInvoices(data.client.invoice))} label="Total" />
   {:else}
     <BlankState />
   {/if}
@@ -144,10 +148,6 @@
   .label {
     @apply text-lightGray text-sm font-black;
   }
-  sup {
-    @apply relative -top-2;
-  }
-
   .number {
     @apply text-purple truncate text-4xl font-black;
   }

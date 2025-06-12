@@ -1,24 +1,23 @@
 <script lang="ts">
   import ModalE from '$lib/components/ModalE.svelte'
   import { Button } from '$lib/components/ui/button'
-  import { deleteInvoice } from '$lib/stores/InvoiceStore'
-  import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
 
-  import type { Invoice } from '../../../global'
+  import type { Client } from '../../../global'
+  import { deleteClient } from '$lib/stores/clientStore'
 
   type Props = {
     open: boolean
-    invoice: Invoice
+    client: Client
   }
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = async () => {
     open = false
-    await deleteInvoice(invoice)
+    await deleteClient(client)
   }
 
-  let { invoice, open = $bindable() }: Props = $props()
+  let { client, open = $bindable() }: Props = $props()
 </script>
 
 <ModalE bind:open buttonText="" className="z-450">
@@ -30,8 +29,7 @@
 
   {#snippet description()}
     <h2 class="text-daisyBush text-center text-lg font-medium">
-      This will delete the invoice to <span class="text-scarlet">{invoice.client.name}</span> for
-      <span class="text-scarlet">{centsToDollars(sumLineItems(invoice.lineItems))}?</span>
+      This will delete the Client called: <span class="text-scarlet">{client.name}</span> for
     </h2>
   {/snippet}
 

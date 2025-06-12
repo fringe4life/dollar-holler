@@ -1,14 +1,12 @@
 <script lang="ts">
   import { onMount } from 'svelte'
   import type { Client } from '../../../global'
-  import { addClient, clients, loadClients, updateClient } from '$lib/stores/clientStore'
+  import { addClient, loadClients, updateClient } from '$lib/stores/clientStore'
   import Button from '$lib/components/ui/button/button.svelte'
   import Trash from '$lib/icon/Trash.svelte'
   import Check from '$lib/icon/Check.svelte'
   import { states } from '$lib/utils/states'
   import type { FormEventHandler } from 'svelte/elements'
-  import { toast } from 'svelte-sonner'
-
   type Panel = {
     closePanel: () => void
   }
@@ -31,10 +29,9 @@
     loadClients()
   })
 
-  let client: Client = $state({
+  let client: Omit<Client, 'id'> = $state({
     city: '',
     email: '',
-    id: '',
     name: '',
     state: '',
     street: '',
@@ -47,18 +44,15 @@
   }
 
   $inspect(client)
-  const handleSubmit: FormEventHandler<HTMLFormElement> = e => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
-    console.log({ client })
 
     if (formState === 'create') {
-      addClient(client)
+      await addClient({ ...client })
       closePanel()
-      toast.success('Client successfully added.')
-    } else {
-      updateClient(client)
+    } else if (formState === 'edit' && edit && edit.id) {
+      await updateClient({ ...client, id: edit.id })
       closePanel()
-      toast.success('Client successfully updated.')
     }
   }
 </script>

@@ -12,7 +12,5 @@ export const load: LayoutServerLoad = async ({ parent }) => {
 
   if (session) {
     throw redirect(303, '/invoices')
-  } else {
-    throw redirect(308, '/login')
   }
 }

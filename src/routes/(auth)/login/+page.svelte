@@ -3,7 +3,7 @@
   import { Button } from '$lib/components/ui/button'
   import type { PageProps } from './$types'
 
-  let { data, form }: PageProps = $props()
+  let { form, data }: PageProps = $props()
 
   let isLoading = $state<boolean>(false)
 </script>
@@ -11,18 +11,18 @@
 <h1 class="auth-heading">Login</h1>
 
 <form method="POST">
-  <Alert message={form?.error?.message || ''} />
+  <Alert message={form?.error || ''} />
   <fieldset disabled={isLoading}>
     <div class="field">
       <label for="email" class="text-goldenFizz">Email</label>
-      <input required type="email" name="email" placeholder="john@email.com" />
+      <input required type="email" name="email" placeholder="john@email.com" id="email" />
     </div>
     <div class="field">
       <div class="flex items-center justify-between">
         <label for="password" class="text-goldenFizz">Password</label>
         <a class="text-sm underline hover:no-underline" href="/forgot-password">Forgot Password</a>
       </div>
-      <input required minlength="6" type="password" name="password" placeholder="john@email.com" />
+      <input required minlength="6" type="password" name="password" id="password" />
     </div>
     <div class="field">
       <Button variant="auth" type="submit">Let's do this!</Button>

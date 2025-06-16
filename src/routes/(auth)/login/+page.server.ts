@@ -9,17 +9,17 @@ export const actions: Actions = {
     const password = formData.get('password') as string
 
     if (!email) {
-      return fail(400, { email, missing: true })
+      return fail(400, { email })
     }
 
     if (!password) {
-      return fail(400, { password, missing: true })
+      return fail(400, { error: 'Your password was missing' })
     }
-
+    console.log(email, password)
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) {
-      console.error(error)
-      return fail(400, {error})
+      console.error('hello')
+      return fail(400, { error: error.message })
     } else {
       redirect(303, '/invoices')
     }

@@ -10,13 +10,14 @@ export const actions: Actions = {
     if (!email) {
       return fail(400, { email, missing: true })
     }
+    console.log({ email })
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${PUBLIC_BASE_URL}/reset-password`
     })
     if (error) {
-      console.error(error)
-      return fail(400, { error })
+      return fail(400, { error: error.message, email})
     } else {
+      console.log('succees')
       return { success: true }
     }
   }

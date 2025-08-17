@@ -1,11 +1,14 @@
 import { fail, redirect } from '@sveltejs/kit'
+import { auth } from '$lib/auth'
 import type { Actions } from './$types'
 
 export const actions: Actions = {
-  default: async ({ request, locals: { supabase } }) => {
+  default: async ({ request }) => {
     const formData = await request.formData()
     const password = formData.get('newPassword') as string
     const confirmPassword = formData.get('confirmPassword') as string
+    const token = formData.get('token') as string
+
     if (!password) {
       return fail(400, { password, missing: true })
     }
@@ -17,13 +20,21 @@ export const actions: Actions = {
       return fail(400, { error: "Passwords don't match" })
     }
 
-    const { error } = await supabase.auth.updateUser({
-      password
-    })
-    if (error) {
-      return fail(400, { error: error.message })
-    } else {
+    try {
+      const result = await auth.api.resetPassword({
+        password,
+        token,
+        headers: request.headers,
+      })
+
+      if (result.error) {
+        return fail(400, { error: result.error.message })
+      }
+
       throw redirect(303, '/invoices')
+    } catch (error) {
+      console.error('Reset password error:', error)
+      return fail(400, { error: 'Failed to reset password' })
     }
   }
 }

@@ -6,7 +6,7 @@
   import { convertDate } from '$lib/utils/dateHelpers'
   import LineItemRows from '../LineItemRows.svelte'
   import { onMount } from 'svelte'
-  import SvelteMarkdown from 'svelte-markdown'
+  import MarkdownRenderer from '$lib/components/MarkdownRenderer.svelte'
   import { loadSettings, settings } from '$lib/stores/settingsStore'
   import { toast } from 'svelte-sonner'
   let { data }: PageProps = $props()
@@ -124,14 +124,14 @@
   {#if invoice?.notes}
     <div class="col-span-full">
       <div class="label">Notes:</div>
-      <SvelteMarkdown source={invoice.notes} />
+      <MarkdownRenderer source={invoice.notes} />
     </div>
   {/if}
   {#if invoice?.terms}
     <div class="col-span-full">
       <div class="label">Terms and Conditions:</div>
 
-      <SvelteMarkdown source={invoice?.terms} />
+      <MarkdownRenderer source={invoice?.terms} />
     </div>
   {/if}
 </section>

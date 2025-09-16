@@ -2,30 +2,30 @@
   import CircledAmount from '$lib/components/CircledAmount.svelte'
   import Search from '$lib/components/Search.svelte'
 
-  import { invoices, loadInvoices } from '$lib/stores/InvoiceStore'
-  import { onMount } from 'svelte'
+  import { invoices, loadInvoices } from '$lib/stores/InvoiceStore.svelte'
   import { centsToDollars, sumInvoices } from '$lib/utils/moneyHelpers'
-  import InvoiceRow from './InvoiceRow.svelte'
+  import { onMount } from 'svelte'
   import BlankState from './BlankState.svelte'
+  import InvoiceRow from './InvoiceRow.svelte'
   import InvoiceRowHeader from './InvoiceRowHeader.svelte'
 
-  import { Button } from '$lib/components/ui/button'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
-  import type { Invoice } from '../../../global'
+  import { Button } from '$lib/components/ui/button'
+  import type { Invoice } from '$lib/db/schema'
   import NoSearchResults from './NoSearchResults.svelte'
 
   let listInvoices: Invoice[] = $state([])
   onMount(async () => {
     await loadInvoices()
-    listInvoices = $invoices
+    listInvoices = invoices
   })
 
   let isInvoiceShowingPanel = $state(false)
 
   const handleSearch = (searchTerms: string): void => {
     console.log(searchTerms)
-    listInvoices = $invoices.filter(invoice => {
+    listInvoices = invoices.filter(invoice => {
       return (
         invoice.client.name.toLowerCase().includes(searchTerms.toLowerCase()) ||
         invoice.invoiceNumber.toLowerCase().includes(searchTerms.toLowerCase()) ||
@@ -42,7 +42,7 @@
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if $invoices.length > 0}
+  {#if invoices.length > 0}
     <Search {handleSearch} />
   {:else}
     <div></div>
@@ -55,7 +55,7 @@
 <!-- list of invoices -->
 <div>
   <!-- invoices -->
-  {#if !$invoices}
+  {#if !invoices}
     <p>Loading...</p>
   {:else if listInvoices.length === 0}
     <NoSearchResults />
@@ -83,11 +83,9 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  {#snippet children()}
-    <InvoiceForm
-      invoiceEdit={undefined}
-      formState="create"
-      closePanel={() => (isInvoiceShowingPanel = false)}
-    />
-  {/snippet}
+  <InvoiceForm
+    invoiceEdit={undefined}
+    formState="create"
+    closePanel={() => (isInvoiceShowingPanel = false)}
+  />
 </SlidePanel>

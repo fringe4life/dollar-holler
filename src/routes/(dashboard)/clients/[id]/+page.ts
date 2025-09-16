@@ -1,14 +1,15 @@
-import { getClientById } from '$lib/stores/clientStore'
 import { error } from '@sveltejs/kit'
 import type { PageLoad } from './$types'
-export const load: PageLoad = async ({ params }) => {
+export const load: PageLoad = async ({ params, fetch }) => {
   const { id } = params
-  const client = await getClientById(id)
+  const response = await fetch(`/api/clients/${id}`)
   
-  if (!client) {
+  if (!response.ok) {
     error(404, {
       message: 'Client not found'
     })
   }
+  
+  const client = await response.json()
   return { client }
 }

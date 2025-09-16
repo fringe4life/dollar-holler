@@ -1,14 +1,14 @@
 <script lang="ts">
   import { page } from '$app/state'
-  import Button from '$lib/components/ui/button/button.svelte'
-  import type { MouseEventHandler } from 'svelte/elements'
-  import type { PageProps } from './$types'
-  import { convertDate } from '$lib/utils/dateHelpers'
-  import LineItemRows from '../LineItemRows.svelte'
-  import { onMount } from 'svelte'
   import MarkdownRenderer from '$lib/components/MarkdownRenderer.svelte'
-  import { loadSettings, settings } from '$lib/stores/settingsStore'
+  import Button from '$lib/components/ui/button/button.svelte'
+  import { loadSettings, settings } from '$lib/stores/settingsStore.svelte'
+  import { convertDate } from '$lib/utils/dateHelpers'
+  import { onMount } from 'svelte'
   import { toast } from 'svelte-sonner'
+  import type { MouseEventHandler } from 'svelte/elements'
+  import LineItemRows from '../LineItemRows.svelte'
+  import type { PageProps } from './$types'
   let { data }: PageProps = $props()
 
   const invoice = $state(data.invoice)
@@ -65,18 +65,19 @@
 
   <div class="col-span-full pt-4 sm:col-span-2 sm:col-start-5 print:col-span-3">
     <div class="label">From</div>
-    {#if $settings && $settings.myName}
+    {#if settings && settings.myName}
       <p>
-        {#if $settings.myName}
-          {$settings.myName}<br />
+        {#if settings.myName}
+          {settings.myName}<br />
         {/if}
-        {#if $settings.city && $settings.street && $settings.state && $settings.zip}
-          {$settings.street}<br />
-          {$settings.city}{' '}{$settings.state}{' '}{$settings.zip}
+        {#if settings.city && settings.street && settings.state && settings.zip}
+          {settings.street}<br />
+          {settings.city}{' '}{settings.state}{' '}{settings.zip}
         {/if}
       </p>
     {:else}
       <div class="bg-gallery flex min-h-17 items-center justify-center rounded">
+        <!-- svelte-ignore a11y_invalid_attribute -->
         <a href="#" class="text-stone-600 underline hover:no-underline"
           >Add your contact information.</a
         >
@@ -117,6 +118,8 @@
     <LineItemRows
       lineItems={invoice?.lineItems}
       isEditible={false}
+      addLineItem={() => {}}
+      removeLineItem={() => {}}
       discount={invoice?.discount || 0}
     />
   </div>

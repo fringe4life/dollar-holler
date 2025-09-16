@@ -1,16 +1,16 @@
 <script lang="ts">
   import Navbar from '$lib/components/Navbar.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
+  import type { Settings } from '$lib/db/schema'
   import Check from '$lib/icon/Check.svelte'
-  import { loadSettings, settings } from '$lib/stores/settingsStore'
+  import { getSettings, loadSettings } from '$lib/stores/settingsStore.svelte'
   import { states } from '$lib/utils/states'
   import { onMount } from 'svelte'
-  import type { Settings } from '../../global'
 
   let mySettings: Settings = {} as Settings
   onMount(() => {
     loadSettings()
-    mySettings = { ...$settings }
+    mySettings = { ...getSettings() }
   })
 </script>
 

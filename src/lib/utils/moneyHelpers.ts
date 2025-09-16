@@ -1,4 +1,4 @@
-import type { Invoice, LineItem } from '../../global'
+import type { Invoice, LineItem } from '$lib/db/schema'
 
 /**
  * @abstract calculates the cost of a part of the invoice

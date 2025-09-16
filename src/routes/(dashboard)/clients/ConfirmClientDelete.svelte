@@ -3,8 +3,8 @@
   import { Button } from '$lib/components/ui/button'
   import type { MouseEventHandler } from 'svelte/elements'
 
-  import type { Client } from '../../../global'
-  import { deleteClient } from '$lib/stores/clientStore'
+  import type { Client } from '$lib/db/schema'
+  import { deleteClient } from '$lib/stores/clientStore.svelte'
 
   type Props = {
     open: boolean
@@ -33,10 +33,8 @@
     </h2>
   {/snippet}
 
-  {#snippet children()}
-    <div class="flex justify-center gap-4">
-      <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
-      <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button>
-    </div>
-  {/snippet}
+  <div class="flex justify-center gap-4">
+    <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
+    <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button>
+  </div>
 </ModalE>

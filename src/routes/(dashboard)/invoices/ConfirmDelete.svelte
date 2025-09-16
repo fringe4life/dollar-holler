@@ -1,11 +1,11 @@
 <script lang="ts">
   import ModalE from '$lib/components/ModalE.svelte'
   import { Button } from '$lib/components/ui/button'
-  import { deleteInvoice } from '$lib/stores/InvoiceStore'
+  import { deleteInvoice } from '$lib/stores/InvoiceStore.svelte'
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
 
-  import type { Invoice } from '../../../global'
+  import type { Invoice } from '$lib/db/schema'
 
   type Props = {
     open: boolean
@@ -35,10 +35,8 @@
     </h2>
   {/snippet}
 
-  {#snippet children()}
-    <div class="flex justify-center gap-4">
-      <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
-      <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button>
-    </div>
-  {/snippet}
+  <div class="flex justify-center gap-4">
+    <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
+    <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button>
+  </div>
 </ModalE>

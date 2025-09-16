@@ -1,27 +1,30 @@
 <script lang="ts">
   import Search from '$lib/components/Search.svelte'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
+  import type { Client } from '$lib/db/schema'
+  import { clientsStore, loadClients } from '$lib/stores/clientStore.svelte'
   import { onMount } from 'svelte'
+  import NoSearchResults from '../invoices/NoSearchResults.svelte'
+  import BlankState from './BlankState.svelte'
+  import ClientForm from './ClientForm.svelte'
   import ClientRow from './ClientRow.svelte'
   import ClientRowHeader from './ClientRowHeader.svelte'
-  import { clients, loadClients } from '$lib/stores/clientStore'
-  import BlankState from './BlankState.svelte'
-  import SlidePanel from '$lib/components/SlidePanel.svelte'
-  import ClientForm from './ClientForm.svelte'
-  import NoSearchResults from '../invoices/NoSearchResults.svelte'
-  import type { Client } from '../../../global'
 
   let clientList: Client[] = $state([])
+  let clients = $state(clientsStore.value)
+
   onMount(async () => {
     await loadClients()
-    clientList = $clients
+    clients = clientsStore.value
+    clientList = clients
   })
 
   let isFormVisible = $state<boolean>(false)
 
   const handleSearch = (searchTerms: string) => {
     console.log(searchTerms)
-    clientList = $clients.filter(client => {
+    clientList = clients.filter(client => {
       return (
         client.city?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client?.state?.toLowerCase().includes(searchTerms.toLowerCase()) ||
@@ -43,7 +46,7 @@
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if $clients.length > 0}
+  {#if clients.length > 0}
     <Search {handleSearch} />
   {:else}
     <div></div>
@@ -62,9 +65,9 @@
 <!-- list of clients -->
 
 <div>
-  {#if !$clients}
+  {#if !clients}
     <p>Loading...</p>
-  {:else if $clients.length === 0}
+  {:else if clients.length === 0}
     <BlankState />
   {:else if clientList.length === 0}
     <NoSearchResults />
@@ -74,7 +77,7 @@
     <!-- client rows -->
     <div class="flex flex-col-reverse">
       {#each clientList as client, index (client.id)}
-        <ClientRow bind:client={$clients[index]} />
+        <ClientRow bind:client={clients[index]} />
       {/each}
     </div>
   {/if}
@@ -91,7 +94,5 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  {#snippet children()}
-    <ClientForm edit={undefined} formState="create" closePanel={() => (isFormVisible = false)} />
-  {/snippet}
+  <ClientForm edit={undefined} formState="create" closePanel={() => (isFormVisible = false)} />
 </SlidePanel>

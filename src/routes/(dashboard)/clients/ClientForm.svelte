@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { onMount } from 'svelte'
-  import type { Client } from '../../../global'
-  import { addClient, loadClients, updateClient } from '$lib/stores/clientStore'
   import Button from '$lib/components/ui/button/button.svelte'
-  import Trash from '$lib/icon/Trash.svelte'
+  import type { Client } from '$lib/db/schema'
   import Check from '$lib/icon/Check.svelte'
+  import Trash from '$lib/icon/Trash.svelte'
+  import { addClient, loadClients, updateClient } from '$lib/stores/clientStore.svelte'
   import { states } from '$lib/utils/states'
+  import { onMount } from 'svelte'
   import type { FormEventHandler } from 'svelte/elements'
   type Panel = {
     closePanel: () => void
@@ -29,7 +29,7 @@
     loadClients()
   })
 
-  let client: Omit<Client, 'id'> = $state({
+  let client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'> = $state({
     city: '',
     email: '',
     name: '',
@@ -43,7 +43,6 @@
     client = edit
   }
 
-  $inspect(client)
   const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
 

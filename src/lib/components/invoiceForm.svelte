@@ -1,16 +1,16 @@
 <script lang="ts">
-  import { addClient, clients, loadClients } from '$lib/stores/clientStore'
-  import { states } from '$lib/utils/states'
+  import type { Client, Invoice, LineItem } from '$lib/db/schema'
   import Trash from '$lib/icon/Trash.svelte'
+  import { addClient, clients, loadClients } from '$lib/stores/clientStore.svelte'
+  import { addInvoice, updateInvoice } from '$lib/stores/InvoiceStore.svelte'
+  import { today } from '$lib/utils/dateHelpers'
+  import { states } from '$lib/utils/states'
+  import { onMount } from 'svelte'
   import type { FormEventHandler, MouseEventHandler } from 'svelte/elements'
-  import type { Client, Invoice, LineItem } from '../../global'
+  import { slide } from 'svelte/transition'
+  import ConfirmDelete from '../../routes/(dashboard)/invoices/ConfirmDelete.svelte'
   import LineItemRows from '../../routes/(dashboard)/invoices/LineItemRows.svelte'
   import Button from './ui/button/button.svelte'
-  import { slide } from 'svelte/transition'
-  import { onMount } from 'svelte'
-  import { today } from '$lib/utils/dateHelpers'
-  import { addInvoice, updateInvoice } from '$lib/stores/InvoiceStore'
-  import ConfirmDelete from '../../routes/(dashboard)/invoices/ConfirmDelete.svelte'
 
   type Panel = {
     closePanel: () => void

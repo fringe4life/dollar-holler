@@ -37,7 +37,7 @@
   const blankLineItem: Omit<LineItem, 'id'> = {
     description: '',
     amount: 0,
-    quantity: 0
+    quantity: 0,
   }
 
   let invoice = $state({
@@ -46,9 +46,9 @@
     lineItems: [
       {
         ...blankLineItem,
-        id: crypto.randomUUID()
-      }
-    ] as LineItem[]
+        id: crypto.randomUUID(),
+      },
+    ] as LineItem[],
   }) as Invoice
 
   if (formState === 'edit') {
@@ -59,7 +59,7 @@
     MouseEventHandler<HTMLAnchorElement> = () => {
     invoice.lineItems = [
       ...(invoice?.lineItems as LineItem[]),
-      { ...blankLineItem, id: crypto.randomUUID() }
+      { ...blankLineItem, id: crypto.randomUUID() },
     ]
   }
 
@@ -78,7 +78,7 @@
     name: '',
     state: '',
     street: '',
-    zip: ''
+    zip: '',
   })
 
   let discount = $derived<number>(invoice.discount || 0)

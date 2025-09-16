@@ -24,7 +24,7 @@
       'text-right': title === 'Received' || title === 'Balanced',
 
       'text-daisyBush': !emptyState,
-      'text-pastelPurple': emptyState
+      'text-pastelPurple': emptyState,
     }}
   >
     {title}

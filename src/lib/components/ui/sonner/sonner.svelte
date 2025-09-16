@@ -16,7 +16,7 @@
     'bg-prim text-daisyBush': className === 'info',
     'bg-scarlet text-goldenFizz': className === 'error',
     'bg-robinEggBlue text-daisyBush': className === 'success',
-    'bg-goldenFizz text-scarlet': className === 'warning'
+    'bg-goldenFizz text-scarlet': className === 'warning',
   }}
   style="--normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border);"
   {...restProps}

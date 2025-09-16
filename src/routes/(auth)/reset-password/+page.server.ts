@@ -36,5 +36,5 @@ export const actions: Actions = {
       console.error('Reset password error:', error)
       return fail(400, { error: 'Failed to reset password' })
     }
-  }
+  },
 }

@@ -1,206 +1,206 @@
 export const states = [
   {
     value: 'AK',
-    name: 'Alaska'
+    name: 'Alaska',
   },
   {
     value: 'AL',
-    name: 'Alabama'
+    name: 'Alabama',
   },
   {
     value: 'AR',
-    name: 'Arkansas'
+    name: 'Arkansas',
   },
   {
     value: 'AZ',
-    name: 'Arizona'
+    name: 'Arizona',
   },
   {
     value: 'CA',
-    name: 'California'
+    name: 'California',
   },
   {
     value: 'CO',
-    name: 'Colorado'
+    name: 'Colorado',
   },
   {
     value: 'CT',
-    name: 'Connecticut'
+    name: 'Connecticut',
   },
   {
     value: 'DC',
-    name: 'District of Columbia'
+    name: 'District of Columbia',
   },
   {
     value: 'DE',
-    name: 'Delaware'
+    name: 'Delaware',
   },
   {
     value: 'FL',
-    name: 'Florida'
+    name: 'Florida',
   },
   {
     value: 'GA',
-    name: 'Georgia'
+    name: 'Georgia',
   },
   {
     value: 'HI',
-    name: 'Hawaii'
+    name: 'Hawaii',
   },
   {
     value: 'IA',
-    name: 'Iowa'
+    name: 'Iowa',
   },
   {
     value: 'ID',
-    name: 'Idaho'
+    name: 'Idaho',
   },
   {
     value: 'IL',
-    name: 'Illinois'
+    name: 'Illinois',
   },
   {
     value: 'IN',
-    name: 'Indiana'
+    name: 'Indiana',
   },
   {
     value: 'KS',
-    name: 'Kansas'
+    name: 'Kansas',
   },
   {
     value: 'KY',
-    name: 'Kentucky'
+    name: 'Kentucky',
   },
   {
     value: 'LA',
-    name: 'Louisiana'
+    name: 'Louisiana',
   },
   {
     value: 'MA',
-    name: 'Massachusetts'
+    name: 'Massachusetts',
   },
   {
     value: 'MD',
-    name: 'Maryland'
+    name: 'Maryland',
   },
   {
     value: 'ME',
-    name: 'Maine'
+    name: 'Maine',
   },
   {
     value: 'MI',
-    name: 'Michigan'
+    name: 'Michigan',
   },
   {
     value: 'MN',
-    name: 'Minnesota'
+    name: 'Minnesota',
   },
   {
     value: 'MO',
-    name: 'Missouri'
+    name: 'Missouri',
   },
   {
     value: 'MS',
-    name: 'Mississippi'
+    name: 'Mississippi',
   },
   {
     value: 'MT',
-    name: 'Montana'
+    name: 'Montana',
   },
   {
     value: 'NC',
-    name: 'North Carolina'
+    name: 'North Carolina',
   },
   {
     value: 'ND',
-    name: 'North Dakota'
+    name: 'North Dakota',
   },
   {
     value: 'NE',
-    name: 'Nebraska'
+    name: 'Nebraska',
   },
   {
     value: 'NH',
-    name: 'New Hampshire'
+    name: 'New Hampshire',
   },
   {
     value: 'NJ',
-    name: 'New Jersey'
+    name: 'New Jersey',
   },
   {
     value: 'NM',
-    name: 'New Mexico'
+    name: 'New Mexico',
   },
   {
     value: 'NV',
-    name: 'Nevada'
+    name: 'Nevada',
   },
   {
     value: 'NY',
-    name: 'New York'
+    name: 'New York',
   },
   {
     value: 'OH',
-    name: 'Ohio'
+    name: 'Ohio',
   },
   {
     value: 'OK',
-    name: 'Oklahoma'
+    name: 'Oklahoma',
   },
   {
     value: 'OR',
-    name: 'Oregon'
+    name: 'Oregon',
   },
   {
     value: 'PA',
-    name: 'Pennsylvania'
+    name: 'Pennsylvania',
   },
   {
     value: 'RI',
-    name: 'Rhode Island'
+    name: 'Rhode Island',
   },
   {
     value: 'SC',
-    name: 'South Carolina'
+    name: 'South Carolina',
   },
   {
     value: 'SD',
-    name: 'South Dakota'
+    name: 'South Dakota',
   },
   {
     value: 'TN',
-    name: 'Tennessee'
+    name: 'Tennessee',
   },
   {
     value: 'TX',
-    name: 'Texas'
+    name: 'Texas',
   },
   {
     value: 'UT',
-    name: 'Utah'
+    name: 'Utah',
   },
   {
     value: 'VA',
-    name: 'Virginia'
+    name: 'Virginia',
   },
   {
     value: 'VT',
-    name: 'Vermont'
+    name: 'Vermont',
   },
   {
     value: 'WA',
-    name: 'Washington'
+    name: 'Washington',
   },
   {
     value: 'WI',
-    name: 'Wisconsin'
+    name: 'Wisconsin',
   },
   {
     value: 'WV',
-    name: 'West Virginia'
+    name: 'West Virginia',
   },
   {
     value: 'WY',
-    name: 'Wyoming'
-  }
+    name: 'Wyoming',
+  },
 ]

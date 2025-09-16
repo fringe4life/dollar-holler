@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button'
-  
+
   import { toast } from 'svelte-sonner'
 </script>
 
@@ -14,9 +14,9 @@
       description: 'Sunday, December 03, 2023 at 9:00 AM',
       action: {
         label: 'Close',
-        onClick: () => console.info('Undo')
+        onClick: () => console.info('Undo'),
       },
-      duration: 10
+      duration: 10,
     })}
 >
   Show Toast

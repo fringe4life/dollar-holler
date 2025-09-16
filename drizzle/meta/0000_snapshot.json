@@ -185,12 +185,8 @@
           "name": "invoices_client_id_clients_id_fk",
           "tableFrom": "invoices",
           "tableTo": "clients",
-          "columnsFrom": [
-            "client_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["client_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -261,12 +257,8 @@
           "name": "line_items_invoice_id_invoices_id_fk",
           "tableFrom": "line_items",
           "tableTo": "invoices",
-          "columnsFrom": [
-            "invoice_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["invoice_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -394,9 +386,7 @@
       "indexes": {
         "users_email_unique": {
           "name": "users_email_unique",
-          "columns": [
-            "email"
-          ],
+          "columns": ["email"],
           "isUnique": true
         }
       },

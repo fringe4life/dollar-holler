@@ -7,13 +7,13 @@ const config = {
   preprocess: [
     vitePreprocess(),
     mdsvex({
-      extensions: ['.md', '.svx']
-    })
+      extensions: ['.md', '.svx'],
+    }),
   ],
   kit: {
     adapter: adapter(),
-    alias: { $utils: './src/utils' }
-  }
+    alias: { $utils: './src/utils' },
+  },
 }
 
 export default config

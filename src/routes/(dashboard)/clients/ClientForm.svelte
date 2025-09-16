@@ -36,7 +36,7 @@
     state: '',
     street: '',
     zip: '',
-    clientStatus: 'active'
+    clientStatus: 'active',
   })
 
   if (edit) {

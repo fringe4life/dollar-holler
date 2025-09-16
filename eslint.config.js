@@ -35,8 +35,8 @@ export default [
       'bun.lock',
       'bun.lockb',
       // Generated files
-      'drizzle/'
-    ]
+      'drizzle/',
+    ],
   },
   js.configs.recommended,
   ...ts.configs.recommended,
@@ -45,14 +45,14 @@ export default [
   ...svelte.configs.prettier,
   {
     languageOptions: {
-      globals: { ...globals.browser, ...globals.node }
+      globals: { ...globals.browser, ...globals.node },
     },
     rules: {
       'no-undef': 'off',
       // Disable rules that conflict with Tailwind CSS v4 @rules
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off'
-    }
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
   },
   {
     files: ['**/*.svelte', '**/*.svelte.ts', '**/*.svelte.js'],
@@ -61,14 +61,14 @@ export default [
         projectService: true,
         extraFileExtensions: ['.svelte'],
         parser: ts.parser,
-        svelteConfig
-      }
+        svelteConfig,
+      },
     },
     rules: {
       // Disable rules that conflict with Tailwind CSS v4 @rules in Svelte files
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off'
-    }
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
   },
   {
     files: ['**/*.css', '**/*.scss', '**/*.sass'],
@@ -76,7 +76,7 @@ export default [
       // Disable all rules for CSS files to avoid conflicts with Tailwind CSS v4
       'no-undef': 'off',
       'no-unused-vars': 'off',
-      '@typescript-eslint/no-unused-vars': 'off'
-    }
-  }
+      '@typescript-eslint/no-unused-vars': 'off',
+    },
+  },
 ]

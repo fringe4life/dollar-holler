@@ -22,7 +22,7 @@
       'text-right': title === 'Amount',
       'truncate whitespace-nowrap': title === 'Client',
       'text-daisyBush': !emptyState,
-      'text-pastelPurple': emptyState
+      'text-pastelPurple': emptyState,
     }}
   >
     {title}

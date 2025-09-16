@@ -23,7 +23,7 @@ export const sumLineItems = (lineItems: LineItem[] | undefined): number => {
 export const centsToDollars = (cents: number): string => {
   return new Intl.NumberFormat('en', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'USD',
   }).format(cents / 100)
 }
 

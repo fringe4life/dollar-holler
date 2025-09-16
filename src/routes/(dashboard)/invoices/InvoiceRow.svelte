@@ -102,7 +102,7 @@
 
             { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: false },
 
-            { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled }
+            { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled },
           ]}
         />
       {/if}

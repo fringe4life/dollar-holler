@@ -111,14 +111,14 @@
               label: 'Active',
               icon: Activate,
               onclick: handleActivation,
-              disabled: client.clientStatus === 'active'
+              disabled: client.clientStatus === 'active',
             },
             {
               label: 'Archive',
               icon: Archive,
               onclick: handleArchive,
-              disabled: client.clientStatus === 'archive'
-            }
+              disabled: client.clientStatus === 'archive',
+            },
           ]}
         />
       {/if}

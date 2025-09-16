@@ -30,5 +30,5 @@ export const actions: Actions = {
       console.error('Signup error:', error)
       return fail(400, { error: 'Signup failed' })
     }
-  }
+  },
 }

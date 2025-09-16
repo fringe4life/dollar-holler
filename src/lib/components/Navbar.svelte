@@ -8,7 +8,7 @@
     { href: '/invoices', title: 'Invoices' },
     { href: '/clients', title: 'Clients' },
     { href: '/settings', title: 'Settings' },
-    { href: '/logout', title: 'Logout' }
+    { href: '/logout', title: 'Logout' },
   ]
   const path = $derived(page.url.pathname)
 
@@ -24,7 +24,7 @@
   class={{
     'fixed top-6 right-6 z-10 cursor-pointer transition-colors duration-200 md:hidden': true,
     'text-goldenFizz': isNavShowing,
-    'text-daisyBush': !isNavShowing
+    'text-daisyBush': !isNavShowing,
   }}
   {onclick}
 >
@@ -38,7 +38,7 @@
 <header
   class={{
     '  bg-daisyBush fixed inset-0 isolate z-2 w-full -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0 ': true,
-    'translate-x-0 ': isNavShowing
+    'translate-x-0 ': isNavShowing,
   }}
 >
   <div class="mt-10 mb-10 md:mb-24">

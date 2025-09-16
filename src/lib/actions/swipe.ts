@@ -17,7 +17,7 @@ export const swipe: Action<HTMLElement, SwipeProps> = (
     { x: 0, y: 0 },
     {
       stiffness: 0.2,
-      damping: 0.4
+      damping: 0.4,
     }
   )
 
@@ -94,7 +94,7 @@ export const swipe: Action<HTMLElement, SwipeProps> = (
     coordinates.update($coords => {
       return {
         x: $coords.x + dx,
-        y: 0
+        y: 0,
       }
     })
   }
@@ -144,6 +144,6 @@ export const swipe: Action<HTMLElement, SwipeProps> = (
     destroy() {
       node.removeEventListener('mousedown', handleMouseDown)
       node.removeEventListener('touchstart', handleTouchStart)
-    }
+    },
   }
 }

@@ -2,24 +2,24 @@
   import { type VariantProps, tv } from 'tailwind-variants'
 
   export const badgeVariants = tv({
-    base: ' whitespace-nowrap capitalize rounded-full font-bold text-center text-md w-20 border focus-visible:border-ring focus-visible:ring-ring/50 ',
+    base: 'text-md focus-visible:border-ring focus-visible:ring-ring/50 w-20 rounded-full border text-center font-bold whitespace-nowrap capitalize',
     variants: {
       variant: {
-        sent: 'text-blueGem bg-robinEggBlue border-robinEggBlue ',
-        draft: 'text-pastelPurple border-pastelPurple ',
+        sent: 'text-blueGem bg-robinEggBlue border-robinEggBlue',
+        draft: 'text-pastelPurple border-pastelPurple',
         late: 'border-scarlet bg-scarlet text-goldenFizz focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/70 border-transparent text-white',
-        paid: 'border-pastelPurple bg-pastelPurple text-white'
+        paid: 'border-pastelPurple bg-pastelPurple text-white',
       },
       size: {
         default: 'px-3 py-1',
-        small: 'px-2 '
-      }
+        small: 'px-2',
+      },
     },
     defaultVariants: {
       variant: 'draft',
 
-      size: 'small'
-    }
+      size: 'small',
+    },
   })
 
   export type BadgeVariant = VariantProps<typeof badgeVariants>['variant']

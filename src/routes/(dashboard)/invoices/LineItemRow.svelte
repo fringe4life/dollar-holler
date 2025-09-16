@@ -15,7 +15,7 @@
     isRequired,
     lineItem = $bindable(),
     removeLineItem,
-    canDelete
+    canDelete,
   }: Props = $props()
 
   let unitPrice = $derived((lineItem.amount / lineItem.quantity).toFixed(2))

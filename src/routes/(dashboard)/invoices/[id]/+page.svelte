@@ -26,7 +26,7 @@
     MouseEventHandler<HTMLAnchorElement> = async () => {
     await window.navigator.clipboard.writeText(page.url.href)
     toast.success('Success!', {
-      description: `${page.url.href}`
+      description: `${page.url.href}`,
     })
   }
 

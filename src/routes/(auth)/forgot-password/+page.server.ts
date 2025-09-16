@@ -26,5 +26,5 @@ export const actions: Actions = {
       console.error('Forgot password error:', error)
       return fail(400, { error: 'Failed to send reset email' })
     }
-  }
+  },
 }

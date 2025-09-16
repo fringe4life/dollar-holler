@@ -18,7 +18,7 @@
     lineItems = $bindable(),
     addLineItem,
     removeLineItem,
-    isEditible = true
+    isEditible = true,
   }: Props = $props()
 
   let subTotal = $derived<number>(sumLineItems(lineItems))

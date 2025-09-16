@@ -9,8 +9,35 @@ import svelteConfig from './svelte.config.js'
 
 const gitignorePath = fileURLToPath(new URL('./.gitignore', import.meta.url))
 
-export default ts.config(
+export default [
   includeIgnoreFile(gitignorePath),
+  {
+    ignores: [
+      // Build outputs
+      '.svelte-kit/',
+      'build/',
+      'dist/',
+      // Dependencies
+      'node_modules/',
+      // Database
+      '*.db',
+      '*.sqlite',
+      // Environment files
+      '.env',
+      '.env.local',
+      '.env.*.local',
+      // Logs
+      '*.log',
+      // Package managers
+      'package-lock.json',
+      'pnpm-lock.yaml',
+      'yarn.lock',
+      'bun.lock',
+      'bun.lockb',
+      // Generated files
+      'drizzle/'
+    ]
+  },
   js.configs.recommended,
   ...ts.configs.recommended,
   ...svelte.configs.recommended,
@@ -52,4 +79,4 @@ export default ts.config(
       '@typescript-eslint/no-unused-vars': 'off'
     }
   }
-)
+]

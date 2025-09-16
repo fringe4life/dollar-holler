@@ -1,10 +1,10 @@
-import { redirect } from '@sveltejs/kit'
-import { auth } from '$lib/auth'
-import type { PageServerLoad } from './$types'
+import { redirect } from "@sveltejs/kit";
+import { auth } from "$lib/auth";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ request }) => {
   await auth.api.signOut({
     headers: request.headers,
-  })
-  throw redirect(303, '/login')
-}
+  });
+  throw redirect(303, "/login");
+};

@@ -9,10 +9,18 @@
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
   "editor.autoIndent": "full",
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact", "svelte"],
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact",
+    "svelte"
+  ],
   "eslint.workingDirectories": ["."],
   "eslint.format.enable": true,
-  "prettier.documentSelectors": ["**/*.{js,jsx,ts,tsx,svelte,css,html,json,md}"],
+  "prettier.documentSelectors": [
+    "**/*.{js,jsx,ts,tsx,svelte,css,html,json,md}"
+  ],
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,

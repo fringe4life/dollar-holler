@@ -1,14 +1,15 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { resolve, asset } from '$app/paths'
   import Close from '$lib/icon/Close.svelte'
   import Hamburger from '$lib/icon/Hamburger.svelte'
   import type { MouseEventHandler } from 'svelte/elements'
 
   const navItems = [
-    { href: '/invoices', title: 'Invoices' },
-    { href: '/clients', title: 'Clients' },
-    { href: '/settings', title: 'Settings' },
-    { href: '/logout', title: 'Logout' },
+    { href: resolve('/invoices'), title: 'Invoices' },
+    { href: resolve('/clients'), title: 'Clients' },
+    { href: resolve('/settings'), title: 'Settings' },
+    { href: resolve('/logout'), title: 'Logout' },
   ]
   const path = $derived(page.url.pathname)
 
@@ -42,8 +43,8 @@
   }}
 >
   <div class="mt-10 mb-10 md:mb-24">
-    <a href="/invoices">
-      <img class="mx-auto" src="/images/logo.svg" alt="Doller Holla company logo" />
+    <a href={resolve('/invoices')}>
+      <img class="mx-auto" src={asset('/images/logo.svg')} alt="Doller Holla company logo" />
     </a>
   </div>
   <ul class="list-none text-2xl font-bold">

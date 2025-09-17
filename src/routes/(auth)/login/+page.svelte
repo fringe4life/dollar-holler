@@ -1,6 +1,7 @@
 <script lang="ts">
   import Alert from '$lib/components/Alert.svelte'
   import { Button } from '$lib/components/ui/button'
+  import { resolve } from '$app/paths'
   import type { PageProps } from './$types'
 
   let { form, data }: PageProps = $props()
@@ -20,14 +21,14 @@
     <div class="field">
       <div class="flex items-center justify-between">
         <label for="password" class="text-goldenFizz">Password</label>
-        <a class="text-sm underline hover:no-underline" href="/forgot-password">Forgot Password</a>
+        <a class="text-sm underline hover:no-underline" href={resolve('/forgot-password')}>Forgot Password</a>
       </div>
       <input required minlength="6" type="password" name="password" id="password" />
     </div>
     <div class="field">
       <Button variant="auth" type="submit">Let's do this!</Button>
       <p class="mt-4 text-center text-sm text-white">
-        <a href="/signup" class="underline hover:no-underline">Don't have an account yet?</a>
+        <a href={resolve('/signup')} class="underline hover:no-underline">Don't have an account yet?</a>
       </p>
     </div>
   </fieldset>

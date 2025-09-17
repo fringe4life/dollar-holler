@@ -7,12 +7,13 @@
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import { centsToDollars, getTotal } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
-  import type { Invoice } from '../../../global'
+  import type {Invoice} from '$lib/db/schema'
   import Send from '$lib/icon/Send.svelte'
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'
   import { clickOutside } from '$lib/attachments/clickOutside'
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
+  import { resolve } from '$app/paths'
   import ConfirmDelete from './ConfirmDelete.svelte'
   import { swipe } from '$lib/actions/swipe'
   import Cancel from '$lib/icon/Cancel.svelte'
@@ -31,7 +32,7 @@
     isAdditionalMenuShowing = !isAdditionalMenuShowing
   }
 
-  const getLabel = (label: BadgeVariant, dueDate: string | undefined): BadgeVariant => {
+  const getLabel = (label: BadgeVariant, dueDate: string | null): BadgeVariant => {
     if (label === 'draft') {
       return 'draft'
     } else if (label === 'sent' && isLate?.(dueDate)) {
@@ -68,6 +69,8 @@
   const { id, invoiceStatus, dueDate, invoiceNumber, client } = invoice
 
   const label = getLabel(invoiceStatus, dueDate)
+
+  const resolved = resolve('/invoices/[id]', { id })
 </script>
 
 <div class="relative isolate">
@@ -85,7 +88,7 @@
     <div
       class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
     >
-      <a href={`/invoices/${id}`} class=""><View /></a>
+      <a href={resolve('/invoices/[id]', { id })} class=""><View /></a>
     </div>
     <div
       class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
@@ -128,7 +131,7 @@
       <Trash width={32} height={32} />
       Delete
     </button>
-    <a class="action-button" href={`/invoices/${id}`}><View height={32} width={32} /></a>
+    <a class="action-button" href={resolve('/invoices/[id]', { id })}><View height={32} width={32} /></a>
   </div>
 </div>
 
@@ -147,13 +150,11 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  {#snippet children()}
-    <InvoiceForm
-      formState="edit"
-      bind:invoiceEdit={invoice}
-      closePanel={() => (isInvoiceShowingPanel = false)}
-    />
-  {/snippet}
+  <InvoiceForm
+    formState="edit"
+    bind:invoiceEdit={invoice}
+    closePanel={() => (isInvoiceShowingPanel = false)}
+  />
 </SlidePanel>
 
 <style>

@@ -3,6 +3,7 @@
   import Arrow from '$lib/icon/Arrow.svelte'
   //   import { navigating, page } from '$app/state'
   import { afterNavigate, goto } from '$app/navigation'
+  import { resolve } from '$app/paths'
   let { children } = $props()
 
   let previousPageLink: string | undefined = $state(undefined)
@@ -14,7 +15,7 @@
 <svelte:window
   onkeydown={e => {
     if (e.key === 'Escape') {
-      goto(previousPageLink || '/invoices')
+      goto(resolve(previousPageLink || '/invoices'))
     }
   }}
 />
@@ -24,7 +25,7 @@
 >
   <main transition:fly={{ y: 500, duration: 200 }} class="mx-auto min-h-[100dvh] max-w-256">
     <a
-      href={previousPageLink ? previousPageLink : '/invoices'}
+      href={resolve(previousPageLink || '/invoices')}
       class="text-pastelPurple fixed top-7 left-7 print:hidden"><Arrow /></a
     >
     {@render children()}

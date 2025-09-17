@@ -1,8 +1,9 @@
+import { getRequestEvent } from "$app/server";
+import { db } from "$lib/db";
+import { createId } from '@paralleldrive/cuid2';
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { sveltekitCookies } from "better-auth/svelte-kit";
-import { getRequestEvent } from "$app/server";
-import { db } from "$lib/db";
 
 export const auth = betterAuth({
   appName: "Dollar Holler",
@@ -10,9 +11,16 @@ export const auth = betterAuth({
   database: drizzleAdapter(db, {
     provider: "pg", // PostgreSQL
   }),
+  secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
+  },
+  session: {
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // Cache duration in seconds (5 minutes)
+    },
   },
   plugins: [sveltekitCookies(getRequestEvent)],
   trustedOrigins: [
@@ -20,4 +28,19 @@ export const auth = betterAuth({
     "http://localhost:4173",
     process.env.PUBLIC_BASE_URL,
   ].filter(Boolean) as string[],
+  databaseHooks: {
+    user: {
+      create: {
+        before: async (user, _) => {
+          // Generate CUID2 for user ID
+          return {
+            data: {
+              ...user,
+              id: createId(),
+            },
+          };
+        },
+      },
+    },
+  },
 });

@@ -3,14 +3,16 @@
   import Button from '$lib/components/ui/button/button.svelte'
   import type { Settings } from '$lib/db/schema'
   import Check from '$lib/icon/Check.svelte'
-  import { getSettings, loadSettings } from '$lib/stores/settingsStore.svelte'
+  import { settingsStore } from '$lib/stores/settingsStore.svelte'
   import { states } from '$lib/utils/states'
   import { onMount } from 'svelte'
 
   let mySettings: Settings = {} as Settings
-  onMount(() => {
-    loadSettings()
-    mySettings = { ...getSettings() }
+  onMount(async () => {
+    await settingsStore.loadSettings()
+    if (settingsStore.settings) {
+      mySettings = { ...settingsStore.settings }
+    }
   })
 </script>
 

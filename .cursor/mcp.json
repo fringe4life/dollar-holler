@@ -4,6 +4,13 @@
       "command": "npx",
       "args": ["@eslint/mcp@latest"],
       "env": {}
+    },
+    "mcp-svelte-docs": {
+      "command": "npx -y mcp-svelte-docs"
+    },
+    "Neon": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote@latest", "https://mcp.neon.tech/mcp"]
     }
   }
 }

@@ -127,7 +127,7 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  {#snippet children()}
+  
     <ClientForm
       edit={isEditing === 'edit' ? data.client : undefined}
       formState={isEditing}
@@ -136,7 +136,6 @@
         isEditing = 'create'
       }}
     />
-  {/snippet}
 </SlidePanel>
 
 <style>

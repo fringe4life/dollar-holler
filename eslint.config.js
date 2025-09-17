@@ -48,7 +48,7 @@ export default [
       globals: { ...globals.browser, ...globals.node },
     },
     rules: {
-      "no-undef": "off",
+      // "no-undef": "off",
       // Disable rules that conflict with Tailwind CSS v4 @rules
       "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": "off",
@@ -74,9 +74,9 @@ export default [
     files: ["**/*.css", "**/*.scss", "**/*.sass"],
     rules: {
       // Disable all rules for CSS files to avoid conflicts with Tailwind CSS v4
-      "no-undef": "off",
-      "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "off",
+      // "no-undef": "off",
+      // "no-unused-vars": "off",
+      // "@typescript-eslint/no-unused-vars": "off",
     },
   },
 ];

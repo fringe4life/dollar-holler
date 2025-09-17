@@ -1,6 +1,7 @@
 <script lang="ts">
   import Alert from '$lib/components/Alert.svelte'
   import { Button } from '$lib/components/ui/button'
+  import { resolve } from '$app/paths'
   import type { PageProps } from './$types'
 
   let { form }: PageProps = $props()
@@ -26,7 +27,7 @@
 
     <Button variant="auth" type="submit">Send me a reset email!</Button>
     <p class="mt-4 text-center text-sm text-white">
-      <a href="/login" class="underline hover:no-underline">Ready to login?</a>
+      <a href={resolve('/login')} class="underline hover:no-underline">Ready to login?</a>
     </p>
   {/if}
 </form>

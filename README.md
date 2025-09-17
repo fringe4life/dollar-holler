@@ -1,41 +1,109 @@
-# sv
+# Dollar Holler
 
-Everything you need to build a Svelte project, powered by
-[`sv`](https://github.com/sveltejs/cli).
+A modern invoice management application built with SvelteKit 5, featuring Better Auth authentication, Drizzle ORM with Neon database, and CUID2 for resilient ID generation.
 
-## Creating a project
+## Prerequisites
 
-If you're seeing this, you've probably already done this step. Congrats!
+- [Bun](https://bun.sh/) (recommended) or Node.js 18+
+- [Neon](https://neon.tech/) account for PostgreSQL database
+- [Vercel](https://vercel.com/) account for deployment (optional)
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Getting Started
 
-# create a new project in my-app
-npx sv create my-app
+1. **Clone and install dependencies:**
+   ```bash
+   git clone <repository-url>
+   cd dollar-holler
+   bun install
+   ```
+
+2. **Set up environment variables:**
+   Create a `.env` file in the root directory:
+   ```env
+   DATABASE_URL="postgresql://username:password@hostname:port/database"
+   PUBLIC_BASE_URL="http://localhost:5173"
+   ```
+
+3. **Set up the database:**
+   ```bash
+   # Generate migrations
+   bun run db:generate
+   
+   # Run migrations
+   bun run db:migrate
+   
+   # Seed the database with sample data
+   bun run db:seed
+   ```
+
+4. **Start the development server:**
+   ```bash
+   bun run dev
+   ```
+
+## Available Scripts
+
+- `bun run dev` - Start development server
+- `bun run build` - Build for production
+- `bun run preview` - Preview production build
+- `bun run check` - Run Svelte check
+- `bun run db:generate` - Generate Drizzle migrations
+- `bun run db:migrate` - Run database migrations
+- `bun run db:seed` - Seed database with sample data
+- `bun run db:studio` - Open Drizzle Studio
+
+## Tech Stack
+
+- **Framework:** SvelteKit 5 with Svelte 5 runes
+- **Database:** PostgreSQL with Neon serverless
+- **ORM:** Drizzle ORM with Neon HTTP driver
+- **Authentication:** Better Auth with email/password
+- **ID Generation:** CUID2 for resilient, cursor-friendly IDs
+- **Deployment:** Vercel adapter
+- **Package Manager:** Bun
+
+## Project Structure
+
+```
+src/
+├── lib/
+│   ├── auth.ts          # Better Auth configuration
+│   ├── db/
+│   │   ├── index.ts     # Database connection (Neon HTTP)
+│   │   ├── schema.ts    # Drizzle schema definitions
+│   │   └── seed.ts      # Database seeding script
+│   └── ...
+├── routes/              # SvelteKit routes
+└── app.html            # HTML template
 ```
 
-## Developing
+## Database Schema
 
-Once you've created a project and installed dependencies with `npm install` (or
-`pnpm install` or `yarn`), start a development server:
+The application uses the following main tables:
+- `user` - Better Auth user accounts
+- `session` - User sessions
+- `account` - OAuth accounts
+- `verification` - Email verification tokens
+- `clients` - Client information
+- `invoices` - Invoice records
+- `line_items` - Invoice line items
+- `settings` - User settings
 
-```bash
-npm run dev
+All tables use CUID2 for primary keys and include proper foreign key relationships with cascade deletes.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
+## Features
 
-## Building
+- **Modern Authentication:** Better Auth with email/password support
+- **Type-Safe Database:** Drizzle ORM with full TypeScript support
+- **Serverless Ready:** Neon HTTP driver for Vercel deployment
+- **Resilient IDs:** CUID2 for cursor-based navigation and better performance
+- **Recent Data:** Seed script generates realistic data from the last 6 months
+- **Multi-User Support:** Data is distributed randomly among users
 
-To create a production version of your app:
+## Deployment
 
-```bash
-npm run build
-```
+The application is configured for Vercel deployment with the Vercel adapter. Ensure your `DATABASE_URL` environment variable is set in your Vercel project settings.
 
-You can preview the production build with `npm run preview`.
+## License
 
-> To deploy your app, you may need to install an
-> [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+MIT

@@ -13,6 +13,7 @@
   import ThreeDots from '$lib/icon/ThreeDots.svelte'
   import Trash from '$lib/icon/Trash.svelte'
   import View from '$lib/icon/View.svelte'
+  import { resolve } from '$app/paths'
   import { centsToDollars, sumInvoices } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
   import ClientForm from './ClientForm.svelte'
@@ -91,7 +92,7 @@
     <div class="view relative hidden place-self-center lg:block">
       <a
         class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
-        href={`/clients/${client.id}`}><View /></a
+        href={resolve('/clients/[id]', { id: client.id })}><View /></a
       >
     </div>
     <div class="relative hidden place-self-center lg:grid">
@@ -147,7 +148,7 @@
       <Trash width={32} height={32} />
       Delete
     </button>
-    <a class="action-button" href={`/clients/${client.id}`}><View height={32} width={32} /></a>
+    <a class="action-button" href={resolve('/clients/[id]', { id: client.id })}><View height={32} width={32} /></a>
   </div>
 </div>
 

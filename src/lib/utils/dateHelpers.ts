@@ -3,7 +3,7 @@
  * @param {string|undefined} myDate a string representation of a date
  * @returns {string} unknown if myDate is undefined otherwise a formatted date
  */
-export const convertDate = (myDate: string | undefined): string => {
+export const convertDate = (myDate: string | null): string => {
   if (!myDate) return "Unknown";
   const dateFormatter = new Intl.DateTimeFormat();
   const date = new Date(myDate);
@@ -15,7 +15,7 @@ export const convertDate = (myDate: string | undefined): string => {
  * @param {string|undefined} myDate string or undefined
  * @returns {boolean} it is either late or not
  */
-export const isLate = (myDate: string | undefined): boolean => {
+export const isLate = (myDate: string | null): boolean => {
   if (!myDate) return false;
 
   const [year, month, date] = splitDate(myDate);

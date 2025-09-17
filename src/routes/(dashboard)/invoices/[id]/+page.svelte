@@ -1,8 +1,9 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { asset } from '$app/paths'
   import MarkdownRenderer from '$lib/components/MarkdownRenderer.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
-  import { loadSettings, settings } from '$lib/stores/settingsStore.svelte'
+  import { settingsStore } from '$lib/stores/settingsStore.svelte'
   import { convertDate } from '$lib/utils/dateHelpers'
   import { onMount } from 'svelte'
   import { toast } from 'svelte-sonner'
@@ -14,7 +15,7 @@
   const invoice = $state(data.invoice)
 
   onMount(() => {
-    loadSettings()
+    settingsStore.loadSettings()
   })
 
   const printInvoice: MouseEventHandler<HTMLButtonElement> &
@@ -57,22 +58,22 @@
 >
   <div class="col-span-full sm:col-span-3 print:col-span-3">
     <img
-      src="/images/logo.png"
-      srcset="/images/logo@2x.png 2x, /images/logo.png 1x"
+      src={asset('/images/logo.png')}
+      srcset={`${asset('/images/logo@2x.png')} 2x, ${asset('/images/logo.png')} 1x`}
       alt="Compressed fm"
     />
   </div>
 
   <div class="col-span-full pt-4 sm:col-span-2 sm:col-start-5 print:col-span-3">
     <div class="label">From</div>
-    {#if settings && settings.myName}
+    {#if settingsStore.settings && settingsStore.settings.myName}
       <p>
-        {#if settings.myName}
-          {settings.myName}<br />
+        {#if settingsStore.settings.myName}
+          {settingsStore.settings.myName}<br />
         {/if}
-        {#if settings.city && settings.street && settings.state && settings.zip}
-          {settings.street}<br />
-          {settings.city}{' '}{settings.state}{' '}{settings.zip}
+        {#if settingsStore.settings.city && settingsStore.settings.street && settingsStore.settings.state && settingsStore.settings.zip}
+          {settingsStore.settings.street}<br />
+          {settingsStore.settings.city} {settingsStore.settings.state} {settingsStore.settings.zip}
         {/if}
       </p>
     {:else}

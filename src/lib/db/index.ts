@@ -1,14 +1,11 @@
-import { drizzle } from "drizzle-orm/postgres-js";
-import postgres from "postgres";
+import { DATABASE_URL } from "$env/static/private";
+import { neon } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-http";
 import * as schema from "./schema";
 
-import { PUBLIC_SUPABASE_URL } from "$env/static/public";
+if (!DATABASE_URL) {
+  throw new Error("Missing DATABASE_URL environment variable");
+}
 
-// Create a PostgreSQL client
-const client = postgres(PUBLIC_SUPABASE_URL);
-
-// Create a Drizzle instance
-export const db = drizzle(client, { schema });
-
-// Export the client for migrations
-export { client };
+const sql = neon(DATABASE_URL);
+export const db = drizzle(sql, { schema });

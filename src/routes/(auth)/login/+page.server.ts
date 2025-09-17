@@ -1,5 +1,6 @@
-import { fail, redirect } from "@sveltejs/kit";
 import { auth } from "$lib/auth";
+import { loginSchema } from "$lib/validators";
+import { fail, redirect } from "@sveltejs/kit";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -8,23 +9,35 @@ export const actions: Actions = {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
 
-    if (!email) {
-      return fail(400, { email });
+    // Validate input with ArkType
+    const validationResult = loginSchema({ email, password });
+    
+    if (validationResult instanceof Error) {
+      return fail(400, { 
+        error: "Invalid input data",
+        details: validationResult.message 
+      });
     }
 
-    if (!password) {
-      return fail(400, { error: "Your password was missing" });
+    // Type guard to ensure we have valid data
+    if (!('email' in validationResult) || !('password' in validationResult)) {
+      return fail(400, { 
+        error: "Invalid input data",
+        details: "Missing required fields" 
+      });
     }
 
     try {
       const result = await auth.api.signInEmail({
-        email,
-        password,
+        body: {
+          email: validationResult.email,
+          password: validationResult.password,
+        },
         headers: request.headers,
       });
 
-      if (result.error) {
-        return fail(400, { error: result.error.message });
+      if ('error' in result) {
+        return fail(400, { error: (result as any).error.message });
       }
 
       throw redirect(303, "/invoices");

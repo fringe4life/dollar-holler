@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from '$app/state'
+  import { asset } from '$app/paths'
 </script>
 
 <svelte:head>
@@ -13,7 +14,7 @@
 </svelte:head>
 
 <div
-  class="flex min-h-[calc(100dvh_-_3rem_-_1.75rem)] w-full items-center justify-center bg-[url('/images/bg-error.svg')] bg-center bg-no-repeat"
+  class="flex min-h-[calc(100dvh_-_3rem_-_1.75rem)] w-full items-center justify-center bg-[url('{asset('/images/bg-error.svg')}')] bg-center bg-no-repeat"
 >
   <div>
     <h1 class="text-daisyBush text-5xl leading-none font-black">Not Found!</h1>

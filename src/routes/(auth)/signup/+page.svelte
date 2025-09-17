@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, buttonVariants } from '$lib/components/ui/button'
-
+  import { resolve } from '$app/paths';
   import Alert from '$lib/components/Alert.svelte'
 
   import Loader from '$lib/components/Loader.svelte'
@@ -14,12 +14,12 @@
 
 {#if isFormShowing}
   <h1 class="auth-heading">Sign up</h1>
-  <Alert message={form?.error?.message || ''} />
+  <Alert message={form?.error || ''} />
   <form method="POST">
     <fieldset disabled={isLoading}>
       <div class="field">
-        <label for="fullName" class="text-goldenFizz">Full Name</label>
-        <input type="text" name="fullName" id="fullName" />
+        <label for="name" class="text-goldenFizz">Full Name</label>
+        <input type="text" name="name" id="name" />
       </div>
 
       <div class="field">
@@ -39,11 +39,11 @@
           <Loader />{:else}Count me in!{/if}</Button
       >
       <p class="mt-4 text-center text-sm text-white">
-        <a href="/login" class="underline hover:no-underline">Already have an account?</a>
+        <a href={resolve('/login')} class="underline hover:no-underline" data-sveltekit-preload-data="hover">Already have an account?</a>
       </p>
     </fieldset>
   </form>
 {:else}
   <Alert message="Check your email for confirmation" />
-  <a href="/login" class={buttonVariants({ variant: 'auth' })}>Login</a>
+  <a href={resolve('/login')} class={buttonVariants({ variant: 'auth' })}>Login</a>
 {/if}

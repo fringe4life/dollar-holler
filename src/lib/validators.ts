@@ -56,6 +56,20 @@ export const signupSchema = type({
   });
 });
 
+export const resetPasswordSchema = type({
+  newPassword: "string >= 6",
+  confirmPassword: "string >= 6",
+  token: "string >= 1",
+}).narrow((data, ctx) => {
+  if (data.newPassword === data.confirmPassword) return true;
+  return ctx.reject({
+    expected: "identical to newPassword",
+    actual: "",
+    path: ["confirmPassword"],
+  });
+});
+
+
 // Type exports for TypeScript inference
 export type UserInsert = typeof userInsertSchema.infer;
 export type UserSelect = typeof userSelectSchema.infer;
@@ -79,3 +93,4 @@ export type SettingsUpdate = typeof settingsUpdateSchema.infer;
 
 export type LoginData = typeof loginSchema.infer;
 export type SignupData = typeof signupSchema.infer;
+export type ResetPasswordData = typeof resetPasswordSchema.infer;

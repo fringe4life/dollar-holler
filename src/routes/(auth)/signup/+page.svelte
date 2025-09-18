@@ -10,6 +10,7 @@
 
   let isFormShowing = $state<boolean>(true)
   let isLoading = $state<boolean>(false)
+
 </script>
 
 {#if isFormShowing}
@@ -17,6 +18,8 @@
   <Alert message={form?.error || ''} />
   <form method="POST">
     <fieldset disabled={isLoading}>
+      <!-- client-side debug: minimal -->
+      <input type="hidden" name="__debug_ts" value={Date.now()} />
       <div class="field">
         <label for="name" class="text-goldenFizz">Full Name</label>
         <input type="text" name="name" id="name" />

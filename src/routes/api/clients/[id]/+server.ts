@@ -1,9 +1,5 @@
 import { db } from "$lib/db";
-import {
-  clients as clientsTable,
-  invoices as invoicesTable,
-  lineItems as lineItemsTable,
-} from "$lib/db/schema";
+import { clients as clientsTable } from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import type { RequestHandler } from "./$types";
@@ -11,42 +7,12 @@ import type { RequestHandler } from "./$types";
 export const GET: RequestHandler = async ({ params }) => {
   try {
     const { id } = params;
-    const clientData = await db
-      .select()
-      .from(clientsTable)
-      .where(eq(clientsTable.id, id))
-      .leftJoin(invoicesTable, eq(clientsTable.id, invoicesTable.clientId))
-      .leftJoin(lineItemsTable, eq(invoicesTable.id, lineItemsTable.invoiceId));
-
-    if (clientData.length === 0) {
-      return json({ error: "Client not found" }, { status: 404 });
-    }
-
-    // Transform the data to match the expected Client structure
-    const client = clientData[0].clients;
-    const invoices = clientData
-      .filter((row) => row.invoices)
-      .map((row) => row.invoices!)
-      .reduce((acc, invoice) => {
-        const existing = acc.find((i) => i.id === invoice.id);
-        if (!existing) {
-          acc.push({
-            ...invoice,
-            client: { id: client.id, name: client.name },
-            lineItems: clientData
-              .filter(
-                (row) => row.line_items && row.invoices?.id === invoice.id,
-              )
-              .map((row) => row.line_items!),
-          });
-        }
-        return acc;
-      }, [] as any[]);
-
-    return json({
-      ...client,
-      invoice: invoices,
+    const client = await db.query.clients.findFirst({
+      where: (clients, { eq }) => eq(clients.id, id),
+      with: { invoices: { with: { lineItems: true } } },
     });
+    if (!client) return json({ error: "Client not found" }, { status: 404 });
+    return json(client);
   } catch (error) {
     console.error("Error getting client by ID:", error);
     return json({ error: "Failed to get client" }, { status: 500 });

@@ -1,6 +1,6 @@
-import { createId } from '@paralleldrive/cuid2';
-import { sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import { boolean, pgTable, real, text, timestamp } from "drizzle-orm/pg-core";
+import { cuidPk, timestamps } from "./columns.helpers";
 
 // Better Auth tables (using standard names for Better Auth compatibility)
 export const user = pgTable("user", {
@@ -9,8 +9,7 @@ export const user = pgTable("user", {
   email: text("email").notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ...timestamps,
   twoFactorEnabled: boolean("two_factor_enabled").default(false),
   username: text("username").unique(),
   displayUsername: text("display_username"),
@@ -20,8 +19,7 @@ export const session = pgTable("session", {
   id: text("id").primaryKey(),
   expiresAt: timestamp("expires_at").notNull(),
   token: text("token").notNull().unique(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ...timestamps,
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
@@ -39,8 +37,7 @@ export const account = pgTable("account", {
   refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
   scope: text("scope"),
   password: text("password"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ...timestamps,
 });
 
 export const verification = pgTable("verification", {
@@ -48,13 +45,12 @@ export const verification = pgTable("verification", {
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: timestamp("expires_at").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+  ...timestamps,
 });
 
 // Clients table
 export const clients = pgTable("clients", {
-  id: text("id").$defaultFn(() => createId()).primaryKey(),
+  id: cuidPk(),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email"),
@@ -65,13 +61,12 @@ export const clients = pgTable("clients", {
   clientStatus: text("client_status", { enum: ["active", "archive"] }).default(
     "active",
   ),
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
 
 // Invoices table
 export const invoices = pgTable("invoices", {
-  id: text("id").$defaultFn(() => createId()).primaryKey(),
+  id: cuidPk(),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   invoiceNumber: text("invoice_number").notNull(),
   clientId: text("client_id")
@@ -86,13 +81,12 @@ export const invoices = pgTable("invoices", {
   invoiceStatus: text("invoice_status", {
     enum: ["draft", "sent", "paid"],
   }).default("draft"),
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
 
 // Line items table
 export const lineItems = pgTable("line_items", {
-  id: text("id").$defaultFn(() => createId()).primaryKey(),
+  id: cuidPk(),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   invoiceId: text("invoice_id")
     .notNull()
@@ -100,13 +94,12 @@ export const lineItems = pgTable("line_items", {
   description: text("description").notNull(),
   quantity: real("quantity").notNull().default(1),
   amount: real("amount").notNull(),
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
 
 // Settings table
 export const settings = pgTable("settings", {
-  id: text("id").$defaultFn(() => createId()).primaryKey(),
+  id: cuidPk(),
   userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
   myName: text("my_name").notNull(),
   email: text("email").notNull(),
@@ -114,9 +107,38 @@ export const settings = pgTable("settings", {
   city: text("city").notNull(),
   state: text("state").notNull(),
   zip: text("zip").notNull(),
-  createdAt: timestamp("created_at").default(sql`CURRENT_TIMESTAMP`),
-  updatedAt: timestamp("updated_at").default(sql`CURRENT_TIMESTAMP`),
+  ...timestamps,
 });
+
+// Relations
+export const userRelations = relations(user, ({ many, one }) => ({
+  settings: one(settings),
+  clients: many(clients),
+  invoices: many(invoices),
+  lineItems: many(lineItems),
+  sessions: many(session),
+  accounts: many(account),
+}));
+
+export const settingsRelations = relations(settings, ({ one }) => ({
+  user: one(user, { fields: [settings.userId], references: [user.id] }),
+}));
+
+export const clientsRelations = relations(clients, ({ one, many }) => ({
+  user: one(user, { fields: [clients.userId], references: [user.id] }),
+  invoices: many(invoices),
+}));
+
+export const invoicesRelations = relations(invoices, ({ one, many }) => ({
+  user: one(user, { fields: [invoices.userId], references: [user.id] }),
+  client: one(clients, { fields: [invoices.clientId], references: [clients.id] }),
+  lineItems: many(lineItems),
+}));
+
+export const lineItemsRelations = relations(lineItems, ({ one }) => ({
+  user: one(user, { fields: [lineItems.userId], references: [user.id] }),
+  invoice: one(invoices, { fields: [lineItems.invoiceId], references: [invoices.id] }),
+}));
 
 // Export enums for use in the application
 export const InvoiceStatus = {

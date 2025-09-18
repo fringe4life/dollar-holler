@@ -1,6 +1,6 @@
 # Dollar Holler
 
-A modern invoice management application built with SvelteKit 5, featuring Better Auth authentication, Drizzle ORM with Neon database, and CUID2 for resilient ID generation.
+A modern invoice management application built with SvelteKit 5, featuring Better Auth authentication, Drizzle ORM (relations API) with Neon database, and CUID2 for resilient ID generation.
 
 ## Prerequisites
 
@@ -21,6 +21,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
    Create a `.env` file in the root directory:
    ```env
    DATABASE_URL="postgresql://username:password@hostname:port/database"
+   # Optionally used by auth/email flows
    PUBLIC_BASE_URL="http://localhost:5173"
    ```
 
@@ -51,6 +52,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run db:migrate` - Run database migrations
 - `bun run db:seed` - Seed database with sample data
 - `bun run db:studio` - Open Drizzle Studio
+- `bun run db:push` - Push schema directly to the database
 
 ## Tech Stack
 
@@ -61,6 +63,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **ID Generation:** CUID2 for resilient, cursor-friendly IDs
 - **Deployment:** Vercel adapter
 - **Package Manager:** Bun
+- **Validation:** ArkType for runtime-safe form validation
 
 ## Project Structure
 
@@ -91,6 +94,8 @@ The application uses the following main tables:
 
 All tables use CUID2 for primary keys and include proper foreign key relationships with cascade deletes.
 
+The application uses Drizzle's relations to simplify nested queries (e.g., `db.query.invoices.findMany({ with: { client: true, lineItems: true } })`) and avoid manual joins in API routes.
+
 ## Features
 
 - **Modern Authentication:** Better Auth with email/password support
@@ -99,6 +104,7 @@ All tables use CUID2 for primary keys and include proper foreign key relationshi
 - **Resilient IDs:** CUID2 for cursor-based navigation and better performance
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
+- **Auth Flows:** Reset password supported; token is read from URL and validated
 
 ## Deployment
 

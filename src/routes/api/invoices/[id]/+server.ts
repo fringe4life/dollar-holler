@@ -1,9 +1,5 @@
 import { db } from "$lib/db";
-import {
-  clients as clientsTable,
-  invoices as invoicesTable,
-  lineItems as lineItemsTable,
-} from "$lib/db/schema";
+import { invoices as invoicesTable, lineItems as lineItemsTable } from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import type { RequestHandler } from "./$types";
@@ -11,29 +7,12 @@ import type { RequestHandler } from "./$types";
 export const GET: RequestHandler = async ({ params }) => {
   try {
     const { id } = params;
-    const invoiceData = await db
-      .select()
-      .from(invoicesTable)
-      .where(eq(invoicesTable.id, id))
-      .leftJoin(clientsTable, eq(invoicesTable.clientId, clientsTable.id))
-      .leftJoin(lineItemsTable, eq(invoicesTable.id, lineItemsTable.invoiceId));
-
-    if (invoiceData.length === 0) {
-      return json({ error: "Invoice not found" }, { status: 404 });
-    }
-
-    // Transform the data to match the expected Invoice structure
-    const invoice = invoiceData[0].invoices;
-    const client = invoiceData[0].clients!;
-    const lineItems = invoiceData
-      .filter((row) => row.line_items)
-      .map((row) => row.line_items!);
-
-    return json({
-      ...invoice,
-      client,
-      lineItems,
+    const invoice = await db.query.invoices.findFirst({
+      where: (invoices, { eq }) => eq(invoices.id, id),
+      with: { client: true, lineItems: true },
     });
+    if (!invoice) return json({ error: "Invoice not found" }, { status: 404 });
+    return json(invoice);
   } catch (error) {
     console.error("Error getting invoice by ID:", error);
     return json({ error: "Failed to get invoice" }, { status: 500 });

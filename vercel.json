@@ -1,11 +1,5 @@
 {
   "buildCommand": "bun run build",
   "installCommand": "bun install",
-  "outputDirectory": ".svelte-kit",
-  "framework": "sveltekit",
-  "functions": {
-    ".svelte-kit/output/server/**/*.js": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  "framework": "sveltekit"
 }

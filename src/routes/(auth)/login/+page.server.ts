@@ -24,7 +24,7 @@ export const actions: Actions = {
         headers: request.headers,
       });
 
-      if ('error' in result) {
+      if ("error" in result) {
         return fail(400, { error: (result as any).error.message });
       }
 

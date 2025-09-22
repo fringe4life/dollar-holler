@@ -5,11 +5,11 @@
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
 
-  import type { Invoice } from '$lib/db/schema'
+  import type { NewInvoice } from '$lib/db/schema'
 
   type Props = {
     open: boolean
-    invoice: Invoice
+    invoice: NewInvoice
   }
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> &
@@ -30,8 +30,8 @@
 
   {#snippet description()}
     <h2 class="text-daisyBush text-center text-lg font-medium">
-      This will delete the invoice to <span class="text-scarlet">{invoice.client.name}</span> for
-      <span class="text-scarlet">{centsToDollars(sumLineItems(invoice.lineItems))}?</span>
+      This will delete the invoice to <span class="text-scarlet">{invoice?.client.name}</span> for
+      <span class="text-scarlet">{centsToDollars(sumLineItems(invoice?.lineItems))}?</span>
     </h2>
   {/snippet}
 

@@ -1,5 +1,8 @@
 import { db } from "$lib/db";
-import { invoices as invoicesTable, lineItems as lineItemsTable } from "$lib/db/schema";
+import {
+  invoices as invoicesTable,
+  lineItems as lineItemsTable,
+} from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
@@ -32,9 +35,11 @@ export const POST: RequestHandler = async ({ request }) => {
       .returning({ id: invoicesTable.id });
 
     if (lineItems && lineItems.length > 0) {
-      await db.insert(lineItemsTable).values(
-        lineItems.map((li: any) => ({ ...li, invoiceId: inserted.id }))
-      );
+      await db
+        .insert(lineItemsTable)
+        .values(
+          lineItems.map((li: any) => ({ ...li, invoiceId: inserted.id })),
+        );
     }
 
     return json({ id: inserted.id });

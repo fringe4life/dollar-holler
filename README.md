@@ -11,6 +11,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ## Getting Started
 
 1. **Clone and install dependencies:**
+
    ```bash
    git clone <repository-url>
    cd dollar-holler
@@ -19,20 +20,23 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 
 2. **Set up environment variables:**
    Create a `.env` file in the root directory:
+
    ```env
    DATABASE_URL="postgresql://username:password@hostname:port/database"
    # Optionally used by auth/email flows
    PUBLIC_BASE_URL="http://localhost:5173"
+   BETTER_AUTH_SECRET="your-strong-secret"
    ```
 
 3. **Set up the database:**
+
    ```bash
    # Generate migrations
    bun run db:generate
-   
+
    # Run migrations
    bun run db:migrate
-   
+
    # Seed the database with sample data
    bun run db:seed
    ```
@@ -40,6 +44,11 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 4. **Start the development server:**
    ```bash
    bun run dev
+   ```
+
+5. **Optional: Preview production build**
+   ```bash
+   bun run build && bun run preview
    ```
 
 ## Available Scripts
@@ -53,6 +62,8 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run db:seed` - Seed database with sample data
 - `bun run db:studio` - Open Drizzle Studio
 - `bun run db:push` - Push schema directly to the database
+ - `bun run format` - Format source with Prettier
+ - `bun run lint` - Run Prettier check and ESLint
 
 ## Tech Stack
 
@@ -64,6 +75,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **Deployment:** Vercel adapter
 - **Package Manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
+ - **Bundler:** rolldown-vite (Vite alias) for faster builds
 
 ## Project Structure
 
@@ -75,6 +87,7 @@ src/
 │   │   ├── index.ts     # Database connection (Neon HTTP)
 │   │   ├── schema.ts    # Drizzle schema definitions
 │   │   └── seed.ts      # Database seeding script
+│   ├── utils/           # Helpers (dates, type helpers)
 │   └── ...
 ├── routes/              # SvelteKit routes
 └── app.html            # HTML template
@@ -83,6 +96,7 @@ src/
 ## Database Schema
 
 The application uses the following main tables:
+
 - `user` - Better Auth user accounts
 - `session` - User sessions
 - `account` - OAuth accounts
@@ -108,7 +122,12 @@ The application uses Drizzle's relations to simplify nested queries (e.g., `db.q
 
 ## Deployment
 
-The application is configured for Vercel deployment with the Vercel adapter. Ensure your `DATABASE_URL` environment variable is set in your Vercel project settings.
+The application is configured for Vercel deployment with the Vercel adapter. Ensure your `DATABASE_URL` and `BETTER_AUTH_SECRET` environment variables are set in your Vercel project settings.
+
+## Notes
+
+- Uses `rolldown-vite` by aliasing `vite` in `package.json` (drop-in replacement). If issues arise with third-party plugins, see Vite’s rolldown guide for `withFilter` and environment APIs.
+- ESLint configuration is in `eslint.config.ts` and uses Svelte 5 rules and Prettier integration. Use `bun run format` before `bun run lint`.
 
 ## License
 

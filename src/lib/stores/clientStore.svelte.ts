@@ -1,13 +1,15 @@
-import type { Client, ClientStatus, Invoice } from "$lib/db/schema";
+import type { NewClient } from "$lib/db/schema";
+import {
+  normalizeToNull,
+  transformNullToUndefined,
+} from "$lib/utils/typeHelpers";
+import type { ClientInsert, ClientWithInvoicesResponse } from "$lib/validators";
+import { clientWithInvoicesResponseSchema } from "$lib/validators";
+import { ArkErrors } from "arktype";
 import { toast } from "svelte-sonner";
 
-// Extended Client type with invoices
-interface ClientWithInvoices extends Client {
-  invoice?: Invoice[];
-}
-
 // Create reactive state using $state
-export const clients = $state<ClientWithInvoices[]>([]);
+export const clients = $state<ClientWithInvoicesResponse[]>([]);
 
 // Export getter function to access clients
 export function getClients() {
@@ -27,17 +29,25 @@ export const loadClients = async () => {
     if (!response.ok) {
       throw new Error("Failed to load clients");
     }
-    const transformedClients = await response.json();
+    const rawData = await response.json();
+
+    // Validate response with ArkType
+    const validationResult = clientWithInvoicesResponseSchema.array()(rawData);
+    if (validationResult instanceof ArkErrors) {
+      console.error("Invalid client data received:", validationResult.summary);
+      throw new Error("Invalid client data received from server");
+    }
 
     // Update the reactive state
     clients.length = 0;
-    clients.push(...transformedClients);
+    clients.push(...validationResult);
   } catch (error) {
     console.error("Error loading clients:", error);
+    toast.error("Failed to load clients");
   }
 };
 
-export const addClient = async (clientToAdd: Omit<Client, "id">) => {
+export const addClient = async (clientToAdd: Omit<ClientInsert, "id">) => {
   try {
     const response = await fetch("/api/clients", {
       method: "POST",
@@ -52,10 +62,19 @@ export const addClient = async (clientToAdd: Omit<Client, "id">) => {
     }
 
     const { id } = await response.json();
-    const newClient: ClientWithInvoices = {
+    const newClient: ClientWithInvoicesResponse = {
       ...clientToAdd,
       id,
-      clientStatus: "active" as ClientStatus,
+      clientStatus: "active",
+      invoices: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      // Ensure all required fields are present
+      email: clientToAdd.email || null,
+      street: clientToAdd.street || null,
+      city: clientToAdd.city || null,
+      state: clientToAdd.state || null,
+      zip: clientToAdd.zip || null,
     };
 
     // Update the reactive state
@@ -67,48 +86,107 @@ export const addClient = async (clientToAdd: Omit<Client, "id">) => {
   }
 };
 
-export const updateClient = async (clientToUpdate: ClientWithInvoices) => {
+// Upsert function that handles both create and update
+export const upsertClient = async (clientData: NewClient) => {
   try {
-    const response = await fetch(`/api/clients/${clientToUpdate.id}`, {
-      method: "PUT",
+    const isUpdate = !!clientData.id;
+    const url = isUpdate ? `/api/clients/${clientData.id}` : "/api/clients";
+    const method = isUpdate ? "PUT" : "POST";
+
+    const response = await fetch(url, {
+      method,
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(clientToUpdate),
+      body: JSON.stringify(transformNullToUndefined(clientData)),
     });
 
     if (!response.ok) {
-      throw new Error("Failed to update client");
+      throw new Error(`Failed to ${isUpdate ? "update" : "add"} client`);
     }
 
-    // Update the reactive state
-    const index = clients.findIndex((c) => c.id === clientToUpdate.id);
-    if (index !== -1) {
-      clients[index] = clientToUpdate;
+    if (isUpdate && clientData.id) {
+      // Update existing client in state
+      const index = clients.findIndex((c) => c.id === clientData.id);
+      if (index !== -1) {
+        clients[index] = {
+          ...clients[index],
+          ...clientData,
+          id: clientData.id, // Ensure id is string, not undefined
+          invoices: clients[index].invoices, // Keep existing invoices
+          createdAt: clients[index].createdAt, // Preserve original createdAt
+          updatedAt: new Date(), // Update the timestamp
+          // Normalize undefined to null for consistent null handling
+          email: normalizeToNull(clientData.email),
+          street: normalizeToNull(clientData.street),
+          city: normalizeToNull(clientData.city),
+          state: normalizeToNull(clientData.state),
+          zip: normalizeToNull(clientData.zip),
+          clientStatus: normalizeToNull(clientData.clientStatus),
+        };
+      }
+      return clientData.id;
+    } else {
+      // Add new client to state
+      const { id } = await response.json();
+      const newClient: ClientWithInvoicesResponse = {
+        ...clientData,
+        id,
+        invoices: [],
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        // Normalize undefined to null for consistent null handling
+        email: normalizeToNull(clientData.email),
+        street: normalizeToNull(clientData.street),
+        city: normalizeToNull(clientData.city),
+        state: normalizeToNull(clientData.state),
+        zip: normalizeToNull(clientData.zip),
+        clientStatus: normalizeToNull(clientData.clientStatus),
+      };
+      clients.push(newClient);
+      return id;
     }
-    return clientToUpdate;
   } catch (error) {
-    console.error("Error updating client:", error);
-    toast.error("Failed to update client");
+    const isUpdate = !!clientData.id;
+    console.error(`Error ${isUpdate ? "updating" : "adding"} client:`, error);
+    toast.error(`Failed to ${isUpdate ? "update" : "add"} client`);
   }
+};
+
+// Legacy wrapper - use upsertClient directly
+export const updateClient = async (
+  clientToUpdate: NewClient & { id: string },
+) => {
+  return upsertClient(clientToUpdate);
 };
 
 export const getClientById = async (
   id: string,
-): Promise<ClientWithInvoices | undefined> => {
+): Promise<ClientWithInvoicesResponse | undefined> => {
   try {
     const response = await fetch(`/api/clients/${id}`);
     if (!response.ok) {
       return undefined;
     }
-    return await response.json();
+    const rawData = await response.json();
+
+    // Validate response with ArkType
+    const validationResult = clientWithInvoicesResponseSchema(rawData);
+    if (validationResult instanceof ArkErrors) {
+      console.error("Invalid client data received:", validationResult.summary);
+      return undefined;
+    }
+
+    return validationResult;
   } catch (error) {
     console.error("Error getting client by ID:", error);
     return undefined;
   }
 };
 
-export const deleteClient = async (clientToDelete: ClientWithInvoices) => {
+export const deleteClient = async (
+  clientToDelete: ClientWithInvoicesResponse,
+) => {
   try {
     const response = await fetch(`/api/clients/${clientToDelete.id}`, {
       method: "DELETE",

@@ -8,7 +8,7 @@ export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
     const validationResult = signupSchema(formData);
-    
+
     if (validationResult instanceof ArkErrors) {
       return fail(400, { error: validationResult.summary ?? "Invalid input" });
     }
@@ -23,8 +23,10 @@ export const actions: Actions = {
         headers: request.headers,
       });
 
-      if ('error' in result) {
-        return fail(400, { error: "Something went wrong please try again later" });
+      if ("error" in result) {
+        return fail(400, {
+          error: "Something went wrong please try again later",
+        });
       }
       throw redirect(303, "/login");
     } catch (error) {

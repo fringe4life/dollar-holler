@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Client, Invoice, LineItem } from '$lib/db/schema'
+  import type {  Invoice, LineItem, NewInvoice, NewClient } from '$lib/db/schema'
   import Trash from '$lib/icon/Trash.svelte'
-  import { addClient, clients, loadClients } from '$lib/stores/clientStore.svelte'
-  import { addInvoice, updateInvoice } from '$lib/stores/InvoiceStore.svelte'
+  import { upsertClient, clients, loadClients } from '$lib/stores/clientStore.svelte'
+  import { upsertInvoice } from '$lib/stores/InvoiceStore.svelte'
   import { today } from '$lib/utils/dateHelpers'
   import { states } from '$lib/utils/states'
   import { onMount } from 'svelte'
@@ -34,67 +34,101 @@
     loadClients()
   })
 
-  const blankLineItem: Omit<LineItem, 'id'> = {
-    description: '',
-    amount: 0,
-    quantity: 0,
-  }
 
-  let invoice = $state({
-    client: {} as Client,
+  // Form data using NewInvoice type
+  let invoice: NewInvoice = $state({
+    clientId: '',
+    invoiceNumber: '',
+    subject: null,
+    issueDate: today,
+    dueDate: '',
+    discount: null,
+    notes: null,
+    terms: null,
+    invoiceStatus: 'draft',
+    userId: '', // This will be set from the session
+  })
 
-    lineItems: [
-      {
-        ...blankLineItem,
-        id: crypto.randomUUID(),
-      },
-    ] as LineItem[],
-  }) as Invoice
+  // Separate state for line items (not part of NewInvoice)
+  let lineItems: LineItem[] = $state([
+    {
+      id: crypto.randomUUID(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      userId: '',
+      description: '',
+      invoiceId: '',
+      quantity: 0,
+      amount: 0,
+    },
+  ])
 
-  if (formState === 'edit') {
-    invoice = invoiceEdit as Invoice
+  // Initialize form data based on edit mode
+  if (formState === 'edit' && invoiceEdit) {
+    // Extract only the fields we need for the form
+    invoice = {
+      clientId: invoiceEdit.clientId,
+      invoiceNumber: invoiceEdit.invoiceNumber,
+      subject: invoiceEdit.subject,
+      issueDate: invoiceEdit.issueDate,
+      dueDate: invoiceEdit.dueDate,
+      discount: invoiceEdit.discount,
+      notes: invoiceEdit.notes,
+      terms: invoiceEdit.terms,
+      invoiceStatus: invoiceEdit.invoiceStatus,
+      userId: invoiceEdit.userId,
+      id: invoiceEdit.id, // Ensure id is present for updates
+    }
+    // Line items will be handled separately
   }
 
   const addLineItem: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = () => {
-    invoice.lineItems = [
-      ...(invoice?.lineItems as LineItem[]),
-      { ...blankLineItem, id: crypto.randomUUID() },
+    lineItems = [
+      ...lineItems,
+      {
+        id: crypto.randomUUID(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        userId: '',
+        description: '',
+        invoiceId: '',
+        quantity: 0,
+        amount: 0,
+      },
     ]
   }
 
   const removeLineItem = (id: string) => {
     console.log(id)
-    invoice.lineItems =
-      invoice?.lineItems && invoice?.lineItems.filter(lineItem => lineItem.id !== id)
+    lineItems = lineItems.filter(lineItem => lineItem.id !== id)
   }
 
   let isNewClient = $state<boolean>(false)
 
-  let newClient: Omit<Client, 'id'> = $state({
+  let newClient: NewClient = $state({
     clientStatus: 'active',
-    city: '',
-    email: '',
+    city: null,
+    email: null,
     name: '',
-    state: '',
-    street: '',
-    zip: '',
+    state: null,
+    street: null,
+    zip: null,
+    userId: '', // This will be set from the session
   })
 
   let discount = $derived<number>(invoice.discount || 0)
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
+    
     if (isNewClient) {
-      invoice.client = newClient as Client
-      const id = await addClient({ ...newClient })
-      invoice.client.id = id
+      const clientId = await upsertClient(newClient)
+      invoice.clientId = clientId
     }
-    if (formState === 'create') {
-      await addInvoice({ ...invoice })
-    } else {
-      await updateInvoice({ ...invoice })
-    }
+    
+    // Single upsert call - much simpler!
+    await upsertInvoice(invoice)
     closePanel()
   }
 
@@ -114,17 +148,12 @@
       <div class="flex flex-wrap items-end gap-x-2 sm:flex-nowrap md:gap-x-5">
         <select
           id="client"
-          onchange={() => {
-            const selectedClient = $clients.find(client => client.id === invoice.client.id)
-
-            invoice.client.name = selectedClient?.name === undefined ? '' : selectedClient.name
-          }}
           name="client"
           required={!isNewClient}
-          bind:value={invoice.client.id}
+          bind:value={invoice.clientId}
           class="mb-2 sm:mb-0"
         >
-          {#each $clients as { id, name } (id)}
+          {#each clients as { id, name } (id)}
             <option value={id}>{name}</option>
           {/each}
         </select>
@@ -133,8 +162,8 @@
           variant="outline"
           onclick={() => {
             isNewClient = true
-            invoice.client.name = ''
-            invoice.client.email = ''
+            newClient.name = ''
+            newClient.email = null
           }}>+ Client</Button
         >
       </div>
@@ -153,7 +182,16 @@
           size="sm"
           onclick={() => {
             isNewClient = false
-            newClient = {} as Omit<Client, 'id'>
+            newClient = {
+              clientStatus: 'active',
+              city: null,
+              email: null,
+              name: '',
+              state: null,
+              street: null,
+              zip: null,
+              userId: '',
+            }
           }}>Existing Client</Button
         >
       </div>
@@ -222,7 +260,7 @@
   </div>
   <!-- line items -->
   <div class="field col-span-6">
-    <LineItemRows bind:discount bind:lineItems={invoice.lineItems} {addLineItem} {removeLineItem} />
+    <LineItemRows bind:discount bind:lineItems {addLineItem} {removeLineItem} />
   </div>
 
   <!-- notes -->
@@ -257,4 +295,4 @@
   <option {value}>{name}</option>
 {/snippet}
 
-<ConfirmDelete {invoice} bind:open />
+<ConfirmDelete invoice={invoice} bind:open />

@@ -1,18 +1,18 @@
 {
   "$schema": "https://biomejs.dev/schemas/2.2.3/biome.json",
   "vcs": {
-    "enabled": false
+    "enabled": false,
   },
   "files": {
-    "ignore": ["**/*"]
+    "ignore": ["**/*"],
   },
   "linter": {
-    "enabled": false
+    "enabled": false,
   },
   "formatter": {
-    "enabled": false
+    "enabled": false,
   },
   "organizeImports": {
-    "enabled": false
-  }
+    "enabled": false,
+  },
 }

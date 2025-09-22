@@ -1,5 +1,18 @@
-import { createInsertSchema, createSelectSchema, createUpdateSchema } from "drizzle-arktype";
-import { account, clients, invoices, lineItems, session, settings, user, verification } from "./db/schema";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-arktype";
+import {
+  account,
+  clients,
+  invoices,
+  lineItems,
+  session,
+  settings,
+  user,
+  verification,
+} from "./db/schema";
 
 // Better Auth schemas
 export const userInsertSchema = createInsertSchema(user);
@@ -37,14 +50,14 @@ import { type } from "arktype";
 
 export const loginSchema = type({
   email: "string.email",
-  password: "string >= 6"
+  password: "string >= 6",
 });
 
 export const signupSchema = type({
-  email: "string.email", 
+  email: "string.email",
   password: "string >= 6",
   confirmPassword: "string >= 6",
-  name: "string >= 1"
+  name: "string >= 1",
 }).narrow((data, ctx) => {
   if (data.password === data.confirmPassword) {
     return true;
@@ -52,7 +65,7 @@ export const signupSchema = type({
   return ctx.reject({
     expected: "identical to password",
     actual: "",
-    path: ["confirmPassword"]
+    path: ["confirmPassword"],
   });
 });
 
@@ -69,6 +82,19 @@ export const resetPasswordSchema = type({
   });
 });
 
+// API Response validation schemas for stores using composition
+export const clientWithInvoicesResponseSchema = type({
+  "...": clientSelectSchema,
+  invoices: invoiceSelectSchema.array(),
+});
+
+export const invoiceWithRelationsResponseSchema = type({
+  "...": invoiceSelectSchema,
+  client: clientSelectSchema,
+  lineItems: lineItemSelectSchema.array(),
+});
+
+export const settingsResponseSchema = settingsSelectSchema;
 
 // Type exports for TypeScript inference
 export type UserInsert = typeof userInsertSchema.infer;
@@ -94,3 +120,10 @@ export type SettingsUpdate = typeof settingsUpdateSchema.infer;
 export type LoginData = typeof loginSchema.infer;
 export type SignupData = typeof signupSchema.infer;
 export type ResetPasswordData = typeof resetPasswordSchema.infer;
+
+// API Response types
+export type ClientWithInvoicesResponse =
+  typeof clientWithInvoicesResponseSchema.infer;
+export type InvoiceWithRelationsResponse =
+  typeof invoiceWithRelationsResponseSchema.infer;
+export type SettingsResponse = typeof settingsResponseSchema.infer;

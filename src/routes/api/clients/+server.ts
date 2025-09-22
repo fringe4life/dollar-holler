@@ -1,6 +1,7 @@
 import { db } from "$lib/db";
 import { clients as clientsTable } from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
+import { sql } from "drizzle-orm";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async () => {
@@ -30,7 +31,19 @@ export const POST: RequestHandler = async ({ request }) => {
       .insert(clientsTable)
       .values({
         ...clientToAdd,
-        clientStatus: "active",
+      })
+      .onConflictDoUpdate({
+        target: clientsTable.id,
+        set: {
+          userId: sql`excluded.user_id`,
+          name: sql`excluded.name`,
+          email: sql`excluded.email`,
+          street: sql`excluded.street`,
+          city: sql`excluded.city`,
+          state: sql`excluded.state`,
+          zip: sql`excluded.zip`,
+          clientStatus: sql`excluded.client_status`,
+        },
       })
       .returning({ id: clientsTable.id });
 

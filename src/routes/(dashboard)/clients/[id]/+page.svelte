@@ -2,6 +2,8 @@
   import CircledAmount from '$lib/components/CircledAmount.svelte'
   import Search from '$lib/components/Search.svelte'
   import { centsToDollars, sumInvoices } from '$lib/utils/moneyHelpers'
+  import type { Client } from '$lib/db/schema'
+  import type { ClientWithInvoicesResponse } from '$lib/validators'
   import BlankState from '../BlankState.svelte'
 
   import { Button } from '$lib/components/ui/button'
@@ -17,6 +19,12 @@
   let isFormShowing = $state<boolean>(false)
   let isEditing = $state<Props['formState']>('create')
 
+  // Utility function to extract client data without invoices
+  function extractClientData(clientWithInvoices: ClientWithInvoicesResponse): Client {
+    const { invoices, ...clientData } = clientWithInvoices;
+    return clientData;
+  }
+
   const handleEdit: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = () => {
     isEditing = 'edit'
@@ -24,17 +32,17 @@
   }
 
   const getDraft = (): string => {
-    const draftInvoices = data.client.invoice?.filter(i => i.invoiceStatus === 'draft')
+    const draftInvoices = data.client.invoices?.filter(i => i.invoiceStatus === 'draft')
     return centsToDollars(sumInvoices(draftInvoices))
   }
 
   const getPaid = (): string => {
-    const paidInvoices = data.client.invoice?.filter(i => i.invoiceStatus === 'paid')
+    const paidInvoices = data.client.invoices?.filter(i => i.invoiceStatus === 'paid')
     return centsToDollars(sumInvoices(paidInvoices))
   }
 
   const getOverdue = (): string => {
-    const overdueInvoices = data.client.invoice?.filter(i => {
+    const overdueInvoices = data.client.invoices?.filter(i => {
       if (isLate(i.dueDate) && i.invoiceStatus === 'sent') {
         return true
       }
@@ -44,7 +52,7 @@
   }
 
   const getOustanding = (): string => {
-    const overdueInvoices = data.client.invoice?.filter(i => {
+    const overdueInvoices = data.client.invoices?.filter(i => {
       if (!isLate(i.dueDate) && i.invoiceStatus === 'sent') {
         return true
       }
@@ -65,7 +73,7 @@
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if data.client.invoice && data.client.invoice.length > 0}
+  {#if data.client.invoices && data.client.invoices.length > 0}
     <Search {handleSearch} />
   {:else}
     <div></div>
@@ -103,16 +111,16 @@
 <!-- list of invoices -->
 <div>
   <!-- invoices -->
-  {#if !data.client.invoice}
+  {#if !data.client.invoices}
     <p>Loading...</p>
-  {:else if data.client.invoice.length > 0}
+  {:else if data.client.invoices.length > 0}
     <InvoiceRowHeader />
     <div class="flex flex-col-reverse">
-      {#each data.client.invoice as i (i.invoiceNumber)}
+      {#each data.client.invoices as i (i.invoiceNumber)}
         <InvoiceRow invoice={i} />
       {/each}
     </div>
-    <CircledAmount amount={centsToDollars(sumInvoices(data.client.invoice))} label="Total" />
+    <CircledAmount amount={centsToDollars(sumInvoices(data.client.invoices))} label="Total" />
   {:else}
     <BlankState />
   {/if}
@@ -128,14 +136,25 @@
   {/snippet}
 
   
-    <ClientForm
-      edit={isEditing === 'edit' ? data.client : undefined}
-      formState={isEditing}
-      closePanel={() => {
-        isFormShowing = false
-        isEditing = 'create'
-      }}
-    />
+    {#if isEditing === 'edit'}
+      <ClientForm
+        edit={extractClientData(data.client)}
+        formState="edit"
+        closePanel={() => {
+          isFormShowing = false
+          isEditing = 'create'
+        }}
+      />
+    {:else}
+      <ClientForm
+        edit={undefined}
+        formState="create"
+        closePanel={() => {
+          isFormShowing = false
+          isEditing = 'create'
+        }}
+      />
+    {/if}
 </SlidePanel>
 
 <style>

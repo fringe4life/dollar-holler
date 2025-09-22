@@ -10,7 +10,7 @@ export const actions: Actions = {
     const entries = Object.fromEntries(formData.entries());
 
     const token = new URL(request.url).searchParams.get("token") ?? "";
-    const result = resetPasswordSchema({...entries, token});
+    const result = resetPasswordSchema({ ...entries, token });
     if (result instanceof ArkErrors) {
       return fail(400, { error: result.summary ?? "Invalid input" });
     }

@@ -22,14 +22,18 @@ export const session = pgTable("session", {
   ...timestamps,
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const account = pgTable("account", {
   id: text("id").primaryKey(),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   accessToken: text("access_token"),
   refreshToken: text("refresh_token"),
   idToken: text("id_token"),
@@ -51,7 +55,9 @@ export const verification = pgTable("verification", {
 // Clients table
 export const clients = pgTable("clients", {
   id: cuidPk(),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   name: text("name").notNull(),
   email: text("email"),
   street: text("street"),
@@ -62,12 +68,14 @@ export const clients = pgTable("clients", {
     "active",
   ),
   ...timestamps,
-});
+}).enableRLS();
 
 // Invoices table
 export const invoices = pgTable("invoices", {
   id: cuidPk(),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   invoiceNumber: text("invoice_number").notNull(),
   clientId: text("client_id")
     .notNull()
@@ -82,12 +90,14 @@ export const invoices = pgTable("invoices", {
     enum: ["draft", "sent", "paid"],
   }).default("draft"),
   ...timestamps,
-});
+}).enableRLS();
 
 // Line items table
 export const lineItems = pgTable("line_items", {
   id: cuidPk(),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   invoiceId: text("invoice_id")
     .notNull()
     .references(() => invoices.id, { onDelete: "cascade" }),
@@ -95,12 +105,14 @@ export const lineItems = pgTable("line_items", {
   quantity: real("quantity").notNull().default(1),
   amount: real("amount").notNull(),
   ...timestamps,
-});
+}).enableRLS();
 
 // Settings table
 export const settings = pgTable("settings", {
   id: cuidPk(),
-  userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+  userId: text("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
   myName: text("my_name").notNull(),
   email: text("email").notNull(),
   street: text("street").notNull(),
@@ -108,7 +120,7 @@ export const settings = pgTable("settings", {
   state: text("state").notNull(),
   zip: text("zip").notNull(),
   ...timestamps,
-});
+}).enableRLS();
 
 // Relations
 export const userRelations = relations(user, ({ many, one }) => ({
@@ -131,13 +143,19 @@ export const clientsRelations = relations(clients, ({ one, many }) => ({
 
 export const invoicesRelations = relations(invoices, ({ one, many }) => ({
   user: one(user, { fields: [invoices.userId], references: [user.id] }),
-  client: one(clients, { fields: [invoices.clientId], references: [clients.id] }),
+  client: one(clients, {
+    fields: [invoices.clientId],
+    references: [clients.id],
+  }),
   lineItems: many(lineItems),
 }));
 
 export const lineItemsRelations = relations(lineItems, ({ one }) => ({
   user: one(user, { fields: [lineItems.userId], references: [user.id] }),
-  invoice: one(invoices, { fields: [lineItems.invoiceId], references: [invoices.id] }),
+  invoice: one(invoices, {
+    fields: [lineItems.invoiceId],
+    references: [invoices.id],
+  }),
 }));
 
 // Export enums for use in the application

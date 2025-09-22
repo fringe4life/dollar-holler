@@ -18,5 +18,3 @@ export const GET: RequestHandler = async ({ locals }) => {
     return json({ error: "Failed to load settings" }, { status: 500 });
   }
 };
-
-

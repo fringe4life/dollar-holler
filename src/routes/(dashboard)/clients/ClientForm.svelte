@@ -1,12 +1,14 @@
 <script lang="ts">
   import Button from '$lib/components/ui/button/button.svelte'
-  import type { Client } from '$lib/db/schema'
+  import type { Client, NewClient } from '$lib/db/schema'
+  import type { ClientInsert } from '$lib/validators'
   import Check from '$lib/icon/Check.svelte'
   import Trash from '$lib/icon/Trash.svelte'
-  import { addClient, loadClients, updateClient } from '$lib/stores/clientStore.svelte'
+  import { upsertClient, loadClients } from '$lib/stores/clientStore.svelte'
   import { states } from '$lib/utils/states'
   import { onMount } from 'svelte'
   import type { FormEventHandler } from 'svelte/elements'
+  
   type Panel = {
     closePanel: () => void
   }
@@ -18,7 +20,7 @@
 
   type CreateProps = {
     formState: 'create'
-    edit: undefined
+    edit?: undefined
   } & Panel
 
   export type Props = CreateProps | EditProps
@@ -29,30 +31,31 @@
     loadClients()
   })
 
-  let client: Omit<Client, 'id' | 'createdAt' | 'updatedAt'> = $state({
-    city: '',
-    email: '',
+      // Form data using NewClient type
+      let client: NewClient = $state({
+    city: null,
+    email: null,
     name: '',
-    state: '',
-    street: '',
-    zip: '',
+    state: null,
+    street: null,
+    zip: null,
     clientStatus: 'active',
+    userId: '', // This will be set from the session
   })
 
-  if (edit) {
-    client = edit
+  // Initialize form data based on edit mode
+  if (formState === 'edit' && edit) {
+    // Extract only the fields we need for the form
+    const { createdAt, updatedAt, ...clientData } = edit
+    client = clientData
   }
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
 
-    if (formState === 'create') {
-      await addClient({ ...client })
-      closePanel()
-    } else if (formState === 'edit' && edit && edit.id) {
-      await updateClient({ ...client, id: edit.id })
-      closePanel()
-    }
+    // Single upsert call - much simpler!
+    await upsertClient(client)
+    closePanel()
   }
 </script>
 

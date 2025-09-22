@@ -1,5 +1,8 @@
 import { db } from "$lib/db";
-import { invoices as invoicesTable, lineItems as lineItemsTable } from "$lib/db/schema";
+import {
+  invoices as invoicesTable,
+  lineItems as lineItemsTable,
+} from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import type { RequestHandler } from "./$types";

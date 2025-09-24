@@ -18,6 +18,18 @@
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
     isNavShowing = !isNavShowing
   }
+
+  // Function to check if a navigation item is active
+  const isActive = (href: string): boolean => {
+    // Exact match for root paths
+    if (href === '/') {
+      return path === '/'
+    }
+    
+    // For other paths, check if current path starts with the href
+    // This handles nested routes like /clients/[id] matching /clients
+    return path.startsWith(href)
+  }
 </script>
 
 <!-- mobile nav control -->
@@ -49,7 +61,7 @@
   </div>
   <ul class="list-none text-2xl font-bold">
     {#each navItems as { href, title } (title)}
-      {@render listItem(href, title, path === href)}
+      {@render listItem(href, title, isActive(href))}
     {/each}
   </ul>
 </header>

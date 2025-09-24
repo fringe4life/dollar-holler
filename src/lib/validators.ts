@@ -114,7 +114,10 @@ const lineItemSelectWithDates = WithParsedDates(lineItemSelectSchema);
 
 export const clientWithInvoicesResponseSchema = type({
   "...": clientSelectWithDates,
-  invoices: invoiceSelectWithDates.array(),
+  invoices: type({
+    "...": invoiceSelectWithDates,
+    lineItems: lineItemSelectWithDates.array(),
+  }).array(),
 });
 
 export const invoiceWithRelationsResponseSchema = type({

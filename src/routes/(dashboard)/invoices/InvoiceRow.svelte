@@ -15,7 +15,7 @@
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
   import { resolve } from '$app/paths'
   import ConfirmDelete from './ConfirmDelete.svelte'
-  import { swipe } from '$lib/actions/swipe'
+  import { swipe } from '$lib/attachments/swipe.svelte'
   import Cancel from '$lib/icon/Cancel.svelte'
 
   let isAdditionalMenuShowing = $state(false)
@@ -75,10 +75,10 @@
 
 <div class="relative isolate">
   <div
-    use:swipe={{ triggerReset }}
+    {@attach swipe({ triggerReset: triggerReset })}
     class="invoice-table invoice-row shadow-tableRow relative z-5 items-center justify-between rounded-lg bg-white py-3 lg:py-6"
   >
-    <div class="status">{@render tag(label)}</div>
+    <div class="status justify-self-end">{@render tag(label)}</div>
     <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>
     <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
     <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>

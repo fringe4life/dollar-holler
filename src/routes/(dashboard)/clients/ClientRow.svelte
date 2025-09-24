@@ -2,7 +2,7 @@
   import AdditionalOptions from '$lib/components/AdditionalOptions.svelte'
   import { Badge } from '$lib/components/ui/badge'
 
-  import { swipe } from '$lib/actions/swipe'
+  import { swipe } from '$lib/attachments/swipe.svelte'
   import { clickOutside } from '$lib/attachments/clickOutside'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import type { ClientWithInvoicesResponse } from '$lib/validators'
@@ -78,7 +78,7 @@
 
 <div class="relative isolate">
   <div
-    use:swipe={{ triggerReset }}
+    {@attach swipe({ triggerReset: triggerReset })}
     class="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
     <div class="status">{@render tag(client.clientStatus as string)}</div>

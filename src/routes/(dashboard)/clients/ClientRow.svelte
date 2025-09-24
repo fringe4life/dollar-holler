@@ -72,6 +72,8 @@
     // get sum of those invoices
   }
   let triggerReset = $state(false)
+
+  const resolved = resolve('/clients/[id]', { id: client.id })
 </script>
 
 <div class="relative isolate">
@@ -92,7 +94,7 @@
     <div class="view relative hidden place-self-center lg:block">
       <a
         class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
-        href={resolve('/clients/[id]', { id: client.id })}><View /></a
+        href={resolved}><View /></a
       >
     </div>
     <div class="relative hidden place-self-center lg:grid">
@@ -148,7 +150,7 @@
       <Trash width={32} height={32} />
       Delete
     </button>
-    <a class="action-button" href={resolve('/clients/[id]', { id: client.id })}><View height={32} width={32} /></a>
+    <a class="action-button" href={resolved}><View height={32} width={32} /></a>
   </div>
 </div>
 

@@ -88,7 +88,7 @@
     <div
       class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
     >
-      <a href={resolve('/invoices/[id]', { id })} class=""><View /></a>
+      <a href={resolved} class=""><View /></a>
     </div>
     <div
       class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
@@ -131,7 +131,7 @@
       <Trash width={32} height={32} />
       Delete
     </button>
-    <a class="action-button" href={resolve('/invoices/[id]', { id })}><View height={32} width={32} /></a>
+    <a class="action-button" href={resolved}><View height={32} width={32} /></a>
   </div>
 </div>
 

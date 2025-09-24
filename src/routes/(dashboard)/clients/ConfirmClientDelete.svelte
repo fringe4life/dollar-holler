@@ -1,5 +1,5 @@
 <script lang="ts">
-  import ModalE from '$lib/components/ModalE.svelte'
+  import Modal from '$lib/components/Modal.svelte'
   import { Button } from '$lib/components/ui/button'
   import type { MouseEventHandler } from 'svelte/elements'
 
@@ -20,7 +20,7 @@
   let { client, open = $bindable() }: Props = $props()
 </script>
 
-<ModalE bind:open buttonText="" className="z-450">
+<Modal bind:open buttonText="" className="z-450">
   {#snippet title()}
     <h2 class="text-daisyBush text-center text-xl font-bold">
       Are you sure you want to delete this invoice?
@@ -37,4 +37,4 @@
     <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
     <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button>
   </div>
-</ModalE>
+</Modal>

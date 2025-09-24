@@ -1,38 +1,69 @@
 <script lang="ts">
-  import { Button, buttonVariants } from '$lib/components/ui/button/index.js'
-  import * as Dialog from '$lib/components/ui/dialog/index.js'
-  import { Input } from '$lib/components/ui/input/index.js'
-  import { Label } from '$lib/components/ui/label/index.js'
   import type { Snippet } from 'svelte'
+  import { Dialog, type WithoutChild } from 'bits-ui'
+  import Cancel from '$lib/icon/Cancel.svelte'
+  import Button from './ui/button/button.svelte'
 
-  type Props = {
-    title: string
-    Description: Snippet
-    children?: Snippet
+  type Props = Dialog.RootProps & {
+    buttonText: string
+    title: Snippet
+    description: Snippet
+    contentProps?: WithoutChild<Dialog.ContentProps>
+    // ...other component props if you wish to pass them
+    className?: string
   }
+
+  let {
+    open = $bindable(false),
+    children,
+    buttonText,
+    contentProps,
+    title,
+    description,
+    className = '',
+    ...restProps
+  }: Props = $props()
 </script>
 
-<Dialog.Root>
-  <Dialog.Trigger class={buttonVariants({ variant: 'outline' })}>Edit Profile</Dialog.Trigger>
-  <Dialog.Content class="sm:max-w-[425px]">
-    <Dialog.Header>
-      <Dialog.Title>Edit profile</Dialog.Title>
-      <Dialog.Description>
-        Make changes to your profile here. Click save when you're done.
+<svelte:head>
+  {#if open}
+    <style>
+      body {
+        overflow: hidden;
+      }
+    </style>
+  {/if}
+</svelte:head>
+
+<Dialog.Root bind:open {...restProps}>
+  <!-- <Dialog.Trigger
+    onclick={() => (open = !open)}
+    class="bg-dark text-pastelPurple hover:text-blueGem shadow-mini hover:bg-dark/95
+  focus-visible:ring-foreground focus-visible:ring-offset-background inline-flex h-12 cursor-pointer
+  items-center justify-center rounded-md px-[21px] text-[15px] font-semibold whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95"
+  >
+    {buttonText}
+  </Dialog.Trigger> -->
+  <Dialog.Portal>
+    <Dialog.Overlay
+      class={`data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-blueGem/60 fixed inset-0 ${className ? className : 'z-50'}`}
+    />
+    <Dialog.Content
+      class="rounded-card-lg bg-background shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-500 grid min-h-57.5 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] content-between items-center border px-10 py-7 outline-hidden sm:max-w-122.5  md:w-full"
+      {...contentProps}
+    >
+      <Dialog.Title>
+        {@render title()}
+      </Dialog.Title>
+      <Dialog.Description class="text-foreground-alt text-sm">
+        {@render description()}
       </Dialog.Description>
-    </Dialog.Header>
-    <div class="grid gap-4 py-4">
-      <div class="grid grid-cols-4 items-center gap-4">
-        <Label for="name" class="text-right">Name</Label>
-        <Input id="name" value="Pedro Duarte" class="col-span-3" />
-      </div>
-      <div class="grid grid-cols-4 items-center gap-4">
-        <Label for="username" class="text-right">Username</Label>
-        <Input id="username" value="@peduarte" class="col-span-3" />
-      </div>
-    </div>
-    <Dialog.Footer>
-      <Button type="submit">Save changes</Button>
-    </Dialog.Footer>
-  </Dialog.Content>
+      {@render children?.()}
+      <Dialog.Close
+        class=" focus-visible:ring-foreground focus-visible:ring-offset-background text-pastelPurple hover:text-blueGem  absolute rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95 pointer-coarse:top-1 pointer-coarse:right-1 pointer-fine:top-4 pointer-fine:right-4"
+      >
+        <Button variant="ghost" size="icon"><Cancel /></Button>
+      </Dialog.Close>
+    </Dialog.Content>
+  </Dialog.Portal>
 </Dialog.Root>

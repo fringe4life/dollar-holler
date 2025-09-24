@@ -12,10 +12,10 @@
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import InvoiceForm from '$lib/components/invoiceForm.svelte'
   import { Button } from '$lib/components/ui/button'
-  import type { Invoice } from '$lib/db/schema'
+  import type { InvoiceWithRelationsResponse } from '$lib/validators'
   import NoSearchResults from './NoSearchResults.svelte'
 
-  let listInvoices: Invoice[] = $state([])
+  let listInvoices: InvoiceWithRelationsResponse[] = $state([])
   onMount(async () => {
     await loadInvoices()
     listInvoices = invoices

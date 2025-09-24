@@ -4,8 +4,6 @@
 
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme {
   --color-*: initial;
   --font-sansserif: "Source Sans 3", sans-serif;

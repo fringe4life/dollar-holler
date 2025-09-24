@@ -7,7 +7,7 @@
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import { centsToDollars, getTotal } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
-  import type {Invoice} from '$lib/db/schema'
+  import type {InvoiceWithRelationsResponse} from '$lib/validators'
   import Send from '$lib/icon/Send.svelte'
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'
@@ -23,7 +23,7 @@
   let triggerReset = $state(false)
 
   type Props = {
-    invoice: Invoice
+    invoice: InvoiceWithRelationsResponse
   }
 
   let { invoice }: Props = $props()
@@ -68,7 +68,7 @@
 
   const { id, invoiceStatus, dueDate, invoiceNumber, client } = invoice
 
-  const label = getLabel(invoiceStatus, dueDate)
+  const label = getLabel(invoiceStatus ?? 'draft', dueDate)
 
   const resolved = resolve('/invoices/[id]', { id })
 </script>

@@ -1,3 +1,4 @@
+/* eslint-disable svelte/prefer-svelte-reactivity */
 import type { NewClient } from "$lib/db/schema";
 import {
   normalizeToNull,
@@ -151,13 +152,6 @@ export const upsertClient = async (clientData: NewClient) => {
     console.error(`Error ${isUpdate ? "updating" : "adding"} client:`, error);
     toast.error(`Failed to ${isUpdate ? "update" : "add"} client`);
   }
-};
-
-// Legacy wrapper - use upsertClient directly
-export const updateClient = async (
-  clientToUpdate: NewClient & { id: string },
-) => {
-  return upsertClient(clientToUpdate);
 };
 
 export const getClientById = async (

@@ -42,6 +42,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
    ```
 
 4. **Start the development server:**
+
    ```bash
    bun run dev
    ```
@@ -62,8 +63,8 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run db:seed` - Seed database with sample data
 - `bun run db:studio` - Open Drizzle Studio
 - `bun run db:push` - Push schema directly to the database
- - `bun run format` - Format source with Prettier
- - `bun run lint` - Run Prettier check and ESLint
+- `bun run format` - Format source with Prettier
+- `bun run lint` - Run Prettier check and ESLint
 
 ## Tech Stack
 
@@ -75,7 +76,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **Deployment:** Vercel adapter
 - **Package Manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
- - **Bundler:** rolldown-vite (Vite alias) for faster builds
+- **Bundler:** rolldown-vite (Vite alias) for faster builds
 
 ## Project Structure
 

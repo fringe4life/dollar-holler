@@ -1,3 +1,4 @@
+import { generic, Hkt, type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
@@ -13,6 +14,21 @@ import {
   user,
   verification,
 } from "./db/schema";
+
+// Custom ArkType for parsed dates from API responses
+export const ParsedDate = type("string.date.parse");
+
+// Generic parser that adds date parsing to any Drizzle schema with timestamps
+const WithParsedDates = generic(["T", "object"])(
+  (args) =>
+    args.T.merge({
+      createdAt: ParsedDate,
+      updatedAt: ParsedDate,
+    }),
+  class WithParsedDatesHkt extends Hkt<[object]> {
+    declare body: this[0] & { createdAt: Date; updatedAt: Date };
+  },
+);
 
 // Better Auth schemas
 export const userInsertSchema = createInsertSchema(user);
@@ -45,8 +61,16 @@ export const settingsInsertSchema = createInsertSchema(settings);
 export const settingsSelectSchema = createSelectSchema(settings);
 export const settingsUpdateSchema = createUpdateSchema(settings);
 
+// Create schemas with parsed dates for API responses
+export const clientSelectWithDatesSchema = WithParsedDates(clientSelectSchema);
+export const invoiceSelectWithDatesSchema =
+  WithParsedDates(invoiceSelectSchema);
+export const lineItemSelectWithDatesSchema =
+  WithParsedDates(lineItemSelectSchema);
+export const settingsSelectWithDatesSchema =
+  WithParsedDates(settingsSelectSchema);
+
 // Auth form validation schemas using ArkType directly
-import { type } from "arktype";
 
 export const loginSchema = type({
   email: "string.email",
@@ -83,18 +107,23 @@ export const resetPasswordSchema = type({
 });
 
 // API Response validation schemas for stores using composition
+// Enhance Drizzle-derived select schemas with date parsing using generic parser
+const clientSelectWithDates = WithParsedDates(clientSelectSchema);
+const invoiceSelectWithDates = WithParsedDates(invoiceSelectSchema);
+const lineItemSelectWithDates = WithParsedDates(lineItemSelectSchema);
+
 export const clientWithInvoicesResponseSchema = type({
-  "...": clientSelectSchema,
-  invoices: invoiceSelectSchema.array(),
+  "...": clientSelectWithDates,
+  invoices: invoiceSelectWithDates.array(),
 });
 
 export const invoiceWithRelationsResponseSchema = type({
-  "...": invoiceSelectSchema,
-  client: clientSelectSchema,
-  lineItems: lineItemSelectSchema.array(),
+  "...": invoiceSelectWithDates,
+  client: clientSelectWithDates,
+  lineItems: lineItemSelectWithDates.array(),
 });
 
-export const settingsResponseSchema = settingsSelectSchema;
+export const settingsResponseSchema = WithParsedDates(settingsSelectSchema);
 
 // Type exports for TypeScript inference
 export type UserInsert = typeof userInsertSchema.infer;

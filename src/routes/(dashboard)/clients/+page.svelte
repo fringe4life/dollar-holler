@@ -2,7 +2,7 @@
   import Search from '$lib/components/Search.svelte'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
-  import type { Client } from '$lib/db/schema'
+  import type { ClientWithInvoicesResponse } from '$lib/validators'
   import { clientsStore, loadClients } from '$lib/stores/clientStore.svelte'
   import { onMount } from 'svelte'
   import NoSearchResults from '../invoices/NoSearchResults.svelte'
@@ -11,20 +11,14 @@
   import ClientRow from './ClientRow.svelte'
   import ClientRowHeader from './ClientRowHeader.svelte'
 
-  let clientList: Client[] = $state([])
-  let clients = $state(clientsStore.value)
-
-  onMount(async () => {
-    await loadClients()
-    clients = clientsStore.value
-    clientList = clients
-  })
-
+  let searchTerms = $state('')
   let isFormVisible = $state<boolean>(false)
 
-  const handleSearch = (searchTerms: string) => {
-    console.log(searchTerms)
-    clientList = clients.filter(client => {
+  // Derived state for filtered clients
+  const filteredClients = $derived.by(() => {
+    if (!searchTerms) return clientsStore.value
+    
+    return clientsStore.value.filter(client => {
       return (
         client.city?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client?.state?.toLowerCase().includes(searchTerms.toLowerCase()) ||
@@ -35,6 +29,14 @@
         client.name.toLowerCase().includes(searchTerms.toLowerCase())
       )
     })
+  })
+
+  onMount(async () => {
+    await loadClients()
+  })
+
+  const handleSearch = (terms: string) => {
+    searchTerms = terms
   }
 </script>
 
@@ -46,7 +48,7 @@
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if clients.length > 0}
+  {#if clientsStore.value.length > 0}
     <Search {handleSearch} />
   {:else}
     <div></div>
@@ -65,19 +67,19 @@
 <!-- list of clients -->
 
 <div>
-  {#if !clients}
+  {#if !clientsStore.value}
     <p>Loading...</p>
-  {:else if clients.length === 0}
+  {:else if clientsStore.value.length === 0}
     <BlankState />
-  {:else if clientList.length === 0}
+  {:else if filteredClients.length === 0}
     <NoSearchResults />
   {:else}
     <!-- client header row -->
     <ClientRowHeader />
     <!-- client rows -->
     <div class="flex flex-col-reverse">
-      {#each clientList as client, index (client.id)}
-        <ClientRow bind:client={clients[index]} />
+      {#each filteredClients as client, index (client.id)}
+        <ClientRow bind:client={filteredClients[index]} />
       {/each}
     </div>
   {/if}

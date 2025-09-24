@@ -5,7 +5,7 @@
   import { swipe } from '$lib/actions/swipe'
   import { clickOutside } from '$lib/attachments/clickOutside'
   import SlidePanel from '$lib/components/SlidePanel.svelte'
-  import type { Client } from '$lib/db/schema'
+  import type { ClientWithInvoicesResponse } from '$lib/validators'
   import Activate from '$lib/icon/Activate.svelte'
   import Archive from '$lib/icon/Archive.svelte'
   import Cancel from '$lib/icon/Cancel.svelte'
@@ -19,7 +19,7 @@
   import ClientForm from './ClientForm.svelte'
   import ConfirmClientDelete from './ConfirmClientDelete.svelte'
   type Props = {
-    client: Client
+    client: ClientWithInvoicesResponse
   }
 
   let { client = $bindable() }: Props = $props()
@@ -61,14 +61,14 @@
 
   const receivedInvoices = () => {
     // find invoices that have been paid
-    const paidInvoices = sumInvoices(client?.invoice?.filter(i => i.invoiceStatus === 'paid'))
+    const paidInvoices = sumInvoices(client?.invoices?.filter(i => i.invoiceStatus === 'paid') || [])
     return centsToDollars(paidInvoices)
     // get sum of those invoices
   }
 
   const balanceInvoices = () => {
-    const paidInvoices = sumInvoices(client?.invoice?.filter(i => i.invoiceStatus !== 'paid'))
-    return centsToDollars(paidInvoices)
+    const unpaidInvoices = sumInvoices(client?.invoices?.filter(i => i.invoiceStatus !== 'paid') || [])
+    return centsToDollars(unpaidInvoices)
     // get sum of those invoices
   }
   let triggerReset = $state(false)
@@ -165,9 +165,9 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  {#snippet children()}
+  
     <ClientForm formState="edit" bind:edit={client} closePanel={() => (isFormShowing = false)} />
-  {/snippet}
+
 </SlidePanel>
 
 <ConfirmClientDelete bind:open {client} />

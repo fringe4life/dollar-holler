@@ -1,5 +1,17 @@
 # Dollar Holler
 
+<div align="center">
+
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.43.4-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/)
+[![Svelte](https://img.shields.io/badge/Svelte-5.39.6-red?logo=svelte&logoColor=white)](https://svelte.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.9.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-0.44.5-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/)
+[![Better Auth](https://img.shields.io/badge/Better%20Auth-1.3.17-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/)
+[![Neon](https://img.shields.io/badge/Neon-0.10.4-cyan?logo=postgresql&logoColor=white)](https://neon.tech/)
+[![CUID2](https://img.shields.io/badge/CUID2-2.2.2-yellow?logo=javascript&logoColor=white)](https://github.com/paralleldrive/cuid2)
+
+</div>
+
 A modern invoice management application built with SvelteKit 5, featuring Better Auth authentication, Drizzle ORM (relations API) with Neon database, and CUID2 for resilient ID generation.
 
 ## Prerequisites
@@ -23,7 +35,6 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 
    ```env
    DATABASE_URL="postgresql://username:password@hostname:port/database"
-   # Optionally used by auth/email flows
    PUBLIC_BASE_URL="http://localhost:5173"
    BETTER_AUTH_SECRET="your-strong-secret"
    ```
@@ -58,6 +69,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run build` - Build for production
 - `bun run preview` - Preview production build
 - `bun run check` - Run Svelte check
+- `bun run check:watch` - Run Svelte check in watch mode
 - `bun run db:generate` - Generate Drizzle migrations
 - `bun run db:migrate` - Run database migrations
 - `bun run db:seed` - Seed database with sample data
@@ -77,6 +89,8 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **Package Manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
 - **Bundler:** rolldown-vite (Vite alias) for faster builds
+- **UI Components:** Bits UI with Tailwind CSS
+- **Styling:** Tailwind CSS 4 with Tailwind Variants
 
 ## Project Structure
 
@@ -84,12 +98,19 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 src/
 ├── lib/
 │   ├── auth.ts          # Better Auth configuration
+│   ├── auth-client.ts   # Client-side auth utilities
 │   ├── db/
 │   │   ├── index.ts     # Database connection (Neon HTTP)
 │   │   ├── schema.ts    # Drizzle schema definitions
-│   │   └── seed.ts      # Database seeding script
-│   ├── utils/           # Helpers (dates, type helpers)
-│   └── ...
+│   │   ├── seed.ts      # Database seeding script
+│   │   └── migrate.ts   # Migration utilities
+│   ├── components/      # Reusable UI components
+│   │   ├── ui/          # Bits UI components
+│   │   └── ...          # Custom components
+│   ├── attachments/     # Svelte 5 @attach directives
+│   ├── stores/          # Svelte stores (client, invoice, settings)
+│   ├── utils/           # Helper functions
+│   └── validators.ts    # ArkType validation schemas
 ├── routes/              # SvelteKit routes
 └── app.html            # HTML template
 ```
@@ -120,6 +141,9 @@ The application uses Drizzle's relations to simplify nested queries (e.g., `db.q
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Reset password supported; token is read from URL and validated
+- **Modern UI:** Bits UI components with Tailwind CSS 4
+- **Svelte 5 Runes:** Uses @attach directives and reactive patterns
+- **Responsive Design:** Mobile-first with swipe gestures
 
 ## Deployment
 
@@ -127,8 +151,10 @@ The application is configured for Vercel deployment with the Vercel adapter. Ens
 
 ## Notes
 
-- Uses `rolldown-vite` by aliasing `vite` in `package.json` (drop-in replacement). If issues arise with third-party plugins, see Vite’s rolldown guide for `withFilter` and environment APIs.
+- Uses `rolldown-vite` by aliasing `vite` in `package.json` (drop-in replacement). If issues arise with third-party plugins, see Vite's rolldown guide for `withFilter` and environment APIs.
 - ESLint configuration is in `eslint.config.ts` and uses Svelte 5 rules and Prettier integration. Use `bun run format` before `bun run lint`.
+- The project uses Svelte 5's new `@attach` directive for modern component patterns and the Spring class for smooth animations.
+- Better Auth is configured with CUID2 for user ID generation and includes session caching for performance.
 
 ## License
 

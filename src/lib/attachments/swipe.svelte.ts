@@ -1,4 +1,4 @@
-import { Spring } from 'svelte/motion';
+import { Spring } from "svelte/motion";
 
 interface SwipeConfig {
   triggerReset?: boolean;
@@ -16,7 +16,7 @@ export function swipe(config: SwipeConfig = {}) {
     triggerReset = false,
     onSwipeLeft,
     onSwipeRight,
-    threshold = 20
+    threshold = 20,
   } = config;
 
   return (element: HTMLElement) => {
@@ -26,10 +26,13 @@ export function swipe(config: SwipeConfig = {}) {
     let elementWidth = 0;
 
     // Use the new Spring class for smooth animations
-    const spring = new Spring({ x: 0, y: 0 }, {
-      stiffness: 0.2,
-      damping: 0.4,
-    });
+    const spring = new Spring(
+      { x: 0, y: 0 },
+      {
+        stiffness: 0.2,
+        damping: 0.4,
+      },
+    );
 
     // Apply transforms reactively
     $effect(() => {
@@ -38,7 +41,7 @@ export function swipe(config: SwipeConfig = {}) {
 
     // Check if we're on mobile
     const isMobile = $derived(() => {
-      if (typeof window === 'undefined') return false;
+      if (typeof window === "undefined") return false;
       return window.innerWidth <= 1024;
     });
 
@@ -50,7 +53,7 @@ export function swipe(config: SwipeConfig = {}) {
     // Handle swipe completion
     function handleSwipeEnd() {
       if (!isDragging) return;
-      
+
       const movement = startX - currentX;
       const leftSnapX = elementWidth * -0.95;
       const rightSnapX = 0;
@@ -71,64 +74,66 @@ export function swipe(config: SwipeConfig = {}) {
     // Mouse event handlers
     function handleMouseDown(event: MouseEvent) {
       if (!isMobile()) return;
-      
+
       event.preventDefault();
       startX = event.clientX;
       currentX = event.clientX;
       isDragging = true;
       elementWidth = element.clientWidth;
 
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener("mousemove", handleMouseMove);
+      document.addEventListener("mouseup", handleMouseUp);
     }
 
     function handleMouseMove(event: MouseEvent) {
       if (!isDragging) return;
-      
+
       const dx = event.clientX - currentX;
       currentX = event.clientX;
-      
+
       spring.set({ x: spring.current.x + dx, y: 0 });
     }
 
     function handleMouseUp() {
       if (!isDragging) return;
-      
+
       handleSwipeEnd();
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     }
 
     // Touch event handlers
     function handleTouchStart(event: TouchEvent) {
       if (!isMobile()) return;
-      
+
       event.preventDefault();
       startX = event.touches[0].clientX;
       currentX = event.touches[0].clientX;
       isDragging = true;
       elementWidth = element.clientWidth;
 
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleTouchEnd);
+      document.addEventListener("touchmove", handleTouchMove, {
+        passive: false,
+      });
+      document.addEventListener("touchend", handleTouchEnd);
     }
 
     function handleTouchMove(event: TouchEvent) {
       if (!isDragging) return;
-      
+
       event.preventDefault();
       const dx = event.touches[0].clientX - currentX;
       currentX = event.touches[0].clientX;
-      
+
       spring.set({ x: spring.current.x + dx, y: 0 });
     }
 
     function handleTouchEnd() {
       if (!isDragging) return;
-      
+
       handleSwipeEnd();
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     }
 
     // Watch for reset trigger
@@ -141,11 +146,11 @@ export function swipe(config: SwipeConfig = {}) {
     // Watch for mobile breakpoint changes
     $effect(() => {
       if (isMobile()) {
-        element.addEventListener('mousedown', handleMouseDown);
-        element.addEventListener('touchstart', handleTouchStart);
+        element.addEventListener("mousedown", handleMouseDown);
+        element.addEventListener("touchstart", handleTouchStart);
       } else {
-        element.removeEventListener('mousedown', handleMouseDown);
-        element.removeEventListener('touchstart', handleTouchStart);
+        element.removeEventListener("mousedown", handleMouseDown);
+        element.removeEventListener("touchstart", handleTouchStart);
         // Reset position when switching to desktop
         spring.set({ x: 0, y: 0 });
       }
@@ -153,12 +158,12 @@ export function swipe(config: SwipeConfig = {}) {
 
     // Cleanup function
     return () => {
-      element.removeEventListener('mousedown', handleMouseDown);
-      element.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
+      element.removeEventListener("mousedown", handleMouseDown);
+      element.removeEventListener("touchstart", handleTouchStart);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
+      document.removeEventListener("touchmove", handleTouchMove);
+      document.removeEventListener("touchend", handleTouchEnd);
     };
   };
 }

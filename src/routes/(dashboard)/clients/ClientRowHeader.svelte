@@ -1,32 +1,27 @@
 <script lang="ts">
-  type Props = {
-    className?: string
-    emptyState?: boolean
-  }
+  import TableHeader from '$lib/components/TableHeader.svelte';
+ import type { HeaderProps } from '$lib/components/TableHeader.svelte';
 
   const clientHeaders = ['Status', 'Client', 'Received', 'Balanced']
 
-  let { className = '', emptyState = false }: Props = $props()
+  let { className = '', emptyState = false }: HeaderProps = $props()
 </script>
 
-<div class={`client-table hidden lg:grid ${className}`}>
-  {#each clientHeaders as client (client)}
-    {@render clientHeader(client, emptyState)}
-  {/each}
-  <div></div>
-  <div></div>
-</div>
-
-{#snippet clientHeader(title: string, emptyState: boolean = false)}
-  <h3
-    class={{
-      'text-xl leading-snug font-black': true,
-      'text-right': title === 'Received' || title === 'Balanced',
-
-      'text-daisyBush': !emptyState,
-      'text-pastelPurple': emptyState,
-    }}
-  >
-    {title}
-  </h3>
-{/snippet}
+<TableHeader 
+  headers={clientHeaders} 
+  className={`client-table ${className}`} 
+  emptyState={emptyState}
+>
+  {#snippet headerSnippet(title: string, emptyState: boolean = false)}
+    <h3
+      class={{
+        'text-xl leading-snug font-black': true,
+        'text-right': title === 'Received' || title === 'Balanced',
+        'text-daisyBush': !emptyState,
+        'text-pastelPurple': emptyState,
+      }}
+    >
+      {title}
+    </h3>
+  {/snippet}
+</TableHeader>

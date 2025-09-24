@@ -66,19 +66,7 @@
   // Initialize form data based on edit mode
   if (formState === 'edit' && invoiceEdit) {
     // Extract only the fields we need for the form
-    invoice = {
-      clientId: invoiceEdit.clientId,
-      invoiceNumber: invoiceEdit.invoiceNumber,
-      subject: invoiceEdit.subject,
-      issueDate: invoiceEdit.issueDate,
-      dueDate: invoiceEdit.dueDate,
-      discount: invoiceEdit.discount,
-      notes: invoiceEdit.notes,
-      terms: invoiceEdit.terms,
-      invoiceStatus: invoiceEdit.invoiceStatus,
-      userId: invoiceEdit.userId,
-      id: invoiceEdit.id, // Ensure id is present for updates
-    }
+    invoice = invoiceEdit
     // Line items will be handled separately
   }
 

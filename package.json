@@ -53,7 +53,8 @@
   },
   "overrides": {
     "vite": "npm:rolldown-vite@latest",
-    "esbuild": "^0.25.0"
+    "esbuild": "^0.25.0",
+    "cookie": "^1.0.2"
   },
   "trustedDependencies": [
     "@tailwindcss/oxide",

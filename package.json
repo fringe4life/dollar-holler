@@ -25,7 +25,7 @@
     "@lucide/svelte": "^0.511.0",
     "@sveltejs/adapter-auto": "^6.1.0",
     "@sveltejs/adapter-vercel": "^5.10.2",
-    "@sveltejs/kit": "^2.43.4",
+    "@sveltejs/kit": "^2.43.5",
     "@sveltejs/vite-plugin-svelte": "^6.2.1",
     "@tailwindcss/vite": "^4.1.13",
     "bits-ui": "^2.11.4",
@@ -52,7 +52,8 @@
     "vite-plugin-devtools-json": "^0.1.1"
   },
   "overrides": {
-    "vite": "npm:rolldown-vite@latest"
+    "vite": "npm:rolldown-vite@latest",
+    "esbuild": "^0.25.0"
   },
   "trustedDependencies": [
     "@tailwindcss/oxide",

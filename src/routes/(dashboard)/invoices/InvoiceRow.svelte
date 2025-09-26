@@ -12,7 +12,7 @@
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'
   import { clickOutside } from '$lib/attachments/clickOutside'
-  import InvoiceForm from '$lib/components/invoiceForm.svelte'
+  import InvoiceForm from '$lib/components/invoice-form.svelte'
   import { resolve } from '$app/paths'
   import ConfirmDelete from './ConfirmDelete.svelte'
   import { swipe } from '$lib/attachments/swipe.svelte'
@@ -70,13 +70,14 @@
 
   const label = getLabel(invoiceStatus ?? 'draft', dueDate)
 
+  // @ts-expect-error - resolve function supports 2 arguments in SvelteKit v2.26+
   const resolved = resolve('/invoices/[id]', { id })
 </script>
 
 <div class="relative isolate">
   <div
     {@attach swipe({ triggerReset: triggerReset })}
-    class="invoice-table invoice-row shadow-tableRow relative z-5 items-center justify-between rounded-lg bg-white py-3 lg:py-6"
+    class="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
     <div class="status justify-self-end">{@render tag(label)}</div>
     <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>

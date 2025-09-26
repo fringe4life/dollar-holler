@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Button } from '$lib/components/ui/button'
   import Trash from '$lib/icon/Trash.svelte'
-  import type { LineItem } from '../../../global'
+  import type { LineItem } from '$lib/db/schema'
 
   type Props = {
     lineItem: LineItem
@@ -23,7 +23,6 @@
   $effect(() => {
     lineItem.amount = Number(amount)
   })
-  $inspect(lineItem)
 </script>
 
 <div class="invoice-line-item border-fog border-b-2 py-4 sm:py-2">

@@ -73,6 +73,7 @@
   }
   let triggerReset = $state(false)
 
+  // @ts-expect-error - resolve function supports 2 arguments in SvelteKit v2.26+
   const resolved = resolve('/clients/[id]', { id: client.id })
 </script>
 

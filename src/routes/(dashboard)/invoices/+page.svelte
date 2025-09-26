@@ -10,7 +10,7 @@
   import InvoiceRowHeader from './InvoiceRowHeader.svelte'
 
   import SlidePanel from '$lib/components/SlidePanel.svelte'
-  import InvoiceForm from '$lib/components/invoiceForm.svelte'
+  import InvoiceForm from '$lib/components/invoice-form.svelte'
   import { Button } from '$lib/components/ui/button'
   import type { InvoiceWithRelationsResponse } from '$lib/validators'
   import NoSearchResults from './NoSearchResults.svelte'

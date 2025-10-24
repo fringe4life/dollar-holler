@@ -4,7 +4,7 @@ import {
   normalizeToNull,
   transformNullToUndefined,
 } from "$lib/utils/typeHelpers";
-import type { ClientInsert, ClientWithInvoicesResponse } from "$lib/validators";
+import type { ClientWithInvoicesResponse } from "$lib/validators";
 import { clientWithInvoicesResponseSchema } from "$lib/validators";
 import { ArkErrors } from "arktype";
 import { toast } from "svelte-sonner";
@@ -45,45 +45,6 @@ export const loadClients = async () => {
   } catch (error) {
     console.error("Error loading clients:", error);
     toast.error("Failed to load clients");
-  }
-};
-
-export const addClient = async (clientToAdd: Omit<ClientInsert, "id">) => {
-  try {
-    const response = await fetch("/api/clients", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(clientToAdd),
-    });
-
-    if (!response.ok) {
-      throw new Error("Failed to add client");
-    }
-
-    const { id } = await response.json();
-    const newClient: ClientWithInvoicesResponse = {
-      ...clientToAdd,
-      id,
-      clientStatus: "active",
-      invoices: [],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      // Ensure all required fields are present
-      email: clientToAdd.email || null,
-      street: clientToAdd.street || null,
-      city: clientToAdd.city || null,
-      state: clientToAdd.state || null,
-      zip: clientToAdd.zip || null,
-    };
-
-    // Update the reactive state
-    clients.push(newClient);
-    return id;
-  } catch (error) {
-    console.error("Error adding client:", error);
-    toast.error("Failed to add client");
   }
 };
 

@@ -2,7 +2,7 @@
   import CircledAmount from '$lib/components/CircledAmount.svelte'
   import Button from '$lib/components/ui/button/button.svelte'
   import type { MouseEventHandler } from 'svelte/elements'
-  import type { LineItem } from '../../../global'
+  import type { LineItem } from '$lib/db/schema'
   import LineItemRow from './LineItemRow.svelte'
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
 

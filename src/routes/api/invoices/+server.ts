@@ -2,18 +2,15 @@ import { db } from "$lib/db";
 import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
+  type LineItem,
 } from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async () => {
   try {
-    const invoices = await db.query.invoices.findMany({
-      with: {
-        client: true,
-        lineItems: true,
-      },
-    });
+    // Return only invoices without relations - relations loaded separately
+    const invoices = await db.select().from(invoicesTable);
     return json(invoices);
   } catch (error) {
     console.error("Error loading invoices:", error);
@@ -38,7 +35,7 @@ export const POST: RequestHandler = async ({ request }) => {
       await db
         .insert(lineItemsTable)
         .values(
-          lineItems.map((li: any) => ({ ...li, invoiceId: inserted.id })),
+          lineItems.map((li: LineItem) => ({ ...li, invoiceId: inserted.id })),
         );
     }
 

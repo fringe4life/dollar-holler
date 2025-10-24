@@ -1,54 +1,44 @@
 import { db } from "$lib/db";
-import {
-  invoices as invoicesTable,
-  lineItems as lineItemsTable,
-} from "$lib/db/schema";
+import { invoices as invoicesTable } from "$lib/db/schema";
 import { json } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
 import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params }) => {
   try {
-    const { id } = params;
-    const invoice = await db.query.invoices.findFirst({
-      where: (invoices, { eq }) => eq(invoices.id, id),
-      with: { client: true, lineItems: true },
-    });
-    if (!invoice) return json({ error: "Invoice not found" }, { status: 404 });
-    return json(invoice);
+    const invoice = await db
+      .select()
+      .from(invoicesTable)
+      .where(eq(invoicesTable.id, params.id))
+      .limit(1);
+
+    if (invoice.length === 0) {
+      return json({ error: "Invoice not found" }, { status: 404 });
+    }
+
+    return json(invoice[0]);
   } catch (error) {
-    console.error("Error getting invoice by ID:", error);
-    return json({ error: "Failed to get invoice" }, { status: 500 });
+    console.error("Error loading invoice:", error);
+    return json({ error: "Failed to load invoice" }, { status: 500 });
   }
 };
 
 export const PUT: RequestHandler = async ({ params, request }) => {
   try {
-    const { id } = params;
-    const invoiceToUpdate = await request.json();
-    const { lineItems, client, ...updatedInvoice } = invoiceToUpdate;
+    const invoiceData = await request.json();
+    const { lineItems, client, ...updateData } = invoiceData;
 
-    // Delete all line items
-    await db.delete(lineItemsTable).where(eq(lineItemsTable.invoiceId, id));
-
-    // Add new line items
-    if (lineItems && lineItems.length > 0) {
-      const newLineItems = lineItems.map((lineItem: any) => ({
-        ...lineItem,
-        id: crypto.randomUUID(),
-        invoiceId: id,
-      }));
-
-      await db.insert(lineItemsTable).values(newLineItems);
-    }
-
-    // Update invoice
-    await db
+    const [updated] = await db
       .update(invoicesTable)
-      .set({ ...updatedInvoice, clientId: client.id })
-      .where(eq(invoicesTable.id, id));
+      .set({
+        ...updateData,
+        clientId: client?.id,
+        updatedAt: new Date(),
+      })
+      .where(eq(invoicesTable.id, params.id))
+      .returning();
 
-    return json({ success: true });
+    return json(updated);
   } catch (error) {
     console.error("Error updating invoice:", error);
     return json({ error: "Failed to update invoice" }, { status: 500 });
@@ -57,14 +47,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
 export const DELETE: RequestHandler = async ({ params }) => {
   try {
-    const { id } = params;
-
-    // Delete all line items first
-    await db.delete(lineItemsTable).where(eq(lineItemsTable.invoiceId, id));
-
-    // Delete the invoice
-    await db.delete(invoicesTable).where(eq(invoicesTable.id, id));
-
+    await db.delete(invoicesTable).where(eq(invoicesTable.id, params.id));
     return json({ success: true });
   } catch (error) {
     console.error("Error deleting invoice:", error);

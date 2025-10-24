@@ -61,14 +61,6 @@ export const settingsInsertSchema = createInsertSchema(settings);
 export const settingsSelectSchema = createSelectSchema(settings);
 export const settingsUpdateSchema = createUpdateSchema(settings);
 
-// Create schemas with parsed dates for API responses
-export const clientSelectWithDatesSchema = WithParsedDates(clientSelectSchema);
-export const invoiceSelectWithDatesSchema =
-  WithParsedDates(invoiceSelectSchema);
-export const lineItemSelectWithDatesSchema =
-  WithParsedDates(lineItemSelectSchema);
-export const settingsSelectWithDatesSchema =
-  WithParsedDates(settingsSelectSchema);
 
 // Auth form validation schemas using ArkType directly
 
@@ -106,27 +98,11 @@ export const resetPasswordSchema = type({
   });
 });
 
-// API Response validation schemas for stores using composition
-// Enhance Drizzle-derived select schemas with date parsing using generic parser
-const clientSelectWithDates = WithParsedDates(clientSelectSchema);
-const invoiceSelectWithDates = WithParsedDates(invoiceSelectSchema);
-const lineItemSelectWithDates = WithParsedDates(lineItemSelectSchema);
-
-export const clientWithInvoicesResponseSchema = type({
-  "...": clientSelectWithDates,
-  invoices: type({
-    "...": invoiceSelectWithDates,
-    lineItems: lineItemSelectWithDates.array(),
-  }).array(),
-});
-
-export const invoiceWithRelationsResponseSchema = type({
-  "...": invoiceSelectWithDates,
-  client: clientSelectWithDates,
-  lineItems: lineItemSelectWithDates.array(),
-});
-
-export const settingsResponseSchema = WithParsedDates(settingsSelectSchema);
+// Simple API Response schemas without complex relations
+export const clientSelectWithDatesSchema = WithParsedDates(clientSelectSchema);
+export const invoiceSelectWithDatesSchema = WithParsedDates(invoiceSelectSchema);
+export const lineItemSelectWithDatesSchema = WithParsedDates(lineItemSelectSchema);
+export const settingsSelectWithDatesSchema = WithParsedDates(settingsSelectSchema);
 
 // Type exports for TypeScript inference
 export type UserInsert = typeof userInsertSchema.infer;
@@ -134,16 +110,19 @@ export type UserSelect = typeof userSelectSchema.infer;
 export type UserUpdate = typeof userUpdateSchema.infer;
 
 export type ClientInsert = typeof clientInsertSchema.infer;
-export type ClientSelect = typeof clientSelectSchema.infer;
+export type ClientSelect = typeof clientSelectWithDatesSchema.infer;
 export type ClientUpdate = typeof clientUpdateSchema.infer;
+export type NewClient = ClientInsert; // Alias for convenience
 
 export type InvoiceInsert = typeof invoiceInsertSchema.infer;
-export type InvoiceSelect = typeof invoiceSelectSchema.infer;
+export type InvoiceSelect = typeof invoiceSelectWithDatesSchema.infer;
 export type InvoiceUpdate = typeof invoiceUpdateSchema.infer;
+export type NewInvoice = InvoiceInsert; // Alias for convenience
 
 export type LineItemInsert = typeof lineItemInsertSchema.infer;
-export type LineItemSelect = typeof lineItemSelectSchema.infer;
+export type LineItemSelect = typeof lineItemSelectWithDatesSchema.infer;
 export type LineItemUpdate = typeof lineItemUpdateSchema.infer;
+export type NewLineItem = LineItemInsert; // Alias for convenience
 
 export type SettingsInsert = typeof settingsInsertSchema.infer;
 export type SettingsSelect = typeof settingsSelectSchema.infer;
@@ -153,9 +132,6 @@ export type LoginData = typeof loginSchema.infer;
 export type SignupData = typeof signupSchema.infer;
 export type ResetPasswordData = typeof resetPasswordSchema.infer;
 
-// API Response types
-export type ClientWithInvoicesResponse =
-  typeof clientWithInvoicesResponseSchema.infer;
-export type InvoiceWithRelationsResponse =
-  typeof invoiceWithRelationsResponseSchema.infer;
-export type SettingsResponse = typeof settingsResponseSchema.infer;
+// Simple API Response types
+export type SettingsResponse = typeof settingsSelectWithDatesSchema.infer;
+

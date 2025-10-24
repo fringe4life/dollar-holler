@@ -1,43 +1,43 @@
 <script lang="ts">
-  import CircledAmount from '$lib/components/CircledAmount.svelte'
-  import Search from '$lib/components/Search.svelte'
+  import Search from '$lib/components/Search.svelte';
+  import SlidePanel from '$lib/components/SlidePanel.svelte';
+  import Button from '$lib/components/ui/button/button.svelte';
+  import { invoices, loadInvoices, loading, error } from '$lib/stores/invoicesStore.svelte';
+  import InvoiceWithDetails from '$lib/components/InvoiceWithDetails.svelte';
+  import { onMount } from 'svelte';
+  import NoSearchResults from './NoSearchResults.svelte';
+  import BlankState from '../clients/BlankState.svelte';
 
-  import { invoices, loadInvoices } from '$lib/stores/InvoiceStore.svelte'
-  import { centsToDollars, sumInvoices } from '$lib/utils/moneyHelpers'
-  import { onMount } from 'svelte'
-  import BlankState from './BlankState.svelte'
-  import InvoiceRow from './InvoiceRow.svelte'
-  import InvoiceRowHeader from './InvoiceRowHeader.svelte'
+  let searchTerms = $state('');
+  let isFormVisible = $state<boolean>(false);
 
-  import SlidePanel from '$lib/components/SlidePanel.svelte'
-  import InvoiceForm from '$lib/components/invoice-form.svelte'
-  import { Button } from '$lib/components/ui/button'
-  import type { InvoiceWithRelationsResponse } from '$lib/validators'
-  import NoSearchResults from './NoSearchResults.svelte'
-
-  let listInvoices: InvoiceWithRelationsResponse[] = $state([])
-  onMount(async () => {
-    await loadInvoices()
-    listInvoices = invoices
-  })
-
-  let isInvoiceShowingPanel = $state(false)
-
-  const handleSearch = (searchTerms: string): void => {
-    console.log(searchTerms)
-    listInvoices = invoices.filter(invoice => {
+  // Derived state for filtered invoices
+  const filteredInvoices = $derived.by(() => {
+    if (!searchTerms) return invoices;
+    
+    return invoices.filter(invoice => {
       return (
-        invoice.client.name.toLowerCase().includes(searchTerms.toLowerCase()) ||
-        invoice.invoiceNumber.toLowerCase().includes(searchTerms.toLowerCase()) ||
-        invoice?.subject?.toLowerCase().includes(searchTerms.toLowerCase())
-      )
-    })
-  }
+        invoice.invoiceNumber?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        invoice.subject?.toLowerCase().includes(searchTerms.toLowerCase()) ||
+        invoice.invoiceStatus?.toLowerCase().includes(searchTerms.toLowerCase()) 
+        // invoice.total?.toString().includes(searchTerms)
+      );
+    });
+  });
+
+  onMount(async () => {
+    await loadInvoices();
+  });
+
+  const handleSearch = (terms: string) => {
+    searchTerms = terms;
+  };
 </script>
 
 <svelte:head>
-  <title>Invoices | Doller Holla</title>
+  <title>Invoices | Dollar Holler</title>
 </svelte:head>
+
 <div
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
@@ -49,30 +49,40 @@
   {/if}
   <!-- new invoice button -->
   <div class="z-1">
-    <Button onclick={() => (isInvoiceShowingPanel = true)} size="lg">+ Invoice</Button>
+    <Button
+      onclick={() => {
+        isFormVisible = true;
+      }}
+      size="lg">+ Invoice</Button
+    >
   </div>
 </div>
+
 <!-- list of invoices -->
 <div>
-  <!-- invoices -->
-  {#if !invoices}
-    <p>Loading...</p>
-  {:else if listInvoices.length === 0}
+  {#if loading}
+    <div class="flex justify-center items-center py-8">
+      <div class="text-lg">Loading invoices...</div>
+    </div>
+  {:else if error}
+    <div class="flex justify-center items-center py-8">
+      <div class="text-lg text-red-500">Error: {error}</div>
+    </div>
+  {:else if invoices.length === 0}
+    <BlankState />
+  {:else if filteredInvoices.length === 0}
     <NoSearchResults />
-  {:else if listInvoices.length > 0}
-    <InvoiceRowHeader />
-    <div class="flex flex-col-reverse">
-      {#each listInvoices as invoice (invoice.invoiceNumber)}
-        <InvoiceRow {invoice} />
+  {:else}
+    <!-- invoice cards with details loaded separately -->
+    <div class="space-y-4">
+      {#each filteredInvoices as invoice (invoice.id)}
+        <InvoiceWithDetails {invoice} />
       {/each}
     </div>
-    <CircledAmount amount={centsToDollars(sumInvoices(listInvoices))} label="Total" />
-  {:else}
-    <BlankState />
   {/if}
 </div>
 
-<SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
+<SlidePanel bind:open={isFormVisible} buttonText="">
   {#snippet title()}
     <h2 class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0">
       Add an Invoice
@@ -83,9 +93,8 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  <InvoiceForm
-    invoiceEdit={undefined}
-    formState="create"
-    closePanel={() => (isInvoiceShowingPanel = false)}
-  />
+  <!-- Invoice form would go here -->
+  <div class="p-4">
+    <p>Invoice form component would be integrated here</p>
+  </div>
 </SlidePanel>

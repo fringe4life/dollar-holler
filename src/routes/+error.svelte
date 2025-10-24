@@ -8,7 +8,8 @@
 </svelte:head>
 
 <div
-  class="flex min-h-[100dvh] w-full items-center justify-center bg-[url('{asset('/images/bg-error.svg')}')] bg-center bg-no-repeat"
+  class="flex min-h-[100dvh] w-full items-center justify-center bg-center bg-no-repeat"
+  style="background-image: url('{asset('/images/bg-error.svg')}')"
 >
   <div>
     <h1 class="text-daisyBush text-5xl leading-none font-black">{page.status}</h1>

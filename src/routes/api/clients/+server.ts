@@ -6,16 +6,8 @@ import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async () => {
   try {
-    const clients = await db.query.clients.findMany({
-      with: {
-        invoices: {
-          with: {
-            lineItems: true,
-          },
-        },
-      },
-    });
-
+    // Return only clients without relations - relations loaded separately
+    const clients = await db.select().from(clientsTable);
     return json(clients);
   } catch (error) {
     console.error("Error loading clients:", error);

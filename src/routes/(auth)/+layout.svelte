@@ -4,7 +4,8 @@
 </script>
 
 <div
-  class="bg-daisyBush min-h-[100dvh] w-full bg-cover bg-center bg-no-repeat md:bg-[url('{asset('/images/bg-auth.svg')}')]"
+  class="auth-layout bg-daisyBush min-h-[100dvh] w-full bg-cover bg-center bg-no-repeat"
+  style="--bg-auth: url('{asset('/images/bg-auth.svg')}')"
 >
   <div class="grid min-h-[100dvh] auto-rows-min grid-cols-12 px-4 md:auto-rows-fr md:gap-5 xl:px-0">
     <div
@@ -17,3 +18,15 @@
     </div>
   </div>
 </div>
+
+<style>
+  .auth-layout {
+    background-image: none;
+  }
+  
+  @media (min-width: 768px) {
+    .auth-layout {
+      background-image: var(--bg-auth);
+    }
+  }
+</style>

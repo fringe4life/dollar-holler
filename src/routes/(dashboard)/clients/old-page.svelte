@@ -1,22 +1,24 @@
 <script lang="ts">
-  import Search from '$lib/components/Search.svelte';
-  import SlidePanel from '$lib/components/SlidePanel.svelte';
-  import Button from '$lib/components/ui/button/button.svelte';
-  import { clients, loadClients, loading, error } from '$lib/stores/clientsStore.svelte';
-  import ClientWithInvoices from '$lib/components/ClientWithInvoices.svelte';
-  import { onMount } from 'svelte';
-  import NoSearchResults from '../invoices/NoSearchResults.svelte';
-  import BlankState from './BlankState.svelte';
-  import ClientForm from './ClientForm.svelte';
+  import Search from '$lib/components/Search.svelte'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
+  import type { ClientWithInvoicesResponse } from '$lib/validators'
+  import { clientsStore, loadClients } from '$lib/stores/clientStore.svelte'
+  import { onMount } from 'svelte'
+  import NoSearchResults from '../invoices/NoSearchResults.svelte'
+  import BlankState from './BlankState.svelte'
+  import ClientForm from './ClientForm.svelte'
+  import ClientRow from './ClientRow.svelte'
+  import ClientRowHeader from './ClientRowHeader.svelte'
 
-  let searchTerms = $state('');
-  let isFormVisible = $state<boolean>(false);
+  let searchTerms = $state('')
+  let isFormVisible = $state<boolean>(false)
 
   // Derived state for filtered clients
   const filteredClients = $derived.by(() => {
-    if (!searchTerms) return clients;
+    if (!searchTerms) return clientsStore.value
     
-    return clients.filter(client => {
+    return clientsStore.value.filter(client => {
       return (
         client.city?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client?.state?.toLowerCase().includes(searchTerms.toLowerCase()) ||
@@ -25,37 +27,37 @@
         client?.street?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client?.clientStatus?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client.name.toLowerCase().includes(searchTerms.toLowerCase())
-      );
-    });
-  });
+      )
+    })
+  })
 
   onMount(async () => {
-    await loadClients();
-  });
+    await loadClients()
+  })
 
   const handleSearch = (terms: string) => {
-    searchTerms = terms;
-  };
+    searchTerms = terms
+  }
 </script>
 
 <svelte:head>
-  <title>Clients | Dollar Holler</title>
+  <title>Client Page | Doller Holla</title>
 </svelte:head>
 
 <div
   class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if clients.length > 0}
+  {#if clientsStore.value.length > 0}
     <Search {handleSearch} />
   {:else}
     <div></div>
   {/if}
-  <!-- new client button -->
+  <!-- new invoice button -->
   <div class="z-1">
     <Button
       onclick={() => {
-        isFormVisible = true;
+        isFormVisible = true
       }}
       size="lg">+ Client</Button
     >
@@ -63,24 +65,21 @@
 </div>
 
 <!-- list of clients -->
+
 <div>
-  {#if loading}
-    <div class="flex justify-center items-center py-8">
-      <div class="text-lg">Loading clients...</div>
-    </div>
-  {:else if error}
-    <div class="flex justify-center items-center py-8">
-      <div class="text-lg text-red-500">Error: {error}</div>
-    </div>
-  {:else if clients.length === 0}
+  {#if !clientsStore.value}
+    <p>Loading...</p>
+  {:else if clientsStore.value.length === 0}
     <BlankState />
   {:else if filteredClients.length === 0}
     <NoSearchResults />
   {:else}
-    <!-- client cards with invoices loaded separately -->
-    <div class="space-y-4">
-      {#each filteredClients as client (client.id)}
-        <ClientWithInvoices {client} />
+    <!-- client header row -->
+    <ClientRowHeader />
+    <!-- client rows -->
+    <div class="flex flex-col-reverse">
+      {#each filteredClients as client, index (client.id)}
+        <ClientRow bind:client={filteredClients[index]} />
       {/each}
     </div>
   {/if}
@@ -89,7 +88,7 @@
 <SlidePanel bind:open={isFormVisible} buttonText="">
   {#snippet title()}
     <h2 class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0">
-      Add a Client
+      Add an Client
     </h2>
   {/snippet}
 

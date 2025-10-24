@@ -6,28 +6,37 @@ import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params }) => {
   try {
-    const { id } = params;
-    const client = await db.query.clients.findFirst({
-      where: (clients, { eq }) => eq(clients.id, id),
-      with: { invoices: { with: { lineItems: true } } },
-    });
-    if (!client) return json({ error: "Client not found" }, { status: 404 });
-    return json(client);
+    const client = await db
+      .select()
+      .from(clientsTable)
+      .where(eq(clientsTable.id, params.id))
+      .limit(1);
+
+    if (client.length === 0) {
+      return json({ error: "Client not found" }, { status: 404 });
+    }
+
+    return json(client[0]);
   } catch (error) {
-    console.error("Error getting client by ID:", error);
-    return json({ error: "Failed to get client" }, { status: 500 });
+    console.error("Error loading client:", error);
+    return json({ error: "Failed to load client" }, { status: 500 });
   }
 };
 
 export const PUT: RequestHandler = async ({ params, request }) => {
   try {
-    const { id } = params;
-    const clientToUpdate = await request.json();
-    const { invoice, ...newClient } = clientToUpdate;
+    const clientData = await request.json();
 
-    await db.update(clientsTable).set(newClient).where(eq(clientsTable.id, id));
+    const [updated] = await db
+      .update(clientsTable)
+      .set({
+        ...clientData,
+        updatedAt: new Date(),
+      })
+      .where(eq(clientsTable.id, params.id))
+      .returning();
 
-    return json({ success: true });
+    return json(updated);
   } catch (error) {
     console.error("Error updating client:", error);
     return json({ error: "Failed to update client" }, { status: 500 });
@@ -36,8 +45,7 @@ export const PUT: RequestHandler = async ({ params, request }) => {
 
 export const DELETE: RequestHandler = async ({ params }) => {
   try {
-    const { id } = params;
-    await db.delete(clientsTable).where(eq(clientsTable.id, id));
+    await db.delete(clientsTable).where(eq(clientsTable.id, params.id));
     return json({ success: true });
   } catch (error) {
     console.error("Error deleting client:", error);

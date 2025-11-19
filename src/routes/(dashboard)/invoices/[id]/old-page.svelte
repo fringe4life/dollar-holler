@@ -73,7 +73,9 @@
         {/if}
         {#if settingsStore.settings.city && settingsStore.settings.street && settingsStore.settings.state && settingsStore.settings.zip}
           {settingsStore.settings.street}<br />
-          {settingsStore.settings.city} {settingsStore.settings.state} {settingsStore.settings.zip}
+          {settingsStore.settings.city}
+          {settingsStore.settings.state}
+          {settingsStore.settings.zip}
         {/if}
       </p>
     {:else}

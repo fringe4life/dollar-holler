@@ -8,7 +8,7 @@
 </svelte:head>
 
 <div
-  class="flex min-h-[100dvh] w-full items-center justify-center bg-center bg-no-repeat"
+  class="flex min-h-dvh w-full items-center justify-center bg-center bg-no-repeat"
   style="background-image: url('{asset('/images/bg-error.svg')}')"
 >
   <div>

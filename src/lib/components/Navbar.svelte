@@ -1,6 +1,6 @@
 <script lang="ts">
+  import { asset, resolve } from '$app/paths'
   import { page } from '$app/state'
-  import { resolve, asset } from '$app/paths'
   import Close from '$lib/icon/Close.svelte'
   import Hamburger from '$lib/icon/Hamburger.svelte'
   import type { MouseEventHandler } from 'svelte/elements'
@@ -25,7 +25,7 @@
     if (href === '/') {
       return path === '/'
     }
-    
+
     // For other paths, check if current path starts with the href
     // This handles nested routes like /clients/[id] matching /clients
     return path.startsWith(href)
@@ -81,16 +81,12 @@
 <svelte:head>
   {#if isNavShowing}
     <style>
-      /* @reference '../../app.css'; */
       body {
         overflow: hidden;
         @media screen and (width > 768px) {
           overflow: auto;
         }
       }
-      /* body {
-        @apply overflow-hidden md:overflow-auto;
-      } */
     </style>
   {/if}
 </svelte:head>

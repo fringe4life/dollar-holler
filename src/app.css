@@ -1,14 +1,14 @@
-@import url("https://fonts.googleapis.com/css2?family=Kalam&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Kalam&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap');
 
-@import "tailwindcss";
+@import 'tailwindcss';
 
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @theme {
   --color-*: initial;
-  --font-sansserif: "Source Sans 3", sans-serif;
-  --font-mono: "Source Code Pro", monospace;
-  --font-handwriting: "Kalam", cursive;
+  --font-sansserif: 'Source Sans 3', sans-serif;
+  --font-mono: 'Source Code Pro', monospace;
+  --font-handwriting: 'Kalam', cursive;
   --color-lavenderIndigo: oklch(57.85% 0.2 295.07);
   --color-daisyBush: oklch(38.26% 0.202 288.17);
   --color-goldenFizz: oklch(96.89% 0.195 109.86);
@@ -62,11 +62,11 @@
     @apply font-sansserif text-monsoon block text-base font-bold;
   }
 
-  input[type="text"]:not(.search, .line-item),
-  input[type="number"]:not(.line-item),
-  input[type="date"],
-  input[type="password"],
-  input[type="email"] {
+  input[type='text']:not(.search, .line-item),
+  input[type='number']:not(.line-item),
+  input[type='date'],
+  input[type='password'],
+  input[type='email'] {
     @apply border-silver font-sansserif h-10 w-full rounded-lg border-2 px-4 text-base lg:h-14;
   }
 
@@ -75,26 +75,26 @@
   }
 
   select {
-    @apply border-silver h-10 w-full appearance-none rounded-lg border-2 bg-[url('/images/chevron-down.svg')] bg-[97%_center] bg-no-repeat px-4 lg:h-14 lg:p-4;
+    @apply border-silver h-10 w-full appearance-none rounded-lg border-2 bg-[url('/images/chevron-down.svg')] bg-position-[97%_center] bg-no-repeat px-4 lg:h-14 lg:p-4;
   }
 
-  input[type="text"]:not(.search, .line-item):focus-visible,
-  input[type="number"]:not(.line-item):focus-visible,
-  input[type="date"]:focus-visible,
-  input[type="password"]:focus-visible,
-  input[type="email"]:focus-visible,
+  input[type='text']:not(.search, .line-item):focus-visible,
+  input[type='number']:not(.line-item):focus-visible,
+  input[type='date']:focus-visible,
+  input[type='password']:focus-visible,
+  input[type='email']:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
     @apply border-lavenderIndigo border-2 outline-none;
   }
 
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
+  input[type='number']::-webkit-inner-spin-button,
+  input[type='number']::-webkit-outer-spin-button {
     -webkit-appearance: none;
     margin: 0;
   }
 
-  input[type="number"] {
+  input[type='number'] {
     -moz-appearance: textfield;
   }
 }
@@ -122,11 +122,11 @@
   .invoice-line-item {
     @apply relative grid gap-x-2 sm:grid-cols-[1fr_100px_100px_100px_65px] md:gap-x-5;
     grid-template-areas:
-      "description description description"
-      "unitPrice   quantity    amount";
+      'description description description'
+      'unitPrice   quantity    amount';
 
     @media screen and (width > 640px) {
-      grid-template-areas: "description unitPrice quantity amount trash";
+      grid-template-areas: 'description unitPrice quantity amount trash';
     }
 
     .description {
@@ -152,7 +152,7 @@
     }
 
     @media print {
-      grid-template-areas: "description unitPrice quantity amount trash";
+      grid-template-areas: 'description unitPrice quantity amount trash';
     }
   }
 

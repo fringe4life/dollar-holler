@@ -7,7 +7,7 @@
   import SlidePanel from '$lib/components/SlidePanel.svelte'
   import { centsToDollars, getTotal } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
-  import type {InvoiceWithRelationsResponse} from '$lib/validators'
+  import type { InvoiceWithRelationsResponse } from '$lib/validators'
   import Send from '$lib/icon/Send.svelte'
   import Edit from '$lib/icon/Edit.svelte'
   import Trash from '$lib/icon/Trash.svelte'

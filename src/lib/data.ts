@@ -27,7 +27,7 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
       clientStatus: 'active',
       userId: 'user-1',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     lineItems: [
       {
@@ -38,9 +38,9 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
         invoiceId: '1',
         userId: 'user-1',
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ]
+        updatedAt: new Date(),
+      },
+    ],
   },
   {
     id: '2',
@@ -67,7 +67,7 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
       clientStatus: 'active',
       userId: 'user-1',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     lineItems: [
       {
@@ -78,9 +78,9 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
         invoiceId: '2',
         userId: 'user-1',
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ]
+        updatedAt: new Date(),
+      },
+    ],
   },
   {
     id: '3',
@@ -107,7 +107,7 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
       clientStatus: 'active',
       userId: 'user-1',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     lineItems: [
       {
@@ -118,9 +118,9 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
         invoiceId: '3',
         userId: 'user-1',
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ]
+        updatedAt: new Date(),
+      },
+    ],
   },
   {
     id: '4',
@@ -147,7 +147,7 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
       clientStatus: 'active',
       userId: 'user-1',
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
     },
     lineItems: [
       {
@@ -158,10 +158,10 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
         invoiceId: '4',
         userId: 'user-1',
         createdAt: new Date(),
-        updatedAt: new Date()
-      }
-    ]
-  }
+        updatedAt: new Date(),
+      },
+    ],
+  },
 ]
 
 // Dummy client data
@@ -202,11 +202,11 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
             invoiceId: '1',
             userId: 'user-1',
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        ]
-      }
-    ]
+            updatedAt: new Date(),
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'client-2',
@@ -244,11 +244,11 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
             invoiceId: '2',
             userId: 'user-1',
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        ]
-      }
-    ]
+            updatedAt: new Date(),
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'client-3',
@@ -286,11 +286,11 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
             invoiceId: '3',
             userId: 'user-1',
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        ]
-      }
-    ]
+            updatedAt: new Date(),
+          },
+        ],
+      },
+    ],
   },
   {
     id: 'client-4',
@@ -328,10 +328,10 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
             invoiceId: '4',
             userId: 'user-1',
             createdAt: new Date(),
-            updatedAt: new Date()
-          }
-        ]
-      }
-    ]
-  }
+            updatedAt: new Date(),
+          },
+        ],
+      },
+    ],
+  },
 ]

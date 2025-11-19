@@ -4,7 +4,7 @@
   import type { MouseEventHandler } from 'svelte/elements'
 
   import type { Client } from '$lib/db/schema'
-  import { deleteClient } from '$lib/stores/clientStore.svelte'
+  import { deleteClient } from '$lib/stores/clientsStore.svelte'
 
   type Props = {
     open: boolean
@@ -14,7 +14,7 @@
   const handleDelete: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = async () => {
     open = false
-    await deleteClient(client)
+    await deleteClient(client.id)
   }
 
   let { client, open = $bindable() }: Props = $props()

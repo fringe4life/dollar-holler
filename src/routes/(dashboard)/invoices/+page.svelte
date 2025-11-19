@@ -1,37 +1,37 @@
 <script lang="ts">
-  import Search from '$lib/components/Search.svelte';
-  import SlidePanel from '$lib/components/SlidePanel.svelte';
-  import Button from '$lib/components/ui/button/button.svelte';
-  import { invoices, loadInvoices, loading, error } from '$lib/stores/invoicesStore.svelte';
-  import InvoiceWithDetails from '$lib/components/InvoiceWithDetails.svelte';
-  import { onMount } from 'svelte';
-  import NoSearchResults from './NoSearchResults.svelte';
-  import BlankState from '../clients/BlankState.svelte';
+  import Search from '$lib/components/Search.svelte'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
+  import { invoices, loadInvoices, loading, error } from '$lib/stores/invoicesStore.svelte'
+  import InvoiceWithDetails from '$lib/components/InvoiceWithDetails.svelte'
+  import { onMount } from 'svelte'
+  import NoSearchResults from './NoSearchResults.svelte'
+  import BlankState from '../clients/BlankState.svelte'
 
-  let searchTerms = $state('');
-  let isFormVisible = $state<boolean>(false);
+  let searchTerms = $state('')
+  let isFormVisible = $state<boolean>(false)
 
   // Derived state for filtered invoices
   const filteredInvoices = $derived.by(() => {
-    if (!searchTerms) return invoices;
-    
+    if (!searchTerms) return invoices
+
     return invoices.filter(invoice => {
       return (
         invoice.invoiceNumber?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         invoice.subject?.toLowerCase().includes(searchTerms.toLowerCase()) ||
-        invoice.invoiceStatus?.toLowerCase().includes(searchTerms.toLowerCase()) 
+        invoice.invoiceStatus?.toLowerCase().includes(searchTerms.toLowerCase())
         // invoice.total?.toString().includes(searchTerms)
-      );
-    });
-  });
+      )
+    })
+  })
 
   onMount(async () => {
-    await loadInvoices();
-  });
+    await loadInvoices()
+  })
 
   const handleSearch = (terms: string) => {
-    searchTerms = terms;
-  };
+    searchTerms = terms
+  }
 </script>
 
 <svelte:head>
@@ -51,7 +51,7 @@
   <div class="z-1">
     <Button
       onclick={() => {
-        isFormVisible = true;
+        isFormVisible = true
       }}
       size="lg">+ Invoice</Button
     >
@@ -61,11 +61,11 @@
 <!-- list of invoices -->
 <div>
   {#if loading}
-    <div class="flex justify-center items-center py-8">
+    <div class="flex items-center justify-center py-8">
       <div class="text-lg">Loading invoices...</div>
     </div>
   {:else if error}
-    <div class="flex justify-center items-center py-8">
+    <div class="flex items-center justify-center py-8">
       <div class="text-lg text-red-500">Error: {error}</div>
     </div>
   {:else if invoices.length === 0}

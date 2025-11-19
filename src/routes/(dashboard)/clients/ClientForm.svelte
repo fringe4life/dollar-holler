@@ -1,14 +1,13 @@
 <script lang="ts">
   import Button from '$lib/components/ui/button/button.svelte'
   import type { Client, NewClient } from '$lib/db/schema'
-  import type { ClientInsert } from '$lib/validators'
   import Check from '$lib/icon/Check.svelte'
   import Trash from '$lib/icon/Trash.svelte'
-  import { upsertClient, loadClients } from '$lib/stores/clientStore.svelte'
+  import { loadClients, upsertClient } from '$lib/stores/clientsStore.svelte'
   import { states } from '$lib/utils/states'
   import { onMount } from 'svelte'
   import type { FormEventHandler } from 'svelte/elements'
-  
+
   type Panel = {
     closePanel: () => void
   }
@@ -31,8 +30,8 @@
     loadClients()
   })
 
-      // Form data using NewClient type
-      let client: NewClient = $state({
+  // Form data using NewClient type
+  let client: NewClient = $state({
     city: null,
     email: null,
     name: '',
@@ -95,12 +94,12 @@
   </div>
 
   <div class="field col-span-3">
-    <Button variant="textOnlyDestructive" onclick={() => {}}><Trash />{' '}Delete</Button>
+    <Button variant="textOnlyDestructive" onclick={() => {}}><Trash /> Delete</Button>
   </div>
 
   <div class="field col-span-3 flex justify-end gap-x-5">
     <Button variant="secondary" onclick={() => closePanel()}>Cancel</Button>
-    <Button type="submit"><Check />{' '}Submit</Button>
+    <Button type="submit"><Check /> Submit</Button>
   </div>
 </form>
 

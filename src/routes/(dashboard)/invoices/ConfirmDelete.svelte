@@ -1,11 +1,12 @@
 <script lang="ts">
   import Modal from '$lib/components/Modal.svelte'
   import { Button } from '$lib/components/ui/button'
-  import { deleteInvoice } from '$lib/stores/InvoiceStore.svelte'
+  import { deleteInvoice } from '$lib/stores/invoicesStore.svelte'
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
 
   import type { NewInvoice } from '$lib/db/schema'
+  import { toast } from 'svelte-sonner'
 
   type Props = {
     open: boolean
@@ -15,7 +16,11 @@
   const handleDelete: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = async () => {
     open = false
-    await deleteInvoice(invoice)
+    if (!invoice.id) {
+      toast.error('Invoice not found')
+      return
+    }
+    await deleteInvoice(invoice.id)
   }
 
   let { invoice, open = $bindable() }: Props = $props()

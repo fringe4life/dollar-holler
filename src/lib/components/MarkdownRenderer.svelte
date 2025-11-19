@@ -1,16 +1,15 @@
-
 <script lang="ts" module>
   import { marked } from 'marked'
   import DOMPurify from 'isomorphic-dompurify'
-  
+
   // Configure marked globally to sanitize HTML using DOMPurify postprocess hook
   // This is the official recommended approach per marked documentation
   marked.use({
     hooks: {
       postprocess(html) {
         return DOMPurify.sanitize(html)
-      }
-    }
+      },
+    },
   })
 </script>
 

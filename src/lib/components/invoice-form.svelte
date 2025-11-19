@@ -1,11 +1,12 @@
 <script lang="ts">
-  import type {  Invoice, LineItem, NewInvoice, NewClient } from '$lib/db/schema'
+  import type { Invoice, LineItem, NewClient, NewInvoice } from '$lib/db/schema'
   import Trash from '$lib/icon/Trash.svelte'
-  import { upsertClient, clients, loadClients } from '$lib/stores/clientStore.svelte'
-  import { upsertInvoice } from '$lib/stores/InvoiceStore.svelte'
+  import { clients, loadClients, upsertClient } from '$lib/stores/clientsStore.svelte'
+  import { upsertInvoice } from '$lib/stores/invoicesStore.svelte'
   import { today } from '$lib/utils/dateHelpers'
   import { states } from '$lib/utils/states'
   import { onMount } from 'svelte'
+  import { toast } from 'svelte-sonner'
   import type { FormEventHandler, MouseEventHandler } from 'svelte/elements'
   import { slide } from 'svelte/transition'
   import ConfirmDelete from '../../routes/(dashboard)/invoices/ConfirmDelete.svelte'
@@ -33,7 +34,6 @@
   onMount(() => {
     loadClients()
   })
-
 
   // Form data using NewInvoice type
   let invoice: NewInvoice = $state({
@@ -109,12 +109,21 @@
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
     e.preventDefault()
-    
+
+    if (!invoice.clientId) {
+      toast.error('Client is required')
+      return
+    }
+
     if (isNewClient) {
       const clientId = await upsertClient(newClient)
+      if (!clientId) {
+        toast.error('Failed to create client')
+        return
+      }
       invoice.clientId = clientId
     }
-    
+
     // Single upsert call - much simpler!
     await upsertInvoice(invoice)
     closePanel()
@@ -283,4 +292,4 @@
   <option {value}>{name}</option>
 {/snippet}
 
-<ConfirmDelete invoice={invoice} bind:open />
+<ConfirmDelete {invoice} bind:open />

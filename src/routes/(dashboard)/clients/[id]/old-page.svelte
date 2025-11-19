@@ -27,14 +27,12 @@
   })
 
   // Get invoices for this client from the invoice store
-  const clientInvoices = $derived(
-    invoices.filter(invoice => invoice.clientId === data.client.id)
-  )
+  const clientInvoices = $derived(invoices.filter(invoice => invoice.clientId === data.client.id))
 
   // Utility function to extract client data without invoices
   function extractClientData(clientWithInvoices: ClientWithInvoicesResponse): Client {
-    const { invoices, ...clientData } = clientWithInvoices;
-    return clientData;
+    const { invoices, ...clientData } = clientWithInvoices
+    return clientData
   }
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> &
@@ -147,26 +145,25 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  
-    {#if isEditing === 'edit'}
-      <ClientForm
-        edit={extractClientData(data.client)}
-        formState="edit"
-        closePanel={() => {
-          isFormShowing = false
-          isEditing = 'edit'
-        }}
-      />
-    {:else}
-      <ClientForm
-        edit={undefined}
-        formState="create"
-        closePanel={() => {
-          isFormShowing = false
-          isEditing = 'create'
-        }}
-      />
-    {/if}
+  {#if isEditing === 'edit'}
+    <ClientForm
+      edit={extractClientData(data.client)}
+      formState="edit"
+      closePanel={() => {
+        isFormShowing = false
+        isEditing = 'edit'
+      }}
+    />
+  {:else}
+    <ClientForm
+      edit={undefined}
+      formState="create"
+      closePanel={() => {
+        isFormShowing = false
+        isEditing = 'create'
+      }}
+    />
+  {/if}
 </SlidePanel>
 
 <style>

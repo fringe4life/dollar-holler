@@ -61,13 +61,17 @@
 
   const receivedInvoices = () => {
     // find invoices that have been paid
-    const paidInvoices = sumInvoices(client?.invoices?.filter(i => i.invoiceStatus === 'paid') || [])
+    const paidInvoices = sumInvoices(
+      client?.invoices?.filter(i => i.invoiceStatus === 'paid') || []
+    )
     return centsToDollars(paidInvoices)
     // get sum of those invoices
   }
 
   const balanceInvoices = () => {
-    const unpaidInvoices = sumInvoices(client?.invoices?.filter(i => i.invoiceStatus !== 'paid') || [])
+    const unpaidInvoices = sumInvoices(
+      client?.invoices?.filter(i => i.invoiceStatus !== 'paid') || []
+    )
     return centsToDollars(unpaidInvoices)
     // get sum of those invoices
   }
@@ -168,9 +172,7 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  
-    <ClientForm formState="edit" bind:edit={client} closePanel={() => (isFormShowing = false)} />
-
+  <ClientForm formState="edit" bind:edit={client} closePanel={() => (isFormShowing = false)} />
 </SlidePanel>
 
 <ConfirmClientDelete bind:open {client} />

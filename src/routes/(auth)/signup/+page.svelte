@@ -1,6 +1,6 @@
 <script lang="ts">
   import { Button, buttonVariants } from '$lib/components/ui/button'
-  import { resolve } from '$app/paths';
+  import { resolve } from '$app/paths'
   import Alert from '$lib/components/Alert.svelte'
 
   import Loader from '$lib/components/Loader.svelte'
@@ -10,7 +10,6 @@
 
   let isFormShowing = $state<boolean>(true)
   let isLoading = $state<boolean>(false)
-
 </script>
 
 {#if isFormShowing}
@@ -42,7 +41,11 @@
           <Loader />{:else}Count me in!{/if}</Button
       >
       <p class="mt-4 text-center text-sm text-white">
-        <a href={resolve('/login')} class="underline hover:no-underline" data-sveltekit-preload-data="hover">Already have an account?</a>
+        <a
+          href={resolve('/login')}
+          class="underline hover:no-underline"
+          data-sveltekit-preload-data="hover">Already have an account?</a
+        >
       </p>
     </fieldset>
   </form>

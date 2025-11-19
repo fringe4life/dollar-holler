@@ -17,7 +17,7 @@
   // Derived state for filtered clients
   const filteredClients = $derived.by(() => {
     if (!searchTerms) return clientsStore.value
-    
+
     return clientsStore.value.filter(client => {
       return (
         client.city?.toLowerCase().includes(searchTerms.toLowerCase()) ||

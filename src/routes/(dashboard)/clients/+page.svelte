@@ -1,21 +1,21 @@
 <script lang="ts">
-  import Search from '$lib/components/Search.svelte';
-  import SlidePanel from '$lib/components/SlidePanel.svelte';
-  import Button from '$lib/components/ui/button/button.svelte';
-  import { clients, loadClients, loading, error } from '$lib/stores/clientsStore.svelte';
-  import ClientWithInvoices from '$lib/components/ClientWithInvoices.svelte';
-  import { onMount } from 'svelte';
-  import NoSearchResults from '../invoices/NoSearchResults.svelte';
-  import BlankState from './BlankState.svelte';
-  import ClientForm from './ClientForm.svelte';
+  import Search from '$lib/components/Search.svelte'
+  import SlidePanel from '$lib/components/SlidePanel.svelte'
+  import Button from '$lib/components/ui/button/button.svelte'
+  import { clients, loadClients, loading, error } from '$lib/stores/clientsStore.svelte'
+  import ClientWithInvoices from '$lib/components/ClientWithInvoices.svelte'
+  import { onMount } from 'svelte'
+  import NoSearchResults from '../invoices/NoSearchResults.svelte'
+  import BlankState from './BlankState.svelte'
+  import ClientForm from './ClientForm.svelte'
 
-  let searchTerms = $state('');
-  let isFormVisible = $state<boolean>(false);
+  let searchTerms = $state('')
+  let isFormVisible = $state<boolean>(false)
 
   // Derived state for filtered clients
   const filteredClients = $derived.by(() => {
-    if (!searchTerms) return clients;
-    
+    if (!searchTerms) return clients
+
     return clients.filter(client => {
       return (
         client.city?.toLowerCase().includes(searchTerms.toLowerCase()) ||
@@ -25,17 +25,17 @@
         client?.street?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client?.clientStatus?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         client.name.toLowerCase().includes(searchTerms.toLowerCase())
-      );
-    });
-  });
+      )
+    })
+  })
 
   onMount(async () => {
-    await loadClients();
-  });
+    await loadClients()
+  })
 
   const handleSearch = (terms: string) => {
-    searchTerms = terms;
-  };
+    searchTerms = terms
+  }
 </script>
 
 <svelte:head>
@@ -55,7 +55,7 @@
   <div class="z-1">
     <Button
       onclick={() => {
-        isFormVisible = true;
+        isFormVisible = true
       }}
       size="lg">+ Client</Button
     >
@@ -65,11 +65,11 @@
 <!-- list of clients -->
 <div>
   {#if loading}
-    <div class="flex justify-center items-center py-8">
+    <div class="flex items-center justify-center py-8">
       <div class="text-lg">Loading clients...</div>
     </div>
   {:else if error}
-    <div class="flex justify-center items-center py-8">
+    <div class="flex items-center justify-center py-8">
       <div class="text-lg text-red-500">Error: {error}</div>
     </div>
   {:else if clients.length === 0}
@@ -88,9 +88,7 @@
 
 <SlidePanel bind:open={isFormVisible} buttonText="">
   {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0">
-      Add a Client
-    </h2>
+    <h2 class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0">Add a Client</h2>
   {/snippet}
 
   {#snippet description()}

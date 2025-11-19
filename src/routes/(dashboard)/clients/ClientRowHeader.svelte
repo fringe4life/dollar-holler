@@ -1,17 +1,13 @@
 <script lang="ts">
-  import TableHeader from '$lib/components/TableHeader.svelte';
- import type { HeaderProps } from '$lib/components/TableHeader.svelte';
+  import TableHeader from '$lib/components/TableHeader.svelte'
+  import type { HeaderProps } from '$lib/components/TableHeader.svelte'
 
   const clientHeaders = ['Status', 'Client', 'Received', 'Balanced']
 
   let { className = '', emptyState = false }: HeaderProps = $props()
 </script>
 
-<TableHeader 
-  headers={clientHeaders} 
-  className={`client-table ${className}`} 
-  emptyState={emptyState}
->
+<TableHeader headers={clientHeaders} className={`client-table ${className}`} {emptyState}>
   {#snippet headerSnippet(title: string, emptyState: boolean = false)}
     <h3
       class={{

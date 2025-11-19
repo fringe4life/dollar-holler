@@ -1,23 +1,23 @@
-import { db } from "$lib/db";
-import { clients as clientsTable } from "$lib/db/schema";
-import { json } from "@sveltejs/kit";
-import { sql } from "drizzle-orm";
-import type { RequestHandler } from "./$types";
+import { db } from '$lib/db'
+import { clients as clientsTable } from '$lib/db/schema'
+import { json } from '@sveltejs/kit'
+import { sql } from 'drizzle-orm'
+import type { RequestHandler } from './$types'
 
 export const GET: RequestHandler = async () => {
   try {
     // Return only clients without relations - relations loaded separately
-    const clients = await db.select().from(clientsTable);
-    return json(clients);
+    const clients = await db.select().from(clientsTable)
+    return json(clients)
   } catch (error) {
-    console.error("Error loading clients:", error);
-    return json({ error: "Failed to load clients" }, { status: 500 });
+    console.error('Error loading clients:', error)
+    return json({ error: 'Failed to load clients' }, { status: 500 })
   }
-};
+}
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
-    const clientToAdd = await request.json();
+    const clientToAdd = await request.json()
 
     const [inserted] = await db
       .insert(clientsTable)
@@ -37,11 +37,11 @@ export const POST: RequestHandler = async ({ request }) => {
           clientStatus: sql`excluded.client_status`,
         },
       })
-      .returning({ id: clientsTable.id });
+      .returning({ id: clientsTable.id })
 
-    return json({ id: inserted.id });
+    return json({ id: inserted.id })
   } catch (error) {
-    console.error("Error adding client:", error);
-    return json({ error: "Failed to add client" }, { status: 500 });
+    console.error('Error adding client:', error)
+    return json({ error: 'Failed to add client' }, { status: 500 })
   }
-};
+}

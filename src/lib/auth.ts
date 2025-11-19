@@ -1,15 +1,15 @@
-import { getRequestEvent } from "$app/server";
-import { db } from "$lib/db";
-import { createId } from "@paralleldrive/cuid2";
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import { sveltekitCookies } from "better-auth/svelte-kit";
+import { getRequestEvent } from '$app/server'
+import { db } from '$lib/db'
+import { createId } from '@paralleldrive/cuid2'
+import { betterAuth } from 'better-auth'
+import { drizzleAdapter } from 'better-auth/adapters/drizzle'
+import { sveltekitCookies } from 'better-auth/svelte-kit'
 
 export const auth = betterAuth({
-  appName: "Dollar Holler",
-  baseURL: process.env.PUBLIC_BASE_URL || "http://localhost:5173",
+  appName: 'Dollar Holler',
+  baseURL: process.env.PUBLIC_BASE_URL || 'http://localhost:5173',
   database: drizzleAdapter(db, {
-    provider: "pg", // PostgreSQL
+    provider: 'pg', // PostgreSQL
   }),
   secret: process.env.BETTER_AUTH_SECRET,
   emailAndPassword: {
@@ -24,8 +24,8 @@ export const auth = betterAuth({
   },
   plugins: [sveltekitCookies(getRequestEvent)],
   trustedOrigins: [
-    "http://localhost:5173",
-    "http://localhost:4173",
+    'http://localhost:5173',
+    'http://localhost:4173',
     process.env.PUBLIC_BASE_URL,
   ].filter(Boolean) as string[],
   databaseHooks: {
@@ -38,9 +38,9 @@ export const auth = betterAuth({
               ...user,
               id: createId(),
             },
-          };
+          }
         },
       },
     },
   },
-});
+})

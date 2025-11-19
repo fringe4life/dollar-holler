@@ -23,7 +23,7 @@
   .auth-layout {
     background-image: none;
   }
-  
+
   @media (min-width: 768px) {
     .auth-layout {
       background-image: var(--bg-auth);

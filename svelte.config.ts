@@ -1,13 +1,13 @@
-import adapter from '@sveltejs/adapter-vercel'
-import type { Config } from '@sveltejs/kit'
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte'
+import adapter from "@sveltejs/adapter-vercel";
+import type { Config } from "@sveltejs/kit";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 const config: Config = {
-  extensions: ['.svelte'],
+  extensions: [".svelte"],
   preprocess: [vitePreprocess()],
   kit: {
     adapter: adapter(),
-    alias: { $utils: './src/utils' },
+    alias: { $utils: "./src/utils" },
     experimental: {
       remoteFunctions: true,
     },
@@ -17,6 +17,6 @@ const config: Config = {
       async: true,
     },
   },
-}
+};
 
-export default config
+export default config;

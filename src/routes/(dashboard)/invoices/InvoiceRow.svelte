@@ -1,77 +1,89 @@
 <script lang="ts">
-  import AdditionalOptions from '$lib/components/AdditionalOptions.svelte'
-  import Badge, { type BadgeVariant } from '$lib/components/ui/badge/badge.svelte'
-  import ThreeDots from '$lib/icon/ThreeDots.svelte'
-  import View from '$lib/icon/View.svelte'
-  import { convertDate, isLate } from '$lib/utils/dateHelpers'
-  import SlidePanel from '$lib/components/SlidePanel.svelte'
-  import { centsToDollars, getTotal } from '$lib/utils/moneyHelpers'
-  import type { MouseEventHandler } from 'svelte/elements'
-  import type { InvoiceWithRelationsResponse } from '$lib/validators'
-  import Send from '$lib/icon/Send.svelte'
-  import Edit from '$lib/icon/Edit.svelte'
-  import Trash from '$lib/icon/Trash.svelte'
-  import { clickOutside } from '$lib/attachments/clickOutside'
-  import InvoiceForm from '$lib/components/invoice-form.svelte'
-  import { resolve } from '$app/paths'
-  import ConfirmDelete from './ConfirmDelete.svelte'
-  import { swipe } from '$lib/attachments/swipe.svelte'
-  import Cancel from '$lib/icon/Cancel.svelte'
+  import { resolve } from "$app/paths";
+  import { clickOutside } from "$lib/attachments/clickOutside";
+  import { swipe } from "$lib/attachments/swipe.svelte";
+  import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
+  import InvoiceForm from "$lib/components/invoice-form.svelte";
+  import SlidePanel from "$lib/components/SlidePanel.svelte";
+  import Badge, {
+    type BadgeVariant,
+  } from "$lib/components/ui/badge/badge.svelte";
+  import Cancel from "$lib/icon/Cancel.svelte";
+  import Edit from "$lib/icon/Edit.svelte";
+  import Send from "$lib/icon/Send.svelte";
+  import ThreeDots from "$lib/icon/ThreeDots.svelte";
+  import Trash from "$lib/icon/Trash.svelte";
+  import View from "$lib/icon/View.svelte";
+  import { convertDate, isLate } from "$lib/utils/dateHelpers";
+  import { centsToDollars, getTotal } from "$lib/utils/moneyHelpers";
+  import type { InvoiceWithRelationsResponse } from "$lib/validators";
+  import type { MouseEventHandler } from "svelte/elements";
+  import ConfirmDelete from "./ConfirmDelete.svelte";
 
-  let isAdditionalMenuShowing = $state(false)
-  let isOptionsDisabled = $state(false)
-  let triggerReset = $state(false)
+  let isAdditionalMenuShowing = $state(false);
+  let isOptionsDisabled = $state(false);
+  let triggerReset = $state(false);
 
   type Props = {
-    invoice: InvoiceWithRelationsResponse
-  }
+    invoice: InvoiceWithRelationsResponse;
+  };
 
-  let { invoice }: Props = $props()
+  let { invoice }: Props = $props();
 
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
-    isAdditionalMenuShowing = !isAdditionalMenuShowing
-  }
+    isAdditionalMenuShowing = !isAdditionalMenuShowing;
+  };
 
-  const getLabel = (label: BadgeVariant, dueDate: string | null): BadgeVariant => {
-    if (label === 'draft') {
-      return 'draft'
-    } else if (label === 'sent' && isLate?.(dueDate)) {
-      isOptionsDisabled = true
-      return 'late'
-    } else if (label === 'sent' && !isLate?.(dueDate)) {
-      isOptionsDisabled = true
-      return 'sent'
-    } else if (label === 'paid') {
-      isOptionsDisabled = true
-      return 'paid'
+  const getLabel = (
+    label: BadgeVariant,
+    dueDate: string | null
+  ): BadgeVariant => {
+    if (label === "draft") {
+      return "draft";
+    } else if (label === "sent" && isLate?.(dueDate)) {
+      isOptionsDisabled = true;
+      return "late";
+    } else if (label === "sent" && !isLate?.(dueDate)) {
+      isOptionsDisabled = true;
+      return "sent";
+    } else if (label === "paid") {
+      isOptionsDisabled = true;
+      return "paid";
     }
-  }
+  };
 
   const closeOptions = () => {
-    isAdditionalMenuShowing = false
-  }
+    isAdditionalMenuShowing = false;
+  };
 
-  let open = $state<boolean>(false)
-  let isInvoiceShowingPanel = $state<boolean>(false)
+  let open = $state<boolean>(false);
+  let isInvoiceShowingPanel = $state<boolean>(false);
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
-    open = true
-    isAdditionalMenuShowing = false
-  }
+    open = true;
+    isAdditionalMenuShowing = false;
+  };
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
-    isInvoiceShowingPanel = true
-    isAdditionalMenuShowing = false
-  }
+    isInvoiceShowingPanel = true;
+    isAdditionalMenuShowing = false;
+  };
 
-  const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {}
+  const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {};
 
-  const { id, invoiceStatus, dueDate, invoiceNumber, client } = invoice
+  // svelte-ignore state_referenced_locally
+  const {
+    id,
+    invoiceStatus,
+    dueDate,
+    invoiceNumber,
+    client,
+  }: InvoiceWithRelationsResponse = invoice;
 
-  const label = getLabel(invoiceStatus ?? 'draft', dueDate)
+  const label = getLabel(invoiceStatus ?? "draft", dueDate);
 
   // @ts-expect-error - resolve function supports 2 arguments in SvelteKit v2.26+
-  const resolved = resolve('/invoices/[id]', { id })
+  const resolved = resolve("/invoices/[id]", { id });
 </script>
 
 <div class="relative isolate">
@@ -97,16 +109,32 @@
       <button
         {@attach isAdditionalMenuShowing && clickOutside(closeOptions)}
         {onclick}
-        class="flex cursor-pointer items-center justify-center"><ThreeDots /></button
+        class="flex cursor-pointer items-center justify-center"
+        ><ThreeDots /></button
       >
       {#if isAdditionalMenuShowing}
         <AdditionalOptions
           options={[
-            { label: 'Edit', icon: Edit, onclick: handleEdit, disabled: isOptionsDisabled },
+            {
+              label: "Edit",
+              icon: Edit,
+              onclick: handleEdit,
+              disabled: isOptionsDisabled,
+            },
 
-            { label: 'Delete', icon: Trash, onclick: handleDelete, disabled: false },
+            {
+              label: "Delete",
+              icon: Trash,
+              onclick: handleDelete,
+              disabled: false,
+            },
 
-            { label: 'Send', icon: Send, onclick: handleSendInvoice, disabled: isOptionsDisabled },
+            {
+              label: "Send",
+              icon: Send,
+              onclick: handleSendInvoice,
+              disabled: isOptionsDisabled,
+            },
           ]}
         />
       {/if}
@@ -144,7 +172,9 @@
 
 <SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
   {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">Edit an Invoice</h2>
+    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">
+      Edit an Invoice
+    </h2>
   {/snippet}
 
   {#snippet description()}
@@ -162,11 +192,11 @@
   @reference "../../../app.css";
   .invoice-row {
     grid-template-areas:
-      'invoicenumber invoicenumber '
-      'clientname    amount'
-      'duedate       status';
+      "invoicenumber invoicenumber "
+      "clientname    amount"
+      "duedate       status";
     @media screen and (width > 1024px) {
-      grid-template-areas: 'status duedate invoicenumber clientname amount viewbutton morebutton';
+      grid-template-areas: "status duedate invoicenumber clientname amount viewbutton morebutton";
     }
   }
 

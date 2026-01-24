@@ -10,7 +10,7 @@
 
 // Utility function to convert undefined to null for consistent null handling
 export function normalizeToNull<T>(value: T | undefined | null): T | null {
-  return value ?? null
+  return value ?? null;
 }
 
 // Transform null values to undefined for Drizzle insert operations
@@ -19,28 +19,28 @@ export function normalizeToNull<T>(value: T | undefined | null): T | null {
 export function transformNullToUndefined<T extends object>(data: T): T {
   const entries = Object.entries(data).map(([key, value]) => {
     if (value === null) {
-      return [key, undefined]
+      return [key, undefined];
     } else {
-      return [key, value]
+      return [key, value];
     }
-  })
-  return Object.fromEntries(entries) as T
+  });
+  return Object.fromEntries(entries) as T;
 }
 
 export function normalizeObjToNull<T extends object>(data: T): T {
   const entries = Object.entries(data).map(([key, value]) => {
     if (value === undefined) {
-      return [key, null]
+      return [key, null];
     } else {
-      return [key, value]
+      return [key, value];
     }
-  })
-  return Object.fromEntries(entries) as T
+  });
+  return Object.fromEntries(entries) as T;
 }
 
 // For upsert operations, we want optional fields to be null instead of undefined
 // This is a simpler approach than complex type manipulation
-export type UpsertType<T> = T
+export type UpsertType<T> = T;
 
 // Example usage:
 // const cleanValue = normalizeToNull(invoiceData.subject);

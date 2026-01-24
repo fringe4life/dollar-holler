@@ -2,9 +2,7 @@
 
 ## Usage
 
-Supply this file to the AI to generate a git commit message based on changes
-since the last commit. For small changes, aim for 140 characters. For large
-changes (10+ files or 100+ lines), allow up to 300 characters.
+Supply this file to the AI to generate a git commit message based on changes since the last commit. For small changes, aim for 140 characters. For large changes (10+ files or 100+ lines), allow up to 300 characters.
 
 ## Format
 

@@ -1,45 +1,46 @@
 <script lang="ts">
-  import { page } from '$app/state'
-  import { asset } from '$app/paths'
-  import MarkdownRenderer from '$lib/components/MarkdownRenderer.svelte'
-  import Button from '$lib/components/ui/button/button.svelte'
-  import { settingsStore } from '$lib/stores/settingsStore.svelte'
-  import { convertDate } from '$lib/utils/dateHelpers'
-  import { onMount } from 'svelte'
-  import { toast } from 'svelte-sonner'
-  import type { MouseEventHandler } from 'svelte/elements'
-  import LineItemRows from '../LineItemRows.svelte'
-  import type { PageProps } from './$types'
-  let { data }: PageProps = $props()
+  import { asset } from "$app/paths";
+  import { page } from "$app/state";
+  import MarkdownRenderer from "$lib/components/MarkdownRenderer.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import { settingsStore } from "$lib/stores/settingsStore.svelte";
+  import { convertDate } from "$lib/utils/dateHelpers";
+  import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
+  import type { MouseEventHandler } from "svelte/elements";
+  import LineItemRows from "../LineItemRows.svelte";
+  import type { PageProps } from "./$types";
+  let { data }: PageProps = $props();
 
-  const invoice = $state(data.invoice)
+  // svelte-ignore state_referenced_locally
+  const invoice = $state(data.invoice);
 
   onMount(() => {
-    settingsStore.loadSettings()
-  })
+    settingsStore.loadSettings();
+  });
 
   const printInvoice: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = () => {
-    window.print()
-  }
+    window.print();
+  };
 
   const copyLink: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = async () => {
-    await window.navigator.clipboard.writeText(page.url.href)
-    toast.success('Success!', {
+    await window.navigator.clipboard.writeText(page.url.href);
+    toast.success("Success!", {
       description: `${page.url.href}`,
-    })
-  }
+    });
+  };
 
   const payInvoice: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = () => {
-    console.log('PAY INVOICE')
-  }
+    console.log("PAY INVOICE");
+  };
 
   const sendInvoice: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = () => {
-    console.log('SEND INVOICE')
-  }
+    console.log("SEND INVOICE");
+  };
 </script>
 
 <div
@@ -58,8 +59,8 @@
 >
   <div class="col-span-full sm:col-span-3 print:col-span-3">
     <img
-      src={asset('/images/logo.png')}
-      srcset={`${asset('/images/logo@2x.png')} 2x, ${asset('/images/logo.png')} 1x`}
+      src={asset("/images/logo.png")}
+      srcset={`${asset("/images/logo@2x.png")} 2x, ${asset("/images/logo.png")} 1x`}
       alt="Compressed fm"
     />
   </div>
@@ -89,13 +90,27 @@
   </div>
   <div class="col-span-full sm:col-span-3 print:col-span-3">
     <div class="label">Bill To:</div>
-    <p>
-      {#if invoice.client.name}<strong>{invoice.client.name}</strong><br />{/if}
-      {#if invoice.client.name}{invoice.client.email}<br />{/if}
-      {#if invoice.client.street}{invoice.client.street}<br />{/if}
-      {#if invoice.client.state}{invoice.client.state}{/if}
-      {#if invoice.client.zip}{invoice.client.zip}{/if}
-    </p>
+    {#await data.clientPromise}
+      <div class="animate-pulse space-y-2">
+        <div class="h-5 w-32 rounded bg-gray-200"></div>
+        <div class="h-4 w-48 rounded bg-gray-200"></div>
+        <div class="h-4 w-40 rounded bg-gray-200"></div>
+      </div>
+    {:then client}
+      <p>
+        {#if client}
+          {#if client.name}<strong>{client.name}</strong><br />{/if}
+          {#if client.email}{client.email}<br />{/if}
+          {#if client.street}{client.street}<br />{/if}
+          {#if client.state}{client.state}{/if}
+          {#if client.zip}{client.zip}{/if}
+        {:else}
+          No client found
+        {/if}
+      </p>
+    {:catch}
+      <p class="text-red-500">Failed to load client</p>
+    {/await}
   </div>
   <div class="col-span-full sm:col-span-2 sm:col-start-5">
     <div class="label">Invoice Id:</div>
@@ -118,13 +133,28 @@
 
   <!-- line items div wrapper -->
   <div class="col-span-full">
-    <LineItemRows
-      lineItems={invoice?.lineItems}
-      isEditible={false}
-      addLineItem={() => {}}
-      removeLineItem={() => {}}
-      discount={invoice?.discount || 0}
-    />
+    {#await data.lineItemsPromise}
+      <div class="animate-pulse space-y-4">
+        <div class="flex justify-between border-b-2 pb-2">
+          <div class="h-4 w-24 rounded bg-gray-200"></div>
+          <div class="h-4 w-16 rounded bg-gray-200"></div>
+          <div class="h-4 w-12 rounded bg-gray-200"></div>
+          <div class="h-4 w-16 rounded bg-gray-200"></div>
+        </div>
+        <div class="h-10 w-full rounded bg-gray-100"></div>
+        <div class="h-10 w-full rounded bg-gray-100"></div>
+      </div>
+    {:then lineItems}
+      <LineItemRows
+        {lineItems}
+        isEditible={false}
+        addLineItem={() => {}}
+        removeLineItem={() => {}}
+        discount={invoice?.discount || 0}
+      />
+    {:catch}
+      <p class="text-red-500">Failed to load line items</p>
+    {/await}
   </div>
 
   {#if invoice?.notes}

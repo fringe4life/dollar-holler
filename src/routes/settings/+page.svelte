@@ -1,22 +1,26 @@
 <script lang="ts">
-  import Navbar from '$lib/components/Navbar.svelte'
-  import Button from '$lib/components/ui/button/button.svelte'
-  import type { Settings } from '$lib/db/schema'
-  import Check from '$lib/icon/Check.svelte'
-  import { settingsStore } from '$lib/stores/settingsStore.svelte'
-  import { states } from '$lib/utils/states'
-  import { onMount } from 'svelte'
+  import Navbar from "$lib/components/Navbar.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import type { Settings } from "$lib/db/schema";
+  import Check from "$lib/icon/Check.svelte";
+  import { settingsStore } from "$lib/stores/settingsStore.svelte";
+  import { states } from "$lib/utils/states";
+  import { onMount } from "svelte";
 
-  let mySettings: Settings = {} as Settings
+  let mySettings: Settings = {} as Settings;
   onMount(async () => {
-    await settingsStore.loadSettings()
+    await settingsStore.loadSettings();
     if (settingsStore.settings) {
-      mySettings = { ...settingsStore.settings }
+      mySettings = { ...settingsStore.settings };
     }
-  })
+  });
+
+  const saveSettings = async () => {
+    await settingsStore.updateSettings(mySettings);
+  };
 </script>
 
-<div class="bg-whisper grid min-h-[100dvh] grid-cols-12 md:gap-x-16">
+<div class="bg-whisper grid min-h-dvh grid-cols-12 md:gap-x-16">
   <Navbar />
   <main
     class="col-span-12 px-4 pt-4 md:col-span-8 md:col-start-4 md:pt-20 lg:col-span-6 lg:col-start-5"
@@ -25,13 +29,32 @@
     <p class="mb-8">This information gets included on each invoice.</p>
 
     <form class="grid grid-cols-6 gap-x-5">
-      <div class="field col-span-6">
+      <div class="field col-span-6 md:col-span-3">
         <label for="myName">Name</label>
-        <input type="text" name="myName" id="myName" bind:value={mySettings.myName} />
+        <input
+          type="text"
+          name="myName"
+          id="myName"
+          bind:value={mySettings.myName}
+        />
+      </div>
+      <div class="field col-span-6 md:col-span-3">
+        <label for="invoiceEmail">Email (shown on invoices)</label>
+        <input
+          type="email"
+          name="invoiceEmail"
+          id="invoiceEmail"
+          bind:value={mySettings.email}
+        />
       </div>
       <div class="field col-span-6">
         <label for="address">Address</label>
-        <input type="text" name="address" id="address" bind:value={mySettings.street} />
+        <input
+          type="text"
+          name="address"
+          id="address"
+          bind:value={mySettings.street}
+        />
       </div>
       <div class="field col-span-6 md:col-span-2">
         <label for="city">City</label>
@@ -49,8 +72,10 @@
         <label for="zip">Zip</label>
         <input type="text" name="zip" id="zip" bind:value={mySettings.zip} />
       </div>
-      <div class="field col-span-6 justify-self-end md:col-span-2 md:col-start-5">
-        <Button><Check /> Save</Button>
+      <div
+        class="field col-span-6 justify-self-end md:col-span-2 md:col-start-5"
+      >
+        <Button onclick={saveSettings}><Check /> Save</Button>
       </div>
     </form>
     <div class="col-span-6">

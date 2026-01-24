@@ -1,28 +1,43 @@
 <script lang="ts">
-  import { Button } from '$lib/components/ui/button'
-  import Trash from '$lib/icon/Trash.svelte'
-  import type { LineItem } from '$lib/db/schema'
+  import { Button } from "$lib/components/ui/button";
+  import type { LineItem } from "$lib/db/schema";
+  import Trash from "$lib/icon/Trash.svelte";
 
   type Props = {
-    lineItem: LineItem
-    removeLineItem: (id: string) => void
-    canDelete: boolean
-    isRequired: boolean
-    isEditible: boolean
-  }
+    lineItem: LineItem;
+    removeLineItem: (id: string) => void;
+    canDelete: boolean;
+    isRequired: boolean;
+    isEditible: boolean;
+  };
   let {
     isEditible = true,
     isRequired,
     lineItem = $bindable(),
     removeLineItem,
     canDelete,
-  }: Props = $props()
+  }: Props = $props();
 
-  let unitPrice = $derived((lineItem.amount / lineItem.quantity).toFixed(2))
-  let amount = $derived((lineItem.quantity * Number(unitPrice)).toFixed(2))
-  $effect(() => {
-    lineItem.amount = Number(amount)
-  })
+  // Use $state for editable values, initialize from lineItem
+  let unitPrice = $state(
+    lineItem.quantity > 0
+      ? (lineItem.amount / lineItem.quantity).toFixed(2)
+      : "0.00"
+  );
+
+  // Derived amount for display (read-only)
+  const amount = $derived((lineItem.quantity * Number(unitPrice)).toFixed(2));
+
+  // Update lineItem.amount when unitPrice or quantity changes
+  const updateAmount = () => {
+    lineItem.amount = lineItem.quantity * Number(unitPrice);
+  };
+
+  // Format unitPrice on blur
+  const formatUnitPrice = () => {
+    unitPrice = Number(unitPrice).toFixed(2);
+    updateAmount();
+  };
 </script>
 
 <div class="invoice-line-item border-fog border-b-2 py-4 sm:py-2">
@@ -43,14 +58,13 @@
     <label for="unitPrice" class="line-item-label text-right">Unit Price</label>
     <input
       bind:value={unitPrice}
+      oninput={updateAmount}
+      onblur={formatUnitPrice}
       class="line-item text-right"
       type="number"
       name="unitPrice"
       step="0.01"
       min="0"
-      onblur={() => {
-        unitPrice = Number(unitPrice).toFixed(2)
-      }}
       required={isRequired}
       disabled={!isEditible}
     />
@@ -59,6 +73,7 @@
     <label for="quantity" class="line-item-label text-center">Qty</label>
     <input
       bind:value={lineItem.quantity}
+      oninput={updateAmount}
       class="line-item text-center"
       type="number"
       name="quantity"
@@ -70,7 +85,7 @@
   <div class="amount">
     <label for="amount" class="line-item-label text-right">Amount</label>
     <input
-      bind:value={amount}
+      value={amount}
       class="line-item text-right"
       type="number"
       name="amount"
@@ -92,24 +107,24 @@
 
 <style>
   @reference "../../../app.css";
-  input[type='text'],
-  input[type='number'] {
+  input[type="text"],
+  input[type="number"] {
     @apply h-10 w-full border-b-2 border-dashed border-stone-300;
   }
-  input[type='text'] {
+  input[type="text"] {
     @apply font-sansserif h-10 text-xl font-bold;
   }
 
-  input[type='number'] {
+  input[type="number"] {
     @apply font-mono text-base;
   }
 
-  input[type='text']:focus,
-  input[type='number']:focus {
+  input[type="text"]:focus,
+  input[type="number"]:focus {
     @apply border-lavenderIndigo border-solid outline-none;
   }
 
-  input:is([type='number'], [type='text']):is(:disabled) {
+  input:is([type="number"], [type="text"]):is(:disabled) {
     @apply border-b-0 bg-transparent px-0;
   }
 

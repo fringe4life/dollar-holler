@@ -1,53 +1,66 @@
 <script lang="ts">
-  import type { Invoice, LineItem, NewClient, NewInvoice } from '$lib/db/schema'
-  import Trash from '$lib/icon/Trash.svelte'
-  import { clients, loadClients, upsertClient } from '$lib/stores/clientsStore.svelte'
-  import { upsertInvoice } from '$lib/stores/invoicesStore.svelte'
-  import { today } from '$lib/utils/dateHelpers'
-  import { states } from '$lib/utils/states'
-  import { onMount } from 'svelte'
-  import { toast } from 'svelte-sonner'
-  import type { FormEventHandler, MouseEventHandler } from 'svelte/elements'
-  import { slide } from 'svelte/transition'
-  import ConfirmDelete from '../../routes/(dashboard)/invoices/ConfirmDelete.svelte'
-  import LineItemRows from '../../routes/(dashboard)/invoices/LineItemRows.svelte'
-  import Button from './ui/button/button.svelte'
+  import type {
+    Invoice,
+    LineItem,
+    NewClient,
+    NewInvoice,
+  } from "$lib/db/schema";
+  import Trash from "$lib/icon/Trash.svelte";
+  import {
+    clients,
+    loadClients,
+    upsertClient,
+  } from "$lib/stores/clientsStore.svelte";
+  import { upsertInvoice } from "$lib/stores/invoicesStore.svelte";
+  import { today } from "$lib/utils/dateHelpers";
+  import { states } from "$lib/utils/states";
+  import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
+  import type { FormEventHandler, MouseEventHandler } from "svelte/elements";
+  import { slide } from "svelte/transition";
+  import ConfirmDelete from "../../routes/(dashboard)/invoices/ConfirmDelete.svelte";
+  import LineItemRows from "../../routes/(dashboard)/invoices/LineItemRows.svelte";
+  import Button from "./ui/button/button.svelte";
 
   type Panel = {
-    closePanel: () => void
-  }
+    closePanel: () => void;
+  };
 
   type EditProps = {
-    invoiceEdit: Invoice
-    formState: 'edit'
-  } & Panel
+    invoiceEdit: Invoice;
+    formState: "edit";
+  } & Panel;
 
   type CreateProps = {
-    formState: 'create'
-    invoiceEdit: undefined
-  } & Panel
+    formState: "create";
+    invoiceEdit: undefined;
+  } & Panel;
 
-  type Props = CreateProps | EditProps
+  type Props = CreateProps | EditProps;
 
-  let { formState = 'create', closePanel, invoiceEdit = $bindable() }: Props = $props()
+  let {
+    formState = "create",
+    closePanel,
+    invoiceEdit = $bindable(),
+  }: Props = $props();
 
   onMount(() => {
-    loadClients()
-  })
+    loadClients();
+  });
 
   // Form data using NewInvoice type
   let invoice: NewInvoice = $state({
-    clientId: '',
-    invoiceNumber: '',
+    clientId: "",
+    invoiceNumber: "",
     subject: null,
     issueDate: today,
-    dueDate: '',
+    dueDate: "",
     discount: null,
     notes: null,
     terms: null,
-    invoiceStatus: 'draft',
-    userId: '', // This will be set from the session
-  })
+    invoiceStatus: "draft",
+    userId: "", // This will be set from the session
+  });
 
   // Separate state for line items (not part of NewInvoice)
   let lineItems: LineItem[] = $state([
@@ -55,18 +68,19 @@
       id: crypto.randomUUID(),
       createdAt: new Date(),
       updatedAt: new Date(),
-      userId: '',
-      description: '',
-      invoiceId: '',
+      userId: "",
+      description: "",
+      invoiceId: "",
       quantity: 0,
       amount: 0,
     },
-  ])
+  ]);
 
-  // Initialize form data based on edit mode
-  if (formState === 'edit' && invoiceEdit) {
+  // Initialize form data based on edit mode (one-time, on mount)
+  // svelte-ignore state_referenced_locally
+  if (formState === "edit" && invoiceEdit) {
     // Extract only the fields we need for the form
-    invoice = invoiceEdit
+    invoice = invoiceEdit;
     // Line items will be handled separately
   }
 
@@ -78,62 +92,62 @@
         id: crypto.randomUUID(),
         createdAt: new Date(),
         updatedAt: new Date(),
-        userId: '',
-        description: '',
-        invoiceId: '',
+        userId: "",
+        description: "",
+        invoiceId: "",
         quantity: 0,
         amount: 0,
       },
-    ]
-  }
+    ];
+  };
 
   const removeLineItem = (id: string) => {
-    console.log(id)
-    lineItems = lineItems.filter(lineItem => lineItem.id !== id)
-  }
+    lineItems = lineItems.filter((lineItem) => lineItem.id !== id);
+  };
 
-  let isNewClient = $state<boolean>(false)
+  let isNewClient = $state<boolean>(false);
 
   let newClient: NewClient = $state({
-    clientStatus: 'active',
+    clientStatus: "active",
     city: null,
     email: null,
-    name: '',
+    name: "",
     state: null,
     street: null,
     zip: null,
-    userId: '', // This will be set from the session
-  })
+    userId: "", // This will be set from the session
+  });
 
-  let discount = $derived<number>(invoice.discount || 0)
+  // Use $state for discount - syncs bidirectionally with invoice.discount
+  // svelte-ignore state_referenced_locally
+  let discount = $state<number>(invoice.discount ?? 0);
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
-    e.preventDefault()
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
 
     if (!invoice.clientId) {
-      toast.error('Client is required')
-      return
+      toast.error("Client is required");
+      return;
     }
 
     if (isNewClient) {
-      const clientId = await upsertClient(newClient)
+      const clientId = await upsertClient(newClient);
       if (!clientId) {
-        toast.error('Failed to create client')
-        return
+        toast.error("Failed to create client");
+        return;
       }
-      invoice.clientId = clientId
+      invoice.clientId = clientId;
     }
 
+    // Sync discount back to invoice before saving
+    invoice.discount = discount;
+
     // Single upsert call - much simpler!
-    await upsertInvoice(invoice)
-    closePanel()
-  }
+    await upsertInvoice(invoice);
+    closePanel();
+  };
 
-  let open = $state<boolean>(false)
-
-  $effect(() => {
-    invoice.discount = discount
-  })
+  let open = $state<boolean>(false);
 </script>
 
 <form class="grid grid-cols-6 gap-x-2 md:gap-x-5" onsubmit={handleSubmit}>
@@ -154,13 +168,15 @@
             <option value={id}>{name}</option>
           {/each}
         </select>
-        <p class="text-monsoon text-base leading-9 font-bold lg:leading-14">or</p>
+        <p class="text-monsoon text-base leading-9 font-bold lg:leading-14">
+          or
+        </p>
         <Button
           variant="outline"
           onclick={() => {
-            isNewClient = true
-            newClient.name = ''
-            newClient.email = null
+            isNewClient = true;
+            newClient.name = "";
+            newClient.email = null;
           }}>+ Client</Button
         >
       </div>
@@ -178,17 +194,17 @@
           variant="outline"
           size="sm"
           onclick={() => {
-            isNewClient = false
+            isNewClient = false;
             newClient = {
-              clientStatus: 'active',
+              clientStatus: "active",
               city: null,
               email: null,
-              name: '',
+              name: "",
               state: null,
               street: null,
               zip: null,
-              userId: '',
-            }
+              userId: "",
+            };
           }}>Existing Client</Button
         >
       </div>
@@ -198,7 +214,12 @@
   <!-- invoiceid -->
   <div class="field -order-1 col-span-6 self-end sm:order-0 sm:col-span-2">
     <label for="invoiceNumber">InvoiceNumber</label>
-    <input type="number" name="invoiceNumber" required bind:value={invoice.invoiceNumber} />
+    <input
+      type="number"
+      name="invoiceNumber"
+      required
+      bind:value={invoice.invoiceNumber}
+    />
   </div>
   <!-- new client information -->
   {#if isNewClient}
@@ -216,7 +237,12 @@
 
       <div class="field col-span-6">
         <label for="street">Street</label>
-        <input bind:value={newClient.street} type="text" name="street" id="street" />
+        <input
+          bind:value={newClient.street}
+          type="text"
+          name="street"
+          id="street"
+        />
       </div>
 
       <div class="field col-span-2">
@@ -235,7 +261,12 @@
 
       <div class="field col-span-2">
         <label for="zipCode">Zip Code</label>
-        <input bind:value={newClient.zip} type="text" name="zipCode" id="zipCode" />
+        <input
+          bind:value={newClient.zip}
+          type="text"
+          name="zipCode"
+          id="zipCode"
+        />
       </div>
     </div>
   {/if}
@@ -243,12 +274,23 @@
   <!-- duedate -->
   <div class="field col-span-3 sm:col-span-2">
     <label for="dueDate">Due Date</label>
-    <input required type="date" name="dueDate" min={today} bind:value={invoice.dueDate} />
+    <input
+      required
+      type="date"
+      name="dueDate"
+      min={today}
+      bind:value={invoice.dueDate}
+    />
   </div>
   <!-- issue date -->
   <div class="field col-span-3 sm:col-span-2 md:col-start-5">
     <label for="issueDate">Issue Date</label>
-    <input type="date" name="issueDate" min={today} bind:value={invoice.issueDate} />
+    <input
+      type="date"
+      name="issueDate"
+      min={today}
+      bind:value={invoice.issueDate}
+    />
   </div>
   <!-- subject -->
   <div class="field col-span-6">
@@ -263,23 +305,29 @@
   <!-- notes -->
   <div class="field col-span-6">
     <label for="notes"
-      >Notes <span class="font-normal">(optional, displayed on invoice)</span></label
+      >Notes <span class="font-normal">(optional, displayed on invoice)</span
+      ></label
     >
     <textarea bind:value={invoice.notes} name="notes" id="notes"></textarea>
   </div>
   <!-- terms -->
   <div class="field col-span-6">
     <label for="terms"
-      >Terms <span class="font-normal">(optional, displayed on invoice)</span></label
+      >Terms <span class="font-normal">(optional, displayed on invoice)</span
+      ></label
     >
     <textarea bind:value={invoice.terms} name="terms" id="terms"></textarea>
-    <p class="text-xs text-gray-400">Formatting tips: <strong>*bold*</strong>, <em>_italic_</em></p>
+    <p class="text-xs text-gray-400">
+      Formatting tips: <strong>*bold*</strong>, <em>_italic_</em>
+    </p>
   </div>
   <!-- buttons -->
   <div class="field col-span-2">
     <!-- delete button only visible if editing -->
-    {#if formState === 'edit'}
-      <Button variant="textOnlyDestructive" onclick={() => (open = true)}><Trash />Delete</Button>
+    {#if formState === "edit"}
+      <Button variant="textOnlyDestructive" onclick={() => (open = true)}
+        ><Trash />Delete</Button
+      >
     {/if}
   </div>
   <div class="field col-span-4 flex justify-end gap-x-5">

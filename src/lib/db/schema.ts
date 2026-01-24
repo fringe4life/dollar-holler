@@ -105,8 +105,8 @@ export const invoices = pgTable("invoices", {
     .notNull()
     .references(() => clients.id, { onDelete: "cascade" }),
   subject: text("subject"),
-  issueDate: text("issue_date").notNull(),
-  dueDate: text("due_date").notNull(),
+  issueDate: timestamp("issue_date").notNull(),
+  dueDate: timestamp("due_date").notNull(),
   discount: real("discount").default(0),
   notes: text("notes"),
   terms: text("terms"),

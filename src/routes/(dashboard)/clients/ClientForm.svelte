@@ -1,72 +1,85 @@
 <script lang="ts">
-  import Button from '$lib/components/ui/button/button.svelte'
-  import type { Client, NewClient } from '$lib/db/schema'
-  import Check from '$lib/icon/Check.svelte'
-  import Trash from '$lib/icon/Trash.svelte'
-  import { loadClients, upsertClient } from '$lib/stores/clientsStore.svelte'
-  import { states } from '$lib/utils/states'
-  import { onMount } from 'svelte'
-  import type { FormEventHandler } from 'svelte/elements'
+  import Button from "$lib/components/ui/button/button.svelte";
+  import type { Client, NewClient } from "$lib/db/schema";
+  import Check from "$lib/icon/Check.svelte";
+  import Trash from "$lib/icon/Trash.svelte";
+  import { clientsStore } from "$lib/stores/clientsStore.svelte";
+  import { states } from "$lib/utils/states";
+  import { onMount } from "svelte";
+  import type { FormEventHandler } from "svelte/elements";
 
   type Panel = {
-    closePanel: () => void
-  }
+    closePanel: () => void;
+  };
 
   type EditProps = {
-    edit: Client
-    formState: 'edit'
-  } & Panel
+    edit: Client;
+    formState: "edit";
+  } & Panel;
 
   type CreateProps = {
-    formState: 'create'
-    edit?: undefined
-  } & Panel
+    formState: "create";
+    edit?: undefined;
+  } & Panel;
 
-  export type Props = CreateProps | EditProps
+  export type Props = CreateProps | EditProps;
 
-  let { formState, closePanel, edit = $bindable() }: Props = $props()
+  let { formState, closePanel, edit = $bindable() }: Props = $props();
 
   onMount(() => {
-    loadClients()
-  })
+    clientsStore.loadClients();
+  });
 
   // Form data using NewClient type
   let client: NewClient = $state({
     city: null,
     email: null,
-    name: '',
+    name: "",
     state: null,
     street: null,
     zip: null,
-    clientStatus: 'active',
-    userId: '', // This will be set from the session
-  })
+    clientStatus: "active",
+    userId: "", // This will be set from the session
+  });
 
   // Initialize form data based on edit mode
-  if (formState === 'edit' && edit) {
+  // svelte-ignore state_referenced_locally
+  if (formState === "edit" && edit) {
     // Extract only the fields we need for the form
-    const { createdAt, updatedAt, ...clientData } = edit
-    client = clientData
+    const { createdAt, updatedAt, ...clientData } = edit;
+    client = clientData;
   }
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async e => {
-    e.preventDefault()
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault();
 
     // Single upsert call - much simpler!
-    await upsertClient(client)
-    closePanel()
-  }
+    await clientsStore.upsertClient(client);
+    closePanel();
+  };
 </script>
 
 <form class="grid grid-cols-6 gap-x-5" onsubmit={handleSubmit}>
   <div class="field col-span-full">
     <label for="name">Client Name</label>
-    <input type="text" name="name" id="name" bind:value={client.name} required />
+    <input
+      type="text"
+      name="name"
+      id="name"
+      bind:value={client.name}
+      required
+    />
   </div>
 
   <div class="field col-span-full">
     <label for="email">Client Email</label>
-    <input type="text" name="email" id="email" bind:value={client.email} required />
+    <input
+      type="text"
+      name="email"
+      id="email"
+      bind:value={client.email}
+      required
+    />
   </div>
 
   <div class="field col-span-full">
@@ -90,11 +103,19 @@
 
   <div class="field col-span-2">
     <label for="zip">Zip</label>
-    <input type="text" name="zip" id="zip" minlength="4" bind:value={client.zip} />
+    <input
+      type="text"
+      name="zip"
+      id="zip"
+      minlength="4"
+      bind:value={client.zip}
+    />
   </div>
 
   <div class="field col-span-3">
-    <Button variant="textOnlyDestructive" onclick={() => {}}><Trash /> Delete</Button>
+    <Button variant="textOnlyDestructive" onclick={() => {}}
+      ><Trash /> Delete</Button
+    >
   </div>
 
   <div class="field col-span-3 flex justify-end gap-x-5">

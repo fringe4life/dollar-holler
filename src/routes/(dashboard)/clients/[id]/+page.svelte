@@ -9,10 +9,7 @@
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";
   import Edit from "$lib/icon/Edit.svelte";
-  import {
-    getInvoicesByClientId,
-    invoices,
-  } from "$lib/stores/invoicesStore.svelte";
+  import { invoices, invoicesStore } from "$lib/stores/invoicesStore.svelte";
   import { isLate } from "$lib/utils/dateHelpers";
   import { onMount } from "svelte";
   import type { MouseEventHandler } from "svelte/elements";
@@ -27,7 +24,7 @@
   const client = $state(data.client);
   // Load invoices and filter by client
   onMount(async () => {
-    await getInvoicesByClientId(client.id);
+    await invoicesStore.getInvoicesByClientId(client.id);
   });
 
   // Get invoices for this client from the invoice store
@@ -65,7 +62,7 @@
 
   const getOverdue = (): string => {
     const overdueInvoices = clientInvoices.filter((i) => {
-      if (isLate(i.dueDate) && i.invoiceStatus === "sent") {
+      if (isLate(i.dueDate.toISOString()) && i.invoiceStatus === "sent") {
         return true;
       }
       return false;
@@ -75,7 +72,7 @@
 
   const getOustanding = (): string => {
     const overdueInvoices = clientInvoices.filter((i) => {
-      if (!isLate(i.dueDate) && i.invoiceStatus === "sent") {
+      if (!isLate(i.dueDate.toISOString()) && i.invoiceStatus === "sent") {
         return true;
       }
       return false;

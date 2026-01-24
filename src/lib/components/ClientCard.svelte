@@ -1,11 +1,11 @@
 <script lang="ts">
   import type { ClientSelect } from '$lib/validators'
-  import { getInvoicesByClientId } from '$lib/stores/invoicesStore.svelte'
+  import { invoicesStore } from '$lib/stores/invoicesStore.svelte'
 
   let { client }: { client: ClientSelect } = $props()
 
   // Create a promise for the client's invoices
-  const invoicesPromise = getInvoicesByClientId(client.id)
+  const invoicesPromise = invoicesStore.getInvoicesByClientId(client.id)
 </script>
 
 <div class="client-card rounded-lg border p-4 shadow-sm">

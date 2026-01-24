@@ -6,12 +6,8 @@
     NewInvoice,
   } from "$lib/db/schema";
   import Trash from "$lib/icon/Trash.svelte";
-  import {
-    clients,
-    loadClients,
-    upsertClient,
-  } from "$lib/stores/clientsStore.svelte";
-  import { upsertInvoice } from "$lib/stores/invoicesStore.svelte";
+  import { clientsStore } from "$lib/stores/clientsStore.svelte";
+  import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
   import { today } from "$lib/utils/dateHelpers";
   import { states } from "$lib/utils/states";
   import { onMount } from "svelte";
@@ -45,7 +41,7 @@
   }: Props = $props();
 
   onMount(() => {
-    loadClients();
+    clientsStore.loadClients();
   });
 
   // Form data using NewInvoice type
@@ -53,8 +49,8 @@
     clientId: "",
     invoiceNumber: "",
     subject: null,
-    issueDate: today,
-    dueDate: "",
+    issueDate: new Date(),
+    dueDate: new Date(),
     discount: null,
     notes: null,
     terms: null,
@@ -131,7 +127,7 @@
     }
 
     if (isNewClient) {
-      const clientId = await upsertClient(newClient);
+      const clientId = await clientsStore.upsertClient(newClient);
       if (!clientId) {
         toast.error("Failed to create client");
         return;
@@ -143,7 +139,7 @@
     invoice.discount = discount;
 
     // Single upsert call - much simpler!
-    await upsertInvoice(invoice);
+    await invoicesStore.upsertInvoice(invoice);
     closePanel();
   };
 
@@ -164,7 +160,7 @@
           bind:value={invoice.clientId}
           class="mb-2 sm:mb-0"
         >
-          {#each clients as { id, name } (id)}
+          {#each clientsStore.clients as { id, name } (id)}
             <option value={id}>{name}</option>
           {/each}
         </select>

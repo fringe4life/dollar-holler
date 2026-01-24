@@ -1,10 +1,9 @@
+import { client } from "$lib/client";
 import {
   normalizeToNull,
   transformNullToUndefined,
 } from "$lib/utils/typeHelpers";
 import type { InvoiceSelect, NewInvoice } from "$lib/validators";
-import { invoiceSelectWithDatesSchema } from "$lib/validators";
-import { ArkErrors } from "arktype";
 import { toast } from "svelte-sonner";
 
 class InvoicesStore {
@@ -22,25 +21,17 @@ class InvoicesStore {
     this.error = null;
 
     try {
-      const response = await fetch("/api/invoices");
-      if (!response.ok) {
-        throw new Error("Failed to load invoices");
-      }
-      const rawData = await response.json();
-
-      // Validate response with ArkType
-      const validationResult = invoiceSelectWithDatesSchema.array()(rawData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid invoice data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid invoice data received from server");
+      const { data: invoiceData } = await client.api.invoices.get();
+      if (
+        !invoiceData ||
+        (typeof invoiceData === "object" && "error" in invoiceData)
+      ) {
+        throw new Error(invoiceData?.error || "Failed to load invoices");
       }
 
       // Update the reactive state
       this.invoices.length = 0;
-      this.invoices.push(...validationResult);
+      this.invoices.push(...invoiceData);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load invoices";
@@ -55,23 +46,15 @@ class InvoicesStore {
   // Load a single invoice by ID (without relations)
   async loadInvoiceById(id: string): Promise<InvoiceSelect | null> {
     try {
-      const response = await fetch(`/api/invoices/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to load invoice");
-      }
-      const rawData = await response.json();
-
-      // Validate response with ArkType
-      const validationResult = invoiceSelectWithDatesSchema(rawData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid invoice data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid invoice data received from server");
+      const { data: invoiceData } = await client.api.invoices({ id }).get();
+      if (
+        !invoiceData ||
+        (typeof invoiceData === "object" && "error" in invoiceData)
+      ) {
+        throw new Error(invoiceData?.error || "Failed to load invoice");
       }
 
-      return validationResult;
+      return invoiceData;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load invoice";
@@ -84,23 +67,17 @@ class InvoicesStore {
   // Get invoices for a specific client
   async getInvoicesByClientId(clientId: string): Promise<InvoiceSelect[]> {
     try {
-      const response = await fetch(`/api/clients/${clientId}/invoices`);
-      if (!response.ok) {
-        throw new Error("Failed to load client invoices");
-      }
-      const rawData = await response.json();
-
-      // Validate response with ArkType
-      const validationResult = invoiceSelectWithDatesSchema.array()(rawData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid invoice data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid invoice data received from server");
+      const { data: invoiceData } = await client.api
+        .clients({ id: clientId })
+        .invoices.get();
+      if (
+        !invoiceData ||
+        (typeof invoiceData === "object" && "error" in invoiceData)
+      ) {
+        throw new Error(invoiceData?.error || "Failed to load client invoices");
       }
 
-      return validationResult;
+      return invoiceData;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load client invoices";
@@ -113,12 +90,9 @@ class InvoicesStore {
   // Delete invoice
   async deleteInvoice(invoiceId: string) {
     try {
-      const response = await fetch(`/api/invoices/${invoiceId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete invoice");
+      const { data } = await client.api.invoices({ id: invoiceId }).delete();
+      if (data && typeof data === "object" && "error" in data) {
+        throw new Error(data.error || "Failed to delete invoice");
       }
 
       // Remove from local state
@@ -142,21 +116,31 @@ class InvoicesStore {
   async upsertInvoice(invoiceData: NewInvoice): Promise<string | null> {
     try {
       const isUpdate = !!invoiceData.id;
-      const url = isUpdate
-        ? `/api/invoices/${invoiceData.id}`
-        : "/api/invoices";
-      const method = isUpdate ? "PUT" : "POST";
+      const body = transformNullToUndefined(invoiceData);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(transformNullToUndefined(invoiceData)),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to ${isUpdate ? "update" : "create"} invoice`);
+      let responseData: { id?: string; error?: string } | InvoiceSelect;
+      if (isUpdate && invoiceData.id) {
+        const { data } = await client.api.invoices({ id: invoiceData.id }).put({
+          ...body,
+          client: {
+            id: invoiceData.clientId,
+          },
+        });
+        if (!data || (typeof data === "object" && "error" in data)) {
+          throw new Error(data?.error || "Failed to update invoice");
+        }
+        responseData = data as InvoiceSelect;
+      } else {
+        const { data } = await client.api.invoices.post({
+          ...body,
+          client: {
+            id: invoiceData.clientId,
+          },
+        });
+        if (!data || (typeof data === "object" && "error" in data)) {
+          throw new Error(data?.error || "Failed to create invoice");
+        }
+        responseData = data as { id: string };
       }
 
       if (isUpdate && invoiceData.id) {
@@ -179,7 +163,7 @@ class InvoicesStore {
         return invoiceData.id;
       } else {
         // Add new invoice to state
-        const { id } = await response.json();
+        const id = (responseData as { id: string }).id;
         const newInvoice: InvoiceSelect = {
           ...invoiceData,
           id,
@@ -221,16 +205,5 @@ class InvoicesStore {
 // Create and export a singleton instance
 export const invoicesStore = new InvoicesStore();
 
-// Export convenience methods for backward compatibility
-export const {
-  invoices,
-  loading,
-  error,
-  isLoaded,
-  loadInvoices,
-  loadInvoiceById,
-  getInvoicesByClientId,
-  deleteInvoice,
-  upsertInvoice,
-  resetInvoices,
-} = invoicesStore;
+// Export store instance and reactive properties
+export const { invoices, loading, error, isLoaded } = invoicesStore;

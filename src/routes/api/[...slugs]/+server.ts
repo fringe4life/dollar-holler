@@ -1,6 +1,6 @@
 import { betterAuthPlugin } from "$lib/elysia/auth-plugin";
 import { clientsRoutes } from "$lib/elysia/routes/clients";
-import { invoicesRoutes } from "$lib/elysia/routes/invoices";
+import { invoicesRoutes, lineItemsRoutes } from "$lib/elysia/routes/invoices";
 import { settingsRoutes } from "$lib/elysia/routes/settings";
 import { Elysia } from "elysia";
 
@@ -9,6 +9,7 @@ const app = new Elysia({ prefix: "/api" })
   .use(betterAuthPlugin)
   .use(clientsRoutes)
   .use(invoicesRoutes)
+  .use(lineItemsRoutes)
   .use(settingsRoutes)
   .onError(({ code, error, set }) => {
     // Handle errors consistently
@@ -27,3 +28,5 @@ const app = new Elysia({ prefix: "/api" })
 type RequestHandler = (v: { request: Request }) => Response | Promise<Response>;
 
 export const fallback: RequestHandler = ({ request }) => app.handle(request);
+
+export type App = typeof app;

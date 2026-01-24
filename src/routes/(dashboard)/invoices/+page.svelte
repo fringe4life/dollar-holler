@@ -6,7 +6,7 @@
   import {
     error,
     invoices,
-    loadInvoices,
+    invoicesStore,
     loading,
   } from "$lib/stores/invoicesStore.svelte";
   import { onMount } from "svelte";
@@ -33,7 +33,7 @@
   });
 
   onMount(async () => {
-    await loadInvoices();
+    await invoicesStore.loadInvoices();
   });
 
   const handleSearch = (terms: string) => {

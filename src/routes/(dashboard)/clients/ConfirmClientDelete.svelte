@@ -4,7 +4,7 @@
   import type { MouseEventHandler } from 'svelte/elements'
 
   import type { Client } from '$lib/db/schema'
-  import { deleteClient } from '$lib/stores/clientsStore.svelte'
+  import { clientsStore } from '$lib/stores/clientsStore.svelte'
 
   type Props = {
     open: boolean

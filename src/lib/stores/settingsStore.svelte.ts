@@ -1,3 +1,4 @@
+import { client } from "$lib/client";
 import {
   settingsSelectWithDatesSchema,
   type SettingsResponse,
@@ -20,14 +21,29 @@ class SettingsStore {
     this.error = null;
 
     try {
-      const response = await fetch("/api/settings");
-      if (!response.ok) {
-        throw new Error("Failed to load settings");
+      const { data: settingsData } = await client.api.settings.get();
+      if (
+        !settingsData ||
+        (typeof settingsData === "object" && "error" in settingsData)
+      ) {
+        throw new Error(settingsData?.error || "Failed to load settings");
       }
-      const rawData = await response.json();
+
+      // Convert Date objects to ISO strings for validation
+      const serializedData = {
+        ...settingsData,
+        createdAt:
+          settingsData.createdAt instanceof Date
+            ? settingsData.createdAt.toISOString()
+            : settingsData.createdAt,
+        updatedAt:
+          settingsData.updatedAt instanceof Date
+            ? settingsData.updatedAt.toISOString()
+            : settingsData.updatedAt,
+      };
 
       // Validate response with ArkType
-      const validationResult = settingsSelectWithDatesSchema(rawData);
+      const validationResult = settingsSelectWithDatesSchema(serializedData);
       if (validationResult instanceof ArkErrors) {
         console.error(
           "Invalid settings data received:",
@@ -54,16 +70,13 @@ class SettingsStore {
     this.error = null;
 
     try {
-      const response = await fetch("/api/settings", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(settingsToUpdate),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update settings");
+      const { data: settingsData } =
+        await client.api.settings.put(settingsToUpdate);
+      if (
+        !settingsData ||
+        (typeof settingsData === "object" && "error" in settingsData)
+      ) {
+        throw new Error(settingsData?.error || "Failed to update settings");
       }
 
       // Update the reactive state

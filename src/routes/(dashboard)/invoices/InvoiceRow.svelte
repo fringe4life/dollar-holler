@@ -3,7 +3,7 @@
   import { clickOutside } from "$lib/attachments/clickOutside";
   import { swipe } from "$lib/attachments/swipe.svelte";
   import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
-  import InvoiceForm from "$lib/components/invoice-form.svelte";
+  import InvoiceForm from "$lib/components/InvoiceForm.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Badge, {
     type BadgeVariant,
@@ -80,7 +80,7 @@
     client,
   }: InvoiceWithRelationsResponse = invoice;
 
-  const label = getLabel(invoiceStatus ?? "draft", dueDate);
+  const label = getLabel(invoiceStatus ?? "draft", dueDate.toISOString());
 
   // @ts-expect-error - resolve function supports 2 arguments in SvelteKit v2.26+
   const resolved = resolve("/invoices/[id]", { id });
@@ -92,7 +92,9 @@
     class="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
     <div class="status justify-self-end">{@render tag(label)}</div>
-    <div class="duedate text-sm lg:text-lg">{convertDate(dueDate)}</div>
+    <div class="duedate text-sm lg:text-lg">
+      {convertDate(dueDate.toISOString())}
+    </div>
     <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
     <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
     <div class="amount text-right font-mono text-sm font-bold lg:text-lg">

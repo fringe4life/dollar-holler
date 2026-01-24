@@ -1,14 +1,16 @@
 <script lang="ts">
-  import { getClientById } from "$lib/stores/clientsStore.svelte";
-  import { loadLineItemsByInvoiceId } from "$lib/stores/lineItemsStore.svelte";
+  import { clientsStore } from "$lib/stores/clientsStore.svelte";
+  import { lineItemsStore } from "$lib/stores/lineItemsStore.svelte";
   import type { InvoiceSelect, LineItemSelect } from "$lib/validators";
 
   let { invoice }: { invoice: InvoiceSelect } = $props();
 
   // Use $derived for reactive promises - re-fetches when invoice changes
-  const clientPromise = $derived(getClientById(invoice.clientId));
+  const clientPromise = $derived(clientsStore.getClientById(invoice.clientId));
 
-  const lineItemsPromise = $derived(loadLineItemsByInvoiceId(invoice.id));
+  const lineItemsPromise = $derived(
+    lineItemsStore.loadLineItemsByInvoiceId(invoice.id)
+  );
 
   // Helper to calculate subtotal from line items array
   const calcSubtotal = (items: LineItemSelect[]) =>

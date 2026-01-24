@@ -86,6 +86,7 @@
     "protobufjs"
   ],
   "dependencies": {
+    "@elysiajs/eden": "^1.4.6",
     "@neondatabase/serverless": "^1.0.2",
     "@paralleldrive/cuid2": "^3.1.0",
     "@sveltejs/mcp": "^0.1.19",

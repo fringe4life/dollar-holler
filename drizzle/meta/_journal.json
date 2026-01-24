@@ -8,6 +8,13 @@
       "when": 1758560549660,
       "tag": "0000_even_piledriver",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769293534127,
+      "tag": "0001_wide_harpoon",
+      "breakpoints": true
     }
   ]
 }

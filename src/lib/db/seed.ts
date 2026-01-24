@@ -2,26 +2,26 @@ import { createId } from "@paralleldrive/cuid2";
 import "dotenv/config";
 import { db } from "./index";
 import type { NewClient, NewInvoice, NewLineItem, NewSettings } from "./schema";
-import { clients, invoices, lineItems, settings, user } from "./schema";
+import { clients, invoices, lineItems, settings } from "./schema";
 
 // Helper function to generate random date within last 6 months
-function randomDateWithinLast6Months(): string {
+function randomDateWithinLast6Months(): Date {
   const now = new Date();
   const sixMonthsAgo = new Date(now.getTime() - 6 * 30 * 24 * 60 * 60 * 1000);
   const randomTime =
     sixMonthsAgo.getTime() +
     Math.random() * (now.getTime() - sixMonthsAgo.getTime());
-  return new Date(randomTime).toISOString().split("T")[0];
+  return new Date(randomTime);
 }
 
 // Helper function to generate random date within last 3 months (for due dates)
-function randomDateWithinLast3Months(): string {
+function randomDateWithinLast3Months(): Date {
   const now = new Date();
   const threeMonthsAgo = new Date(now.getTime() - 3 * 30 * 24 * 60 * 60 * 1000);
   const randomTime =
     threeMonthsAgo.getTime() +
     Math.random() * (now.getTime() - threeMonthsAgo.getTime());
-  return new Date(randomTime).toISOString().split("T")[0];
+  return new Date(randomTime);
 }
 
 // Helper function to get random user from array
@@ -31,7 +31,7 @@ function getRandomUser<T>(users: T[]): T {
 
 async function main() {
   // 1) Load existing users from Better Auth tables (cannot seed users)
-  const users = await db.select().from(user);
+  const users = await db.query.user.findMany();
 
   if (users.length === 0) {
     throw new Error(

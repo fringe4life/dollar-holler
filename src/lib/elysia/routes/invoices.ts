@@ -1,10 +1,10 @@
-import { Elysia, t } from "elysia";
 import { db } from "$lib/db";
 import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
+import { Elysia, t } from "elysia";
 
 // Invoice validation schema
 const invoiceSchema = t.Object({
@@ -13,8 +13,8 @@ const invoiceSchema = t.Object({
   invoiceNumber: t.String(),
   clientId: t.String(),
   subject: t.Optional(t.Nullable(t.String())),
-  issueDate: t.String(),
-  dueDate: t.String(),
+  issueDate: t.Date(),
+  dueDate: t.Date(),
   discount: t.Optional(t.Nullable(t.Number())),
   notes: t.Optional(t.Nullable(t.String())),
   terms: t.Optional(t.Nullable(t.String())),
@@ -192,7 +192,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
             const lineItems = await db
               .insert(lineItemsTable)
               .values(
-                body.map((item: any) => ({
+                body.map((item) => ({
                   ...item,
                   invoiceId: id,
                 }))
@@ -234,7 +234,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
             const lineItems = await db
               .insert(lineItemsTable)
               .values(
-                body.map((item: any) => ({
+                body.map((item) => ({
                   ...item,
                   invoiceId: id,
                 }))
@@ -262,4 +262,35 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           ),
         }
       )
+  );
+
+// Standalone line items routes (not nested under invoices)
+export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
+  // GET /api/line-items - List all line items (for admin purposes)
+  .get("/", async () => {
+    try {
+      const lineItems = await db.query.lineItems.findMany();
+      return lineItems;
+    } catch (error) {
+      console.error("Error loading line items:", error);
+      return { error: "Failed to load line items" };
+    }
+  })
+  // DELETE /api/line-items/:id - Delete a specific line item
+  .delete(
+    "/:id",
+    async ({ params: { id } }) => {
+      try {
+        await db.delete(lineItemsTable).where(eq(lineItemsTable.id, id));
+        return { success: true };
+      } catch (error) {
+        console.error("Error deleting line item:", error);
+        return { error: "Failed to delete line item" };
+      }
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+    }
   );

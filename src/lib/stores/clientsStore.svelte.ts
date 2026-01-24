@@ -1,10 +1,9 @@
+import { client } from "$lib/client";
 import {
   normalizeToNull,
   transformNullToUndefined,
 } from "$lib/utils/typeHelpers";
 import type { ClientSelect, NewClient } from "$lib/validators";
-import { clientSelectWithDatesSchema } from "$lib/validators";
-import { ArkErrors } from "arktype";
 import { toast } from "svelte-sonner";
 
 class ClientsStore {
@@ -22,25 +21,15 @@ class ClientsStore {
     this.error = null;
 
     try {
-      const response = await fetch("/api/clients");
-      if (!response.ok) {
-        throw new Error("Failed to load clients");
+      const { data: clientData } = await client.api.clients.get();
+      if (
+        !clientData ||
+        (typeof clientData === "object" && "error" in clientData)
+      ) {
+        throw new Error(clientData?.error || "Failed to load clients");
       }
-      const rawData = await response.json();
-
-      // Validate response with ArkType
-      const validationResult = clientSelectWithDatesSchema.array()(rawData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid client data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid client data received from server");
-      }
-
-      // Update the reactive state
       this.clients.length = 0;
-      this.clients.push(...validationResult);
+      this.clients.push(...clientData);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load clients";
@@ -55,23 +44,15 @@ class ClientsStore {
   // Load a single client by ID (without relations)
   async getClientById(id: string): Promise<ClientSelect | null> {
     try {
-      const response = await fetch(`/api/clients/${id}`);
-      if (!response.ok) {
-        throw new Error("Failed to load client");
-      }
-      const rawData = await response.json();
-
-      // Validate response with ArkType
-      const validationResult = clientSelectWithDatesSchema(rawData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid client data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid client data received from server");
+      const { data: clientData } = await client.api.clients({ id }).get();
+      if (
+        !clientData ||
+        (typeof clientData === "object" && "error" in clientData)
+      ) {
+        throw new Error(clientData?.error || "Failed to load client");
       }
 
-      return validationResult;
+      return clientData;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load client";
@@ -84,12 +65,9 @@ class ClientsStore {
   // Delete client
   async deleteClient(clientId: string) {
     try {
-      const response = await fetch(`/api/clients/${clientId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete client");
+      const { data } = await client.api.clients({ id: clientId }).delete();
+      if (data && typeof data === "object" && "error" in data) {
+        throw new Error(data.error || "Failed to delete client");
       }
 
       // Remove from local state
@@ -111,19 +89,23 @@ class ClientsStore {
   async upsertClient(clientData: NewClient): Promise<string | null> {
     try {
       const isUpdate = !!clientData.id;
-      const url = isUpdate ? `/api/clients/${clientData.id}` : "/api/clients";
-      const method = isUpdate ? "PUT" : "POST";
+      const body = transformNullToUndefined(clientData);
 
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(transformNullToUndefined(clientData)),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to ${isUpdate ? "update" : "create"} client`);
+      let responseData: { id?: string; error?: string } | ClientSelect;
+      if (isUpdate && clientData.id) {
+        const { data } = await client.api
+          .clients({ id: clientData.id })
+          .put(body);
+        if (!data || (typeof data === "object" && "error" in data)) {
+          throw new Error(data?.error || "Failed to update client");
+        }
+        responseData = data;
+      } else {
+        const { data } = await client.api.clients.post(body);
+        if (!data || (typeof data === "object" && "error" in data)) {
+          throw new Error(data?.error || "Failed to create client");
+        }
+        responseData = data;
       }
 
       if (isUpdate && clientData.id) {
@@ -148,7 +130,7 @@ class ClientsStore {
         return clientData.id;
       } else {
         // Add new client to state
-        const { id } = await response.json();
+        const id = (responseData as { id: string }).id;
         const newClient: ClientSelect = {
           ...clientData,
           id,
@@ -188,15 +170,5 @@ class ClientsStore {
 // Create and export a singleton instance
 export const clientsStore = new ClientsStore();
 
-// Export convenience methods for backward compatibility
-export const {
-  clients,
-  loading,
-  error,
-  isLoaded,
-  loadClients,
-  getClientById,
-  deleteClient,
-  upsertClient,
-  resetClients,
-} = clientsStore;
+// Export store instance and reactive properties
+export const { clients, loading, error, isLoaded } = clientsStore;

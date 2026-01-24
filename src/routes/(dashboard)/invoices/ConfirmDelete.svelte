@@ -1,7 +1,7 @@
 <script lang="ts">
   import Modal from '$lib/components/Modal.svelte'
   import { Button } from '$lib/components/ui/button'
-  import { deleteInvoice } from '$lib/stores/invoicesStore.svelte'
+  import { invoicesStore } from '$lib/stores/invoicesStore.svelte'
   import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
   import type { MouseEventHandler } from 'svelte/elements'
 

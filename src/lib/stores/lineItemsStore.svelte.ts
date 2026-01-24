@@ -1,8 +1,23 @@
-import { transformNullToUndefined } from "$lib/utils/typeHelpers";
+import { client } from "$lib/client";
 import type { LineItemSelect, NewLineItem } from "$lib/validators";
 import { lineItemSelectWithDatesSchema } from "$lib/validators";
 import { ArkErrors } from "arktype";
 import { toast } from "svelte-sonner";
+
+// Helper to serialize Date objects to ISO strings for validation
+function serializeDates<T extends Record<string, any>>(data: T): T {
+  return {
+    ...data,
+    createdAt:
+      data.createdAt instanceof Date
+        ? data.createdAt.toISOString()
+        : data.createdAt,
+    updatedAt:
+      data.updatedAt instanceof Date
+        ? data.updatedAt.toISOString()
+        : data.updatedAt,
+  };
+}
 
 class LineItemsStore {
   // Use $state for reactive class fields
@@ -16,14 +31,22 @@ class LineItemsStore {
   // Load line items for a specific invoice
   async loadLineItemsByInvoiceId(invoiceId: string): Promise<LineItemSelect[]> {
     try {
-      const response = await fetch(`/api/invoices/${invoiceId}/line-items`);
-      if (!response.ok) {
-        throw new Error("Failed to load line items");
+      const { data: lineItemsData } = await client.api
+        .invoices({ id: invoiceId })
+        ["line-items"].get();
+      if (
+        !lineItemsData ||
+        (typeof lineItemsData === "object" && "error" in lineItemsData)
+      ) {
+        throw new Error(lineItemsData?.error || "Failed to load line items");
       }
-      const rawData = await response.json();
+
+      // Convert Date objects to ISO strings for validation
+      const serializedData = lineItemsData.map((item) => serializeDates(item));
 
       // Validate response with ArkType
-      const validationResult = lineItemSelectWithDatesSchema.array()(rawData);
+      const validationResult =
+        lineItemSelectWithDatesSchema.array()(serializedData);
       if (validationResult instanceof ArkErrors) {
         console.error(
           "Invalid line item data received:",
@@ -48,14 +71,20 @@ class LineItemsStore {
     this.error = null;
 
     try {
-      const response = await fetch("/api/line-items");
-      if (!response.ok) {
-        throw new Error("Failed to load line items");
+      const { data: lineItemsData } = await client.api["line-items"].get();
+      if (
+        !lineItemsData ||
+        (typeof lineItemsData === "object" && "error" in lineItemsData)
+      ) {
+        throw new Error(lineItemsData?.error || "Failed to load line items");
       }
-      const rawData = await response.json();
+
+      // Convert Date objects to ISO strings for validation
+      const serializedData = lineItemsData.map((item) => serializeDates(item));
 
       // Validate response with ArkType
-      const validationResult = lineItemSelectWithDatesSchema.array()(rawData);
+      const validationResult =
+        lineItemSelectWithDatesSchema.array()(serializedData);
       if (validationResult instanceof ArkErrors) {
         console.error(
           "Invalid line item data received:",
@@ -84,24 +113,30 @@ class LineItemsStore {
     items: NewLineItem[]
   ): Promise<LineItemSelect[]> {
     try {
-      const response = await fetch(`/api/invoices/${invoiceId}/line-items`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          items.map((item) => transformNullToUndefined(item))
-        ),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to create line items");
+      // Map to only include fields expected by the API schema
+      const body = items.map((item) => ({
+        id: item.id,
+        userId: item.userId,
+        description: item.description,
+        quantity: item.quantity ?? 0,
+        amount: item.amount,
+      }));
+      const { data: lineItemsData } = await client.api
+        .invoices({ id: invoiceId })
+        ["line-items"].post(body);
+      if (
+        !lineItemsData ||
+        (typeof lineItemsData === "object" && "error" in lineItemsData)
+      ) {
+        throw new Error(lineItemsData?.error || "Failed to create line items");
       }
 
-      const rawData = await response.json();
+      // Convert Date objects to ISO strings for validation
+      const serializedData = lineItemsData.map((item) => serializeDates(item));
 
       // Validate response with ArkType
-      const validationResult = lineItemSelectWithDatesSchema.array()(rawData);
+      const validationResult =
+        lineItemSelectWithDatesSchema.array()(serializedData);
       if (validationResult instanceof ArkErrors) {
         console.error(
           "Invalid line item data received:",
@@ -127,24 +162,30 @@ class LineItemsStore {
     items: NewLineItem[]
   ): Promise<LineItemSelect[]> {
     try {
-      const response = await fetch(`/api/invoices/${invoiceId}/line-items`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(
-          items.map((item) => transformNullToUndefined(item))
-        ),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update line items");
+      // Map to only include fields expected by the API schema
+      const body = items.map((item) => ({
+        id: item.id,
+        userId: item.userId,
+        description: item.description,
+        quantity: item.quantity ?? 0,
+        amount: item.amount,
+      }));
+      const { data: lineItemsData } = await client.api
+        .invoices({ id: invoiceId })
+        ["line-items"].put(body);
+      if (
+        !lineItemsData ||
+        (typeof lineItemsData === "object" && "error" in lineItemsData)
+      ) {
+        throw new Error(lineItemsData?.error || "Failed to update line items");
       }
 
-      const rawData = await response.json();
+      // Convert Date objects to ISO strings for validation
+      const serializedData = lineItemsData.map((item) => serializeDates(item));
 
       // Validate response with ArkType
-      const validationResult = lineItemSelectWithDatesSchema.array()(rawData);
+      const validationResult =
+        lineItemSelectWithDatesSchema.array()(serializedData);
       if (validationResult instanceof ArkErrors) {
         console.error(
           "Invalid line item data received:",
@@ -167,12 +208,11 @@ class LineItemsStore {
   // Delete a line item
   async deleteLineItem(lineItemId: string) {
     try {
-      const response = await fetch(`/api/line-items/${lineItemId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete line item");
+      const { data } = await client.api["line-items"]({
+        id: lineItemId,
+      }).delete();
+      if (data && typeof data === "object" && "error" in data) {
+        throw new Error(data.error || "Failed to delete line item");
       }
 
       // Remove from local state
@@ -201,16 +241,5 @@ class LineItemsStore {
 // Create and export a singleton instance
 export const lineItemsStore = new LineItemsStore();
 
-// Export convenience methods for backward compatibility
-export const {
-  lineItems,
-  loading,
-  error,
-  isLoaded,
-  loadLineItemsByInvoiceId,
-  loadAllLineItems,
-  createLineItems,
-  updateLineItems,
-  deleteLineItem,
-  resetLineItems,
-} = lineItemsStore;
+// Export store instance and reactive properties
+export const { lineItems, loading, error, isLoaded } = lineItemsStore;

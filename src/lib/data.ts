@@ -1,17 +1,30 @@
 import type {
-  ClientWithInvoicesResponse,
-  InvoiceWithRelationsResponse,
+  ClientSelect,
+  InvoiceSelect,
+  LineItemSelect,
 } from "$lib/validators";
 
+// Types for dummy data that include all relations
+export type DummyInvoice = InvoiceSelect & {
+  client: ClientSelect;
+  lineItems: LineItemSelect[];
+};
+
+export type DummyClient = ClientSelect & {
+  invoices: (InvoiceSelect & {
+    lineItems: LineItemSelect[];
+  })[];
+};
+
 // Dummy invoice data
-export const dummyInvoices: InvoiceWithRelationsResponse[] = [
+export const dummyInvoices: DummyInvoice[] = [
   {
     id: "1",
     invoiceNumber: "INV-001",
-    dueDate: "2024-02-15",
+    dueDate: new Date("2024-02-15"),
     invoiceStatus: "sent",
     clientId: "client-1",
-    issueDate: "2024-01-15",
+    issueDate: new Date("2024-01-15"),
     subject: null,
     discount: null,
     notes: null,
@@ -48,10 +61,10 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
   {
     id: "2",
     invoiceNumber: "INV-002",
-    dueDate: "2024-02-20",
+    dueDate: new Date("2024-02-20"),
     invoiceStatus: "paid",
     clientId: "client-2",
-    issueDate: "2024-01-20",
+    issueDate: new Date("2024-01-20"),
     subject: null,
     discount: null,
     notes: null,
@@ -88,10 +101,10 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
   {
     id: "3",
     invoiceNumber: "INV-003",
-    dueDate: "2024-01-30",
+    dueDate: new Date("2024-01-30"),
     invoiceStatus: "sent", // "late" is computed based on due date
     clientId: "client-3",
-    issueDate: "2024-01-01",
+    issueDate: new Date("2024-01-01"),
     subject: null,
     discount: null,
     notes: null,
@@ -128,10 +141,10 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
   {
     id: "4",
     invoiceNumber: "INV-004",
-    dueDate: "2024-02-25",
+    dueDate: new Date("2024-02-25"),
     invoiceStatus: "draft",
     clientId: "client-4",
-    issueDate: "2024-01-25",
+    issueDate: new Date("2024-01-25"),
     subject: null,
     discount: null,
     notes: null,
@@ -168,7 +181,7 @@ export const dummyInvoices: InvoiceWithRelationsResponse[] = [
 ];
 
 // Dummy client data
-export const dummyClients: ClientWithInvoicesResponse[] = [
+export const dummyClients: DummyClient[] = [
   {
     id: "client-1",
     name: "Acme Corporation",
@@ -185,10 +198,10 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
       {
         id: "1",
         invoiceNumber: "INV-001",
-        dueDate: "2024-02-15",
+        dueDate: new Date("2024-02-15"),
         invoiceStatus: "sent",
         clientId: "client-1",
-        issueDate: "2024-01-15",
+        issueDate: new Date("2024-01-15"),
         subject: null,
         discount: null,
         notes: null,
@@ -227,10 +240,10 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
       {
         id: "2",
         invoiceNumber: "INV-002",
-        dueDate: "2024-02-20",
+        dueDate: new Date("2024-02-20"),
         invoiceStatus: "paid",
         clientId: "client-2",
-        issueDate: "2024-01-20",
+        issueDate: new Date("2024-01-20"),
         subject: null,
         discount: null,
         notes: null,
@@ -269,10 +282,10 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
       {
         id: "3",
         invoiceNumber: "INV-003",
-        dueDate: "2024-01-30",
+        dueDate: new Date("2024-01-30"),
         invoiceStatus: "sent",
         clientId: "client-3",
-        issueDate: "2024-01-01",
+        issueDate: new Date("2024-01-01"),
         subject: null,
         discount: null,
         notes: null,
@@ -311,10 +324,10 @@ export const dummyClients: ClientWithInvoicesResponse[] = [
       {
         id: "4",
         invoiceNumber: "INV-004",
-        dueDate: "2024-02-25",
+        dueDate: new Date("2024-02-25"),
         invoiceStatus: "draft",
         clientId: "client-4",
-        issueDate: "2024-01-25",
+        issueDate: new Date("2024-01-25"),
         subject: null,
         discount: null,
         notes: null,

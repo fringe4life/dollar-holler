@@ -1,23 +1,6 @@
 import { client } from "$lib/client";
 import type { LineItemSelect, NewLineItem } from "$lib/validators";
-import { lineItemSelectWithDatesSchema } from "$lib/validators";
-import { ArkErrors } from "arktype";
 import { toast } from "svelte-sonner";
-
-// Helper to serialize Date objects to ISO strings for validation
-function serializeDates<T extends Record<string, any>>(data: T): T {
-  return {
-    ...data,
-    createdAt:
-      data.createdAt instanceof Date
-        ? data.createdAt.toISOString()
-        : data.createdAt,
-    updatedAt:
-      data.updatedAt instanceof Date
-        ? data.updatedAt.toISOString()
-        : data.updatedAt,
-  };
-}
 
 class LineItemsStore {
   // Use $state for reactive class fields
@@ -41,21 +24,7 @@ class LineItemsStore {
         throw new Error(lineItemsData?.error || "Failed to load line items");
       }
 
-      // Convert Date objects to ISO strings for validation
-      const serializedData = lineItemsData.map((item) => serializeDates(item));
-
-      // Validate response with ArkType
-      const validationResult =
-        lineItemSelectWithDatesSchema.array()(serializedData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid line item data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid line item data received from server");
-      }
-
-      return validationResult;
+      return lineItemsData;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load line items";
@@ -79,23 +48,9 @@ class LineItemsStore {
         throw new Error(lineItemsData?.error || "Failed to load line items");
       }
 
-      // Convert Date objects to ISO strings for validation
-      const serializedData = lineItemsData.map((item) => serializeDates(item));
-
-      // Validate response with ArkType
-      const validationResult =
-        lineItemSelectWithDatesSchema.array()(serializedData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid line item data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid line item data received from server");
-      }
-
       // Update the reactive state
       this.lineItems.length = 0;
-      this.lineItems.push(...validationResult);
+      this.lineItems.push(...lineItemsData);
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load line items";
@@ -131,22 +86,8 @@ class LineItemsStore {
         throw new Error(lineItemsData?.error || "Failed to create line items");
       }
 
-      // Convert Date objects to ISO strings for validation
-      const serializedData = lineItemsData.map((item) => serializeDates(item));
-
-      // Validate response with ArkType
-      const validationResult =
-        lineItemSelectWithDatesSchema.array()(serializedData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid line item data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid line item data received from server");
-      }
-
       toast.success("Line items created successfully");
-      return validationResult;
+      return lineItemsData;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to create line items";
@@ -180,22 +121,8 @@ class LineItemsStore {
         throw new Error(lineItemsData?.error || "Failed to update line items");
       }
 
-      // Convert Date objects to ISO strings for validation
-      const serializedData = lineItemsData.map((item) => serializeDates(item));
-
-      // Validate response with ArkType
-      const validationResult =
-        lineItemSelectWithDatesSchema.array()(serializedData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid line item data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid line item data received from server");
-      }
-
       toast.success("Line items updated successfully");
-      return validationResult;
+      return lineItemsData;
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to update line items";

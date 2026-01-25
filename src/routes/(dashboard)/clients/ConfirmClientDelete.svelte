@@ -1,23 +1,23 @@
 <script lang="ts">
-  import Modal from '$lib/components/Modal.svelte'
-  import { Button } from '$lib/components/ui/button'
-  import type { MouseEventHandler } from 'svelte/elements'
+  import Modal from "$lib/components/Modal.svelte";
+  import { Button } from "$lib/components/ui/button";
+  import type { MouseEventHandler } from "svelte/elements";
 
-  import type { Client } from '$lib/db/schema'
-  import { clientsStore } from '$lib/stores/clientsStore.svelte'
+  import type { Client } from "$lib/db/schema";
+  import { clientsStore } from "$lib/stores/clientsStore.svelte";
 
   type Props = {
-    open: boolean
-    client: Client
-  }
+    open: boolean;
+    client: Client;
+  };
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = async () => {
-    open = false
-    await deleteClient(client.id)
-  }
+    open = false;
+    await clientsStore.deleteClient(client.id);
+  };
 
-  let { client, open = $bindable() }: Props = $props()
+  let { client, open = $bindable() }: Props = $props();
 </script>
 
 <Modal bind:open buttonText="" className="z-450">
@@ -29,12 +29,15 @@
 
   {#snippet description()}
     <h2 class="text-daisyBush text-center text-lg font-medium">
-      This will delete the Client called: <span class="text-scarlet">{client.name}</span> for
+      This will delete the Client called: <span class="text-scarlet"
+        >{client.name}</span
+      > for
     </h2>
   {/snippet}
 
   <div class="flex justify-center gap-4">
     <Button variant="secondary" onclick={() => (open = false)}>Cancel</Button>
-    <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button>
+    <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button
+    >
   </div>
 </Modal>

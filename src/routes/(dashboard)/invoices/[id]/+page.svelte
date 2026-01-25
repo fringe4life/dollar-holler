@@ -44,7 +44,7 @@
 </script>
 
 <div
-  class=" fixed z-0 mb-16 flex w-full max-w-256 flex-col justify-between gap-y-5 px-4 md:flex-row lg:px-0 print:hidden"
+  class=" fixed z-0 mb-16 flex w-full max-w-5xl flex-col justify-between gap-y-5 px-4 md:flex-row lg:px-0 print:hidden"
 >
   <h1 class="text-daisyBush text-3xl font-bold">Invoice</h1>
   <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-4">
@@ -118,12 +118,12 @@
   </div>
   <div class="col-span-3">
     <div class="label">Due Date:</div>
-    <p>{convertDate(invoice?.dueDate)}</p>
+    <p>{convertDate(invoice?.dueDate.toISOString())}</p>
   </div>
 
   <div class="col-span-3 sm:col-span-2 sm:col-start-5">
     <div class="label">Issue Date:</div>
-    <p>{convertDate(invoice?.issueDate)}</p>
+    <p>{convertDate(invoice?.issueDate.toISOString())}</p>
   </div>
 
   <div class="col-span-full">

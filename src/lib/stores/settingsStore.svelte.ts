@@ -1,9 +1,5 @@
 import { client } from "$lib/client";
-import {
-  settingsSelectWithDatesSchema,
-  type SettingsResponse,
-} from "$lib/validators";
-import { ArkErrors } from "arktype";
+import { type SettingsResponse } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
 class SettingsStore {
@@ -29,31 +25,8 @@ class SettingsStore {
         throw new Error(settingsData?.error || "Failed to load settings");
       }
 
-      // Convert Date objects to ISO strings for validation
-      const serializedData = {
-        ...settingsData,
-        createdAt:
-          settingsData.createdAt instanceof Date
-            ? settingsData.createdAt.toISOString()
-            : settingsData.createdAt,
-        updatedAt:
-          settingsData.updatedAt instanceof Date
-            ? settingsData.updatedAt.toISOString()
-            : settingsData.updatedAt,
-      };
-
-      // Validate response with ArkType
-      const validationResult = settingsSelectWithDatesSchema(serializedData);
-      if (validationResult instanceof ArkErrors) {
-        console.error(
-          "Invalid settings data received:",
-          validationResult.summary
-        );
-        throw new Error("Invalid settings data received from server");
-      }
-
       // Update the reactive state
-      this.settings = validationResult;
+      this.settings = settingsData;
     } catch (error) {
       console.error("Error loading settings:", error);
       this.error =

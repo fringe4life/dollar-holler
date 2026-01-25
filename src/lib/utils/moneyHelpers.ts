@@ -1,4 +1,5 @@
 import type { Invoice, LineItem } from "$lib/db/schema";
+import type { InvoiceSelect } from "$lib/validators";
 
 /**
  * @abstract calculates the cost of a part of the invoice
@@ -51,7 +52,7 @@ export const dollarsToCents = (dollars: number): number => {
  * @param {Invoice} invoice the invoice to get the total for
  * @returns {string} a human friendly string to display to the user of the total
  */
-export const getTotal = (invoice: Invoice | undefined): number => {
+export const getTotal = (invoice: InvoiceSelect | undefined): number => {
   if (!invoice) {
     return 0;
   }

@@ -1,11 +1,13 @@
 <script lang="ts">
-  import type { ClientSelect } from '$lib/validators'
-  import { invoicesStore } from '$lib/stores/invoicesStore.svelte'
+  import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
+  import { centsToDollars, getTotal } from "$lib/utils/moneyHelpers";
+  import type { ClientSelect } from "$lib/validators";
 
-  let { client }: { client: ClientSelect } = $props()
+  let { client }: { client: ClientSelect } = $props();
 
   // Create a promise for the client's invoices
-  const invoicesPromise = invoicesStore.getInvoicesByClientId(client.id)
+  // svelte-ignore state_referenced_locally
+  const invoicesPromise = invoicesStore.getInvoicesByClientId(client.id);
 </script>
 
 <div class="client-card rounded-lg border p-4 shadow-sm">
@@ -38,7 +40,9 @@
           {#each invoices.slice(0, 3) as invoice (invoice.id)}
             <div class="border-l-2 border-blue-200 pl-2 text-sm">
               <div class="font-medium">#{invoice.invoiceNumber}</div>
-              <div class="text-gray-600">${invoice.total?.toFixed(2) || '0.00'}</div>
+              <div class="text-gray-600">
+                ${centsToDollars(getTotal(invoice))}
+              </div>
             </div>
           {/each}
           {#if invoices.length > 3}
@@ -47,7 +51,9 @@
         </div>
       {/if}
     {:catch error}
-      <div class="text-sm text-red-500">Error loading invoices: {error.message}</div>
+      <div class="text-sm text-red-500">
+        Error loading invoices: {error.message}
+      </div>
     {/await}
   </div>
 </div>

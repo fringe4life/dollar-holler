@@ -63,7 +63,7 @@
           No line items found
         </div>
       {:else}
-        <div class="grid grid-flow-col auto-cols-max gap-2 auto-rows-[40px]">
+        <div class="grid sm:grid-flow-col auto-cols-max gap-2 auto-rows-[40px]">
           {#each lineItems as item (item.id)}
             <div class="border-l-2 border-green-200 pl-2 text-sm">
               <div class="font-medium">{item.description}</div>

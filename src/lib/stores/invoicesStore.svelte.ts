@@ -175,7 +175,7 @@ class InvoicesStore {
           terms: normalizeToNull(invoiceData.terms),
           invoiceStatus: normalizeToNull(invoiceData.invoiceStatus),
         };
-        this.invoices.push(newInvoice);
+        this.invoices.unshift(newInvoice);
         toast.success("Invoice created successfully");
         return id;
       }

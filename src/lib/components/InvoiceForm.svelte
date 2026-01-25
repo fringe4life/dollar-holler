@@ -8,6 +8,7 @@
   import Trash from "$lib/icon/Trash.svelte";
   import { clients, clientsStore } from "$lib/stores/clientsStore.svelte";
   import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
+  import { lineItemsStore } from "$lib/stores/lineItemsStore.svelte";
   import { today } from "$lib/utils/dateHelpers";
   import { states } from "$lib/utils/states";
   import { onMount } from "svelte";
@@ -32,12 +33,15 @@
     invoiceEdit: undefined;
   } & Panel;
 
-  type Props = CreateProps | EditProps;
+  type Props = (CreateProps | EditProps) & {
+    userId?: string | null;
+  };
 
   let {
     formState = "create",
     closePanel,
     invoiceEdit = $bindable(),
+    userId = null,
   }: Props = $props();
 
   onMount(() => {
@@ -120,15 +124,44 @@
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
+    console.log("[InvoiceForm] submit start", {
+      formState,
+      userId,
+      invoice: $state.snapshot(invoice),
+      lineItems: $state.snapshot(lineItems),
+      isNewClient,
+      newClient: $state.snapshot(newClient),
+    });
 
     if (!invoice.clientId) {
+      console.warn("[InvoiceForm] missing clientId", {
+        invoice: $state.snapshot(invoice),
+      });
       toast.error("Client is required");
       return;
     }
 
+    const resolvedUserId = userId ?? invoice.userId;
+    if (!resolvedUserId) {
+      console.warn("[InvoiceForm] missing userId", {
+        invoice: $state.snapshot(invoice),
+      });
+      toast.error("User not available");
+      return;
+    }
+
+    invoice.userId = resolvedUserId;
+    newClient.userId = resolvedUserId;
+
     if (isNewClient) {
+      console.log("[InvoiceForm] creating new client", {
+        newClient: $state.snapshot(newClient),
+      });
       const clientId = await clientsStore.upsertClient(newClient);
       if (!clientId) {
+        console.error("[InvoiceForm] client create failed", {
+          newClient: $state.snapshot(newClient),
+        });
         toast.error("Failed to create client");
         return;
       }
@@ -139,7 +172,39 @@
     invoice.discount = discount;
 
     // Single upsert call - much simpler!
-    await invoicesStore.upsertInvoice(invoice);
+    const normalizedInvoice = {
+      ...invoice,
+      userId: resolvedUserId,
+      invoiceNumber: String(invoice.invoiceNumber ?? ""),
+      issueDate: new Date(invoice.issueDate),
+      dueDate: new Date(invoice.dueDate),
+    };
+    console.log("[InvoiceForm] upsert invoice", normalizedInvoice);
+    const invoiceId = await invoicesStore.upsertInvoice(normalizedInvoice);
+    if (!invoiceId) {
+      return;
+    }
+
+    const normalizedLineItems = $state
+      .snapshot(lineItems)
+      .map((item) => ({
+        id: item.id,
+        userId: resolvedUserId,
+        invoiceId,
+        description: item.description?.trim() ?? "",
+        quantity: Number(item.quantity ?? 0),
+        amount: Number(item.amount ?? 0),
+      }))
+      .filter((item) => item.description.length > 0);
+
+    if (normalizedLineItems.length > 0) {
+      if (formState === "edit") {
+        await lineItemsStore.updateLineItems(invoiceId, normalizedLineItems);
+      } else {
+        await lineItemsStore.createLineItems(invoiceId, normalizedLineItems);
+      }
+    }
+    console.log("[InvoiceForm] upsert success");
     closePanel();
   };
 

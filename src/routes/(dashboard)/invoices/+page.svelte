@@ -1,4 +1,5 @@
 <script lang="ts">
+  import InvoiceForm from "$lib/components/InvoiceForm.svelte";
   import InvoiceWithDetails from "$lib/components/InvoiceWithDetails.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
@@ -15,6 +16,7 @@
 
   let searchTerms = $state<string>("");
   let isFormVisible = $state<boolean>(false);
+  let { data } = $props();
 
   // Derived state for filtered invoices
   const filteredInvoices = $derived.by(() => {
@@ -102,8 +104,12 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  <!-- Invoice form would go here -->
-  <div class="p-4">
-    <p>Invoice form component would be integrated here</p>
-  </div>
+  <InvoiceForm
+    formState="create"
+    invoiceEdit={undefined}
+    userId={data.user?.id ?? ""}
+    closePanel={() => {
+      isFormVisible = false;
+    }}
+  />
 </SlidePanel>

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import Close from "$lib/icon/Close.svelte";
@@ -27,6 +28,14 @@
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
     isNavShowing = !isNavShowing;
   };
+
+  const closeNav: MouseEventHandler<HTMLAnchorElement> = () => {
+    isNavShowing = false;
+  };
+
+  afterNavigate(() => {
+    isNavShowing = false;
+  });
 
   // Function to check if a navigation item is active
   const isActive = (href: string): boolean => {
@@ -84,6 +93,7 @@
     <a
       aria-current={isActive}
       {href}
+      onclick={closeNav}
       class="aria-current:text-robinEggBlue hover:text-goldenFizz font-bold text-white transition-[padding] duration-200 ease-out aria-current:px-8 aria-current:[background:url(/images/active-nav--left.svg)_left_top_no-repeat,url(/images/active-nav--right.svg)_right_top_no-repeat] aria-current:hover:px-9"
     >
       {title}

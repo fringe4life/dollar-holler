@@ -6,7 +6,7 @@
     NewInvoice,
   } from "$lib/db/schema";
   import Trash from "$lib/icon/Trash.svelte";
-  import { clientsStore } from "$lib/stores/clientsStore.svelte";
+  import { clients, clientsStore } from "$lib/stores/clientsStore.svelte";
   import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
   import { today } from "$lib/utils/dateHelpers";
   import { states } from "$lib/utils/states";
@@ -160,7 +160,7 @@
           bind:value={invoice.clientId}
           class="mb-2 sm:mb-0"
         >
-          {#each clientsStore.clients as { id, name } (id)}
+          {#each clients as { id, name } (id)}
             <option value={id}>{name}</option>
           {/each}
         </select>

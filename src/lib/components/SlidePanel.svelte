@@ -1,17 +1,16 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
-  import { Dialog, type WithoutChild } from 'bits-ui'
-  import Cancel from '$lib/icon/Cancel.svelte'
-  import Button from './ui/button/button.svelte'
-  import Arrow from '$lib/icon/Arrow.svelte'
+  import Arrow from "$lib/icon/Arrow.svelte";
+  import { Dialog, type WithoutChild } from "bits-ui";
+  import type { Snippet } from "svelte";
+  import Button from "./ui/button/button.svelte";
 
   type Props = Dialog.RootProps & {
-    buttonText: string
-    title: Snippet
-    description: Snippet
-    contentProps?: WithoutChild<Dialog.ContentProps>
+    buttonText: string;
+    title: Snippet;
+    description: Snippet;
+    contentProps?: WithoutChild<Dialog.ContentProps>;
     // ...other component props if you wish to pass them
-  }
+  };
 
   let {
     open = $bindable(false),
@@ -21,7 +20,7 @@
     title,
     description,
     ...restProps
-  }: Props = $props()
+  }: Props = $props();
 </script>
 
 <svelte:head>
@@ -40,7 +39,7 @@
       class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-blueGem/60 fixed inset-0 z-50"
     />
     <Dialog.Content
-      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 shadow-addInvoice fixed top-0 right-0  z-80  h-[100dvh] w-full overflow-y-scroll bg-white p-2 lg:w-3/4 lg:px-15 lg:py-12"
+      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 shadow-addInvoice fixed top-0 right-0  z-80  h-dvh w-full overflow-y-scroll bg-white p-2 lg:w-3/4 lg:px-15 lg:py-12"
       {...contentProps}
     >
       <Dialog.Title>

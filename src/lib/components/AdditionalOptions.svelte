@@ -1,18 +1,19 @@
 <script lang="ts">
-  import View from '$lib/icon/View.svelte'
-  import type { Component } from 'svelte'
-  import type { MouseEventHandler } from 'svelte/elements'
+  import View from "$lib/icon/View.svelte";
+  import type { Component } from "svelte";
+  import type { MouseEventHandler } from "svelte/elements";
+  import type { IconProps } from "./Icon.svelte";
 
   type Props = {
     options: {
-      label: string
-      icon?: Component<{ height?: number; width?: number }>
-      disabled: boolean
-      onclick: MouseEventHandler<HTMLButtonElement>
-    }[]
-  }
+      label: string;
+      icon?: Component<IconProps>;
+      disabled: boolean;
+      onclick: MouseEventHandler<HTMLButtonElement>;
+    }[];
+  };
 
-  let { options }: Props = $props()
+  let { options }: Props = $props();
 </script>
 
 <ul class="absolute top-4 left-0 rounded-lg bg-white shadow-lg">

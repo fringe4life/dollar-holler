@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { clientsStore } from "$lib/stores/clientsStore.svelte";
   import { lineItemsStore } from "$lib/stores/lineItemsStore.svelte";
   import type { InvoiceSelect, LineItemSelect } from "$lib/validators";
@@ -20,7 +21,13 @@
 <div class="invoice-card rounded-lg border p-4">
   <div class="flex items-start justify-between">
     <div>
-      <h3 class="text-lg font-semibold">Invoice #{invoice.invoiceNumber}</h3>
+      <h3 class="text-lg font-semibold">
+        <a
+          class="hover:text-daisyBush hover:underline"
+          href={resolve(`/invoices/${invoice.id}`)}
+          >Invoice #{invoice.invoiceNumber}</a
+        >
+      </h3>
       <div class="text-sm text-gray-600">
         {#await clientPromise}
           Loading client...
@@ -43,14 +50,20 @@
   <div class="mt-4">
     {#await lineItemsPromise}
       <h4 class="font-medium">Line Items (...)</h4>
-      <div class="text-sm text-gray-500">Loading line items...</div>
+      <div
+        class="text-sm text-gray-500 h-[40px] w-full rounded bg-gray-200 animate-pulse"
+      ></div>
     {:then lineItems}
       <h4 class="font-medium">Line Items ({lineItems.length})</h4>
 
       {#if lineItems.length === 0}
-        <div class="text-sm text-gray-500">No line items found</div>
+        <div
+          class="text-sm text-gray-500 h-[40px] w-full grid place-items-center"
+        >
+          No line items found
+        </div>
       {:else}
-        <div class="space-y-2">
+        <div class="grid grid-flow-col auto-cols-max gap-2 auto-rows-[40px]">
           {#each lineItems as item (item.id)}
             <div class="border-l-2 border-green-200 pl-2 text-sm">
               <div class="font-medium">{item.description}</div>

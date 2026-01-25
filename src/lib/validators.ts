@@ -53,6 +53,10 @@ export const loginSchema = type({
   password: "string >= 6",
 });
 
+export const forgotPassword = type({
+  email: "string.email",
+});
+
 export const signupSchema = type({
   email: "string.email",
   password: "string >= 6",

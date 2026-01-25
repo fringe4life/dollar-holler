@@ -1,30 +1,42 @@
-import { fail } from "@sveltejs/kit";
 import { auth } from "$lib/auth";
+import { forgotPassword } from "$lib/validators";
+import { fail, isRedirect } from "@sveltejs/kit";
+import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
-    const email = formData.get("email") as string;
-
-    if (!email) {
-      return fail(400, { email, missing: true });
+    const result = forgotPassword(Object.fromEntries(formData.entries()));
+    if (result instanceof ArkErrors) {
+      return fail(400, {
+        error: result.summary ?? "Invalid input",
+        email: (formData.get("email") as string | undefined) ?? "",
+      });
     }
 
     try {
-      const result = await auth.api.forgetPassword({
-        body: { email },
+      const passwordReset = await auth.api.requestPasswordReset({
+        body: { email: result.email },
         headers: request.headers,
       });
 
-      if (!result.status) {
-        return fail(400, { error: "Failed to send reset email", email });
+      if (!passwordReset.status) {
+        return fail(400, {
+          error: "Failed to send reset email",
+          email: result.email,
+        });
       }
 
-      return { success: true };
+      return { success: true, email: result.email };
     } catch (error) {
-      console.error("Forgot password error:", error);
-      return fail(400, { error: "Failed to send reset email" });
+      if (isRedirect(error)) {
+        throw error;
+      }
+      return fail(400, {
+        error: "Failed to send reset email",
+        email: result.email,
+      });
     }
   },
 };

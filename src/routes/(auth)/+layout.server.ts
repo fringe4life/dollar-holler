@@ -1,10 +1,10 @@
+import { resolve } from "$app/paths";
 import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ parent }) => {
-  const { session } = await parent();
-
-  if (session) {
-    throw redirect(303, "/invoices");
+  const { user } = await parent();
+  if (user) {
+    throw redirect(303, resolve("/invoices"));
   }
 };

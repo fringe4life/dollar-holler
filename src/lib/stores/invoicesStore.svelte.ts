@@ -129,7 +129,7 @@ class InvoicesStore {
         if (!data || (typeof data === "object" && "error" in data)) {
           throw new Error(data?.error || "Failed to update invoice");
         }
-        responseData = data as InvoiceSelect;
+        responseData = data;
       } else {
         const { data } = await client.api.invoices.post({
           ...body,

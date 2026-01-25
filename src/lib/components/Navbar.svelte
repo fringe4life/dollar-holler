@@ -3,14 +3,23 @@
   import { page } from "$app/state";
   import Close from "$lib/icon/Close.svelte";
   import Hamburger from "$lib/icon/Hamburger.svelte";
+  import type { User } from "better-auth";
   import type { MouseEventHandler } from "svelte/elements";
 
-  const navItems = [
+  type Props = {
+    user: User | null;
+  };
+
+  let { user = null }: Props = $props();
+
+  const navItems = $derived([
     { href: resolve("/invoices"), title: "Invoices" },
     { href: resolve("/clients"), title: "Clients" },
     { href: resolve("/settings"), title: "Settings" },
-    { href: resolve("/logout"), title: "Logout" },
-  ];
+    user
+      ? { href: resolve("/logout"), title: "Logout" }
+      : { href: resolve("/login"), title: "Login" },
+  ]);
   const path = $derived(page.url.pathname);
 
   let isNavShowing = $state(false);

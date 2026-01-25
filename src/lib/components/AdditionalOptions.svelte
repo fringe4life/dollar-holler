@@ -4,13 +4,15 @@
   import type { MouseEventHandler } from "svelte/elements";
   import type { IconProps } from "./Icon.svelte";
 
+  type Option = {
+    label: string;
+    icon?: Component<IconProps>;
+    disabled: boolean;
+    onclick: MouseEventHandler<HTMLButtonElement>;
+  };
+
   type Props = {
-    options: {
-      label: string;
-      icon?: Component<IconProps>;
-      disabled: boolean;
-      onclick: MouseEventHandler<HTMLButtonElement>;
-    }[];
+    options: Option[];
   };
 
   let { options }: Props = $props();
@@ -28,7 +30,6 @@
           <View />
           {#if option.icon}
             <option.icon />
-            <!-- <svelte:element this={option.icon} /> -->
           {/if}
           {option.label}
         </button>

@@ -1,5 +1,7 @@
+/* eslint-disable sonarjs/arrow-function-convention */
+/* eslint-disable no-inline-comments */
 import { createId } from "@paralleldrive/cuid2";
-import { relations } from "drizzle-orm";
+import { defineRelations } from "drizzle-orm";
 import {
   boolean,
   index,
@@ -104,7 +106,7 @@ export const clients = pgTable("clients", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-}).enableRLS();
+});
 
 // Invoices table
 export const invoices = pgTable("invoices", {
@@ -132,7 +134,7 @@ export const invoices = pgTable("invoices", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-}).enableRLS();
+});
 
 // Line items table
 export const lineItems = pgTable("line_items", {
@@ -153,7 +155,7 @@ export const lineItems = pgTable("line_items", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-}).enableRLS();
+});
 
 // Settings table
 export const settings = pgTable("settings", {
@@ -174,56 +176,79 @@ export const settings = pgTable("settings", {
     .defaultNow()
     .notNull()
     .$onUpdate(() => new Date()),
-}).enableRLS();
+});
 
-// Relations
-export const userRelations = relations(user, ({ many, one }) => ({
-  settings: one(settings),
-  clients: many(clients),
-  invoices: many(invoices),
-  lineItems: many(lineItems),
-  sessions: many(session),
-  accounts: many(account),
-}));
+// Relations (Drizzle Relations v2 - defineRelations)
+export const schemaTables = {
+  user,
+  session,
+  account,
+  verification,
+  clients,
+  invoices,
+  lineItems,
+  settings,
+};
 
-export const settingsRelations = relations(settings, ({ one }) => ({
-  user: one(user, { fields: [settings.userId], references: [user.id] }),
-}));
-
-export const clientsRelations = relations(clients, ({ one, many }) => ({
-  user: one(user, { fields: [clients.userId], references: [user.id] }),
-  invoices: many(invoices),
-}));
-
-export const invoicesRelations = relations(invoices, ({ one, many }) => ({
-  user: one(user, { fields: [invoices.userId], references: [user.id] }),
-  client: one(clients, {
-    fields: [invoices.clientId],
-    references: [clients.id],
-  }),
-  lineItems: many(lineItems),
-}));
-
-export const lineItemsRelations = relations(lineItems, ({ one }) => ({
-  user: one(user, { fields: [lineItems.userId], references: [user.id] }),
-  invoice: one(invoices, {
-    fields: [lineItems.invoiceId],
-    references: [invoices.id],
-  }),
-}));
-
-export const sessionRelations = relations(session, ({ one }) => ({
-  user: one(user, {
-    fields: [session.userId],
-    references: [user.id],
-  }),
-}));
-
-export const accountRelations = relations(account, ({ one }) => ({
-  user: one(user, {
-    fields: [account.userId],
-    references: [user.id],
-  }),
+export const tableRelations = defineRelations(schemaTables, (relations) => ({
+  user: {
+    settings: relations.one.settings({
+      from: relations.user.id,
+      to: relations.settings.userId,
+    }),
+    clients: relations.many.clients(),
+    invoices: relations.many.invoices(),
+    lineItems: relations.many.lineItems(),
+    sessions: relations.many.session(),
+    accounts: relations.many.account(),
+  },
+  settings: {
+    user: relations.one.user({
+      from: relations.settings.userId,
+      to: relations.user.id,
+    }),
+  },
+  clients: {
+    user: relations.one.user({
+      from: relations.clients.userId,
+      to: relations.user.id,
+    }),
+    invoices: relations.many.invoices(),
+  },
+  invoices: {
+    user: relations.one.user({
+      from: relations.invoices.userId,
+      to: relations.user.id,
+    }),
+    client: relations.one.clients({
+      from: relations.invoices.clientId,
+      to: relations.clients.id,
+    }),
+    lineItems: relations.many.lineItems(),
+  },
+  lineItems: {
+    user: relations.one.user({
+      from: relations.lineItems.userId,
+      to: relations.user.id,
+    }),
+    invoice: relations.one.invoices({
+      from: relations.lineItems.invoiceId,
+      to: relations.invoices.id,
+    }),
+  },
+  session: {
+    user: relations.one.user({
+      from: relations.session.userId,
+      to: relations.user.id,
+    }),
+  },
+  account: {
+    user: relations.one.user({
+      from: relations.account.userId,
+      to: relations.user.id,
+    }),
+  },
+  verification: {},
 }));
 
 // Export enums for use in the application
@@ -238,8 +263,9 @@ export const ClientStatus = {
   ARCHIVE: "archive",
 } as const;
 
-export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
-export type ClientStatus = (typeof ClientStatus)[keyof typeof ClientStatus];
+export type InvoiceStatusType =
+  (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
+export type ClientStatusType = (typeof ClientStatus)[keyof typeof ClientStatus];
 
 // Export types for use in the application
 export type User = typeof user.$inferSelect;

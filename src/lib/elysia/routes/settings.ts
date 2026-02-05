@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 import { db } from "$lib/db";
 import { settings as settingsTable } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
@@ -7,15 +8,15 @@ import { betterAuthPlugin } from "../auth-plugin";
 // Settings validation schema - userId comes from auth context, not request body
 const settingsSchema = t.Object({
   id: t.Optional(t.String()),
-  userId: t.Optional(t.String()), // Optional in request, will be set from auth
+  userId: t.Optional(t.String()),
   myName: t.String(),
   email: t.String(),
   street: t.String(),
   city: t.String(),
   state: t.String(),
   zip: t.String(),
-  createdAt: t.Optional(t.Any()), // Allow dates to pass through
-  updatedAt: t.Optional(t.Any()), // Allow dates to pass through
+  createdAt: t.Optional(t.Any()),
+  updatedAt: t.Optional(t.Any()),
 });
 
 export const settingsRoutes = new Elysia({ prefix: "/settings" })
@@ -25,13 +26,8 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
     "/",
     async ({ user, set }) => {
       try {
-        if (!user) {
-          set.status = 401;
-          return { error: "Unauthorized" };
-        }
-
         const userSettings = await db.query.settings.findFirst({
-          where: (s, { eq }) => eq(s.userId, user.id),
+          where: { userId: user.id },
         });
 
         if (!userSettings) {
@@ -41,13 +37,12 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
 
         return userSettings;
       } catch (error) {
-        console.error("Error loading settings:", error);
         set.status = 500;
         return { error: "Failed to load settings" };
       }
     },
     {
-      auth: true, // Require authentication
+      auth: true,
     }
   )
   // PUT /api/settings - Update or create user settings (requires auth)
@@ -55,14 +50,9 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
     "/",
     async ({ user, body, set }) => {
       try {
-        if (!user) {
-          set.status = 401;
-          return { error: "Unauthorized" };
-        }
-
         // Check if settings exist
         const existing = await db.query.settings.findFirst({
-          where: (s, { eq }) => eq(s.userId, user.id),
+          where: { userId: user.id },
         });
 
         if (existing) {
@@ -71,25 +61,24 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
             .update(settingsTable)
             .set({
               ...body,
-              userId: user.id, // Ensure userId matches authenticated user
+              userId: user.id,
               updatedAt: new Date(),
             })
             .where(eq(settingsTable.id, existing.id))
             .returning();
 
           return updated;
-        } else {
-          // Create new settings
-          const [created] = await db
-            .insert(settingsTable)
-            .values({
-              ...body,
-              userId: user.id,
-            })
-            .returning();
-
-          return created;
         }
+        // Create new settings
+        const [created] = await db
+          .insert(settingsTable)
+          .values({
+            ...body,
+            userId: user.id,
+          })
+          .returning();
+
+        return created;
       } catch (error) {
         console.error("Error updating settings:", error);
         set.status = 500;
@@ -97,7 +86,7 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
       }
     },
     {
-      auth: true, // Require authentication
+      auth: true,
       body: settingsSchema,
     }
   );

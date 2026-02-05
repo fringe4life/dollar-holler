@@ -5,4 +5,7 @@ import devToolsJson from "vite-plugin-devtools-json";
 
 export default defineConfig({
   plugins: [tailwindcss(), sveltekit(), devToolsJson()],
+  preview: {
+    port: 5173,
+  },
 });

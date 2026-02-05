@@ -5,5 +5,6 @@
   "framework": "sveltekit",
   "git": {
     "deploymentEnabled": false
-  }
+  },
+  "bunVersion": "1.x"
 }

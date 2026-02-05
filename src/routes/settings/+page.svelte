@@ -9,7 +9,13 @@
 
   let mySettings: Settings = {} as Settings;
   onMount(async () => {
+    console.log("[settings list] loadSettings() called");
     await settingsStore.loadSettings();
+    console.log("[settings list] loadSettings() done", {
+      hasSettings: !!settingsStore.settings,
+      error: settingsStore.error,
+      loading: settingsStore.loading,
+    });
     if (settingsStore.settings) {
       mySettings = { ...settingsStore.settings };
     }

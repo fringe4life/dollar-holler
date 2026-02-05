@@ -1,8 +1,6 @@
+/* eslint-disable new-cap */
 import { db } from "$lib/db";
-import {
-  clients as clientsTable,
-  invoices as invoicesTable,
-} from "$lib/db/schema";
+import { clients as clientsTable } from "$lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 
@@ -25,10 +23,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // GET /api/clients - List all clients
   .get("/", async () => {
     try {
-      const clients = await db.select().from(clientsTable);
-      return clients;
+      const result = await db.query.clients.findMany();
+      return result;
     } catch (error) {
-      console.error("Error loading clients:", error);
       return { error: "Failed to load clients" };
     }
   })
@@ -72,17 +69,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     "/:id",
     async ({ params: { id } }) => {
       try {
-        const client = await db
-          .select()
-          .from(clientsTable)
-          .where(eq(clientsTable.id, id))
-          .limit(1);
-
-        if (client.length === 0) {
-          return { error: "Client not found" };
-        }
-
-        return client[0];
+        return await db.query.clients.findFirst({
+          where: { id },
+        });
       } catch (error) {
         console.error("Error loading client:", error);
         return { error: "Failed to load client" };
@@ -144,12 +133,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     "/:id/invoices",
     async ({ params: { id } }) => {
       try {
-        const invoices = await db
-          .select()
-          .from(invoicesTable)
-          .where(eq(invoicesTable.clientId, id));
-
-        return invoices;
+        return await db.query.invoices.findMany({
+          where: { clientId: id },
+        });
       } catch (error) {
         console.error("Error loading client invoices:", error);
         return { error: "Failed to load client invoices" };

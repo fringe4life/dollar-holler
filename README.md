@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.50.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.48.2-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-0.45.1-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.4.17-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.22-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.18-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.50.2-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.49.2-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-beta-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.22-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.1.18-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
 
@@ -58,10 +58,10 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 
 ## Available Scripts
 
-- `bun run dev` - Start development server
+- `bun run dev` - Start development server (Vite via rolldown)
 - `bun run build` - Build for production
 - `bun run preview` - Preview production build
-- `bun run check` - Run Svelte check
+- `bun run check` - Run Ultracite checks
 - `bun run check:watch` - Run Svelte check in watch mode
 - `bun run db:generate` - Generate Drizzle migrations
 - `bun run db:migrate` - Run database migrations
@@ -70,13 +70,18 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run db:push` - Push schema directly to the database
 - `bun run format` - Format source with Prettier
 - `bun run lint` - Run Prettier check and ESLint
+- `bun run lint:fix` - Auto-fix lint and formatting issues
+- `bun run ultracite` - Run Ultracite linting and best-practices checks
+- `bun run ultracite:fix` - Autofix Ultracite issues where possible
+- `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
+- `bun run fix` - Convenience script to run the main fix pipeline
 
 ## Tech Stack
 
 - **Framework:** SvelteKit 5 with Svelte 5 runes
 - **API Layer:** ElysiaJS for type-safe API routes
 - **Database:** PostgreSQL with Neon serverless
-- **ORM:** Drizzle ORM with Neon HTTP driver
+- **ORM:** Drizzle ORM with Neon serverless driver (WebSocket Pool)
 - **Authentication:** Better Auth with email/password
 - **ID Generation:** CUID2 for resilient, cursor-friendly IDs
 - **Deployment:** Vercel adapter
@@ -99,7 +104,6 @@ src/
 │   │   ├── seed.ts      # Database seeding script
 │   │   └── migrate.ts   # Migration utilities
 │   ├── elysia/
-│   │   ├── index.ts     # ElysiaJS app with mounted routes
 │   │   ├── auth-plugin.ts # Better Auth integration plugin
 │   │   └── routes/      # API route modules (clients, invoices, settings)
 │   ├── components/      # Reusable UI components

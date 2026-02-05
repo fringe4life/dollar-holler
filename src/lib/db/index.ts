@@ -1,13 +1,16 @@
-import { neon } from "@neondatabase/serverless";
-import "dotenv/config";
-import { drizzle } from "drizzle-orm/neon-http";
-import * as schema from "./schema";
+import { neonConfig, Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { schemaTables, tableRelations } from "./schema";
+// eslint-disable-next-line sonarjs/no-implicit-dependencies
+import { DATABASE_URL } from "$env/static/private";
 
-const { DATABASE_URL } = process.env;
+neonConfig.webSocketConstructor = globalThis.WebSocket;
+// Create the Pool client (WebSocket-based for transaction support)
+const pool = new Pool({ connectionString: DATABASE_URL });
 
-if (!DATABASE_URL) {
-  throw new Error("Missing DATABASE_URL environment variable");
-}
-
-const sql = neon(DATABASE_URL);
-export const db = drizzle(sql, { schema });
+// eslint-disable-next-line unicorn/prevent-abbreviations
+export const db = drizzle({
+  client: pool,
+  relations: tableRelations,
+  schema: { ...schemaTables, ...tableRelations },
+});

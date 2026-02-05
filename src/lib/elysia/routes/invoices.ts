@@ -1,3 +1,4 @@
+/* eslint-disable new-cap */
 import { db } from "$lib/db";
 import {
   invoices as invoicesTable,
@@ -48,10 +49,9 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // GET /api/invoices - List all invoices
   .get("/", async () => {
     try {
-      const invoices = await db.select().from(invoicesTable);
-      return invoices;
+      const result = await db.query.invoices.findMany();
+      return result;
     } catch (error) {
-      console.error("Error loading invoices:", error);
       return { error: "Failed to load invoices" };
     }
   })
@@ -89,17 +89,9 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     "/:id",
     async ({ params: { id } }) => {
       try {
-        const invoice = await db
-          .select()
-          .from(invoicesTable)
-          .where(eq(invoicesTable.id, id))
-          .limit(1);
-
-        if (invoice.length === 0) {
-          return { error: "Invoice not found" };
-        }
-
-        return invoice[0];
+        return await db.query.invoices.findFirst({
+          where: { id },
+        });
       } catch (error) {
         console.error("Error loading invoice:", error);
         return { error: "Failed to load invoice" };
@@ -122,7 +114,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           .update(invoicesTable)
           .set({
             ...updateData,
-            clientId: client?.id,
+            clientId: client.id,
             updatedAt: new Date(),
           })
           .where(eq(invoicesTable.id, id))
@@ -167,12 +159,9 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         "/",
         async ({ params: { id } }) => {
           try {
-            const lineItems = await db
-              .select()
-              .from(lineItemsTable)
-              .where(eq(lineItemsTable.invoiceId, id));
-
-            return lineItems;
+            return await db.query.lineItems.findMany({
+              where: { invoiceId: id },
+            });
           } catch (error) {
             console.error("Error loading line items:", error);
             return { error: "Failed to load line items" };
@@ -189,7 +178,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         "/",
         async ({ params: { id }, body }) => {
           try {
-            const lineItems = await db
+            return await db
               .insert(lineItemsTable)
               .values(
                 body.map((item) => ({
@@ -198,8 +187,6 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
                 }))
               )
               .returning();
-
-            return lineItems;
           } catch (error) {
             console.error("Error creating line items:", error);
             return { error: "Failed to create line items" };
@@ -231,7 +218,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
               .where(eq(lineItemsTable.invoiceId, id));
 
             // Then insert the new ones
-            const lineItems = await db
+            return await db
               .insert(lineItemsTable)
               .values(
                 body.map((item) => ({
@@ -240,8 +227,6 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
                 }))
               )
               .returning();
-
-            return lineItems;
           } catch (error) {
             console.error("Error updating line items:", error);
             return { error: "Failed to update line items" };
@@ -269,8 +254,7 @@ export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
   // GET /api/line-items - List all line items (for admin purposes)
   .get("/", async () => {
     try {
-      const lineItems = await db.query.lineItems.findMany();
-      return lineItems;
+      return await db.query.lineItems.findMany();
     } catch (error) {
       console.error("Error loading line items:", error);
       return { error: "Failed to load line items" };

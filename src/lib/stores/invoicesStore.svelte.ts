@@ -32,11 +32,11 @@ class InvoicesStore {
       // Update the reactive state
       this.invoices.length = 0;
       this.invoices.push(...invoiceData);
-    } catch (err) {
+    } catch (error_) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to load invoices";
+        error_ instanceof Error ? error_.message : "Failed to load invoices";
       this.error = errorMessage;
-      console.error("Error loading invoices:", err);
+      console.error("Error loading invoices:", error_);
       toast.error(errorMessage);
     } finally {
       this.loading = false;
@@ -55,10 +55,10 @@ class InvoicesStore {
       }
 
       return invoiceData;
-    } catch (err) {
+    } catch (error_) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to load invoice";
-      console.error("Error loading invoice:", err);
+        error_ instanceof Error ? error_.message : "Failed to load invoice";
+      console.error("Error loading invoice:", error_);
       toast.error(errorMessage);
       return null;
     }
@@ -78,10 +78,12 @@ class InvoicesStore {
       }
 
       return invoiceData;
-    } catch (err) {
+    } catch (error_) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to load client invoices";
-      console.error("Error loading client invoices:", err);
+        error_ instanceof Error
+          ? error_.message
+          : "Failed to load client invoices";
+      console.error("Error loading client invoices:", error_);
       toast.error(errorMessage);
       return [];
     }
@@ -104,10 +106,10 @@ class InvoicesStore {
       }
 
       toast.success("Invoice deleted successfully");
-    } catch (err) {
+    } catch (error_) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to delete invoice";
-      console.error("Error deleting invoice:", err);
+        error_ instanceof Error ? error_.message : "Failed to delete invoice";
+      console.error("Error deleting invoice:", error_);
       toast.error(errorMessage);
     }
   }
@@ -115,7 +117,7 @@ class InvoicesStore {
   // Upsert invoice (create or update)
   async upsertInvoice(invoiceData: NewInvoice): Promise<string | null> {
     try {
-      const isUpdate = !!invoiceData.id;
+      const isUpdate = Boolean(invoiceData.id);
       const body = transformNullToUndefined(invoiceData);
 
       let responseData: { id?: string; error?: string } | InvoiceSelect;
@@ -145,7 +147,9 @@ class InvoicesStore {
 
       if (isUpdate && invoiceData.id) {
         // Update existing invoice in state
-        const index = this.invoices.findIndex((i) => i.id === invoiceData.id);
+        const index = this.invoices.findIndex(
+          (index_) => index_.id === invoiceData.id
+        );
         if (index !== -1) {
           this.invoices[index] = {
             ...this.invoices[index],
@@ -161,33 +165,32 @@ class InvoicesStore {
         }
         toast.success("Invoice updated successfully");
         return invoiceData.id;
-      } else {
-        // Add new invoice to state
-        const id = (responseData as { id: string }).id;
-        const newInvoice: InvoiceSelect = {
-          ...invoiceData,
-          id,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          subject: normalizeToNull(invoiceData.subject),
-          discount: normalizeToNull(invoiceData.discount),
-          notes: normalizeToNull(invoiceData.notes),
-          terms: normalizeToNull(invoiceData.terms),
-          invoiceStatus: normalizeToNull(invoiceData.invoiceStatus),
-        };
-        this.invoices.unshift(newInvoice);
-        toast.success("Invoice created successfully");
-        return id;
       }
-    } catch (err) {
-      const isUpdate = !!invoiceData.id;
+      // Add new invoice to state
+      const { id } = responseData as { id: string };
+      const newInvoice: InvoiceSelect = {
+        ...invoiceData,
+        id,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        subject: normalizeToNull(invoiceData.subject),
+        discount: normalizeToNull(invoiceData.discount),
+        notes: normalizeToNull(invoiceData.notes),
+        terms: normalizeToNull(invoiceData.terms),
+        invoiceStatus: normalizeToNull(invoiceData.invoiceStatus),
+      };
+      this.invoices.unshift(newInvoice);
+      toast.success("Invoice created successfully");
+      return id;
+    } catch (error_) {
+      const isUpdate = Boolean(invoiceData.id);
       const errorMessage =
-        err instanceof Error
-          ? err.message
+        error_ instanceof Error
+          ? error_.message
           : `Failed to ${isUpdate ? "update" : "create"} invoice`;
       console.error(
         `Error ${isUpdate ? "updating" : "creating"} invoice:`,
-        err
+        error_
       );
       toast.error(errorMessage);
       return null;

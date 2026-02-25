@@ -2,7 +2,7 @@ import { getRequestEvent } from "$app/server";
 import { PUBLIC_BASE_URL } from "$env/static/public";
 import { db } from "$lib/db";
 import { schemaTables } from "$lib/db/schema";
-import { createId } from "@paralleldrive/cuid2";
+import { createId } from "$lib/db/id";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { sveltekitCookies } from "better-auth/svelte-kit";

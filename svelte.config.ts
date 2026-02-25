@@ -8,9 +8,6 @@ const config: Config = {
   kit: {
     adapter: adapter(),
     alias: { $utils: "./src/utils" },
-    experimental: {
-      remoteFunctions: true,
-    },
   },
   compilerOptions: {
     experimental: {

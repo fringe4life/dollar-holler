@@ -1,8 +1,26 @@
-import { createId } from "@paralleldrive/cuid2";
-import "dotenv/config";
-import { db } from "./index";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { createId } from "./id";
 import type { NewClient, NewInvoice, NewLineItem, NewSettings } from "./schema";
-import { clients, invoices, lineItems, settings } from "./schema";
+import {
+  clients,
+  invoices,
+  lineItems,
+  schemaTables,
+  settings,
+  tableRelations,
+} from "./schema";
+// eslint-disable-next-line sonarjs/no-implicit-dependencies
+import { neonConfig, Pool } from "@neondatabase/serverless";
+
+neonConfig.webSocketConstructor = globalThis.WebSocket;
+// Create the Pool client (WebSocket-based for transaction support)
+const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+
+const db = drizzle({
+  client: pool,
+  relations: tableRelations,
+  schema: { ...schemaTables, ...tableRelations },
+});
 
 // Helper function to generate random date within last 6 months
 function randomDateWithinLast6Months(): Date {
@@ -30,7 +48,7 @@ function getRandomUser<T>(users: T[]): T {
 }
 
 async function main() {
-  // 1) Load existing users from Better Auth tables (cannot seed users)
+  // 1) Load existing users from Better Auth tables
   const users = await db.query.user.findMany();
 
   if (users.length === 0) {

@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/arrow-function-convention */
 /* eslint-disable no-inline-comments */
-import { createId } from "@paralleldrive/cuid2";
+import { createId } from "./id";
 import { defineRelations } from "drizzle-orm";
 import {
   boolean,

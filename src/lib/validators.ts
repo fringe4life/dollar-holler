@@ -1,9 +1,11 @@
+/* eslint-disable sonarjs/no-duplicate-string */
+/* eslint-disable sonarjs/no-hardcoded-passwords */
 import { type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
-} from "drizzle-arktype";
+} from "drizzle-orm/arktype";
 import {
   account,
   clients,
@@ -62,11 +64,11 @@ export const signupSchema = type({
   password: "string >= 6",
   confirmPassword: "string >= 6",
   name: "string >= 1",
-}).narrow((data, ctx) => {
+}).narrow((data, context) => {
   if (data.password === data.confirmPassword) {
     return true;
   }
-  return ctx.reject({
+  return context.reject({
     expected: "identical to password",
     actual: "",
     path: ["confirmPassword"],
@@ -77,9 +79,9 @@ export const resetPasswordSchema = type({
   newPassword: "string >= 6",
   confirmPassword: "string >= 6",
   token: "string >= 1",
-}).narrow((data, ctx) => {
+}).narrow((data, context) => {
   if (data.newPassword === data.confirmPassword) return true;
-  return ctx.reject({
+  return context.reject({
     expected: "identical to newPassword",
     actual: "",
     path: ["confirmPassword"],

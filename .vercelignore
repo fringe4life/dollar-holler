@@ -1,0 +1,16 @@
+update-readme.md
+README.md
+git-commit-msg.md
+node_modules
+components.json
+prettier.config.mjs
+stylelint.config.mjs
+
+.cursor
+.qodo
+.vscode
+
+
+.svelte-kit
+.vercel
+drizzle

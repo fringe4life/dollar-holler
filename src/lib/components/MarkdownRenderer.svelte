@@ -1,45 +1,26 @@
 <script lang="ts" module>
-  import { marked } from 'marked'
-  import DOMPurify from 'isomorphic-dompurify'
-
-  // Configure marked globally to sanitize HTML using DOMPurify postprocess hook
-  // This is the official recommended approach per marked documentation
-  marked.use({
-    hooks: {
-      postprocess(html) {
-        return DOMPurify.sanitize(html)
-      },
-    },
-  })
+  import { sanitize } from "isomorphic-dompurify";
 </script>
 
 <script lang="ts">
-  let { source }: { source: string } = $props()
+  let { source }: { source: string } = $props();
 
-  let compiled = $state('')
+  const compiled = $derived.by(() => {
+    if (!source) return "";
 
-  $effect(() => {
-    if (source) {
-      const result = marked(source)
-      if (typeof result === 'string') {
-        compiled = result
-      } else {
-        result
-          .then((html: string) => {
-            compiled = html
-          })
-          .catch((error: unknown) => {
-            console.error('Error parsing markdown:', error)
-            compiled = DOMPurify.sanitize(source) // fallback to sanitized plain text
-          })
-      }
+    try {
+      const html = Bun.markdown.html(source);
+      return sanitize(html);
+    } catch (error) {
+      console.error("Error parsing markdown with Bun.markdown:", error);
+      return sanitize(source);
     }
-  })
+  });
 </script>
 
 {#if compiled}
   <!-- eslint-disable-next-line svelte/no-at-html-tags -->
   {@html compiled}
 {:else}
-  <p>{source}</p>
+  <p>Something went wrong, please refresh your page</p>
 {/if}

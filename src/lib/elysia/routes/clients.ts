@@ -3,6 +3,7 @@ import { db } from "$lib/db";
 import { clients as clientsTable } from "$lib/db/schema";
 import { eq, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
+import { betterAuthPlugin } from "../auth-plugin";
 
 // Client validation schema
 const clientSchema = t.Object({
@@ -20,6 +21,7 @@ const clientSchema = t.Object({
 });
 
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
+  .use(betterAuthPlugin)
   // GET /api/clients - List all clients
   .get("/", async () => {
     try {
@@ -32,12 +34,13 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // POST /api/clients - Create client (with upsert on conflict)
   .post(
     "/",
-    async ({ body }) => {
+    async ({ body, user }) => {
       try {
         const [inserted] = await db
           .insert(clientsTable)
           .values({
             ...body,
+            userId: user.id,
           })
           .onConflictDoUpdate({
             target: clientsTable.id,
@@ -62,6 +65,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     },
     {
       body: clientSchema,
+      auth: true,
     }
   )
   // GET /api/clients/:id - Get single client
@@ -108,6 +112,8 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         id: t.String(),
       }),
       body: clientSchema,
+
+      auth: true,
     }
   )
   // DELETE /api/clients/:id - Delete client
@@ -126,6 +132,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       params: t.Object({
         id: t.String(),
       }),
+      auth: true,
     }
   )
   // GET /api/clients/:id/invoices - Get client's invoices

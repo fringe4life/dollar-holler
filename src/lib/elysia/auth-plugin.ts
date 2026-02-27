@@ -1,4 +1,5 @@
 import { auth } from "$lib/auth";
+import type { Maybe } from "$lib/types";
 import type { Session, User } from "better-auth";
 import { Elysia } from "elysia";
 
@@ -22,6 +23,6 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
   });
 
 export type AuthContext = {
-  user: User | null;
-  session: Session | null;
+  user: Maybe<User>;
+  session: Maybe<Session>;
 };

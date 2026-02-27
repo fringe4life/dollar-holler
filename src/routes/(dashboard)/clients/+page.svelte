@@ -37,13 +37,7 @@
   });
 
   onMount(async () => {
-    console.log("[clients list] loadClients() called");
     await clientsStore.loadClients();
-    console.log("[clients list] loadClients() done", {
-      count: clients.length,
-      error: clientsStore.error,
-      loading: clientsStore.loading,
-    });
   });
 
   const handleSearch = (terms: string) => {

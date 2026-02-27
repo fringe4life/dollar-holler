@@ -1,18 +1,22 @@
 <script lang="ts">
-  import Search from '$lib/icon/Search.svelte'
-  import type { FormEventHandler } from 'svelte/elements'
+  import Search from "$lib/icon/Search.svelte";
+  import type { ChangeEventHandler, FormEventHandler } from "svelte/elements";
 
-  let searchTerms = $state<string>('')
+  let searchTerms = $state<string>("");
 
   type Props = {
-    handleSearch: (searchTerms: string) => void
-  }
+    handleSearch: (searchTerms: string) => void;
+  };
 
-  let { handleSearch }: Props = $props()
+  let { handleSearch }: Props = $props();
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = () => {
-    handleSearch(searchTerms)
-  }
+    handleSearch(searchTerms);
+  };
+
+  const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+    searchTerms = e.currentTarget.value;
+  };
 </script>
 
 <form onsubmit={handleSubmit} class="relative flex w-full items-baseline">
@@ -25,6 +29,7 @@
       placeholder="Search by keyword"
       id="search"
       bind:value={searchTerms}
+      onchange={handleChange}
     />
     <button
       type="submit"

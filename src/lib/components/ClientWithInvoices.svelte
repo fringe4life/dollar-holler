@@ -1,18 +1,23 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
   import type { ClientSelect } from "$lib/validators";
 
   let { client }: { client: ClientSelect } = $props();
 
   // Use $derived for reactive promise - re-fetches when client.id changes
-  const invoicesPromise = $derived(invoicesStore.getInvoicesByClientId(client.id));
+  const invoicesPromise = $derived(
+    invoicesStore.getInvoicesByClientId(client.id)
+  );
 
   // Note: Invoice totals would need to be calculated from line items
   // For now, we just display the invoice count
 </script>
 
 <div class="client-card rounded-lg border p-4">
-  <h3 class="text-lg font-semibold">{client.name}</h3>
+  <h3 class="text-lg font-semibold">
+    <a href={resolve(`/clients/${client.id}`)}>{client.name}</a>
+  </h3>
   <p class="text-gray-600">{client.email}</p>
 
   <!-- Invoices section using {#await} for loading states -->

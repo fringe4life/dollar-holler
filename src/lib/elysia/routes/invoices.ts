@@ -6,6 +6,7 @@ import {
 } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
+import { betterAuthPlugin } from "../auth-plugin";
 
 // Invoice validation schema
 const invoiceSchema = t.Object({
@@ -46,6 +47,7 @@ const invoiceWithRelationsSchema = t.Object({
 });
 
 export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
+  .use(betterAuthPlugin)
   // GET /api/invoices - List all invoices
   .get("/", async () => {
     try {
@@ -58,7 +60,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // POST /api/invoices - Create invoice (with line items)
   .post(
     "/",
-    async ({ body }) => {
+    async ({ body, user }) => {
       try {
         const { lineItems, client, ...newInvoice } = body;
 
@@ -67,6 +69,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           .values({
             ...newInvoice,
             clientId: client.id,
+            userId: user.id,
           })
           .returning({ id: invoicesTable.id });
 
@@ -82,6 +85,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     },
     {
       body: invoiceWithRelationsSchema,
+      auth: true,
     }
   )
   // GET /api/invoices/:id - Get single invoice
@@ -106,7 +110,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // PUT /api/invoices/:id - Update invoice
   .put(
     "/:id",
-    async ({ params: { id }, body }) => {
+    async ({ params: { id }, body, user }) => {
       try {
         const { lineItems, client, ...updateData } = body;
 
@@ -131,6 +135,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         id: t.String(),
       }),
       body: invoiceWithRelationsSchema,
+      auth: true,
     }
   )
   // DELETE /api/invoices/:id - Delete invoice
@@ -149,6 +154,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       params: t.Object({
         id: t.String(),
       }),
+      auth: true,
     }
   )
   // Line items routes nested under invoices
@@ -205,6 +211,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
               amount: t.Number(),
             })
           ),
+          auth: true,
         }
       )
       // PUT /api/invoices/:id/line-items - Replace line items
@@ -245,12 +252,14 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
               amount: t.Number(),
             })
           ),
+          auth: true,
         }
       )
   );
 
 // Standalone line items routes (not nested under invoices)
 export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
+  .use(betterAuthPlugin)
   // GET /api/line-items - List all line items (for admin purposes)
   .get("/", async () => {
     try {
@@ -276,5 +285,6 @@ export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
       params: t.Object({
         id: t.String(),
       }),
+      auth: true,
     }
   );

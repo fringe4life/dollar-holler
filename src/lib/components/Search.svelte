@@ -15,10 +15,6 @@
   const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
 
-    if (!derivedTerms) {
-      return;
-    }
-
     const runSearch = () => Promise.resolve(handleSearch(derivedTerms));
 
     if (typeof document.startViewTransition === "function") {
@@ -37,8 +33,8 @@
     const curr = derivedTerms ?? "";
     if (prev !== "" && curr === "") {
       handleSearch("");
+      prev = curr;
     }
-    prev = curr;
   });
 </script>
 
@@ -55,21 +51,18 @@
       placeholder="Search by keyword"
       id="search"
       bind:value={searchTerms}
-      onchange={handleChange}
+      oninput={handleChange}
     />
     <button
-      disabled={!derivedTerms}
       type="submit"
-      class="disabled:cursor-not-allowed peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush transition-discrete text-pastelPurple translate-x-0 font-sansserif w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
+      class="pointer-events-none peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush text-pastelPurple translate-x-0 font-sansserif w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
       >Search</button
     >
   </div>
 </form>
 
 <style>
-  @reference "../../app.css";
-
   input:is(:focus, :not(:placeholder-shown)) + button {
-    @apply right-0 left-auto text-right md:right-auto md:translate-x-52 lg:translate-x-72;
+    @apply right-0 md:right-auto pointer-events-auto text-right md:translate-x-52 lg:translate-x-72;
   }
 </style>

@@ -1,9 +1,7 @@
 <script lang="ts">
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Search from "$lib/components/Search.svelte";
-  import type { Client } from "$lib/db/schema";
   import { centsToDollars, sumInvoices } from "$lib/utils/moneyHelpers";
-  import type { ClientWithInvoicesResponse } from "$lib/validators";
   import BlankState from "../BlankState.svelte";
 
   import SlidePanel from "$lib/components/SlidePanel.svelte";
@@ -31,14 +29,6 @@
   const clientInvoices = $derived(
     invoices.filter((invoice) => invoice.clientId === data.client.id)
   );
-
-  // Utility function to extract client data without invoices
-  function extractClientData(
-    clientWithInvoices: ClientWithInvoicesResponse
-  ): Client {
-    const { invoices, ...clientData } = clientWithInvoices;
-    return clientData;
-  }
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> &
     MouseEventHandler<HTMLAnchorElement> = () => {

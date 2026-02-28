@@ -4,6 +4,8 @@
 
 @import "tw-animate-css";
 
+@custom-variant has-value (&:where(data-has-value="true") *);
+
 @theme {
   --color-*: initial;
   --font-sansserif: "Source Sans 3", sans-serif;

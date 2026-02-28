@@ -50,7 +50,7 @@
 </svelte:head>
 
 <div
-  class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
+  class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
   {#if clients.length > 0}

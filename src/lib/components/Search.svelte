@@ -17,13 +17,23 @@
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     searchTerms = e.currentTarget.value;
   };
+
+  // needed as type="search" doesn't trigger onchange when the value is cleared via special x button
+  $effect(() => {
+    if (!searchTerms) {
+      handleSearch("");
+    }
+  });
 </script>
 
-<form onsubmit={handleSubmit} class="relative flex w-full items-baseline">
-  <div class="relative isolate z-0 flex w-full items-baseline">
-    <div class="text-pastelPurple mr-2 self-center"><Search /></div>
+<form
+  onsubmit={handleSubmit}
+  class="w-full grid grid-flow-col grid-cols-[24px_1fr] gap-x-2 items-baseline"
+>
+  <div class="text-pastelPurple self-center"><Search /></div>
+  <div class="relative isolate z-0 flex items-baseline w-full">
     <input
-      class=" search font-sansserif focus-visible:outline-lavenderIndigo border-b-pastelPurple w-full border-b-2 border-dashed bg-transparent pr-20 text-black outline-none focus-visible:border-solid focus-visible:outline-2 md:w-56 md:pr-0 lg:w-72 lg:text-xl"
+      class="peer placeholder:text-transparent search font-sansserif focus-visible:outline-lavenderIndigo border-b-pastelPurple w-full border-b-2 border-dashed bg-transparent pr-16 text-black outline-none focus-visible:border-solid focus-visible:outline-2 md:w-52 md:pr-0 lg:w-72 lg:text-xl"
       type="search"
       name="search"
       placeholder="Search by keyword"
@@ -33,7 +43,7 @@
     />
     <button
       type="submit"
-      class="text-pastelPurple font-sansserif pointer-events-none absolute left-8 transform text-xl font-black transition-transform duration-200 ease-out"
+      class="peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush transition-discrete text-pastelPurple translate-x-0 font-sansserif pointer-events-none w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
       >Search</button
     >
   </div>
@@ -42,15 +52,7 @@
 <style>
   @reference "../../app.css";
 
-  ::placeholder {
-    @apply text-transparent;
-  }
-
   input:is(:focus, :not(:placeholder-shown)) + button {
-    @apply text-lavenderIndigo pointer-events-auto right-0 text-right md:right-auto md:translate-x-56 lg:translate-x-72;
-  }
-
-  input:focus + button:is(:hover, :focus) {
-    @apply text-daisyBush;
+    @apply right-0 pointer-events-auto left-auto text-right md:right-auto md:translate-x-52 lg:translate-x-72;
   }
 </style>

@@ -18,16 +18,23 @@
     if (!derivedTerms) {
       return;
     }
-    handleSearch(derivedTerms);
+
+    const runSearch = () => Promise.resolve(handleSearch(derivedTerms));
+
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(runSearch);
+    } else {
+      runSearch();
+    }
   };
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     searchTerms = e.currentTarget.value;
   };
 
-  // needed as type="search" doesn't trigger onchange when the value is cleared via special x button // Only trigger a clear when transitioning from non-empty to empty to avoid duplicate submissions let prev = "";
+  // needed as type="search" doesn't trigger onchange when the value is cleared via special x button // Only trigger a clear when transitioning from non-empty to empty to avoid duplicate submissions
   $effect(() => {
-    const curr = searchTerms ?? "";
+    const curr = derivedTerms ?? "";
     if (prev !== "" && curr === "") {
       handleSearch("");
     }
@@ -53,7 +60,7 @@
     <button
       disabled={!derivedTerms}
       type="submit"
-      class="disabled:cursor-not-allowed peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush transition-discrete text-pastelPurple translate-x-0 font-sansserif pointer-events-none w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
+      class="disabled:cursor-not-allowed peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush transition-discrete text-pastelPurple translate-x-0 font-sansserif w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
       >Search</button
     >
   </div>
@@ -63,6 +70,6 @@
   @reference "../../app.css";
 
   input:is(:focus, :not(:placeholder-shown)) + button {
-    @apply right-0 pointer-events-auto left-auto text-right md:right-auto md:translate-x-52 lg:translate-x-72;
+    @apply right-0 left-auto text-right md:right-auto md:translate-x-52 lg:translate-x-72;
   }
 </style>

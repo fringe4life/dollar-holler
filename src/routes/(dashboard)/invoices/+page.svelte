@@ -35,13 +35,7 @@
   });
 
   onMount(async () => {
-    console.log("[invoices list] loadInvoices() called");
     await invoicesStore.loadInvoices();
-    console.log("[invoices list] loadInvoices() done", {
-      count: invoices.length,
-      error: invoicesStore.error,
-      loading: invoicesStore.loading,
-    });
   });
 
   const handleSearch = (terms: string) => {

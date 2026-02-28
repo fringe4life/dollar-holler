@@ -3,6 +3,8 @@
   import type { ChangeEventHandler, FormEventHandler } from "svelte/elements";
 
   let searchTerms = $state<string>("");
+  let derivedTerms = $derived(searchTerms.trim());
+  let prev = $state<string>("");
 
   type Props = {
     handleSearch: (searchTerms: string) => void;
@@ -10,19 +12,26 @@
 
   let { handleSearch }: Props = $props();
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = () => {
-    handleSearch(searchTerms);
+  const handleSubmit: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+
+    if (!derivedTerms) {
+      return;
+    }
+    handleSearch(derivedTerms);
   };
 
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     searchTerms = e.currentTarget.value;
   };
 
-  // needed as type="search" doesn't trigger onchange when the value is cleared via special x button
+  // needed as type="search" doesn't trigger onchange when the value is cleared via special x button // Only trigger a clear when transitioning from non-empty to empty to avoid duplicate submissions let prev = "";
   $effect(() => {
-    if (!searchTerms) {
+    const curr = searchTerms ?? "";
+    if (prev !== "" && curr === "") {
       handleSearch("");
     }
+    prev = curr;
   });
 </script>
 
@@ -42,8 +51,9 @@
       onchange={handleChange}
     />
     <button
+      disabled={!derivedTerms}
       type="submit"
-      class="peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush transition-discrete text-pastelPurple translate-x-0 font-sansserif pointer-events-none w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
+      class="disabled:cursor-not-allowed peer-focus:text-lavenderIndigo peer-not-placeholder-shown:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush transition-discrete text-pastelPurple translate-x-0 font-sansserif pointer-events-none w-15.5 absolute transform text-xl font-black transition-transform duration-200 ease-out"
       >Search</button
     >
   </div>

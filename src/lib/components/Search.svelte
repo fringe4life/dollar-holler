@@ -32,7 +32,13 @@
   $effect(() => {
     const curr = derivedTerms ?? "";
     if (prev !== "" && curr === "") {
-      handleSearch("");
+      const runSearch = () => Promise.resolve(handleSearch(derivedTerms));
+
+      if (typeof document.startViewTransition === "function") {
+        document.startViewTransition(runSearch);
+      } else {
+        runSearch();
+      }
       prev = curr;
     }
   });
@@ -42,7 +48,7 @@
   onsubmit={handleSubmit}
   class="w-full grid grid-flow-col grid-cols-[24px_1fr] gap-x-2 items-baseline"
 >
-  <div class="text-pastelPurple self-center"><Search /></div>
+  <Search class="text-pastelPurple self-center" />
   <div class="relative isolate z-0 flex items-baseline w-full">
     <input
       class="peer placeholder:text-transparent search font-sansserif focus-visible:outline-lavenderIndigo border-b-pastelPurple w-full border-b-2 border-dashed bg-transparent pr-16 text-black outline-none focus-visible:border-solid focus-visible:outline-2 md:w-52 md:pr-0 lg:w-72 lg:text-xl"
@@ -62,6 +68,7 @@
 </form>
 
 <style>
+  @reference "../../app.css";
   input:is(:focus, :not(:placeholder-shown)) + button {
     @apply right-0 md:right-auto pointer-events-auto text-right md:translate-x-52 lg:translate-x-72;
   }

@@ -119,12 +119,22 @@ export type ResetPasswordData = typeof resetPasswordSchema.infer;
 // Simple API Response types
 export type SettingsResponse = typeof settingsSelectSchema.infer;
 
-// Invoice with relations (includes client)
-export type InvoiceWithRelationsResponse = InvoiceSelect & {
-  client: ClientSelect;
+export type Total = {
+  total: number;
 };
 
-// Client with relations (includes invoices)
+// List view: only what InvoiceRow needs (client name + total)
+export type InvoiceListResponse = InvoiceSelect & {
+  client: Pick<ClientSelect, "name">;
+} & Total;
+
+// List view: only what ClientRow needs (received + balance)
+export type ClientListResponse = ClientSelect & {
+  received: number; // sum of paid invoice totals (cents)
+  balance: number; // sum of unpaid invoice totals (cents)
+};
+
+/** @deprecated Use ClientListResponse instead */
 export type ClientWithInvoicesResponse = ClientSelect & {
   invoices: InvoiceSelect[];
 };

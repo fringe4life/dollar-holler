@@ -1,14 +1,19 @@
 import { client } from "$lib/client";
+import type { Maybe } from "$lib/types";
 import {
   normalizeToNull,
   transformNullToUndefined,
 } from "$lib/utils/typeHelpers";
-import type { ClientSelect, NewClient } from "$lib/validators";
+import type {
+  ClientListResponse,
+  ClientSelect,
+  NewClient,
+} from "$lib/validators";
 import { toast } from "svelte-sonner";
 
 class ClientsStore {
   // Use $state for reactive class fields
-  clients = $state<ClientSelect[]>([]);
+  clients = $state<ClientListResponse[]>([]);
   loading = $state(false);
   error = $state<string | null>(null);
 
@@ -42,14 +47,17 @@ class ClientsStore {
   }
 
   // Load a single client by ID (without relations)
-  async getClientById(id: string): Promise<ClientSelect | null> {
+  async getClientById(id: string): Promise<Maybe<ClientSelect>> {
     try {
-      const { data: clientData } = await client.api.clients({ id }).get();
+      const { data: clientData, error } = await client.api
+        .clients({ id })
+        .get();
       if (
         !clientData ||
-        (typeof clientData === "object" && "error" in clientData)
+        (typeof clientData === "object" && "error" in clientData) ||
+        error
       ) {
-        throw new Error(clientData?.error || "Failed to load client");
+        throw new Error(error?.value?.message || "Failed to load client");
       }
 
       return clientData;
@@ -131,7 +139,7 @@ class ClientsStore {
       } else {
         // Add new client to state
         const id = (responseData as { id: string }).id;
-        const newClient: ClientSelect = {
+        const newClient: ClientListResponse = {
           ...clientData,
           id,
           createdAt: new Date(),
@@ -142,6 +150,8 @@ class ClientsStore {
           state: normalizeToNull(clientData.state),
           zip: normalizeToNull(clientData.zip),
           clientStatus: normalizeToNull(clientData.clientStatus),
+          received: 0,
+          balance: 0,
         };
         this.clients.push(newClient);
         toast.success("Client created successfully");

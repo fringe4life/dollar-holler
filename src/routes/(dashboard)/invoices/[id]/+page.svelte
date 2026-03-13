@@ -1,13 +1,13 @@
 <script lang="ts">
   import { asset } from "$app/paths";
   import { page } from "$app/state";
-  import MarkdownRenderer from "$lib/components/MarkdownRenderer.svelte";
+  import HtmlContent from "$lib/components/HtmlContent.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { settingsStore } from "$lib/stores/settingsStore.svelte";
+  import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import type { MouseEventHandler } from "svelte/elements";
   import LineItemRows from "../LineItemRows.svelte";
   import type { PageProps } from "./$types";
   let { data }: PageProps = $props();
@@ -19,26 +19,22 @@
     settingsStore.loadSettings();
   });
 
-  const printInvoice: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = () => {
+  const printInvoice: BitsButton = () => {
     window.print();
   };
 
-  const copyLink: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = async () => {
+  const copyLink: BitsButton = async () => {
     await window.navigator.clipboard.writeText(page.url.href);
     toast.success("Success!", {
       description: `${page.url.href}`,
     });
   };
 
-  const payInvoice: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = () => {
+  const payInvoice: BitsButton = () => {
     console.log("PAY INVOICE");
   };
 
-  const sendInvoice: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = () => {
+  const sendInvoice: BitsButton = () => {
     console.log("SEND INVOICE");
   };
 </script>
@@ -90,27 +86,17 @@
   </div>
   <div class="col-span-full sm:col-span-3 print:col-span-3">
     <div class="label">Bill To:</div>
-    {#await data.clientPromise}
-      <div class="animate-pulse space-y-2">
-        <div class="h-5 w-32 rounded bg-gray-200"></div>
-        <div class="h-4 w-48 rounded bg-gray-200"></div>
-        <div class="h-4 w-40 rounded bg-gray-200"></div>
-      </div>
-    {:then client}
-      <p>
-        {#if client}
-          {#if client.name}<strong>{client.name}</strong><br />{/if}
-          {#if client.email}{client.email}<br />{/if}
-          {#if client.street}{client.street}<br />{/if}
-          {#if client.state}{client.state}{/if}
-          {#if client.zip}{client.zip}{/if}
-        {:else}
-          No client found
-        {/if}
-      </p>
-    {:catch}
-      <p class="text-red-500">Failed to load client</p>
-    {/await}
+    <p>
+      {#if data.client}
+        {#if data.client.name}<strong>{data.client.name}</strong><br />{/if}
+        {#if data.client.email}{data.client.email}<br />{/if}
+        {#if data.client.street}{data.client.street}<br />{/if}
+        {#if data.client.state}{data.client.state}{/if}
+        {#if data.client.zip}{data.client.zip}{/if}
+      {:else}
+        No client found
+      {/if}
+    </p>
   </div>
   <div class="col-span-full sm:col-span-2 sm:col-start-5">
     <div class="label">Invoice Id:</div>
@@ -118,12 +104,12 @@
   </div>
   <div class="col-span-3">
     <div class="label">Due Date:</div>
-    <p>{convertDate(invoice?.dueDate.toISOString())}</p>
+    <p>{convertDate(invoice?.dueDate != null ? String(invoice.dueDate) : null)}</p>
   </div>
 
   <div class="col-span-3 sm:col-span-2 sm:col-start-5">
     <div class="label">Issue Date:</div>
-    <p>{convertDate(invoice?.issueDate.toISOString())}</p>
+    <p>{convertDate(invoice?.issueDate != null ? String(invoice.issueDate) : null)}</p>
   </div>
 
   <div class="col-span-full">
@@ -133,41 +119,25 @@
 
   <!-- line items div wrapper -->
   <div class="col-span-full">
-    {#await data.lineItemsPromise}
-      <div class="animate-pulse space-y-4">
-        <div class="flex justify-between border-b-2 pb-2">
-          <div class="h-4 w-24 rounded bg-gray-200"></div>
-          <div class="h-4 w-16 rounded bg-gray-200"></div>
-          <div class="h-4 w-12 rounded bg-gray-200"></div>
-          <div class="h-4 w-16 rounded bg-gray-200"></div>
-        </div>
-        <div class="h-10 w-full rounded bg-gray-100"></div>
-        <div class="h-10 w-full rounded bg-gray-100"></div>
-      </div>
-    {:then lineItems}
-      <LineItemRows
-        {lineItems}
-        isEditible={false}
-        addLineItem={() => {}}
-        removeLineItem={() => {}}
-        discount={invoice?.discount || 0}
-      />
-    {:catch}
-      <p class="text-red-500">Failed to load line items</p>
-    {/await}
+    <LineItemRows
+      lineItems={data.lineItems}
+      isEditible={false}
+      addLineItem={() => {}}
+      removeLineItem={() => {}}
+      discount={invoice?.discount || 0}
+    />
   </div>
 
-  {#if invoice?.notes}
+  {#if data.notesHtml}
     <div class="col-span-full">
       <div class="label">Notes:</div>
-      <MarkdownRenderer source={invoice.notes} />
+      <HtmlContent html={data.notesHtml} />
     </div>
   {/if}
-  {#if invoice?.terms}
+  {#if data.termsHtml}
     <div class="col-span-full">
       <div class="label">Terms and Conditions:</div>
-
-      <MarkdownRenderer source={invoice?.terms} />
+      <HtmlContent html={data.termsHtml} />
     </div>
   {/if}
 </section>

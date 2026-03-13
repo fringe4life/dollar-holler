@@ -3,19 +3,23 @@ import {
   normalizeToNull,
   transformNullToUndefined,
 } from "$lib/utils/typeHelpers";
-import type { InvoiceSelect, NewInvoice } from "$lib/validators";
+import type {
+  InvoiceListResponse,
+  InvoiceSelect,
+  NewInvoice,
+} from "$lib/validators";
 import { toast } from "svelte-sonner";
 
 class InvoicesStore {
   // Use $state for reactive class fields
-  invoices = $state<InvoiceSelect[]>([]);
+  invoices = $state<InvoiceListResponse[]>([]);
   loading = $state(false);
   error = $state<string | null>(null);
 
   // Use $derived for computed values
   isLoaded = $derived(this.invoices.length > 0 || this.error !== null);
 
-  // Load all invoices (without relations)
+  // Load all invoices (with client name and total)
   async loadInvoices() {
     this.loading = true;
     this.error = null;
@@ -26,17 +30,20 @@ class InvoicesStore {
         !invoiceData ||
         (typeof invoiceData === "object" && "error" in invoiceData)
       ) {
-        throw new Error(invoiceData?.error || "Failed to load invoices");
+        throw new Error(
+          (invoiceData as { error?: string })?.error ||
+            "Failed to load invoices"
+        );
       }
 
       // Update the reactive state
       this.invoices.length = 0;
       this.invoices.push(...invoiceData);
-    } catch (error_) {
+    } catch (error) {
       const errorMessage =
-        error_ instanceof Error ? error_.message : "Failed to load invoices";
+        error instanceof Error ? error.message : "Failed to load invoices";
       this.error = errorMessage;
-      console.error("Error loading invoices:", error_);
+      console.error("Error loading invoices:", error);
       toast.error(errorMessage);
     } finally {
       this.loading = false;
@@ -46,12 +53,19 @@ class InvoicesStore {
   // Load a single invoice by ID (without relations)
   async loadInvoiceById(id: string): Promise<InvoiceSelect | null> {
     try {
-      const { data: invoiceData } = await client.api.invoices({ id }).get();
+      const { data: invoiceData, error } = await client.api
+        .invoices({ id })
+        .get();
       if (
         !invoiceData ||
+        error ||
         (typeof invoiceData === "object" && "error" in invoiceData)
       ) {
-        throw new Error(invoiceData?.error || "Failed to load invoice");
+        throw new Error(
+          error?.value?.message ||
+            (invoiceData as { error?: string })?.error ||
+            "Failed to load invoice"
+        );
       }
 
       return invoiceData;
@@ -64,8 +78,10 @@ class InvoicesStore {
     }
   }
 
-  // Get invoices for a specific client
-  async getInvoicesByClientId(clientId: string): Promise<InvoiceSelect[]> {
+  // Get invoices for a specific client (with total)
+  async getInvoicesByClientId(
+    clientId: string
+  ): Promise<InvoiceListResponse[]> {
     try {
       const { data: invoiceData } = await client.api
         .clients({ id: clientId })
@@ -166,20 +182,8 @@ class InvoicesStore {
         toast.success("Invoice updated successfully");
         return invoiceData.id;
       }
-      // Add new invoice to state
+      // Add new invoice to state - form will call loadInvoices after line items are created
       const { id } = responseData as { id: string };
-      const newInvoice: InvoiceSelect = {
-        ...invoiceData,
-        id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        subject: normalizeToNull(invoiceData.subject),
-        discount: normalizeToNull(invoiceData.discount),
-        notes: normalizeToNull(invoiceData.notes),
-        terms: normalizeToNull(invoiceData.terms),
-        invoiceStatus: normalizeToNull(invoiceData.invoiceStatus),
-      };
-      this.invoices.unshift(newInvoice);
       toast.success("Invoice created successfully");
       return id;
     } catch (error_) {

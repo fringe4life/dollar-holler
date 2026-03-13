@@ -1,12 +1,26 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import Navbar from "$lib/components/Navbar.svelte";
   import { dummyClients, dummyInvoices } from "$lib/data";
+  import { getTotal } from "$lib/utils/moneyHelpers";
+  import type { InvoiceListResponse } from "$lib/validators";
   import ClientRow from "./(dashboard)/clients/ClientRow.svelte";
   import ClientRowHeader from "./(dashboard)/clients/ClientRowHeader.svelte";
   import InvoiceRow from "./(dashboard)/invoices/InvoiceRow.svelte";
   import InvoiceRowHeader from "./(dashboard)/invoices/InvoiceRowHeader.svelte";
 
   let { data } = $props();
+
+  const invoiceListItems = $derived(
+    dummyInvoices.map(
+      (inv) =>
+        ({
+          ...inv,
+          client: { name: inv.client.name },
+          total: getTotal(inv),
+        }) as InvoiceListResponse
+    )
+  );
 </script>
 
 <svelte:head>
@@ -49,8 +63,11 @@
           </h2>
           <InvoiceRowHeader />
           <div class="flex flex-col-reverse gap-4">
-            {#each dummyInvoices as invoice (invoice.id)}
-              <InvoiceRow {invoice} />
+            {#each invoiceListItems as invoice (invoice.id)}
+              <InvoiceRow
+                {invoice}
+                onEdit={(inv) => goto(`/invoices/${inv.id}`)}
+              />
             {/each}
           </div>
         </section>
@@ -62,8 +79,13 @@
           </h2>
           <ClientRowHeader />
           <div class="flex flex-col-reverse gap-4">
-            {#each dummyClients as client, index (client.id)}
-              <ClientRow bind:client={dummyClients[index]} />
+            {#each dummyClients as client (client.id)}
+              <ClientRow
+                {client}
+                onEdit={(c) => goto(`/clients/${c.id}`)}
+                onActivate={() => {}}
+                onArchive={() => {}}
+              />
             {/each}
           </div>
         </section>

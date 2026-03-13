@@ -1,35 +1,37 @@
 <script lang="ts">
-  import CircledAmount from '$lib/components/CircledAmount.svelte'
-  import Button from '$lib/components/ui/button/button.svelte'
-  import type { MouseEventHandler } from 'svelte/elements'
-  import type { LineItem } from '$lib/db/schema'
-  import LineItemRow from './LineItemRow.svelte'
-  import { centsToDollars, sumLineItems } from '$lib/utils/moneyHelpers'
+  import CircledAmount from "$lib/components/CircledAmount.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import type { LineItem } from "$lib/db/schema";
+  import type { BitsButton, Maybe } from "$lib/types";
+  import { centsToDollars, sumLineItems } from "$lib/utils/moneyHelpers";
+  import LineItemRow from "./LineItemRow.svelte";
 
   type Props = {
-    lineItems: LineItem[] | undefined
-    addLineItem: MouseEventHandler<HTMLButtonElement> & MouseEventHandler<HTMLAnchorElement>
-    removeLineItem: (id: string) => void
-    discount: number
-    isEditible?: boolean
-  }
+    lineItems: Maybe<LineItem[]>;
+    addLineItem: BitsButton;
+    removeLineItem: (id: string) => void;
+    discount: number;
+    isEditible?: boolean;
+  };
   let {
     discount = $bindable(),
-    lineItems = $bindable(),
+    lineItems: lineItems = $bindable(),
     addLineItem,
     removeLineItem,
     isEditible = true,
-  }: Props = $props()
+  }: Props = $props();
 
-  let subTotal = $derived<number>(sumLineItems(lineItems))
+  let subTotal = $derived<number>(sumLineItems(lineItems));
 
-  let discountAmount = $derived<number>(sumLineItems(lineItems) * (discount ? discount / 100 : 0))
+  let discountAmount = $derived<number>(
+    sumLineItems(lineItems) * (discount ? discount / 100 : 0)
+  );
 
   let total = $derived.by<string>(() => {
-    let final = Number(subTotal) - Number(discountAmount)
-    if (isNaN(final)) return '$0.00'
-    return centsToDollars(final)
-  })
+    let final = Number(subTotal) - Number(discountAmount);
+    if (isNaN(final)) return "$0.00";
+    return centsToDollars(final);
+  });
 </script>
 
 <div class="border-daisyBush invoice-line-item border-b-2 pb-2">
@@ -57,12 +59,16 @@
       <Button variant="textOnly" onclick={addLineItem}>+ Line Item</Button>
     {/if}
   </div>
-  <div class="text-monsoon py-5 text-right font-bold print:col-span-3">Subtotal</div>
+  <div class="text-monsoon py-5 text-right font-bold print:col-span-3">
+    Subtotal
+  </div>
   <div class="py-5 text-right font-mono">{subTotal}</div>
 </div>
 
 <div class="invoice-line-item">
-  <p class="text-monsoon col-span-1 py-5 text-right font-bold sm:col-span-2 print:col-span-3">
+  <p
+    class="text-monsoon col-span-1 py-5 text-right font-bold sm:col-span-2 print:col-span-3"
+  >
     Discount
   </p>
   <div class="relative">

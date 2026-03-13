@@ -1,4 +1,5 @@
 import type { Invoice, LineItem } from "$lib/db/schema";
+import type { List, Maybe } from "$lib/types";
 import type { InvoiceSelect } from "$lib/validators";
 
 /**
@@ -6,7 +7,7 @@ import type { InvoiceSelect } from "$lib/validators";
  * @param {LineItem[] | undefined} lineItems found on Invoices
  * @returns {number} the sum cost of the invoice
  */
-export const sumLineItems = (lineItems: LineItem[] | undefined): number => {
+export const sumLineItems = (lineItems: Maybe<LineItem[]>): number => {
   if (!lineItems) return 0;
 
   return lineItems.reduce((acc, cur) => {
@@ -16,26 +17,59 @@ export const sumLineItems = (lineItems: LineItem[] | undefined): number => {
     return (acc += cur.amount);
   }, 0);
 };
+const MONEY_FORMATTER = new Intl.NumberFormat("en", {
+  style: "currency",
+  currency: "USD",
+});
 /**
  * @abstract turns cent based money amounts into dollars
  * @param {number} cents the cents to be turned into a dollar amount
- * @returns {number} the amount of dollars based on the initial received cents
+ * @returns {string} formatted currency string
  */
-export const centsToDollars = (cents: number): string => {
-  return new Intl.NumberFormat("en", {
-    style: "currency",
-    currency: "USD",
-  }).format(cents / 100);
+export const centsToDollars = (cents: Maybe<number>): string => {
+  if (!cents) {
+    return MONEY_FORMATTER.format(0);
+  }
+  return MONEY_FORMATTER.format(cents / 100);
 };
 
 /**
- * @abstract returns the sum of the line items
- * @param {Invoice[] | undefined} invoices
- * @returns {number} the sum of all the Invoices
+ * @abstract formats a pre-computed total (in cents) for display, optionally applying discount
+ * @param {number} totalOrSubtotal total in cents, or subtotal if discountPercent provided
+ * @param {number | null | undefined} discountPercent optional discount percentage (0-100)
+ * @returns {string} formatted currency string
  */
-export const sumInvoices = (invoices: Invoice[] | undefined): number => {
+export const formatTotal = (
+  totalOrSubtotal: number,
+  discountPercent?: number | null
+): string => {
+  const total =
+    discountPercent != null && discountPercent > 0
+      ? totalOrSubtotal - totalOrSubtotal * (discountPercent / 100)
+      : totalOrSubtotal;
+  return centsToDollars(isNaN(total) ? 0 : total);
+};
+
+/**
+ * @abstract returns the sum of the line items (uses getTotal with lineItems)
+ * @param {Invoice[] | undefined} invoices invoices with lineItems
+ * @returns {number} the sum of all the Invoices in cents
+ */
+export const sumInvoices = (invoices: List<InvoiceSelect>): number => {
   if (!invoices) return 0;
   return invoices.reduce((acc, cur) => (acc += getTotal(cur)), 0);
+};
+
+/**
+ * @abstract returns the sum of pre-computed totals (for InvoiceListResponse etc.)
+ * @param {Array<{ total?: number }> | undefined} invoices invoices with total property
+ * @returns {number} the sum of all invoice totals in cents
+ */
+export const sumInvoiceTotals = <T extends { total?: number }>(
+  invoices: List<T>
+): number => {
+  if (!invoices) return 0;
+  return invoices.reduce((acc, cur) => acc + (cur.total ?? 0), 0);
 };
 
 /**
@@ -48,11 +82,13 @@ export const dollarsToCents = (dollars: number): number => {
 };
 
 /**
- * @abstract provides a displayable version of the total cost of the invoice
- * @param {Invoice} invoice the invoice to get the total for
- * @returns {string} a human friendly string to display to the user of the total
+ * @abstract provides the total cost of the invoice (subtotal - discount)
+ * @param {Invoice} invoice the invoice to get the total for (may have lineItems)
+ * @returns {number} total in cents
  */
-export const getTotal = (invoice: InvoiceSelect | undefined): number => {
+export const getTotal = (
+  invoice: (InvoiceSelect & { lineItems?: LineItem[] }) | undefined
+): number => {
   if (!invoice) {
     return 0;
   }

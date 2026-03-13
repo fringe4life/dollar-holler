@@ -5,7 +5,6 @@
   import { resolve } from "$app/paths";
   import { clickOutside } from "$lib/attachments/clickOutside";
   import { swipe } from "$lib/attachments/swipe.svelte";
-  import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Activate from "$lib/icon/Activate.svelte";
   import Archive from "$lib/icon/Archive.svelte";
   import Cancel from "$lib/icon/Cancel.svelte";
@@ -13,22 +12,23 @@
   import ThreeDots from "$lib/icon/ThreeDots.svelte";
   import Trash from "$lib/icon/Trash.svelte";
   import View from "$lib/icon/View.svelte";
-  import { centsToDollars, sumInvoices } from "$lib/utils/moneyHelpers";
-  import type { ClientWithInvoicesResponse } from "$lib/validators";
+  import { centsToDollars } from "$lib/utils/moneyHelpers";
+  import type { ClientListResponse } from "$lib/validators";
   import type { MouseEventHandler } from "svelte/elements";
-  import ClientForm from "./ClientForm.svelte";
   import ConfirmClientDelete from "./ConfirmClientDelete.svelte";
+
   type Props = {
-    client: ClientWithInvoicesResponse;
+    client: ClientListResponse;
+    onEdit: (client: ClientListResponse) => void;
+    onActivate: (client: ClientListResponse) => void;
+    onArchive: (client: ClientListResponse) => void;
   };
 
-  let { client = $bindable() }: Props = $props();
+  let { client, onEdit, onActivate, onArchive }: Props = $props();
 
-  let isFormShowing = $state<boolean>(false);
   let open = $state<boolean>(false);
-
   let isAdditionalMenuShowing = $state(false);
-  let isOptionsDisabled = $state(false);
+  let triggerReset = $state(false);
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true;
@@ -36,7 +36,7 @@
   };
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
-    isFormShowing = true;
+    onEdit(client);
     isAdditionalMenuShowing = false;
   };
 
@@ -45,12 +45,12 @@
   };
 
   const handleActivation: MouseEventHandler<HTMLButtonElement> = () => {
-    client.clientStatus = "active";
+    onActivate(client);
     isAdditionalMenuShowing = false;
   };
 
   const handleArchive: MouseEventHandler<HTMLButtonElement> = () => {
-    client.clientStatus = "archive";
+    onArchive(client);
     isAdditionalMenuShowing = false;
   };
 
@@ -58,26 +58,9 @@
     isAdditionalMenuShowing = false;
   };
 
-  const receivedInvoices = () => {
-    // find invoices that have been paid
-    const paidInvoices = sumInvoices(
-      client?.invoices?.filter((i) => i.invoiceStatus === "paid") || []
-    );
-    return centsToDollars(paidInvoices);
-    // get sum of those invoices
-  };
-
-  const balanceInvoices = () => {
-    const unpaidInvoices = sumInvoices(
-      client?.invoices?.filter((i) => i.invoiceStatus !== "paid") || []
-    );
-    return centsToDollars(unpaidInvoices);
-    // get sum of those invoices
-  };
-  let triggerReset = $state(false);
-
-  // @ts-expect-error - resolve function supports 2 arguments in SvelteKit v2.26+
-  const resolved = resolve("/clients/[id]", { id: client.id });
+  const receivedDisplay = $derived(centsToDollars(client.received ?? 0));
+  const balanceDisplay = $derived(centsToDollars(client.balance ?? 0));
+  const resolved = $derived(resolve(`/clients/${client.id}`));
 </script>
 
 <div class="relative isolate">
@@ -92,12 +75,12 @@
       {client.name}
     </div>
     <div class="received text-right font-mono text-sm font-bold lg:text-lg">
-      {receivedInvoices()}
+      {receivedDisplay}
     </div>
     <div
       class="text-scarlet balance text-right font-mono text-sm font-bold lg:text-lg"
     >
-      {balanceInvoices()}
+      {balanceDisplay}
     </div>
     <div class="view relative hidden place-self-center lg:block">
       <a
@@ -109,7 +92,7 @@
       <button
         {@attach isAdditionalMenuShowing && clickOutside(closeOptions)}
         onclick={handleMenu}
-        class="text-pastelPurple hover:text-daisyBushtransition-colors duration-200"
+        class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
         ><ThreeDots /></button
       >
       {#if isAdditionalMenuShowing}
@@ -119,14 +102,13 @@
               label: "Edit",
               icon: Edit,
               onclick: handleEdit,
-              disabled: isOptionsDisabled,
+              disabled: false,
             },
-
             {
               label: "Delete",
               icon: Trash,
               onclick: handleDelete,
-              disabled: isOptionsDisabled,
+              disabled: false,
             },
             {
               label: "Active",
@@ -173,26 +155,8 @@
 </div>
 
 {#snippet tag(title: string)}
-  <Badge class="ml-auto " variant="draft" size="small">{title}</Badge>
+  <Badge class="ml-auto" variant="draft" size="small">{title}</Badge>
 {/snippet}
-
-<SlidePanel bind:open={isFormShowing} buttonText="">
-  {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">
-      Edit an Invoice
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class="hidden">""</h2>
-  {/snippet}
-
-  <ClientForm
-    formState="edit"
-    bind:edit={client}
-    closePanel={() => (isFormShowing = false)}
-  />
-</SlidePanel>
 
 <ConfirmClientDelete bind:open {client} />
 
@@ -229,7 +193,5 @@
       content: "Balance: " / "Your balance is";
       @apply block text-xs font-bold lg:hidden;
     }
-  }
-  .view {
   }
 </style>

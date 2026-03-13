@@ -1,30 +1,39 @@
 <script lang="ts">
-  import type {
-    Invoice,
-    LineItem,
-    NewClient,
-    NewInvoice,
-  } from "$lib/db/schema";
+  import type { LineItem, NewClient, NewInvoice } from "$lib/db/schema";
   import Trash from "$lib/icon/Trash.svelte";
   import { clients, clientsStore } from "$lib/stores/clientsStore.svelte";
   import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
   import { lineItemsStore } from "$lib/stores/lineItemsStore.svelte";
+  import type { BitsButton } from "$lib/types";
   import { today } from "$lib/utils/dateHelpers";
+  import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
   import { states } from "$lib/utils/states";
+  import type { InvoiceSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-  import type { FormEventHandler, MouseEventHandler } from "svelte/elements";
+  import type { FormEventHandler } from "svelte/elements";
   import { slide } from "svelte/transition";
   import ConfirmDelete from "../../routes/(dashboard)/invoices/ConfirmDelete.svelte";
   import LineItemRows from "../../routes/(dashboard)/invoices/LineItemRows.svelte";
   import Button from "./ui/button/button.svelte";
+
+  const defaultLineItem = (): LineItem => ({
+    id: crypto.randomUUID(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    userId: "",
+    description: "",
+    invoiceId: "",
+    quantity: 0,
+    amount: 0,
+  });
 
   type Panel = {
     closePanel: () => void;
   };
 
   type EditProps = {
-    invoiceEdit: Invoice;
+    invoiceEdit: InvoiceSelect;
     formState: "edit";
   } & Panel;
 
@@ -62,43 +71,36 @@
     userId: "", // This will be set from the session
   });
 
-  // Separate state for line items (not part of NewInvoice)
-  let lineItems: LineItem[] = $state([
-    {
-      id: crypto.randomUUID(),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: "",
-      description: "",
-      invoiceId: "",
-      quantity: 0,
-      amount: 0,
-    },
-  ]);
+  let lineItems: LineItem[] = $state([defaultLineItem()]);
+  let lineItemsLoaded = $state(true);
 
-  // Initialize form data based on edit mode (one-time, on mount)
   // svelte-ignore state_referenced_locally
-  if (formState === "edit" && invoiceEdit) {
-    // Extract only the fields we need for the form
-    invoice = invoiceEdit;
-    // Line items will be handled separately
-  }
+  let discount = $state<number>(invoice.discount ?? 0);
 
-  const addLineItem: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = () => {
-    lineItems = [
-      ...lineItems,
-      {
-        id: crypto.randomUUID(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        userId: "",
-        description: "",
-        invoiceId: "",
-        quantity: 0,
-        amount: 0,
-      },
-    ];
+  $effect(() => {
+    const isEdit = formState === "edit";
+    const editId = invoiceEdit?.id;
+    if (isEdit && editId) {
+      lineItemsLoaded = false;
+      lineItemsStore.loadLineItemsByInvoiceId(editId).then((items) => {
+        lineItems = items.length > 0 ? items : [defaultLineItem()];
+        lineItemsLoaded = true;
+      });
+    } else if (!isEdit) {
+      lineItems = [defaultLineItem()];
+      lineItemsLoaded = true;
+    }
+  });
+
+  $effect(() => {
+    if (formState === "edit" && invoiceEdit) {
+      invoice = { ...invoiceEdit };
+      discount = invoiceEdit.discount ?? 0;
+    }
+  });
+
+  const addLineItem: BitsButton = () => {
+    lineItems = [...lineItems, defaultLineItem()];
   };
 
   const removeLineItem = (id: string) => {
@@ -118,9 +120,10 @@
     userId: "", // This will be set from the session
   });
 
-  // Use $state for discount - syncs bidirectionally with invoice.discount
-  // svelte-ignore state_referenced_locally
-  let discount = $state<number>(invoice.discount ?? 0);
+  const clientName = $derived(
+    clients.find((c) => c.id === invoice.clientId)?.name ?? "Unknown"
+  );
+  const totalDisplay = $derived(formatTotal(sumLineItems(lineItems), discount));
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -204,6 +207,7 @@
         await lineItemsStore.createLineItems(invoiceId, normalizedLineItems);
       }
     }
+    await invoicesStore.loadInvoices();
     console.log("[InvoiceForm] upsert success");
     closePanel();
   };
@@ -360,7 +364,25 @@
   </div>
   <!-- line items -->
   <div class="field col-span-6">
-    <LineItemRows bind:discount bind:lineItems {addLineItem} {removeLineItem} />
+    {#if !lineItemsLoaded}
+      <div class="space-y-4">
+        <div class="flex justify-between border-b-2 pb-2">
+          <div class="h-4 w-24 rounded bg-gray-200"></div>
+          <div class="h-4 w-16 rounded bg-gray-200"></div>
+          <div class="h-4 w-12 rounded bg-gray-200"></div>
+          <div class="h-4 w-16 rounded bg-gray-200"></div>
+        </div>
+        <div class="h-10 w-full rounded bg-gray-100 animate-pulse"></div>
+        <div class="h-10 w-full rounded bg-gray-100 animate-pulse"></div>
+      </div>
+    {:else}
+      <LineItemRows
+        bind:discount
+        bind:lineItems
+        {addLineItem}
+        {removeLineItem}
+      />
+    {/if}
   </div>
 
   <!-- notes -->
@@ -401,4 +423,9 @@
   <option {value}>{name}</option>
 {/snippet}
 
-<ConfirmDelete {invoice} bind:open />
+<ConfirmDelete
+  bind:open
+  invoiceId={invoice.id ?? ""}
+  {clientName}
+  {totalDisplay}
+/>

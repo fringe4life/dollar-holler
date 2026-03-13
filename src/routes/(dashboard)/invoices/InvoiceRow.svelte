@@ -3,8 +3,6 @@
   import { clickOutside } from "$lib/attachments/clickOutside";
   import { swipe } from "$lib/attachments/swipe.svelte";
   import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
-  import InvoiceForm from "$lib/components/InvoiceForm.svelte";
-  import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Badge, {
     type BadgeVariant,
   } from "$lib/components/ui/badge/badge.svelte";
@@ -15,49 +13,44 @@
   import Trash from "$lib/icon/Trash.svelte";
   import View from "$lib/icon/View.svelte";
   import { convertDate, isLate } from "$lib/utils/dateHelpers";
-  import { centsToDollars, getTotal } from "$lib/utils/moneyHelpers";
-  import type { InvoiceWithRelationsResponse } from "$lib/validators";
+  import { formatTotal } from "$lib/utils/moneyHelpers";
+  import type { InvoiceListResponse } from "$lib/validators";
   import type { MouseEventHandler } from "svelte/elements";
   import ConfirmDelete from "./ConfirmDelete.svelte";
 
   let isAdditionalMenuShowing = $state(false);
-  let isOptionsDisabled = $state(false);
   let triggerReset = $state(false);
 
   type Props = {
-    invoice: InvoiceWithRelationsResponse;
+    invoice: InvoiceListResponse;
+    onEdit: (invoice: InvoiceListResponse) => void;
   };
 
-  let { invoice }: Props = $props();
+  let { invoice, onEdit }: Props = $props();
 
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
     isAdditionalMenuShowing = !isAdditionalMenuShowing;
   };
 
+  // Pure: only returns the label, no mutations
   const getLabel = (
     label: BadgeVariant,
     dueDate: string | null
   ): BadgeVariant => {
-    if (label === "draft") {
-      return "draft";
-    } else if (label === "sent" && isLate?.(dueDate)) {
-      isOptionsDisabled = true;
-      return "late";
-    } else if (label === "sent" && !isLate?.(dueDate)) {
-      isOptionsDisabled = true;
-      return "sent";
-    } else if (label === "paid") {
-      isOptionsDisabled = true;
-      return "paid";
-    }
+    if (label === "draft") return "draft";
+    if (label === "sent" && isLate?.(dueDate)) return "late";
+    if (label === "sent" && !isLate?.(dueDate)) return "sent";
+    if (label === "paid") return "paid";
+    return "draft"; // fallback
   };
+
+  // Derive both from invoice
 
   const closeOptions = () => {
     isAdditionalMenuShowing = false;
   };
 
   let open = $state<boolean>(false);
-  let isInvoiceShowingPanel = $state<boolean>(false);
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true;
@@ -65,25 +58,26 @@
   };
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
-    isInvoiceShowingPanel = true;
+    onEdit(invoice);
     isAdditionalMenuShowing = false;
   };
 
+  // TODO: Implement send invoice functionality
   const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {};
 
-  // svelte-ignore state_referenced_locally
-  const {
-    id,
-    invoiceStatus,
-    dueDate,
-    invoiceNumber,
-    client,
-  }: InvoiceWithRelationsResponse = invoice;
+  const id = $derived(invoice.id);
+  const dueDate = $derived(invoice.dueDate);
+  const invoiceNumber = $derived(invoice.invoiceNumber);
+  const client = $derived(invoice.client);
+  const total = $derived(invoice.total);
+  const totalDisplay = $derived(formatTotal(total));
+  const invoiceStatus = $derived(invoice.invoiceStatus);
 
-  const label = getLabel(invoiceStatus ?? "draft", dueDate.toISOString());
-
-  // @ts-expect-error - resolve function supports 2 arguments in SvelteKit v2.26+
-  const resolved = resolve("/invoices/[id]", { id });
+  const label = $derived(
+    getLabel(invoiceStatus ?? "draft", dueDate.toISOString())
+  );
+  const isOptionsDisabled = $derived(label !== "draft");
+  const resolved = $derived(resolve(`/invoices/${id}`));
 </script>
 
 <div class="relative isolate">
@@ -98,7 +92,7 @@
     <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
     <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
     <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
-      {centsToDollars(getTotal(invoice))}
+      {totalDisplay}
     </div>
     <div
       class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
@@ -170,25 +164,12 @@
   <Badge class="ml-auto lg:ml-0" variant={title} size="small">{title}</Badge>
 {/snippet}
 
-<ConfirmDelete bind:open {invoice} />
-
-<SlidePanel bind:open={isInvoiceShowingPanel} buttonText="">
-  {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">
-      Edit an Invoice
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class="hidden">""</h2>
-  {/snippet}
-
-  <InvoiceForm
-    formState="edit"
-    bind:invoiceEdit={invoice}
-    closePanel={() => (isInvoiceShowingPanel = false)}
-  />
-</SlidePanel>
+<ConfirmDelete
+  bind:open
+  invoiceId={id}
+  clientName={client.name}
+  {totalDisplay}
+/>
 
 <style>
   @reference "../../../app.css";

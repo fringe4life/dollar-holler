@@ -1,5 +1,4 @@
 <script lang="ts">
-  import ClientWithInvoices from "$lib/components/ClientWithInvoices.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -9,13 +8,18 @@
     error,
     loading,
   } from "$lib/stores/clientsStore.svelte";
+  import type { ClientListResponse, ClientSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import NoSearchResults from "../invoices/NoSearchResults.svelte";
   import BlankState from "./BlankState.svelte";
   import ClientForm from "./ClientForm.svelte";
+  import ClientRow from "./ClientRow.svelte";
+  import ClientRowHeader from "./ClientRowHeader.svelte";
 
   let searchTerms = $state("");
   let isFormVisible = $state<boolean>(false);
+  let isEditPanelOpen = $state<boolean>(false);
+  let editingClient = $state<ClientSelect | null>(null);
 
   // Derived state for filtered clients
   const filteredClients = $derived.by(() => {
@@ -42,6 +46,24 @@
 
   const handleSearch = (terms: string) => {
     searchTerms = terms;
+  };
+
+  const handleEdit = (client: ClientListResponse) => {
+    editingClient = client;
+    isEditPanelOpen = true;
+  };
+
+  const closeEditPanel = () => {
+    isEditPanelOpen = false;
+    editingClient = null;
+  };
+
+  const handleActivate = async (client: ClientListResponse) => {
+    await clientsStore.upsertClient({ ...client, clientStatus: "active" });
+  };
+
+  const handleArchive = async (client: ClientListResponse) => {
+    await clientsStore.upsertClient({ ...client, clientStatus: "archive" });
   };
 </script>
 
@@ -84,11 +106,18 @@
   {:else if filteredClients.length === 0}
     <NoSearchResults />
   {:else}
-    <!-- client cards with invoices loaded separately -->
-    <div class="space-y-4">
-      {#each filteredClients as client (client.id)}
-        <ClientWithInvoices {client} />
-      {/each}
+    <div>
+      <ClientRowHeader />
+      <div class="flex flex-col-reverse gap-4">
+        {#each filteredClients as client (client.id)}
+          <ClientRow
+            {client}
+            onEdit={handleEdit}
+            onActivate={handleActivate}
+            onArchive={handleArchive}
+          />
+        {/each}
+      </div>
     </div>
   {/if}
 </div>
@@ -111,4 +140,24 @@
     formState="create"
     closePanel={() => (isFormVisible = false)}
   />
+</SlidePanel>
+
+<SlidePanel bind:open={isEditPanelOpen} buttonText="">
+  {#snippet title()}
+    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">
+      Edit a Client
+    </h2>
+  {/snippet}
+
+  {#snippet description()}
+    <h2 class="hidden">""</h2>
+  {/snippet}
+
+  {#if isEditPanelOpen && editingClient}
+    <ClientForm
+      formState="edit"
+      edit={editingClient}
+      closePanel={closeEditPanel}
+    />
+  {/if}
 </SlidePanel>

@@ -1,10 +1,10 @@
 <script lang="ts">
   import Icon, { type IconProps } from "$lib/components/Icon.svelte"
 
-  let { width, height }: IconProps = $props()
+  let { width, height, ...rest }: IconProps = $props()
 </script>
 
-<Icon {width} {height}>
+<Icon {width} {height} {...rest}>
   <path
     d="M24 11.5C24 11.5 18.9285 4 12 4C5.0715 4 0 11.5 0 11.5C0 11.5 5.0715 19 12 19C18.9285 19 24 11.5 24 11.5ZM12 16C9.5145 16 7.5 13.987 7.5 11.5C7.5 9.013 9.5145 7 12 7C14.484 7 16.5 9.013 16.5 11.5C16.5 13.987 14.484 16 12 16Z"
   />

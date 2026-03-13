@@ -1,6 +1,5 @@
 <script lang="ts">
   import InvoiceForm from "$lib/components/InvoiceForm.svelte";
-  import InvoiceWithDetails from "$lib/components/InvoiceWithDetails.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -10,12 +9,17 @@
     invoicesStore,
     loading,
   } from "$lib/stores/invoicesStore.svelte";
+  import type { InvoiceListResponse, InvoiceSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import BlankState from "./BlankState.svelte";
+  import InvoiceRow from "./InvoiceRow.svelte";
+  import InvoiceRowHeader from "./InvoiceRowHeader.svelte";
   import NoSearchResults from "./NoSearchResults.svelte";
 
   let searchTerms = $state<string>("");
   let isFormVisible = $state<boolean>(false);
+  let isEditPanelOpen = $state<boolean>(false);
+  let editingInvoice = $state<InvoiceSelect | null>(null);
   let { data } = $props();
 
   // Derived state for filtered invoices
@@ -29,7 +33,6 @@
           .includes(searchTerms.toLowerCase()) ||
         invoice.subject?.toLowerCase().includes(searchTerms.toLowerCase()) ||
         invoice.invoiceStatus?.toLowerCase().includes(searchTerms.toLowerCase())
-        // invoice.total?.toString().includes(searchTerms)
       );
     });
   });
@@ -40,6 +43,16 @@
 
   const handleSearch = (terms: string) => {
     searchTerms = terms;
+  };
+
+  const handleEdit = (invoice: InvoiceListResponse) => {
+    editingInvoice = invoice;
+    isEditPanelOpen = true;
+  };
+
+  const closeEditPanel = () => {
+    isEditPanelOpen = false;
+    editingInvoice = null;
   };
 </script>
 
@@ -82,10 +95,10 @@
   {:else if filteredInvoices.length === 0}
     <NoSearchResults />
   {:else}
-    <!-- invoice cards with details loaded separately -->
-    <div class="space-y-4">
+    <div>
+      <InvoiceRowHeader />
       {#each filteredInvoices as invoice (invoice.id)}
-        <InvoiceWithDetails {invoice} />
+        <InvoiceRow {invoice} onEdit={handleEdit} />
       {/each}
     </div>
   {/if}
@@ -112,4 +125,25 @@
       isFormVisible = false;
     }}
   />
+</SlidePanel>
+
+<SlidePanel bind:open={isEditPanelOpen} buttonText="">
+  {#snippet title()}
+    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">
+      Edit an Invoice
+    </h2>
+  {/snippet}
+
+  {#snippet description()}
+    <h2 class="hidden">""</h2>
+  {/snippet}
+
+  {#if isEditPanelOpen && editingInvoice}
+    <InvoiceForm
+      formState="edit"
+      bind:invoiceEdit={editingInvoice}
+      userId={data.user?.id ?? ""}
+      closePanel={closeEditPanel}
+    />
+  {/if}
 </SlidePanel>

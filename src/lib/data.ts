@@ -1,4 +1,5 @@
 import type {
+  ClientListResponse,
   ClientSelect,
   InvoiceSelect,
   LineItemSelect,
@@ -10,11 +11,7 @@ export type DummyInvoice = InvoiceSelect & {
   lineItems: LineItemSelect[];
 };
 
-export type DummyClient = ClientSelect & {
-  invoices: (InvoiceSelect & {
-    lineItems: LineItemSelect[];
-  })[];
-};
+export type DummyClient = ClientListResponse;
 
 // Dummy invoice data
 export const dummyInvoices: DummyInvoice[] = [
@@ -180,7 +177,7 @@ export const dummyInvoices: DummyInvoice[] = [
   },
 ];
 
-// Dummy client data
+// Dummy client data (ClientListResponse: received/balance in cents)
 export const dummyClients: DummyClient[] = [
   {
     id: "client-1",
@@ -194,35 +191,8 @@ export const dummyClients: DummyClient[] = [
     userId: "user-1",
     createdAt: new Date(),
     updatedAt: new Date(),
-    invoices: [
-      {
-        id: "1",
-        invoiceNumber: "INV-001",
-        dueDate: new Date("2024-02-15"),
-        invoiceStatus: "sent",
-        clientId: "client-1",
-        issueDate: new Date("2024-01-15"),
-        subject: null,
-        discount: null,
-        notes: null,
-        terms: null,
-        userId: "user-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lineItems: [
-          {
-            id: "1",
-            description: "Web Development Services",
-            quantity: 40,
-            amount: 500000,
-            invoiceId: "1",
-            userId: "user-1",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      },
-    ],
+    received: 0,
+    balance: 500000, // $5,000 from INV-001 (sent)
   },
   {
     id: "client-2",
@@ -236,35 +206,8 @@ export const dummyClients: DummyClient[] = [
     userId: "user-1",
     createdAt: new Date(),
     updatedAt: new Date(),
-    invoices: [
-      {
-        id: "2",
-        invoiceNumber: "INV-002",
-        dueDate: new Date("2024-02-20"),
-        invoiceStatus: "paid",
-        clientId: "client-2",
-        issueDate: new Date("2024-01-20"),
-        subject: null,
-        discount: null,
-        notes: null,
-        terms: null,
-        userId: "user-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lineItems: [
-          {
-            id: "2",
-            description: "Consulting Services",
-            quantity: 20,
-            amount: 300000,
-            invoiceId: "2",
-            userId: "user-1",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      },
-    ],
+    received: 300000, // $3,000 from INV-002 (paid)
+    balance: 0,
   },
   {
     id: "client-3",
@@ -278,35 +221,8 @@ export const dummyClients: DummyClient[] = [
     userId: "user-1",
     createdAt: new Date(),
     updatedAt: new Date(),
-    invoices: [
-      {
-        id: "3",
-        invoiceNumber: "INV-003",
-        dueDate: new Date("2024-01-30"),
-        invoiceStatus: "sent",
-        clientId: "client-3",
-        issueDate: new Date("2024-01-01"),
-        subject: null,
-        discount: null,
-        notes: null,
-        terms: null,
-        userId: "user-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lineItems: [
-          {
-            id: "3",
-            description: "Project Management",
-            quantity: 30,
-            amount: 300000,
-            invoiceId: "3",
-            userId: "user-1",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      },
-    ],
+    received: 0,
+    balance: 300000, // $3,000 from INV-003 (sent)
   },
   {
     id: "client-4",
@@ -320,34 +236,7 @@ export const dummyClients: DummyClient[] = [
     userId: "user-1",
     createdAt: new Date(),
     updatedAt: new Date(),
-    invoices: [
-      {
-        id: "4",
-        invoiceNumber: "INV-004",
-        dueDate: new Date("2024-02-25"),
-        invoiceStatus: "draft",
-        clientId: "client-4",
-        issueDate: new Date("2024-01-25"),
-        subject: null,
-        discount: null,
-        notes: null,
-        terms: null,
-        userId: "user-1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        lineItems: [
-          {
-            id: "4",
-            description: "Design Services",
-            quantity: 15,
-            amount: 180000,
-            invoiceId: "4",
-            userId: "user-1",
-            createdAt: new Date(),
-            updatedAt: new Date(),
-          },
-        ],
-      },
-    ],
+    received: 0,
+    balance: 180000, // $1,800 from INV-004 (draft)
   },
 ];

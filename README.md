@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.53.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.53.3-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-beta-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.26-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.1-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.55.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.53.11-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.5.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.27-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.1-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
 
@@ -79,8 +79,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run format` - Format source with Prettier
 - `bun run lint` - Run Prettier check and ESLint
 - `bun run lint:fix` - Auto-fix lint and formatting issues
-- `bun run ultracite` - Run Ultracite linting and best-practices checks
-- `bun run ultracite:fix` - Autofix Ultracite issues where possible
+- `bun run ultracite:check` - Run Ultracite checks directly
 - `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
 - `bun run fix` - Convenience script to run the main fix pipeline
 
@@ -147,7 +146,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Modern Authentication:** Better Auth with email/password support
 - **Type-Safe Database:** Drizzle ORM with full TypeScript support
 - **Serverless Ready:** Neon HTTP driver for Vercel deployment
-- **Resilient IDs:** CUID2 for cursor-based navigation and better performance
+- **Resilient IDs:** Bun UUIDv7 for cursor-based navigation and performance
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Reset password supported; token is read from URL and validated

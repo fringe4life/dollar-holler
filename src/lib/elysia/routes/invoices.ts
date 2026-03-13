@@ -1,10 +1,15 @@
 /* eslint-disable new-cap */
 import { db } from "$lib/db";
 import {
+  clients as clientsTable,
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
+import {
+  lineItemsTotalSubquery,
+  mapRowsWithTotal,
+} from "../invoiceListHelpers";
 import { Elysia, t } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 
@@ -48,11 +53,42 @@ const invoiceWithRelationsSchema = t.Object({
 
 export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   .use(betterAuthPlugin)
-  // GET /api/invoices - List all invoices
+  // GET /api/invoices - List all invoices with client name and total (single query)
   .get("/", async () => {
     try {
-      const result = await db.query.invoices.findMany();
-      return result;
+      const rows = await db
+        .select({
+          id: invoicesTable.id,
+          userId: invoicesTable.userId,
+          invoiceNumber: invoicesTable.invoiceNumber,
+          clientId: invoicesTable.clientId,
+          subject: invoicesTable.subject,
+          issueDate: invoicesTable.issueDate,
+          dueDate: invoicesTable.dueDate,
+          discount: invoicesTable.discount,
+          notes: invoicesTable.notes,
+          terms: invoicesTable.terms,
+          invoiceStatus: invoicesTable.invoiceStatus,
+          createdAt: invoicesTable.createdAt,
+          updatedAt: invoicesTable.updatedAt,
+          clientName: clientsTable.name,
+          subtotal: lineItemsTotalSubquery.subtotal,
+        })
+        .from(invoicesTable)
+        .leftJoin(clientsTable, eq(invoicesTable.clientId, clientsTable.id))
+        .leftJoin(
+          lineItemsTotalSubquery,
+          eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
+        );
+
+      const withTotal = mapRowsWithTotal(rows);
+      return withTotal.map((row) => {
+        const { clientName, ...rest } = row;
+        return {
+          ...rest,
+          client: { name: clientName ?? "Unknown" },
+        };
+      });
     } catch (error) {
       return { error: "Failed to load invoices" };
     }
@@ -91,13 +127,17 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // GET /api/invoices/:id - Get single invoice
   .get(
     "/:id",
-    async ({ params: { id } }) => {
+    async ({ params: { id }, set }) => {
       try {
-        return await db.query.invoices.findFirst({
+        const invoice = await db.query.invoices.findFirst({
           where: { id },
         });
+        if (!invoice) {
+          set.status = 404;
+          return { error: "Invoice not found" };
+        }
+        return invoice;
       } catch (error) {
-        console.error("Error loading invoice:", error);
         return { error: "Failed to load invoice" };
       }
     },
@@ -110,7 +150,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // PUT /api/invoices/:id - Update invoice
   .put(
     "/:id",
-    async ({ params: { id }, body, user }) => {
+    async ({ params: { id }, body }) => {
       try {
         const { lineItems, client, ...updateData } = body;
 

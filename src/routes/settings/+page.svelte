@@ -7,7 +7,20 @@
   import { states } from "$lib/utils/states";
   import { onMount } from "svelte";
 
-  let mySettings: Settings = {} as Settings;
+  const { data } = $props();
+
+  let mySettings = $state({
+    myName: "",
+    email: "",
+    street: "",
+    city: "",
+    state: "",
+    zip: "",
+    id: "",
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    userId: "",
+  } satisfies Settings);
   onMount(async () => {
     console.log("[settings list] loadSettings() called");
     await settingsStore.loadSettings();
@@ -27,7 +40,7 @@
 </script>
 
 <div class="bg-whisper grid min-h-dvh grid-cols-12 md:gap-x-16">
-  <Navbar />
+  <Navbar user={data?.user} />
   <main
     class="col-span-12 px-4 pt-4 md:col-span-8 md:col-start-4 md:pt-20 lg:col-span-6 lg:col-start-5"
   >

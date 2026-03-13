@@ -1,16 +1,17 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Search from "$lib/components/Search.svelte";
-  import { centsToDollars, sumInvoices } from "$lib/utils/moneyHelpers";
+  import { centsToDollars, sumInvoiceTotals } from "$lib/utils/moneyHelpers";
   import BlankState from "../BlankState.svelte";
 
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";
   import Edit from "$lib/icon/Edit.svelte";
   import { invoices, invoicesStore } from "$lib/stores/invoicesStore.svelte";
+  import type { BitsButton } from "$lib/types";
   import { isLate } from "$lib/utils/dateHelpers";
   import { onMount } from "svelte";
-  import type { MouseEventHandler } from "svelte/elements";
   import InvoiceRow from "../../invoices/InvoiceRow.svelte";
   import InvoiceRowHeader from "../../invoices/InvoiceRowHeader.svelte";
   import ClientForm, { type Props } from "../ClientForm.svelte";
@@ -30,8 +31,7 @@
     invoices.filter((invoice) => invoice.clientId === data.client.id)
   );
 
-  const handleEdit: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = () => {
+  const handleEdit: BitsButton = () => {
     isEditing = "edit";
     isFormShowing = true;
   };
@@ -40,34 +40,28 @@
     const draftInvoices = clientInvoices.filter(
       (i) => i.invoiceStatus === "draft"
     );
-    return centsToDollars(sumInvoices(draftInvoices));
+    return centsToDollars(sumInvoiceTotals(draftInvoices));
   };
 
   const getPaid = (): string => {
     const paidInvoices = clientInvoices.filter(
       (i) => i.invoiceStatus === "paid"
     );
-    return centsToDollars(sumInvoices(paidInvoices));
+    return centsToDollars(sumInvoiceTotals(paidInvoices));
   };
 
   const getOverdue = (): string => {
-    const overdueInvoices = clientInvoices.filter((i) => {
-      if (isLate(i.dueDate.toISOString()) && i.invoiceStatus === "sent") {
-        return true;
-      }
-      return false;
-    });
-    return centsToDollars(sumInvoices(overdueInvoices));
+    const overdueInvoices = clientInvoices.filter(
+      (i) => isLate(i.dueDate.toISOString()) && i.invoiceStatus === "sent"
+    );
+    return centsToDollars(sumInvoiceTotals(overdueInvoices));
   };
 
   const getOustanding = (): string => {
-    const overdueInvoices = clientInvoices.filter((i) => {
-      if (!isLate(i.dueDate.toISOString()) && i.invoiceStatus === "sent") {
-        return true;
-      }
-      return false;
-    });
-    return centsToDollars(sumInvoices(overdueInvoices));
+    const outstandingInvoices = clientInvoices.filter(
+      (i) => !isLate(i.dueDate.toISOString()) && i.invoiceStatus === "sent"
+    );
+    return centsToDollars(sumInvoiceTotals(outstandingInvoices));
   };
 
   const handleSearch = async (searchTerms: string) => {
@@ -130,11 +124,18 @@
     <InvoiceRowHeader />
     <div class="flex flex-col-reverse">
       {#each clientInvoices as i (i.invoiceNumber)}
-        <InvoiceRow invoice={{ ...i, client }} />
+        <InvoiceRow
+          invoice={{
+            ...i,
+            client: { name: client.name },
+            total: i.total,
+          }}
+          onEdit={(inv) => goto(`/invoices/${inv.id}`)}
+        />
       {/each}
     </div>
     <CircledAmount
-      amount={centsToDollars(sumInvoices(clientInvoices))}
+      amount={centsToDollars(sumInvoiceTotals(clientInvoices))}
       label="Total"
     />
   {:else}

@@ -1,18 +1,17 @@
 <script lang="ts">
   import Modal from "$lib/components/Modal.svelte";
   import { Button } from "$lib/components/ui/button";
-  import type { MouseEventHandler } from "svelte/elements";
 
-  import type { Client } from "$lib/db/schema";
   import { clientsStore } from "$lib/stores/clientsStore.svelte";
+  import type { BitsButton } from "$lib/types";
+  import type { ClientListResponse } from "$lib/validators";
 
   type Props = {
     open: boolean;
-    client: Client;
+    client: ClientListResponse;
   };
 
-  const handleDelete: MouseEventHandler<HTMLButtonElement> &
-    MouseEventHandler<HTMLAnchorElement> = async () => {
+  const handleDelete: BitsButton = async () => {
     open = false;
     await clientsStore.deleteClient(client.id);
   };

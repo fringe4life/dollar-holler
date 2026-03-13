@@ -1,6 +1,6 @@
 <script lang="ts">
   import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
-  import { centsToDollars, getTotal } from "$lib/utils/moneyHelpers";
+  import { centsToDollars } from "$lib/utils/moneyHelpers";
   import type { ClientSelect } from "$lib/validators";
 
   let { client }: { client: ClientSelect } = $props();
@@ -41,7 +41,7 @@
             <div class="border-l-2 border-blue-200 pl-2 text-sm">
               <div class="font-medium">#{invoice.invoiceNumber}</div>
               <div class="text-gray-600">
-                ${centsToDollars(getTotal(invoice))}
+                ${centsToDollars(invoice.total ?? 0)}
               </div>
             </div>
           {/each}

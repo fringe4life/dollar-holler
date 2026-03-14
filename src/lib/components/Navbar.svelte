@@ -4,11 +4,12 @@
   import { page } from "$app/state";
   import Close from "$lib/icon/Close.svelte";
   import Hamburger from "$lib/icon/Hamburger.svelte";
+  import type { Maybe } from "$lib/types";
   import type { User } from "better-auth";
   import type { MouseEventHandler } from "svelte/elements";
 
   type Props = {
-    user: User | null;
+    user: Maybe<User>;
   };
 
   let { user = null }: Props = $props();

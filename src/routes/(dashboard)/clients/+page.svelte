@@ -8,6 +8,7 @@
     error,
     loading,
   } from "$lib/stores/clientsStore.svelte";
+  import type { Maybe } from "$lib/types";
   import type { ClientListResponse, ClientSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import NoSearchResults from "../invoices/NoSearchResults.svelte";
@@ -19,7 +20,7 @@
   let searchTerms = $state("");
   let isFormVisible = $state<boolean>(false);
   let isEditPanelOpen = $state<boolean>(false);
-  let editingClient = $state<ClientSelect | null>(null);
+  let editingClient = $state<Maybe<ClientSelect>>(null);
 
   // Derived state for filtered clients
   const filteredClients = $derived.by(() => {

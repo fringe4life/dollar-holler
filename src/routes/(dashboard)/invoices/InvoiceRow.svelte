@@ -12,14 +12,12 @@
   import ThreeDots from "$lib/icon/ThreeDots.svelte";
   import Trash from "$lib/icon/Trash.svelte";
   import View from "$lib/icon/View.svelte";
-  import { convertDate, isLate } from "$lib/utils/dateHelpers";
+  import { convertDate } from "$lib/utils/dateHelpers";
+  import { getLabel } from "$lib/utils/labelHelpers";
   import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { InvoiceListResponse } from "$lib/validators";
   import type { MouseEventHandler } from "svelte/elements";
   import ConfirmDelete from "./ConfirmDelete.svelte";
-
-  let isAdditionalMenuShowing = $state(false);
-  let triggerReset = $state(false);
 
   type Props = {
     invoice: InvoiceListResponse;
@@ -27,24 +25,12 @@
   };
 
   let { invoice, onEdit }: Props = $props();
+  let isAdditionalMenuShowing = $state(false);
+  let triggerReset = $state(false);
 
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
     isAdditionalMenuShowing = !isAdditionalMenuShowing;
   };
-
-  // Pure: only returns the label, no mutations
-  const getLabel = (
-    label: BadgeVariant,
-    dueDate: string | null
-  ): BadgeVariant => {
-    if (label === "draft") return "draft";
-    if (label === "sent" && isLate?.(dueDate)) return "late";
-    if (label === "sent" && !isLate?.(dueDate)) return "sent";
-    if (label === "paid") return "paid";
-    return "draft"; // fallback
-  };
-
-  // Derive both from invoice
 
   const closeOptions = () => {
     isAdditionalMenuShowing = false;

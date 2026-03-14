@@ -1,12 +1,13 @@
 import { client } from "$lib/client";
+import type { Maybe } from "$lib/types";
 import { type SettingsResponse } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
 class SettingsStore {
   // Use $state for reactive class fields
-  settings = $state<SettingsResponse | null>(null);
+  settings = $state<Maybe<SettingsResponse>>(null);
   loading = $state(false);
-  error = $state<string | null>(null);
+  error = $state<Maybe<string>>(null);
 
   // Use $derived for computed values
   isLoaded = $derived(this.settings !== null);

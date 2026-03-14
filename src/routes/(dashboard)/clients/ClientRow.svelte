@@ -58,8 +58,8 @@
     isAdditionalMenuShowing = false;
   };
 
-  const receivedDisplay = $derived(centsToDollars(client.received ?? 0));
-  const balanceDisplay = $derived(centsToDollars(client.balance ?? 0));
+  const receivedDisplay = $derived(centsToDollars(client.received));
+  const balanceDisplay = $derived(centsToDollars(client.balance));
   const resolved = $derived(resolve(`/clients/${client.id}`));
 </script>
 

@@ -1,4 +1,5 @@
 import { client } from "$lib/client";
+import type { Maybe } from "$lib/types";
 import {
   normalizeToNull,
   transformNullToUndefined,
@@ -14,7 +15,7 @@ class InvoicesStore {
   // Use $state for reactive class fields
   invoices = $state<InvoiceListResponse[]>([]);
   loading = $state(false);
-  error = $state<string | null>(null);
+  error = $state<Maybe<string>>(null);
 
   // Use $derived for computed values
   isLoaded = $derived(this.invoices.length > 0 || this.error !== null);
@@ -51,7 +52,7 @@ class InvoicesStore {
   }
 
   // Load a single invoice by ID (without relations)
-  async loadInvoiceById(id: string): Promise<InvoiceSelect | null> {
+  async loadInvoiceById(id: string): Promise<Maybe<InvoiceSelect>> {
     try {
       const { data: invoiceData, error } = await client.api
         .invoices({ id })
@@ -131,7 +132,7 @@ class InvoicesStore {
   }
 
   // Upsert invoice (create or update)
-  async upsertInvoice(invoiceData: NewInvoice): Promise<string | null> {
+  async upsertInvoice(invoiceData: NewInvoice): Promise<Maybe<string>> {
     try {
       const isUpdate = Boolean(invoiceData.id);
       const body = transformNullToUndefined(invoiceData);

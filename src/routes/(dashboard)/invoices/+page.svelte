@@ -9,6 +9,7 @@
     invoicesStore,
     loading,
   } from "$lib/stores/invoicesStore.svelte";
+  import type { Maybe } from "$lib/types";
   import type { InvoiceListResponse, InvoiceSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import BlankState from "./BlankState.svelte";
@@ -19,7 +20,7 @@
   let searchTerms = $state<string>("");
   let isFormVisible = $state<boolean>(false);
   let isEditPanelOpen = $state<boolean>(false);
-  let editingInvoice = $state<InvoiceSelect | null>(null);
+  let editingInvoice = $state<Maybe<InvoiceSelect>>(null);
   let { data } = $props();
 
   // Derived state for filtered invoices

@@ -1,4 +1,5 @@
 import { client } from "$lib/client";
+import type { Maybe } from "$lib/types";
 import type { LineItemSelect, NewLineItem } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
@@ -6,7 +7,7 @@ class LineItemsStore {
   // Use $state for reactive class fields
   lineItems = $state<LineItemSelect[]>([]);
   loading = $state(false);
-  error = $state<string | null>(null);
+  error = $state<Maybe<string>>(null);
 
   // Use $derived for computed values
   isLoaded = $derived(this.lineItems.length > 0 || this.error !== null);

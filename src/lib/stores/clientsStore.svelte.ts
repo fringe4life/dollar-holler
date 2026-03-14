@@ -15,7 +15,7 @@ class ClientsStore {
   // Use $state for reactive class fields
   clients = $state<ClientListResponse[]>([]);
   loading = $state(false);
-  error = $state<string | null>(null);
+  error = $state<Maybe<string>>(null);
 
   // Use $derived for computed values
   isLoaded = $derived(this.clients.length > 0 || this.error !== null);
@@ -94,7 +94,7 @@ class ClientsStore {
   }
 
   // Upsert client (create or update)
-  async upsertClient(clientData: NewClient): Promise<string | null> {
+  async upsertClient(clientData: NewClient): Promise<Maybe<string>> {
     try {
       const isUpdate = !!clientData.id;
       const body = transformNullToUndefined(clientData);

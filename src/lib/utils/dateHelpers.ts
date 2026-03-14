@@ -1,9 +1,11 @@
+import type { Maybe } from "$lib/types";
+
 /**
  * @abstract converts the date to one to be presented to a user
- * @param {string|undefined} myDate a string representation of a date
+ * @param {Maybe<string>} myDate a string representation of a date
  * @returns {string} unknown if myDate is undefined otherwise a formatted date
  */
-export const convertDate = (myDate: string | null): string => {
+export const convertDate = (myDate: Maybe<string>): string => {
   if (!myDate) return "Unknown";
   const dateFormatter = new Intl.DateTimeFormat();
   const date = new Date(myDate);
@@ -12,10 +14,10 @@ export const convertDate = (myDate: string | null): string => {
 
 /**
  * @abstract takes a date to determine if the invoice is overdue
- * @param {string|undefined} myDate string or undefined
+ * @param {Maybe<string>} myDate string or undefined
  * @returns {boolean} it is either late or not
  */
-export const isLate = (myDate: string | null): boolean => {
+export const isLate = (myDate: Maybe<string>): boolean => {
   if (!myDate) return false;
 
   const [year, month, date] = splitDate(myDate);

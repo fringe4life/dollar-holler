@@ -1,8 +1,8 @@
+import { on } from "svelte/events";
 import type { Attachment } from "svelte/attachments";
 
 export function clickOutside(callback: () => void): Attachment {
   return (element) => {
-    document.addEventListener("click", handleClick);
     function handleClick(e: MouseEvent) {
       if (
         e.target instanceof HTMLElement &&
@@ -12,8 +12,6 @@ export function clickOutside(callback: () => void): Attachment {
       }
     }
 
-    return () => {
-      document.removeEventListener("click", handleClick);
-    };
+    return on(document, "click", handleClick);
   };
 }

@@ -2,10 +2,11 @@
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import Arrow from "$lib/icon/Arrow.svelte";
+  import type { Maybe } from "$lib/types";
   import { fly } from "svelte/transition";
   let { children } = $props();
 
-  let previousPageLink: string | undefined = $state(undefined);
+  let previousPageLink: Maybe<string> = $state(undefined);
 
   afterNavigate((navigation) => {
     previousPageLink = navigation?.from?.url?.pathname;

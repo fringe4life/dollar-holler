@@ -2,12 +2,12 @@
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import type { LineItem } from "$lib/db/schema";
-  import type { BitsButton, Maybe } from "$lib/types";
+  import type { BitsButton, List } from "$lib/types";
   import { centsToDollars, sumLineItems } from "$lib/utils/moneyHelpers";
   import LineItemRow from "./LineItemRow.svelte";
 
   type Props = {
-    lineItems: Maybe<LineItem[]>;
+    lineItems: List<LineItem>;
     addLineItem: BitsButton;
     removeLineItem: (id: string) => void;
     discount: number;
@@ -29,7 +29,6 @@
 
   let total = $derived.by<string>(() => {
     let final = Number(subTotal) - Number(discountAmount);
-    if (isNaN(final)) return "$0.00";
     return centsToDollars(final);
   });
 </script>

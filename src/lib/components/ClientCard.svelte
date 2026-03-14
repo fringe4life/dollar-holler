@@ -41,7 +41,7 @@
             <div class="border-l-2 border-blue-200 pl-2 text-sm">
               <div class="font-medium">#{invoice.invoiceNumber}</div>
               <div class="text-gray-600">
-                ${centsToDollars(invoice.total ?? 0)}
+                ${centsToDollars(invoice.total)}
               </div>
             </div>
           {/each}

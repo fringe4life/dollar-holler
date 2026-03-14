@@ -4,7 +4,7 @@
   import { clients, clientsStore } from "$lib/stores/clientsStore.svelte";
   import { invoicesStore } from "$lib/stores/invoicesStore.svelte";
   import { lineItemsStore } from "$lib/stores/lineItemsStore.svelte";
-  import type { BitsButton } from "$lib/types";
+  import type { BitsButton, Maybe } from "$lib/types";
   import { today } from "$lib/utils/dateHelpers";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
   import { states } from "$lib/utils/states";
@@ -43,7 +43,7 @@
   } & Panel;
 
   type Props = (CreateProps | EditProps) & {
-    userId?: string | null;
+    userId?: Maybe<string>;
   };
 
   let {

@@ -4,10 +4,10 @@ import type { InvoiceSelect } from "$lib/validators";
 
 /**
  * @abstract calculates the cost of a part of the invoice
- * @param {LineItem[] | undefined} lineItems found on Invoices
+ * @param {List<LineItem>} lineItems found on Invoices
  * @returns {number} the sum cost of the invoice
  */
-export const sumLineItems = (lineItems: Maybe<LineItem[]>): number => {
+export const sumLineItems = (lineItems: List<LineItem>): number => {
   if (!lineItems) return 0;
 
   return lineItems.reduce((acc, cur) => {
@@ -36,15 +36,15 @@ export const centsToDollars = (cents: Maybe<number>): string => {
 /**
  * @abstract formats a pre-computed total (in cents) for display, optionally applying discount
  * @param {number} totalOrSubtotal total in cents, or subtotal if discountPercent provided
- * @param {number | null | undefined} discountPercent optional discount percentage (0-100)
+ * @param {Maybe<number>} discountPercent optional discount percentage (0-100)
  * @returns {string} formatted currency string
  */
 export const formatTotal = (
   totalOrSubtotal: number,
-  discountPercent?: number | null
+  discountPercent?: Maybe<number>
 ): string => {
   const total =
-    discountPercent != null && discountPercent > 0
+    discountPercent && discountPercent > 0
       ? totalOrSubtotal - totalOrSubtotal * (discountPercent / 100)
       : totalOrSubtotal;
   return centsToDollars(isNaN(total) ? 0 : total);
@@ -52,7 +52,7 @@ export const formatTotal = (
 
 /**
  * @abstract returns the sum of the line items (uses getTotal with lineItems)
- * @param {Invoice[] | undefined} invoices invoices with lineItems
+ * @param {List<InvoiceSelect>} invoices invoices with lineItems
  * @returns {number} the sum of all the Invoices in cents
  */
 export const sumInvoices = (invoices: List<InvoiceSelect>): number => {
@@ -62,7 +62,7 @@ export const sumInvoices = (invoices: List<InvoiceSelect>): number => {
 
 /**
  * @abstract returns the sum of pre-computed totals (for InvoiceListResponse etc.)
- * @param {Array<{ total?: number }> | undefined} invoices invoices with total property
+ * @param {List<{ total?: number }>} invoices invoices with total property
  * @returns {number} the sum of all invoice totals in cents
  */
 export const sumInvoiceTotals = <T extends { total?: number }>(
@@ -87,7 +87,7 @@ export const dollarsToCents = (dollars: number): number => {
  * @returns {number} total in cents
  */
 export const getTotal = (
-  invoice: (InvoiceSelect & { lineItems?: LineItem[] }) | undefined
+  invoice: Maybe<InvoiceSelect & { lineItems?: List<LineItem> }>
 ): number => {
   if (!invoice) {
     return 0;

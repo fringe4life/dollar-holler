@@ -2,14 +2,16 @@
  * Utility types and functions to handle Drizzle's exactOptionalPropertyTypes issues
  *
  * With exactOptionalPropertyTypes: true, Drizzle infers optional fields as:
- * - T | undefined (when field can be missing)
+ * - Maybe<T> (when field can be missing)
  * - T | null (when field is explicitly nullable in DB)
  *
  * This creates issues when we want consistent null handling.
  */
 
+import type { Maybe } from "$lib/types";
+
 // Utility function to convert undefined to null for consistent null handling
-export function normalizeToNull<T>(value: T | undefined | null): T | null {
+export function normalizeToNull<T>(value: Maybe<T>): T | null {
   return value ?? null;
 }
 

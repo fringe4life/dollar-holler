@@ -1,3 +1,5 @@
+import type { Attachment } from "svelte/attachments";
+import { on } from "svelte/events";
 import { Spring } from "svelte/motion";
 
 interface SwipeConfig {
@@ -10,8 +12,14 @@ interface SwipeConfig {
 /**
  * Modern Svelte 5 swipe attachment using @attach directive
  * Uses the new Spring class for smooth animations
+ *
+ * Performance: Prefer stable callback references for onSwipeLeft/onSwipeRight (e.g. defined
+ * in script or bound with a stable wrapper). If inline functions are passed, the attachment
+ * re-runs whenever those references change; wrapping the config in $derived can reduce churn
+ * by only updating when triggerReset (or other chosen deps) change. Prefer avoiding inline
+ * callbacks over relying on $derived.
  */
-export function swipe(config: SwipeConfig = {}) {
+export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
   const {
     triggerReset = false,
     onSwipeLeft,
@@ -19,11 +27,13 @@ export function swipe(config: SwipeConfig = {}) {
     threshold = 20,
   } = config;
 
-  return (element: HTMLElement) => {
+  return (element) => {
     let startX = 0;
     let currentX = 0;
     let isDragging = false;
     let elementWidth = 0;
+    /** Cleanups for document listeners (drag); cleared when drag ends or on attachment cleanup */
+    let documentCleanups: (() => void)[] = [];
 
     // Use the new Spring class for smooth animations
     const spring = new Spring(
@@ -34,9 +44,23 @@ export function swipe(config: SwipeConfig = {}) {
       }
     );
 
-    // Apply transforms reactively
+    // Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
+    const useTypedOM =
+      typeof element.attributeStyleMap?.set === "function" &&
+      typeof CSSTranslate === "function" &&
+      typeof CSS !== "undefined" &&
+      typeof CSS.px === "function";
+
     $effect(() => {
-      element.style.transform = `translate3d(${spring.current.x}px, 0, 0)`;
+      const x = spring.current.x;
+      if (useTypedOM) {
+        element.attributeStyleMap.set(
+          "transform",
+          new CSSTranslate(CSS.px(x), CSS.px(0), CSS.px(0))
+        );
+      } else {
+        element.style.transform = `translateX(${x}px)`;
+      }
     });
 
     // Check if we're on mobile
@@ -75,14 +99,24 @@ export function swipe(config: SwipeConfig = {}) {
     function handleMouseDown(event: MouseEvent) {
       if (!isMobile()) return;
 
+      documentCleanups.forEach((off) => off());
+      documentCleanups = [];
+
       event.preventDefault();
       startX = event.clientX;
       currentX = event.clientX;
       isDragging = true;
       elementWidth = element.clientWidth;
 
-      document.addEventListener("mousemove", handleMouseMove);
-      document.addEventListener("mouseup", handleMouseUp);
+      const offMove = on(document, "mousemove", handleMouseMove);
+      const offUp = on(document, "mouseup", () => {
+        if (!isDragging) return;
+        handleSwipeEnd();
+        offMove();
+        offUp();
+        documentCleanups = [];
+      });
+      documentCleanups = [offMove, offUp];
     }
 
     function handleMouseMove(event: MouseEvent) {
@@ -94,17 +128,12 @@ export function swipe(config: SwipeConfig = {}) {
       spring.set({ x: spring.current.x + dx, y: 0 });
     }
 
-    function handleMouseUp() {
-      if (!isDragging) return;
-
-      handleSwipeEnd();
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-    }
-
     // Touch event handlers
     function handleTouchStart(event: TouchEvent) {
       if (!isMobile()) return;
+
+      documentCleanups.forEach((off) => off());
+      documentCleanups = [];
 
       event.preventDefault();
       startX = event.touches[0].clientX;
@@ -112,10 +141,17 @@ export function swipe(config: SwipeConfig = {}) {
       isDragging = true;
       elementWidth = element.clientWidth;
 
-      document.addEventListener("touchmove", handleTouchMove, {
+      const offMove = on(document, "touchmove", handleTouchMove, {
         passive: false,
       });
-      document.addEventListener("touchend", handleTouchEnd);
+      const offEnd = on(document, "touchend", () => {
+        if (!isDragging) return;
+        handleSwipeEnd();
+        offMove();
+        offEnd();
+        documentCleanups = [];
+      });
+      documentCleanups = [offMove, offEnd];
     }
 
     function handleTouchMove(event: TouchEvent) {
@@ -128,14 +164,6 @@ export function swipe(config: SwipeConfig = {}) {
       spring.set({ x: spring.current.x + dx, y: 0 });
     }
 
-    function handleTouchEnd() {
-      if (!isDragging) return;
-
-      handleSwipeEnd();
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
-    }
-
     // Watch for reset trigger
     $effect(() => {
       if (triggerReset) {
@@ -143,27 +171,24 @@ export function swipe(config: SwipeConfig = {}) {
       }
     });
 
-    // Watch for mobile breakpoint changes
+    // Watch for mobile breakpoint changes: use on() so cleanup is returned and order matches declarative handlers
     $effect(() => {
-      if (isMobile()) {
-        element.addEventListener("mousedown", handleMouseDown);
-        element.addEventListener("touchstart", handleTouchStart);
-      } else {
-        element.removeEventListener("mousedown", handleMouseDown);
-        element.removeEventListener("touchstart", handleTouchStart);
-        // Reset position when switching to desktop
+      if (!isMobile()) {
         spring.set({ x: 0, y: 0 });
+        return;
       }
+      const offMouse = on(element, "mousedown", handleMouseDown);
+      const offTouch = on(element, "touchstart", handleTouchStart);
+      return () => {
+        offMouse();
+        offTouch();
+      };
     });
 
-    // Cleanup function
+    // Cleanup: remove any active document listeners (e.g. drag in progress) when attachment is detached
     return () => {
-      element.removeEventListener("mousedown", handleMouseDown);
-      element.removeEventListener("touchstart", handleTouchStart);
-      document.removeEventListener("mousemove", handleMouseMove);
-      document.removeEventListener("mouseup", handleMouseUp);
-      document.removeEventListener("touchmove", handleTouchMove);
-      document.removeEventListener("touchend", handleTouchEnd);
+      documentCleanups.forEach((off) => off());
+      documentCleanups = [];
     };
   };
 }

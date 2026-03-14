@@ -1,7 +1,9 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { Toggle } from "$lib/attachments/Toggle.svelte";
   import { clickOutside } from "$lib/attachments/clickOutside";
   import { swipe } from "$lib/attachments/swipe.svelte";
+  import { SwipeTriggerReset } from "$lib/attachments/swipeTriggerReset.svelte";
   import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
   import Badge, {
     type BadgeVariant,
@@ -25,27 +27,18 @@
   };
 
   let { invoice, onEdit }: Props = $props();
-  let isAdditionalMenuShowing = $state(false);
-  let triggerReset = $state(false);
-
-  const onclick: MouseEventHandler<HTMLButtonElement> = () => {
-    isAdditionalMenuShowing = !isAdditionalMenuShowing;
-  };
-
-  const closeOptions = () => {
-    isAdditionalMenuShowing = false;
-  };
-
+  const additionalMenu = new Toggle();
+  const swipeReset = new SwipeTriggerReset();
   let open = $state<boolean>(false);
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true;
-    isAdditionalMenuShowing = false;
+    additionalMenu.off();
   };
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
     onEdit(invoice);
-    isAdditionalMenuShowing = false;
+    additionalMenu.off();
   };
 
   // TODO: Implement send invoice functionality
@@ -68,7 +61,10 @@
 
 <div class="relative isolate">
   <div
-    {@attach swipe({ triggerReset: triggerReset })}
+    {@attach swipe({
+      triggerReset: swipeReset.triggerReset,
+      onResetComplete: swipeReset.handleResetComplete,
+    })}
     class="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
     <div class="status justify-self-end">{@render tag(label)}</div>
@@ -83,18 +79,18 @@
     <div
       class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
     >
-      <a href={resolved} class=""><View /></a>
+      <a href={resolved}><View /></a>
     </div>
     <div
       class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
     >
       <button
-        {@attach isAdditionalMenuShowing && clickOutside(closeOptions)}
-        {onclick}
+        {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
+        onclick={additionalMenu.toggle}
         class="flex cursor-pointer items-center justify-center"
         ><ThreeDots /></button
       >
-      {#if isAdditionalMenuShowing}
+      {#if additionalMenu.isOn}
         <AdditionalOptions
           options={[
             {
@@ -124,7 +120,7 @@
   </div>
   <!-- revealed on swipe -->
   <div class="swipe-revealed-actions">
-    <button onclick={() => (triggerReset = true)} class="action-button">
+    <button onclick={swipeReset.requestReset} class="action-button">
       <Cancel width={32} height={32} />
       Cancel
     </button>

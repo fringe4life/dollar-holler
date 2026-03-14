@@ -15,6 +15,7 @@
   import BlankState from "./BlankState.svelte";
   import InvoiceRow from "./InvoiceRow.svelte";
   import InvoiceRowHeader from "./InvoiceRowHeader.svelte";
+  import InvoiceRowSkeleton from "./InvoiceRowSkeleton.svelte";
   import NoSearchResults from "./NoSearchResults.svelte";
 
   let searchTerms = $state<string>("");
@@ -84,11 +85,11 @@
 <!-- list of invoices -->
 <div>
   {#if loading}
-    <div class="flex items-center justify-center py-8">
-      <div class="text-lg">Loading invoices...</div>
-    </div>
+    {#each { length: 5 } as _, i (i)}
+      <InvoiceRowSkeleton />
+    {/each}
   {:else if error}
-    <div class="flex items-center justify-center py-8">
+    <div class="grid place-content-center h-full py-8">
       <div class="text-lg text-red-500">Error: {error}</div>
     </div>
   {:else if invoices.length === 0}

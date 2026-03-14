@@ -4,6 +4,7 @@ import { Spring } from "svelte/motion";
 
 interface SwipeConfig {
   triggerReset?: boolean;
+  onResetComplete?: () => void;
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
@@ -13,15 +14,16 @@ interface SwipeConfig {
  * Modern Svelte 5 swipe attachment using @attach directive
  * Uses the new Spring class for smooth animations
  *
- * Performance: Prefer stable callback references for onSwipeLeft/onSwipeRight (e.g. defined
- * in script or bound with a stable wrapper). If inline functions are passed, the attachment
- * re-runs whenever those references change; wrapping the config in $derived can reduce churn
- * by only updating when triggerReset (or other chosen deps) change. Prefer avoiding inline
- * callbacks over relying on $derived.
+ * Performance: Prefer stable callback references for onResetComplete, onSwipeLeft, and
+ * onSwipeRight (e.g. defined in script or bound with a stable wrapper). If inline
+ * functions are passed, the attachment re-runs whenever those references change;
+ * wrapping the config in $derived can reduce churn by only updating when triggerReset
+ * (or other chosen deps) change. Prefer avoiding inline callbacks over relying on $derived.
  */
 export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
   const {
     triggerReset = false,
+    onResetComplete,
     onSwipeLeft,
     onSwipeRight,
     threshold = 20,
@@ -59,7 +61,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
           new CSSTranslate(CSS.px(x), CSS.px(0), CSS.px(0))
         );
       } else {
-        element.style.transform = `translateX(${x}px)`;
+        element.style.transform = `translateX${x}px`;
       }
     });
 
@@ -168,6 +170,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     $effect(() => {
       if (triggerReset) {
         reset();
+        onResetComplete?.();
       }
     });
 

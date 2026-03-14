@@ -5,13 +5,13 @@ import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "$lib/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
+import { Elysia, t } from "elysia";
+import { betterAuthPlugin } from "../auth-plugin";
 import {
   lineItemsTotalSubquery,
   mapRowsWithTotal,
 } from "../invoiceListHelpers";
-import { Elysia, t } from "elysia";
-import { betterAuthPlugin } from "../auth-plugin";
 
 // Invoice validation schema
 const invoiceSchema = t.Object({
@@ -54,45 +54,50 @@ const invoiceWithRelationsSchema = t.Object({
 export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   .use(betterAuthPlugin)
   // GET /api/invoices - List all invoices with client name and total (single query)
-  .get("/", async () => {
-    try {
-      const rows = await db
-        .select({
-          id: invoicesTable.id,
-          userId: invoicesTable.userId,
-          invoiceNumber: invoicesTable.invoiceNumber,
-          clientId: invoicesTable.clientId,
-          subject: invoicesTable.subject,
-          issueDate: invoicesTable.issueDate,
-          dueDate: invoicesTable.dueDate,
-          discount: invoicesTable.discount,
-          notes: invoicesTable.notes,
-          terms: invoicesTable.terms,
-          invoiceStatus: invoicesTable.invoiceStatus,
-          createdAt: invoicesTable.createdAt,
-          updatedAt: invoicesTable.updatedAt,
-          clientName: clientsTable.name,
-          subtotal: lineItemsTotalSubquery.subtotal,
-        })
-        .from(invoicesTable)
-        .leftJoin(clientsTable, eq(invoicesTable.clientId, clientsTable.id))
-        .leftJoin(
-          lineItemsTotalSubquery,
-          eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
-        );
+  .get(
+    "/",
+    async ({ user }) => {
+      try {
+        const rows = await db
+          .select({
+            id: invoicesTable.id,
+            userId: invoicesTable.userId,
+            invoiceNumber: invoicesTable.invoiceNumber,
+            clientId: invoicesTable.clientId,
+            subject: invoicesTable.subject,
+            issueDate: invoicesTable.issueDate,
+            dueDate: invoicesTable.dueDate,
+            discount: invoicesTable.discount,
+            notes: invoicesTable.notes,
+            terms: invoicesTable.terms,
+            invoiceStatus: invoicesTable.invoiceStatus,
+            createdAt: invoicesTable.createdAt,
+            updatedAt: invoicesTable.updatedAt,
+            clientName: clientsTable.name,
+            subtotal: lineItemsTotalSubquery.subtotal,
+          })
+          .from(invoicesTable)
+          .leftJoin(clientsTable, eq(invoicesTable.clientId, clientsTable.id))
+          .leftJoin(
+            lineItemsTotalSubquery,
+            eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
+          )
+          .where(eq(invoicesTable.userId, user.id));
 
-      const withTotal = mapRowsWithTotal(rows);
-      return withTotal.map((row) => {
-        const { clientName, ...rest } = row;
-        return {
-          ...rest,
-          client: { name: clientName ?? "Unknown" },
-        };
-      });
-    } catch (error) {
-      return { error: "Failed to load invoices" };
-    }
-  })
+        const withTotal = mapRowsWithTotal(rows);
+        return withTotal.map((row) => {
+          const { clientName, ...rest } = row;
+          return {
+            ...rest,
+            client: { name: clientName ?? "Unknown" },
+          };
+        });
+      } catch (error) {
+        return { error: "Failed to load invoices" };
+      }
+    },
+    { auth: true }
+  )
   // POST /api/invoices - Create invoice (with line items)
   .post(
     "/",
@@ -127,10 +132,10 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // GET /api/invoices/:id - Get single invoice
   .get(
     "/:id",
-    async ({ params: { id }, set }) => {
+    async ({ params: { id }, set, user }) => {
       try {
         const invoice = await db.query.invoices.findFirst({
-          where: { id },
+          where: { id, userId: user.id },
         });
         if (!invoice) {
           set.status = 404;
@@ -145,12 +150,13 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       params: t.Object({
         id: t.String(),
       }),
+      auth: true,
     }
   )
   // PUT /api/invoices/:id - Update invoice
   .put(
     "/:id",
-    async ({ params: { id }, body }) => {
+    async ({ params: { id }, body, set, user }) => {
       try {
         const { lineItems, client, ...updateData } = body;
 
@@ -161,9 +167,15 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
             clientId: client.id,
             updatedAt: new Date(),
           })
-          .where(eq(invoicesTable.id, id))
+          .where(
+            and(eq(invoicesTable.id, id), eq(invoicesTable.userId, user.id))
+          )
           .returning();
 
+        if (!updated) {
+          set.status = 404;
+          return { error: "Invoice not found" };
+        }
         return updated;
       } catch (error) {
         console.error("Error updating invoice:", error);
@@ -181,9 +193,19 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // DELETE /api/invoices/:id - Delete invoice
   .delete(
     "/:id",
-    async ({ params: { id } }) => {
+    async ({ params: { id }, set, user }) => {
       try {
-        await db.delete(invoicesTable).where(eq(invoicesTable.id, id));
+        const [deleted] = await db
+          .delete(invoicesTable)
+          .where(
+            and(eq(invoicesTable.id, id), eq(invoicesTable.userId, user.id))
+          )
+          .returning({ id: invoicesTable.id });
+
+        if (!deleted) {
+          set.status = 404;
+          return { error: "Invoice not found" };
+        }
         return { success: true };
       } catch (error) {
         console.error("Error deleting invoice:", error);
@@ -203,8 +225,15 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       // GET /api/invoices/:id/line-items - Get invoice line items
       .get(
         "/",
-        async ({ params: { id } }) => {
+        async ({ params: { id }, set, user }) => {
           try {
+            const invoice = await db.query.invoices.findFirst({
+              where: { id, userId: user.id },
+            });
+            if (!invoice) {
+              set.status = 404;
+              return { error: "Invoice not found" };
+            }
             return await db.query.lineItems.findMany({
               where: { invoiceId: id },
             });
@@ -217,19 +246,28 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           params: t.Object({
             id: t.String(),
           }),
+          auth: true,
         }
       )
       // POST /api/invoices/:id/line-items - Create line items
       .post(
         "/",
-        async ({ params: { id }, body }) => {
+        async ({ params: { id }, body, set, user }) => {
           try {
+            const invoice = await db.query.invoices.findFirst({
+              where: { id, userId: user.id },
+            });
+            if (!invoice) {
+              set.status = 404;
+              return { error: "Invoice not found" };
+            }
             return await db
               .insert(lineItemsTable)
               .values(
                 body.map((item) => ({
                   ...item,
                   invoiceId: id,
+                  userId: user.id,
                 }))
               )
               .returning();
@@ -257,8 +295,15 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       // PUT /api/invoices/:id/line-items - Replace line items
       .put(
         "/",
-        async ({ params: { id }, body }) => {
+        async ({ params: { id }, body, set, user }) => {
           try {
+            const invoice = await db.query.invoices.findFirst({
+              where: { id, userId: user.id },
+            });
+            if (!invoice) {
+              set.status = 404;
+              return { error: "Invoice not found" };
+            }
             // First, delete existing line items for this invoice
             await db
               .delete(lineItemsTable)
@@ -271,6 +316,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
                 body.map((item) => ({
                   ...item,
                   invoiceId: id,
+                  userId: user.id,
                 }))
               )
               .returning();
@@ -301,20 +347,36 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
 export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
   .use(betterAuthPlugin)
   // GET /api/line-items - List all line items (for admin purposes)
-  .get("/", async () => {
-    try {
-      return await db.query.lineItems.findMany();
-    } catch (error) {
-      console.error("Error loading line items:", error);
-      return { error: "Failed to load line items" };
-    }
-  })
+  .get(
+    "/",
+    async ({ user }) => {
+      try {
+        return await db.query.lineItems.findMany({
+          where: { userId: user.id },
+        });
+      } catch (error) {
+        console.error("Error loading line items:", error);
+        return { error: "Failed to load line items" };
+      }
+    },
+    { auth: true }
+  )
   // DELETE /api/line-items/:id - Delete a specific line item
   .delete(
     "/:id",
-    async ({ params: { id } }) => {
+    async ({ params: { id }, set, user }) => {
       try {
-        await db.delete(lineItemsTable).where(eq(lineItemsTable.id, id));
+        const [deleted] = await db
+          .delete(lineItemsTable)
+          .where(
+            and(eq(lineItemsTable.id, id), eq(lineItemsTable.userId, user.id))
+          )
+          .returning({ id: lineItemsTable.id });
+
+        if (!deleted) {
+          set.status = 404;
+          return { error: "Line item not found" };
+        }
         return { success: true };
       } catch (error) {
         console.error("Error deleting line item:", error);

@@ -4,7 +4,7 @@ import {
   clients as clientsTable,
   invoices as invoicesTable,
 } from "$lib/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 import { clientReceivedBalanceSubquery } from "../clientListHelpers";
@@ -31,39 +31,44 @@ const clientSchema = t.Object({
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
   .use(betterAuthPlugin)
   // GET /api/clients - List all clients with received and balance
-  .get("/", async () => {
-    try {
-      const rows = await db
-        .select({
-          id: clientsTable.id,
-          userId: clientsTable.userId,
-          name: clientsTable.name,
-          email: clientsTable.email,
-          street: clientsTable.street,
-          city: clientsTable.city,
-          state: clientsTable.state,
-          zip: clientsTable.zip,
-          clientStatus: clientsTable.clientStatus,
-          createdAt: clientsTable.createdAt,
-          updatedAt: clientsTable.updatedAt,
-          received: clientReceivedBalanceSubquery.received,
-          balance: clientReceivedBalanceSubquery.balance,
-        })
-        .from(clientsTable)
-        .leftJoin(
-          clientReceivedBalanceSubquery,
-          eq(clientsTable.id, clientReceivedBalanceSubquery.clientId)
-        );
+  .get(
+    "/",
+    async ({ user }) => {
+      try {
+        const rows = await db
+          .select({
+            id: clientsTable.id,
+            userId: clientsTable.userId,
+            name: clientsTable.name,
+            email: clientsTable.email,
+            street: clientsTable.street,
+            city: clientsTable.city,
+            state: clientsTable.state,
+            zip: clientsTable.zip,
+            clientStatus: clientsTable.clientStatus,
+            createdAt: clientsTable.createdAt,
+            updatedAt: clientsTable.updatedAt,
+            received: clientReceivedBalanceSubquery.received,
+            balance: clientReceivedBalanceSubquery.balance,
+          })
+          .from(clientsTable)
+          .leftJoin(
+            clientReceivedBalanceSubquery,
+            eq(clientsTable.id, clientReceivedBalanceSubquery.clientId)
+          )
+          .where(eq(clientsTable.userId, user.id));
 
-      return rows.map((row) => ({
-        ...row,
-        received: Number(row.received ?? 0),
-        balance: Number(row.balance ?? 0),
-      }));
-    } catch (error) {
-      return { error: "Failed to load clients" };
-    }
-  })
+        return rows.map((row) => ({
+          ...row,
+          received: Number(row.received ?? 0),
+          balance: Number(row.balance ?? 0),
+        }));
+      } catch (error) {
+        return { error: "Failed to load clients" };
+      }
+    },
+    { auth: true }
+  )
   // POST /api/clients - Create client (with upsert on conflict)
   .post(
     "/",
@@ -104,10 +109,10 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // GET /api/clients/:id - Get single client
   .get(
     "/:id",
-    async ({ params: { id }, set }) => {
+    async ({ params: { id }, set, user }) => {
       try {
         const client = await db.query.clients.findFirst({
-          where: { id },
+          where: { id, userId: user.id },
         });
         if (!client) {
           set.status = 404;
@@ -123,12 +128,13 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       params: t.Object({
         id: t.String(),
       }),
+      auth: true,
     }
   )
   // PUT /api/clients/:id - Update client
   .put(
     "/:id",
-    async ({ params: { id }, body }) => {
+    async ({ params: { id }, body, set, user }) => {
       try {
         const [updated] = await db
           .update(clientsTable)
@@ -136,9 +142,13 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
             ...body,
             updatedAt: new Date(),
           })
-          .where(eq(clientsTable.id, id))
+          .where(and(eq(clientsTable.id, id), eq(clientsTable.userId, user.id)))
           .returning();
 
+        if (!updated) {
+          set.status = 404;
+          return { error: "Client not found" };
+        }
         return updated;
       } catch (error) {
         console.error("Error updating client:", error);
@@ -157,9 +167,17 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // DELETE /api/clients/:id - Delete client
   .delete(
     "/:id",
-    async ({ params: { id } }) => {
+    async ({ params: { id }, set, user }) => {
       try {
-        await db.delete(clientsTable).where(eq(clientsTable.id, id));
+        const [deleted] = await db
+          .delete(clientsTable)
+          .where(and(eq(clientsTable.id, id), eq(clientsTable.userId, user.id)))
+          .returning({ id: clientsTable.id });
+
+        if (!deleted) {
+          set.status = 404;
+          return { error: "Client not found" };
+        }
         return { success: true };
       } catch (error) {
         console.error("Error deleting client:", error);
@@ -176,8 +194,16 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // GET /api/clients/:id/invoices - Get client's invoices with total
   .get(
     "/:id/invoices",
-    async ({ params: { id } }) => {
+    async ({ params: { id }, set, user }) => {
       try {
+        const client = await db.query.clients.findFirst({
+          where: { id, userId: user.id },
+        });
+        if (!client) {
+          set.status = 404;
+          return { error: "Client not found" };
+        }
+
         const rows = await db
           .select({
             id: invoicesTable.id,
@@ -202,7 +228,12 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
             lineItemsTotalSubquery,
             eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
           )
-          .where(eq(invoicesTable.clientId, id));
+          .where(
+            and(
+              eq(invoicesTable.clientId, id),
+              eq(invoicesTable.userId, user.id)
+            )
+          );
 
         const withTotal = mapRowsWithTotal(rows);
         return withTotal.map((row) => {
@@ -221,5 +252,6 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       params: t.Object({
         id: t.String(),
       }),
+      auth: true,
     }
   );

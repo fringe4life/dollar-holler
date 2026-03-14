@@ -2,6 +2,7 @@
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { Toggle } from "$lib/attachments/Toggle.svelte";
   import Close from "$lib/icon/Close.svelte";
   import Hamburger from "$lib/icon/Hamburger.svelte";
   import type { Maybe } from "$lib/types";
@@ -24,18 +25,18 @@
   ]);
   const path = $derived(page.url.pathname);
 
-  let isNavShowing = $state(false);
+  const nav = new Toggle();
 
   const onclick: MouseEventHandler<HTMLButtonElement> = () => {
-    isNavShowing = !isNavShowing;
+    nav.toggle();
   };
 
   const closeNav: MouseEventHandler<HTMLAnchorElement> = () => {
-    isNavShowing = false;
+    nav.off();
   };
 
   afterNavigate(() => {
-    isNavShowing = false;
+    nav.off();
   });
 
   // Function to check if a navigation item is active
@@ -55,12 +56,12 @@
 <button
   class={{
     "fixed top-6 right-6 z-10 cursor-pointer transition-colors duration-200 md:hidden": true,
-    "text-goldenFizz": isNavShowing,
-    "text-daisyBush": !isNavShowing,
+    "text-goldenFizz": nav.isOn,
+    "text-daisyBush": !nav.isOn,
   }}
   {onclick}
 >
-  {#if isNavShowing}
+  {#if nav.isOn}
     <Close width={32} height={32} />
   {:else}
     <Hamburger width={32} height={32} />
@@ -70,7 +71,7 @@
 <header
   class={{
     "  bg-daisyBush fixed inset-0 isolate z-2 w-full -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0 ": true,
-    "translate-x-0 ": isNavShowing,
+    "translate-x-0 ": nav.isOn,
   }}
 >
   <div class="mt-10 mb-10 md:mb-24">
@@ -103,7 +104,7 @@
 {/snippet}
 
 <svelte:head>
-  {#if isNavShowing}
+  {#if nav.isOn}
     <style>
       body {
         overflow: hidden;

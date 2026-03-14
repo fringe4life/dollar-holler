@@ -3,7 +3,9 @@
   import { Badge } from "$lib/components/ui/badge";
 
   import { resolve } from "$app/paths";
+  import { Toggle } from "$lib/attachments/Toggle.svelte";
   import { clickOutside } from "$lib/attachments/clickOutside";
+  import { SwipeTriggerReset } from "$lib/attachments/swipeTriggerReset.svelte";
   import { swipe } from "$lib/attachments/swipe.svelte";
   import Activate from "$lib/icon/Activate.svelte";
   import Archive from "$lib/icon/Archive.svelte";
@@ -27,35 +29,27 @@
   let { client, onEdit, onActivate, onArchive }: Props = $props();
 
   let open = $state<boolean>(false);
-  let isAdditionalMenuShowing = $state(false);
-  let triggerReset = $state(false);
+  const additionalMenu = new Toggle();
+  const swipeReset = new SwipeTriggerReset();
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true;
-    isAdditionalMenuShowing = false;
+    additionalMenu.off();
   };
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
     onEdit(client);
-    isAdditionalMenuShowing = false;
-  };
-
-  const handleMenu: MouseEventHandler<HTMLButtonElement> = () => {
-    isAdditionalMenuShowing = !isAdditionalMenuShowing;
+    additionalMenu.off();
   };
 
   const handleActivation: MouseEventHandler<HTMLButtonElement> = () => {
     onActivate(client);
-    isAdditionalMenuShowing = false;
+    additionalMenu.off();
   };
 
   const handleArchive: MouseEventHandler<HTMLButtonElement> = () => {
     onArchive(client);
-    isAdditionalMenuShowing = false;
-  };
-
-  const closeOptions = () => {
-    isAdditionalMenuShowing = false;
+    additionalMenu.off();
   };
 
   const receivedDisplay = $derived(centsToDollars(client.received));
@@ -65,7 +59,7 @@
 
 <div class="relative isolate">
   <div
-    {@attach swipe({ triggerReset: triggerReset })}
+    {@attach swipe({ triggerReset: swipeReset.triggerReset, onResetComplete: swipeReset.handleResetComplete })}
     class="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
     <div class="status">{@render tag(client.clientStatus as string)}</div>
@@ -90,12 +84,12 @@
     </div>
     <div class="relative hidden place-self-center lg:grid">
       <button
-        {@attach isAdditionalMenuShowing && clickOutside(closeOptions)}
-        onclick={handleMenu}
+        {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
+        onclick={additionalMenu.toggle}
         class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
         ><ThreeDots /></button
       >
-      {#if isAdditionalMenuShowing}
+      {#if additionalMenu.isOn}
         <AdditionalOptions
           options={[
             {
@@ -130,7 +124,7 @@
 
   <!-- revealed on swipe -->
   <div class="swipe-revealed-actions">
-    <button onclick={() => (triggerReset = true)} class="action-button">
+    <button onclick={swipeReset.requestReset} class="action-button">
       <Cancel width={32} height={32} />
       Cancel
     </button>

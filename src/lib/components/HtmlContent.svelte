@@ -1,5 +1,10 @@
 <script lang="ts">
-  let { html }: { html: string } = $props();
+  import type { Maybe } from "$lib/types";
+
+  type HtmlContentProps = {
+    html: Maybe<string>;
+  };
+  let { html }: HtmlContentProps = $props();
 </script>
 
 {#if html}

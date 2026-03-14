@@ -1,12 +1,16 @@
 <script lang="ts">
+  import type { Maybe } from "$lib/types";
+
   type Props = {
-    message: string
-  }
-  let { message = '' }: Props = $props()
+    message: Maybe<string>;
+  };
+  let { message }: Props = $props();
 </script>
 
 {#if message}
-  <div class="bg-lavenderIndigo mb-8 h-14 rounded-md p-4 text-center text-base text-white">
+  <div
+    class="bg-lavenderIndigo mb-8 h-14 rounded-md p-4 text-center text-base text-white"
+  >
     <p>{message}</p>
   </div>
 {/if}

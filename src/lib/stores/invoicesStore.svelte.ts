@@ -62,11 +62,11 @@ class InvoicesStore {
         error ||
         (typeof invoiceData === "object" && "error" in invoiceData)
       ) {
-        throw new Error(
-          error?.value?.message ||
-            (invoiceData as { error?: string })?.error ||
-            "Failed to load invoice"
-        );
+        const errorMessage =
+          error?.value === "Unauthorized"
+            ? "Unauthorized"
+            : error?.value?.message || "Failed to load invoice";
+        throw new Error(errorMessage);
       }
 
       return invoiceData;

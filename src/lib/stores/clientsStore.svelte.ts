@@ -57,7 +57,11 @@ class ClientsStore {
         (typeof clientData === "object" && "error" in clientData) ||
         error
       ) {
-        throw new Error(error?.value?.message || "Failed to load client");
+        const errorMessage =
+          error?.value === "Unauthorized"
+            ? "Unauthorized"
+            : error?.value?.message || "Failed to load client";
+        throw new Error(errorMessage);
       }
 
       return clientData;

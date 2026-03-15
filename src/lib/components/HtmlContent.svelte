@@ -1,8 +1,8 @@
 <script lang="ts">
-  import type { Maybe } from "$lib/types";
+  import type { Maybe, SanitizedHTML } from "$lib/types";
 
   type HtmlContentProps = {
-    html: Maybe<string>;
+    html: Maybe<SanitizedHTML>;
   };
   let { html }: HtmlContentProps = $props();
 </script>

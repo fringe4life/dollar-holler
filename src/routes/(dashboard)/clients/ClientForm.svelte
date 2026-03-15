@@ -31,16 +31,7 @@
   });
 
   // Form data using NewClient type
-  let client: NewClient = $state({
-    city: null,
-    email: null,
-    name: "",
-    state: null,
-    street: null,
-    zip: null,
-    clientStatus: "active",
-    userId: "", // This will be set from the session
-  });
+  let client: NewClient = $state(clientsStore.newClient());
 
   // Initialize form data based on edit mode
   // svelte-ignore state_referenced_locally

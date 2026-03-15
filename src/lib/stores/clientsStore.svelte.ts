@@ -20,6 +20,20 @@ class ClientsStore {
   // Use $derived for computed values
   isLoaded = $derived(this.clients.length > 0 || this.error !== null);
 
+  /** Returns a blank NewClient for forms (create mode). */
+  newClient(): NewClient {
+    return {
+      city: null,
+      email: null,
+      name: "",
+      state: null,
+      street: null,
+      zip: null,
+      clientStatus: "active",
+      userId: "",
+    };
+  }
+
   // Load all clients (without relations)
   async loadClients() {
     this.loading = true;

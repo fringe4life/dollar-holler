@@ -60,8 +60,8 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
 
         return rows.map((row) => ({
           ...row,
-          received: Number(row.received ?? 0),
-          balance: Number(row.balance ?? 0),
+          received: Math.round(Number(row.received ?? 0)),
+          balance: Math.round(Number(row.balance ?? 0)),
         }));
       } catch (error) {
         return { error: "Failed to load clients" };

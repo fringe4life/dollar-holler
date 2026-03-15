@@ -85,9 +85,11 @@
 <!-- list of invoices -->
 <div>
   {#if loading}
-    {#each { length: 5 } as _, i (i)}
-      <InvoiceRowSkeleton />
-    {/each}
+    <InvoiceRowSkeleton />
+    <InvoiceRowSkeleton />
+    <InvoiceRowSkeleton />
+    <InvoiceRowSkeleton />
+    <InvoiceRowSkeleton />
   {:else if error}
     <div class="grid place-content-center h-full py-8">
       <div class="text-lg text-red-500">Error: {error}</div>

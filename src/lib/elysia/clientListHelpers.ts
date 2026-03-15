@@ -31,16 +31,16 @@ export const clientReceivedBalanceSubquery = db
     clientId: invoiceTotalsSubquery.clientId,
     received: sql<number>`COALESCE(SUM(
       CASE WHEN ${invoiceTotalsSubquery.invoiceStatus} = 'paid'
-      THEN COALESCE(${invoiceTotalsSubquery.subtotal}, 0) - COALESCE(${invoiceTotalsSubquery.subtotal}, 0) * COALESCE(${invoiceTotalsSubquery.discount}, 0) / 100
+      THEN ROUND(COALESCE(${invoiceTotalsSubquery.subtotal}, 0) - COALESCE(${invoiceTotalsSubquery.subtotal}, 0) * COALESCE(${invoiceTotalsSubquery.discount}, 0) / 100)
       ELSE 0
       END
-    ), 0)::real`.as("received"),
+    ), 0)::bigint`.as("received"),
     balance: sql<number>`COALESCE(SUM(
       CASE WHEN ${invoiceTotalsSubquery.invoiceStatus} IS NULL OR ${invoiceTotalsSubquery.invoiceStatus} != 'paid'
-      THEN COALESCE(${invoiceTotalsSubquery.subtotal}, 0) - COALESCE(${invoiceTotalsSubquery.subtotal}, 0) * COALESCE(${invoiceTotalsSubquery.discount}, 0) / 100
+      THEN ROUND(COALESCE(${invoiceTotalsSubquery.subtotal}, 0) - COALESCE(${invoiceTotalsSubquery.subtotal}, 0) * COALESCE(${invoiceTotalsSubquery.discount}, 0) / 100)
       ELSE 0
       END
-    ), 0)::real`.as("balance"),
+    ), 0)::bigint`.as("balance"),
   })
   .from(invoiceTotalsSubquery)
   .groupBy(invoiceTotalsSubquery.clientId)

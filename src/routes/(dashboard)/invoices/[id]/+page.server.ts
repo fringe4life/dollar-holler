@@ -1,5 +1,5 @@
 import { db } from "$lib/db";
-import { markdownToHtml } from "$lib/utils/markdown";
+import { markdownToHtml } from "$lib/utils/markdown.server";
 import { tryCatch } from "$lib/utils/try-catch";
 import { error, redirect } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
@@ -18,7 +18,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   );
 
   if (!invoice) {
-    error(404, { message: "Invoice not found" });
+    throw error(404, { message: "Invoice not found" });
   }
 
   const [{ data: client }, { data: lineItems }] = await Promise.all([

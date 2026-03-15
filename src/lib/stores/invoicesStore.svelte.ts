@@ -1,5 +1,5 @@
 import { client } from "$lib/client";
-import type { Maybe } from "$lib/types";
+import type { List, Maybe } from "$lib/types";
 import {
   normalizeToNull,
   transformNullToUndefined,
@@ -19,6 +19,22 @@ class InvoicesStore {
 
   // Use $derived for computed values
   isLoaded = $derived(this.invoices.length > 0 || this.error !== null);
+
+  /** Returns a blank NewInvoice for forms (create mode). */
+  newInvoice(): NewInvoice {
+    return {
+      clientId: "",
+      invoiceNumber: "",
+      subject: null,
+      issueDate: new Date(),
+      dueDate: new Date(),
+      discount: null,
+      notes: null,
+      terms: null,
+      invoiceStatus: "draft",
+      userId: "",
+    };
+  }
 
   // Load all invoices (with client name and total)
   async loadInvoices() {
@@ -82,7 +98,9 @@ class InvoicesStore {
   // Get invoices for a specific client (with total)
   async getInvoicesByClientId(
     clientId: string
-  ): Promise<InvoiceListResponse[]> {
+  ): Promise<List<InvoiceListResponse>> {
+    this.loading = true;
+    this.error = null;
     try {
       const { data: invoiceData } = await client.api
         .clients({ id: clientId })
@@ -102,7 +120,9 @@ class InvoicesStore {
           : "Failed to load client invoices";
       console.error("Error loading client invoices:", error_);
       toast.error(errorMessage);
-      return [];
+      return null;
+    } finally {
+      this.loading = false;
     }
   }
 

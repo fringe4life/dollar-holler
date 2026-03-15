@@ -17,17 +17,6 @@
   import LineItemRows from "../../routes/(dashboard)/invoices/LineItemRows.svelte";
   import Button from "./ui/button/button.svelte";
 
-  const defaultLineItem = (): LineItem => ({
-    id: crypto.randomUUID(),
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    userId: "",
-    description: "",
-    invoiceId: "",
-    quantity: 0,
-    amount: 0,
-  });
-
   type Panel = {
     closePanel: () => void;
   };
@@ -58,20 +47,9 @@
   });
 
   // Form data using NewInvoice type
-  let invoice: NewInvoice = $state({
-    clientId: "",
-    invoiceNumber: "",
-    subject: null,
-    issueDate: new Date(),
-    dueDate: new Date(),
-    discount: null,
-    notes: null,
-    terms: null,
-    invoiceStatus: "draft",
-    userId: "", // This will be set from the session
-  });
+  let invoice: NewInvoice = $state(invoicesStore.newInvoice());
 
-  let lineItems: LineItem[] = $state([defaultLineItem()]);
+  let lineItems: LineItem[] = $state([lineItemsStore.newLineItem()]);
   let lineItemsLoaded = $state(true);
   let loadToken = 0;
 
@@ -86,14 +64,15 @@
       const token = ++loadToken;
       lineItemsStore.loadLineItemsByInvoiceId(editId).then((items) => {
         if (token !== loadToken) return;
-        lineItems = items.length > 0 ? items : [defaultLineItem()];
+        lineItems =
+          items && items.length > 0 ? items : [lineItemsStore.newLineItem()];
         lineItemsLoaded = true;
       });
       return () => {
         loadToken++;
       };
     } else {
-      lineItems = [defaultLineItem()];
+      lineItems = [lineItemsStore.newLineItem()];
       lineItemsLoaded = true;
     }
   });
@@ -106,7 +85,7 @@
   });
 
   const addLineItem: BitsButton = () => {
-    lineItems = [...lineItems, defaultLineItem()];
+    lineItems = [...lineItems, lineItemsStore.newLineItem()];
   };
 
   const removeLineItem = (id: string) => {
@@ -115,16 +94,7 @@
 
   let isNewClient = $state<boolean>(false);
 
-  let newClient: NewClient = $state({
-    clientStatus: "active",
-    city: null,
-    email: null,
-    name: "",
-    state: null,
-    street: null,
-    zip: null,
-    userId: "", // This will be set from the session
-  });
+  let newClient: NewClient = $state(clientsStore.newClient());
 
   const clientName = $derived(
     clients.find((c) => c.id === invoice.clientId)?.name ?? "Unknown"

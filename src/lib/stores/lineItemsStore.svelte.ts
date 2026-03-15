@@ -1,5 +1,6 @@
 import { client } from "$lib/client";
-import type { Maybe } from "$lib/types";
+import type { LineItem } from "$lib/db/schema";
+import type { List, Maybe } from "$lib/types";
 import type { LineItemSelect, NewLineItem } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
@@ -12,8 +13,27 @@ class LineItemsStore {
   // Use $derived for computed values
   isLoaded = $derived(this.lineItems.length > 0 || this.error !== null);
 
+  /** Returns a blank LineItem for form rows (new id and timestamps each call). */
+  newLineItem(): LineItem {
+    const now = new Date();
+    return {
+      id: crypto.randomUUID(),
+      createdAt: now,
+      updatedAt: now,
+      userId: "",
+      description: "",
+      invoiceId: "",
+      quantity: 0,
+      amount: 0,
+    };
+  }
+
   // Load line items for a specific invoice
-  async loadLineItemsByInvoiceId(invoiceId: string): Promise<LineItemSelect[]> {
+  async loadLineItemsByInvoiceId(
+    invoiceId: string
+  ): Promise<List<LineItemSelect>> {
+    this.loading = true;
+    this.error = null;
     try {
       const { data: lineItemsData } = await client.api
         .invoices({ id: invoiceId })
@@ -31,7 +51,9 @@ class LineItemsStore {
         err instanceof Error ? err.message : "Failed to load line items";
       console.error("Error loading line items:", err);
       toast.error(errorMessage);
-      return [];
+      return null;
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -67,7 +89,7 @@ class LineItemsStore {
   async createLineItems(
     invoiceId: string,
     items: NewLineItem[]
-  ): Promise<LineItemSelect[]> {
+  ): Promise<List<LineItemSelect>> {
     try {
       // Map to only include fields expected by the API schema
       const body = items.map((item) => ({
@@ -94,7 +116,7 @@ class LineItemsStore {
         err instanceof Error ? err.message : "Failed to create line items";
       console.error("Error creating line items:", err);
       toast.error(errorMessage);
-      return [];
+      return null;
     }
   }
 
@@ -102,7 +124,7 @@ class LineItemsStore {
   async updateLineItems(
     invoiceId: string,
     items: NewLineItem[]
-  ): Promise<LineItemSelect[]> {
+  ): Promise<List<LineItemSelect>> {
     try {
       // Map to only include fields expected by the API schema
       const body = items.map((item) => ({
@@ -129,7 +151,7 @@ class LineItemsStore {
         err instanceof Error ? err.message : "Failed to update line items";
       console.error("Error updating line items:", err);
       toast.error(errorMessage);
-      return [];
+      return null;
     }
   }
 

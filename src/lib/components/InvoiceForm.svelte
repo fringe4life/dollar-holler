@@ -73,6 +73,7 @@
 
   let lineItems: LineItem[] = $state([defaultLineItem()]);
   let lineItemsLoaded = $state(true);
+  let loadToken = 0;
 
   // svelte-ignore state_referenced_locally
   let discount = $state<number>(invoice.discount ?? 0);
@@ -82,11 +83,16 @@
     const editId = invoiceEdit?.id;
     if (isEdit && editId) {
       lineItemsLoaded = false;
+      const token = ++loadToken;
       lineItemsStore.loadLineItemsByInvoiceId(editId).then((items) => {
+        if (token !== loadToken) return;
         lineItems = items.length > 0 ? items : [defaultLineItem()];
         lineItemsLoaded = true;
       });
-    } else if (!isEdit) {
+      return () => {
+        loadToken++;
+      };
+    } else {
       lineItems = [defaultLineItem()];
       lineItemsLoaded = true;
     }

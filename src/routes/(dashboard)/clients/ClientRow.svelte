@@ -1,12 +1,10 @@
 <script lang="ts">
-  import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
-  import { Badge } from "$lib/components/ui/badge";
-
   import { resolve } from "$app/paths";
   import { Toggle } from "$lib/attachments/Toggle.svelte";
   import { clickOutside } from "$lib/attachments/clickOutside";
-  import { SwipeTriggerReset } from "$lib/attachments/swipeTriggerReset.svelte";
   import { swipe } from "$lib/attachments/swipe.svelte";
+  import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
+  import { Badge } from "$lib/components/ui/badge";
   import Activate from "$lib/icon/Activate.svelte";
   import Archive from "$lib/icon/Archive.svelte";
   import Cancel from "$lib/icon/Cancel.svelte";
@@ -30,7 +28,7 @@
 
   let open = $state<boolean>(false);
   const additionalMenu = new Toggle();
-  const swipeReset = new SwipeTriggerReset();
+  const swipeReset = new Toggle();
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true;
@@ -59,7 +57,10 @@
 
 <div class="relative isolate">
   <div
-    {@attach swipe({ triggerReset: swipeReset.triggerReset, onResetComplete: swipeReset.handleResetComplete })}
+    {@attach swipe({
+      triggerReset: swipeReset.isOn,
+      onResetComplete: swipeReset.off,
+    })}
     class="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
     <div class="status">{@render tag(client.clientStatus as string)}</div>
@@ -124,7 +125,7 @@
 
   <!-- revealed on swipe -->
   <div class="swipe-revealed-actions">
-    <button onclick={swipeReset.requestReset} class="action-button">
+    <button onclick={swipeReset.toggle} class="action-button">
       <Cancel width={32} height={32} />
       Cancel
     </button>

@@ -4,7 +4,6 @@
 
   let searchTerms = $state<string>("");
   let derivedTerms = $derived(searchTerms.trim());
-  let prev = $state<string>("");
 
   type Props = {
     handleSearch: (searchTerms: string) => void;
@@ -27,21 +26,6 @@
   const handleChange: ChangeEventHandler<HTMLInputElement> = (e) => {
     searchTerms = e.currentTarget.value;
   };
-
-  // needed as type="search" doesn't trigger onchange when the value is cleared via special x button // Only trigger a clear when transitioning from non-empty to empty to avoid duplicate submissions
-  $effect(() => {
-    const curr = derivedTerms ?? "";
-    if (prev !== "" && curr === "") {
-      const runSearch = () => Promise.resolve(handleSearch(derivedTerms));
-
-      if (typeof document.startViewTransition === "function") {
-        document.startViewTransition(runSearch);
-      } else {
-        runSearch();
-      }
-      prev = curr;
-    }
-  });
 </script>
 
 <form

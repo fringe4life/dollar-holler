@@ -99,7 +99,7 @@
       <div class="text-lg">Loading clients...</div>
     </div>
   {:else if error}
-    <div class="flex items-center justify-center py-8">
+    <div class="grid place-content-center h-full py-8">
       <div class="text-lg text-red-500">Error: {error}</div>
     </div>
   {:else if clients.length === 0}

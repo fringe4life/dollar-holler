@@ -3,7 +3,6 @@
   import { Toggle } from "$lib/attachments/Toggle.svelte";
   import { clickOutside } from "$lib/attachments/clickOutside";
   import { swipe } from "$lib/attachments/swipe.svelte";
-  import { SwipeTriggerReset } from "$lib/attachments/swipeTriggerReset.svelte";
   import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
   import Badge, {
     type BadgeVariant,
@@ -28,7 +27,7 @@
 
   let { invoice, onEdit }: Props = $props();
   const additionalMenu = new Toggle();
-  const swipeReset = new SwipeTriggerReset();
+  const swipeReset = new Toggle();
   let open = $state<boolean>(false);
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
@@ -62,8 +61,8 @@
 <div class="relative isolate">
   <div
     {@attach swipe({
-      triggerReset: swipeReset.triggerReset,
-      onResetComplete: swipeReset.handleResetComplete,
+      triggerReset: swipeReset.isOn,
+      onResetComplete: swipeReset.off,
     })}
     class="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   >
@@ -120,7 +119,7 @@
   </div>
   <!-- revealed on swipe -->
   <div class="swipe-revealed-actions">
-    <button onclick={swipeReset.requestReset} class="action-button">
+    <button onclick={swipeReset.toggle} class="action-button">
       <Cancel width={32} height={32} />
       Cancel
     </button>

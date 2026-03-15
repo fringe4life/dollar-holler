@@ -61,7 +61,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
           new CSSTranslate(CSS.px(x), CSS.px(0), CSS.px(0))
         );
       } else {
-        element.style.transform = `translateX${x}px`;
+        element.style.transform = `translateX(${x}px)`;
       }
     });
 

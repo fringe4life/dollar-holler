@@ -6,7 +6,6 @@
   import { settingsStore } from "$lib/stores/settingsStore.svelte";
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
-  import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import LineItemRows from "../LineItemRows.svelte";
   import type { PageProps } from "./$types";
@@ -14,10 +13,6 @@
 
   // svelte-ignore state_referenced_locally
   const invoice = $state(data.invoice);
-
-  onMount(() => {
-    settingsStore.loadSettings();
-  });
 
   const printInvoice: BitsButton = () => {
     window.print();
@@ -104,12 +99,18 @@
   </div>
   <div class="col-span-3">
     <div class="label">Due Date:</div>
-    <p>{convertDate(invoice?.dueDate != null ? String(invoice.dueDate) : null)}</p>
+    <p>
+      {convertDate(invoice?.dueDate != null ? String(invoice.dueDate) : null)}
+    </p>
   </div>
 
   <div class="col-span-3 sm:col-span-2 sm:col-start-5">
     <div class="label">Issue Date:</div>
-    <p>{convertDate(invoice?.issueDate != null ? String(invoice.issueDate) : null)}</p>
+    <p>
+      {convertDate(
+        invoice?.issueDate != null ? String(invoice.issueDate) : null
+      )}
+    </p>
   </div>
 
   <div class="col-span-full">

@@ -1,15 +1,14 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
-  import { clickOutside } from "$lib/attachments/clickOutside";
-  import { swipe } from "$lib/attachments/swipe.svelte";
   import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
+  import AdditionalOptionsButton from "$lib/components/additionaloptions/AdditionalOptionsButton.svelte";
+  import type { Option } from "$lib/components/additionaloptions/AdditionalOptionsItem.svelte";
+  import AdditionalOptionsList from "$lib/components/additionaloptions/AdditionalOptionsList.svelte";
+  import Swipeable from "$lib/components/Swipeable.svelte";
   import { Badge } from "$lib/components/ui/badge";
   import Activate from "$lib/icon/Activate.svelte";
   import Archive from "$lib/icon/Archive.svelte";
-  import Cancel from "$lib/icon/Cancel.svelte";
   import Edit from "$lib/icon/Edit.svelte";
-  import ThreeDots from "$lib/icon/ThreeDots.svelte";
   import Trash from "$lib/icon/Trash.svelte";
   import View from "$lib/icon/View.svelte";
   import { centsToDollars } from "$lib/utils/moneyHelpers";
@@ -25,45 +24,58 @@
   };
 
   let { client, onEdit, onActivate, onArchive }: Props = $props();
+  // EVENT HANDLERS
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = () =>
+    (open = true);
+
+  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => onEdit(client);
+
+  const handleActivation: MouseEventHandler<HTMLButtonElement> = () =>
+    onActivate(client);
+
+  const handleArchive: MouseEventHandler<HTMLButtonElement> = () =>
+    onArchive(client);
 
   let open = $state<boolean>(false);
-  const additionalMenu = new Toggle();
-  const swipeReset = new Toggle();
-
-  const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
-    open = true;
-    additionalMenu.off();
-  };
-
-  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
-    onEdit(client);
-    additionalMenu.off();
-  };
-
-  const handleActivation: MouseEventHandler<HTMLButtonElement> = () => {
-    onActivate(client);
-    additionalMenu.off();
-  };
-
-  const handleArchive: MouseEventHandler<HTMLButtonElement> = () => {
-    onArchive(client);
-    additionalMenu.off();
-  };
-
+  // DERIVED STATE
   const receivedDisplay = $derived(centsToDollars(client.received));
   const balanceDisplay = $derived(centsToDollars(client.balance));
   const resolved = $derived(resolve(`/clients/${client.id}`));
+
+  // ADDITIONAL OPTIONS
+  const CLIENT_OPTIONS = [
+    {
+      label: "Edit",
+      icon: Edit,
+      onclick: handleEdit,
+      disabled: false,
+    },
+    {
+      label: "Delete",
+      icon: Trash,
+      onclick: handleDelete,
+      disabled: false,
+    },
+    {
+      label: "Active",
+      icon: Activate,
+      onclick: handleActivation,
+      disabled: client.clientStatus === "active",
+    },
+    {
+      label: "Archive",
+      icon: Archive,
+      onclick: handleArchive,
+      disabled: client.clientStatus === "archive",
+    },
+  ] satisfies Option[];
 </script>
 
-<div class="relative isolate">
-  <div
-    {@attach swipe({
-      triggerReset: swipeReset.isOn,
-      onResetComplete: swipeReset.off,
-    })}
-    class="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
-  >
-    <div class="status">{@render tag(client.clientStatus as string)}</div>
+<Swipeable
+  contentClass="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+>
+  {#snippet content()}
+    <div class="status">{@render tag(client.clientStatus)}</div>
     <div
       class="clientName truncate text-base font-bold whitespace-nowrap lg:text-xl"
     >
@@ -83,52 +95,14 @@
         href={resolved}><View /></a
       >
     </div>
-    <div class="relative hidden place-self-center lg:grid">
-      <button
-        {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
-        onclick={additionalMenu.toggle}
-        class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
-        ><ThreeDots /></button
-      >
-      {#if additionalMenu.isOn}
-        <AdditionalOptions
-          options={[
-            {
-              label: "Edit",
-              icon: Edit,
-              onclick: handleEdit,
-              disabled: false,
-            },
-            {
-              label: "Delete",
-              icon: Trash,
-              onclick: handleDelete,
-              disabled: false,
-            },
-            {
-              label: "Active",
-              icon: Activate,
-              onclick: handleActivation,
-              disabled: client.clientStatus === "active",
-            },
-            {
-              label: "Archive",
-              icon: Archive,
-              onclick: handleArchive,
-              disabled: client.clientStatus === "archive",
-            },
-          ]}
-        />
-      {/if}
-    </div>
-  </div>
-
-  <!-- revealed on swipe -->
-  <div class="swipe-revealed-actions">
-    <button onclick={swipeReset.toggle} class="action-button">
-      <Cancel width={32} height={32} />
-      Cancel
-    </button>
+    <AdditionalOptions options={CLIENT_OPTIONS}>
+      {#snippet content(additionalMenu, options)}
+        <AdditionalOptionsButton {additionalMenu} />
+        <AdditionalOptionsList {additionalMenu} {options} />
+      {/snippet}
+    </AdditionalOptions>
+  {/snippet}
+  {#snippet revealed()}
     {#if client.clientStatus === "active"}
       <button onclick={handleArchive} class="action-button">
         <Archive width={32} height={32} />
@@ -146,19 +120,22 @@
       Delete
     </button>
     <a class="action-button" href={resolved}><View height={32} width={32} /></a>
-  </div>
-</div>
+  {/snippet}
+</Swipeable>
 
-{#snippet tag(title: string)}
-  <Badge class="ml-auto" variant="draft" size="small">{title}</Badge>
+{#snippet tag(title: string | null)}
+  {#if title}
+    <Badge class="ml-auto" variant="draft" size="small">{title}</Badge>
+  {:else}
+    <Badge class="ml-auto" variant="late" size="small">Error</Badge>
+  {/if}
 {/snippet}
 
 <ConfirmClientDelete bind:open {client} />
 
 <style>
   @reference "../../../app.css";
-
-  .client-row {
+  :global(.client-row) {
     grid-template-areas:
       "clientName status"
       "received balance";

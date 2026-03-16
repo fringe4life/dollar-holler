@@ -1,28 +1,30 @@
 import { building } from "$app/environment";
 import { auth } from "$lib/auth";
+import { tryCatch } from "$lib/utils/try-catch";
 import { type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 
-export const localsHandler: Handle = async ({ event, resolve }) => {
-  const session = await auth.api.getSession({
-    headers: event.request.headers,
-  });
-  if (session) {
-    event.locals.session = session.session;
-    event.locals.user = session.user;
-  }
-  return resolve(event);
-};
-
 // auth handler for better auth routes and to populate locals
-export const authHandler: Handle = async ({ event, resolve }) => {
-  return svelteKitHandler({
+export const authHandler: Handle = async ({ event, resolve }) =>
+  svelteKitHandler({
     event,
     resolve,
     auth,
     building,
   });
+
+export const localsHandler: Handle = async ({ event, resolve }) => {
+  const { data: result } = await tryCatch(() =>
+    auth.api.getSession({
+      headers: event.request.headers,
+    })
+  );
+  if (result) {
+    event.locals.session = result.session;
+    event.locals.user = result.user;
+  }
+  return resolve(event);
 };
 
 const PROTECTED_ROUTES = ["/invoices", "/clients", "/settings"];

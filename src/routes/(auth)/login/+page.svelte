@@ -32,7 +32,7 @@
         type="email"
         name="email"
         placeholder="john@email.com"
-        defaultValue={form?.email}
+        defaultValue={form?.email ?? ""}
       />
     </div>
     <div class="field">

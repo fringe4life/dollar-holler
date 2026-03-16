@@ -1,16 +1,15 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
-  import { clickOutside } from "$lib/attachments/clickOutside";
-  import { swipe } from "$lib/attachments/swipe.svelte";
   import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
+  import AdditionalOptionsButton from "$lib/components/additionaloptions/AdditionalOptionsButton.svelte";
+  import type { Option } from "$lib/components/additionaloptions/AdditionalOptionsItem.svelte";
+  import AdditionalOptionsList from "$lib/components/additionaloptions/AdditionalOptionsList.svelte";
+  import Swipeable from "$lib/components/Swipeable.svelte";
   import Badge, {
     type BadgeVariant,
   } from "$lib/components/ui/badge/badge.svelte";
-  import Cancel from "$lib/icon/Cancel.svelte";
   import Edit from "$lib/icon/Edit.svelte";
   import Send from "$lib/icon/Send.svelte";
-  import ThreeDots from "$lib/icon/ThreeDots.svelte";
   import Trash from "$lib/icon/Trash.svelte";
   import View from "$lib/icon/View.svelte";
   import { convertDate } from "$lib/utils/dateHelpers";
@@ -26,21 +25,18 @@
   };
 
   let { invoice, onEdit }: Props = $props();
-  const additionalMenu = new Toggle();
-  const swipeReset = new Toggle();
   let open = $state<boolean>(false);
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
     open = true;
-    additionalMenu.off();
   };
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
     onEdit(invoice);
-    additionalMenu.off();
   };
 
   // TODO: Implement send invoice functionality
+  // even if just using dummy money and a transaction table to keep track of it.
   const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {};
 
   const id = $derived(invoice.id);
@@ -56,16 +52,35 @@
   );
   const isOptionsDisabled = $derived(label !== "draft");
   const resolved = $derived(resolve(`/invoices/${id}`));
+
+  const INVOICE_OPTIONS = [
+    {
+      label: "Edit",
+      icon: Edit,
+      onclick: handleEdit,
+      disabled: isOptionsDisabled,
+    },
+
+    {
+      label: "Delete",
+      icon: Trash,
+      onclick: handleDelete,
+      disabled: false,
+    },
+
+    {
+      label: "Send",
+      icon: Send,
+      onclick: handleSendInvoice,
+      disabled: isOptionsDisabled,
+    },
+  ] satisfies Option[];
 </script>
 
-<div class="relative isolate">
-  <div
-    {@attach swipe({
-      triggerReset: swipeReset.isOn,
-      onResetComplete: swipeReset.off,
-    })}
-    class="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
-  >
+<Swipeable
+  contentClass="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+>
+  {#snippet content()}
     <div class="status justify-self-end">{@render tag(label)}</div>
     <div class="duedate text-sm lg:text-lg">
       {convertDate(dueDate.toISOString())}
@@ -80,49 +95,14 @@
     >
       <a href={resolved}><View /></a>
     </div>
-    <div
-      class="text-pastelPurple morebutton hover:text-daisyBush relative hidden place-self-center text-sm transition-colors duration-200 lg:block lg:text-lg"
-    >
-      <button
-        {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
-        onclick={additionalMenu.toggle}
-        class="flex cursor-pointer items-center justify-center"
-        ><ThreeDots /></button
-      >
-      {#if additionalMenu.isOn}
-        <AdditionalOptions
-          options={[
-            {
-              label: "Edit",
-              icon: Edit,
-              onclick: handleEdit,
-              disabled: isOptionsDisabled,
-            },
-
-            {
-              label: "Delete",
-              icon: Trash,
-              onclick: handleDelete,
-              disabled: false,
-            },
-
-            {
-              label: "Send",
-              icon: Send,
-              onclick: handleSendInvoice,
-              disabled: isOptionsDisabled,
-            },
-          ]}
-        />
-      {/if}
-    </div>
-  </div>
-  <!-- revealed on swipe -->
-  <div class="swipe-revealed-actions">
-    <button onclick={swipeReset.toggle} class="action-button">
-      <Cancel width={32} height={32} />
-      Cancel
-    </button>
+    <AdditionalOptions options={INVOICE_OPTIONS}>
+      {#snippet content(additionalMenu, options)}
+        <AdditionalOptionsButton {additionalMenu} />
+        <AdditionalOptionsList {additionalMenu} {options} />
+      {/snippet}
+    </AdditionalOptions>
+  {/snippet}
+  {#snippet revealed()}
     {#if isOptionsDisabled}
       <button onclick={handleEdit} class="action-button">
         <Edit width={32} height={32} />
@@ -138,8 +118,8 @@
       Delete
     </button>
     <a class="action-button" href={resolved}><View height={32} width={32} /></a>
-  </div>
-</div>
+  {/snippet}
+</Swipeable>
 
 {#snippet tag(title: BadgeVariant)}
   <Badge class="ml-auto lg:ml-0" variant={title} size="small">{title}</Badge>
@@ -154,7 +134,7 @@
 
 <style>
   @reference "../../../app.css";
-  .invoice-row {
+  :global(.invoice-row) {
     grid-template-areas:
       "invoicenumber invoicenumber "
       "clientname    amount"
@@ -184,7 +164,7 @@
   .viewbutton {
     grid-area: viewbutton;
   }
-  .morebutton {
+  :global(.morebutton) {
     grid-area: morebutton;
   }
 </style>

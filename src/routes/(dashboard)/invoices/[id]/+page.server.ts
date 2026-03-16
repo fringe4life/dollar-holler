@@ -34,8 +34,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     ),
   ]);
 
-  const notesHtml = invoice.notes ? markdownToHtml(invoice.notes) : null;
-  const termsHtml = invoice.terms ? markdownToHtml(invoice.terms) : null;
+  const notesHtml = markdownToHtml(invoice?.notes);
+  const termsHtml = markdownToHtml(invoice?.terms);
 
   return {
     invoice,

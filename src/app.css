@@ -6,6 +6,31 @@
 
 @custom-variant has-value (&:where(data-has-value="true") *);
 
+@custom-variant supports-scroll-timeline {
+  @supports (animation-timeline: scroll()) {
+    @slot;
+  }
+}
+
+.landing-nav {
+  animation: --nav-solidify linear both;
+  animation-timeline: scroll(root block);
+  animation-range: 0px 80px;
+}
+
+@keyframes --nav-solidify {
+  from {
+    background-color: transparent;
+    box-shadow: none;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    background-color: oklch(from var(--color-whisper) l c h / 0.95);
+    box-shadow: 0 1px 3px oklch(from black l c h / 0.1);
+    backdrop-filter: blur(8px);
+  }
+}
+
 @theme {
   --color-*: initial;
   --font-sansserif: "Source Sans 3", sans-serif;
@@ -102,13 +127,6 @@
 }
 
 @layer components {
-  .action-button {
-    @apply text-daisyBush flex flex-col items-center justify-center font-bold;
-  }
-  .swipe-revealed-actions {
-    @apply absolute inset-0 z-1 flex h-full w-full items-center justify-around;
-  }
-
   .invoice-table {
     @apply mb-3 grid w-full grid-cols-[1fr_90px] gap-x-4 px-4 lg:grid-cols-[max-content_100px_80px_max-content_1fr_32px_32px] lg:px-6;
   }

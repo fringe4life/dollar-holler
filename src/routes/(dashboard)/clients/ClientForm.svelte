@@ -1,10 +1,10 @@
 <script lang="ts">
+  import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import type { Client, NewClient } from "$lib/db/schema";
   import Check from "$lib/icon/Check.svelte";
   import Trash from "$lib/icon/Trash.svelte";
   import { clientsStore } from "$lib/stores/clientsStore.svelte";
-  import { states } from "$lib/utils/states";
   import { onMount } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
 
@@ -85,11 +85,7 @@
 
   <div class="field col-span-2">
     <label for="state">State</label>
-    <select name="state" id="state" bind:value={client.state}>
-      {#each states as state (state.name)}
-        {@render State(state)}
-      {/each}
-    </select>
+    <States bind:value={client.state} />
   </div>
 
   <div class="field col-span-2">
@@ -114,7 +110,3 @@
     <Button type="submit"><Check /> Submit</Button>
   </div>
 </form>
-
-{#snippet State({ value, name }: (typeof states)[number])}
-  <option {value}>{name}</option>
-{/snippet}

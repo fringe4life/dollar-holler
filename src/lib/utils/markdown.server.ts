@@ -5,7 +5,7 @@
 import type { Maybe, SanitizedHTML } from "$lib/types";
 import { sanitize } from "isomorphic-dompurify";
 
-export const markdownToHtml = (source: string): Maybe<SanitizedHTML> => {
+export const markdownToHtml = (source: Maybe<string>): Maybe<SanitizedHTML> => {
   if (!source) return null;
 
   try {

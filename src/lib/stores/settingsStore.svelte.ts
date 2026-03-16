@@ -12,6 +12,23 @@ class SettingsStore {
   // Use $derived for computed values
   isLoaded = $derived(this.settings !== null);
 
+  /** Returns a blank Settings for forms (before load or when no settings exist). */
+  newSettings(): SettingsResponse {
+    const now = new Date();
+    return {
+      id: "",
+      userId: "",
+      myName: "",
+      email: "",
+      street: "",
+      city: "",
+      state: "",
+      zip: "",
+      createdAt: now,
+      updatedAt: now,
+    };
+  }
+
   // Load settings from API
   async loadSettings() {
     this.loading = true;

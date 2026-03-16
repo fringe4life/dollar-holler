@@ -99,8 +99,8 @@
   {:else if filteredInvoices.length === 0}
     <NoSearchResults />
   {:else}
-    <div>
-      <InvoiceRowHeader />
+    <InvoiceRowHeader />
+    <div class="flex flex-col-reverse gap-4">
       {#each filteredInvoices as invoice (invoice.id)}
         <InvoiceRow {invoice} onEdit={handleEdit} />
       {/each}

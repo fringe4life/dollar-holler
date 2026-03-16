@@ -1,6 +1,7 @@
 import type { Attachment } from "svelte/attachments";
 import { on } from "svelte/events";
 import { Spring } from "svelte/motion";
+import { MediaQuery } from "svelte/reactivity";
 
 interface SwipeConfig {
   triggerReset?: boolean;
@@ -28,7 +29,16 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     onSwipeRight,
     threshold = 20,
   } = config;
+  // Check if we're on mobile
+  const isMobile = new MediaQuery("(max-width: 1024px)").current;
 
+  const spring = new Spring(
+    { x: 0, y: 0 },
+    {
+      stiffness: 0.2,
+      damping: 0.4,
+    }
+  );
   return (element) => {
     let startX = 0;
     let currentX = 0;
@@ -38,13 +48,6 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     let documentCleanups: (() => void)[] = [];
 
     // Use the new Spring class for smooth animations
-    const spring = new Spring(
-      { x: 0, y: 0 },
-      {
-        stiffness: 0.2,
-        damping: 0.4,
-      }
-    );
 
     // Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
     const useTypedOM =
@@ -63,12 +66,6 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
       } else {
         element.style.transform = `translateX(${x}px)`;
       }
-    });
-
-    // Check if we're on mobile
-    const isMobile = $derived(() => {
-      if (typeof window === "undefined") return false;
-      return window.innerWidth <= 1024;
     });
 
     // Reset function
@@ -99,7 +96,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Mouse event handlers
     function handleMouseDown(event: MouseEvent) {
-      if (!isMobile()) return;
+      if (!isMobile) return;
 
       documentCleanups.forEach((off) => off());
       documentCleanups = [];
@@ -132,7 +129,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Touch event handlers
     function handleTouchStart(event: TouchEvent) {
-      if (!isMobile()) return;
+      if (!isMobile) return;
 
       documentCleanups.forEach((off) => off());
       documentCleanups = [];
@@ -176,7 +173,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Watch for mobile breakpoint changes: use on() so cleanup is returned and order matches declarative handlers
     $effect(() => {
-      if (!isMobile()) {
+      if (!isMobile) {
         spring.set({ x: 0, y: 0 });
         return;
       }

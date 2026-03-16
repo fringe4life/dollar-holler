@@ -7,7 +7,6 @@
   import type { BitsButton, Maybe } from "$lib/types";
   import { today } from "$lib/utils/dateHelpers";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
-  import { states } from "$lib/utils/states";
   import type { InvoiceSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
@@ -15,6 +14,7 @@
   import { slide } from "svelte/transition";
   import ConfirmDelete from "../../routes/(dashboard)/invoices/ConfirmDelete.svelte";
   import LineItemRows from "../../routes/(dashboard)/invoices/LineItemRows.svelte";
+  import States from "./States.svelte";
   import Button from "./ui/button/button.svelte";
 
   type Panel = {
@@ -62,12 +62,23 @@
     if (isEdit && editId) {
       lineItemsLoaded = false;
       const token = ++loadToken;
-      lineItemsStore.loadLineItemsByInvoiceId(editId).then((items) => {
-        if (token !== loadToken) return;
-        lineItems =
-          items && items.length > 0 ? items : [lineItemsStore.newLineItem()];
-        lineItemsLoaded = true;
-      });
+      lineItemsStore
+        .loadLineItemsByInvoiceId(editId)
+        .then((items) => {
+          if (token !== loadToken) return;
+          if (items) {
+            lineItems = items;
+          } else {
+            lineItems = [lineItemsStore.newLineItem()];
+          }
+          lineItemsLoaded = true;
+        })
+        .catch((_) => {
+          lineItems = [lineItemsStore.newLineItem()];
+        })
+        .finally(() => {
+          lineItemsLoaded = true;
+        });
       return () => {
         loadToken++;
       };
@@ -293,11 +304,7 @@
 
       <div class="field col-span-2">
         <label for="state">State</label>
-        <select name="state" id="state" bind:value={newClient.state}>
-          {#each states as state (state.name)}
-            {@render State(state)}
-          {/each}
-        </select>
+        <States bind:value={newClient.state} />
       </div>
 
       <div class="field col-span-2">
@@ -394,10 +401,6 @@
     <Button variant="default" type="submit">Save</Button>
   </div>
 </form>
-
-{#snippet State({ value, name }: (typeof states)[number])}
-  <option {value}>{name}</option>
-{/snippet}
 
 <ConfirmDelete
   bind:open

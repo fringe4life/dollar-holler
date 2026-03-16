@@ -1,34 +1,22 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
+  import Alert from "$lib/components/Alert.svelte";
+  import Loader from "$lib/components/Loader.svelte";
   import Navbar from "$lib/components/Navbar.svelte";
+  import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import type { Settings } from "$lib/db/schema";
   import Check from "$lib/icon/Check.svelte";
   import { settingsStore } from "$lib/stores/settingsStore.svelte";
-  import { states } from "$lib/utils/states";
+  import type { SettingsResponse } from "$lib/validators";
   import { onMount } from "svelte";
 
-  const { data } = $props();
+  const { data, form } = $props();
 
-  let mySettings = $state({
-    myName: "",
-    email: "",
-    street: "",
-    city: "",
-    state: "",
-    zip: "",
-    id: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    userId: "",
-  } satisfies Settings);
+  let isPasswordLoading = $state(false);
+
+  let mySettings = $state<SettingsResponse>(settingsStore.newSettings());
   onMount(async () => {
-    console.log("[settings list] loadSettings() called");
     await settingsStore.loadSettings();
-    console.log("[settings list] loadSettings() done", {
-      hasSettings: !!settingsStore.settings,
-      error: settingsStore.error,
-      loading: settingsStore.loading,
-    });
     if (settingsStore.settings) {
       mySettings = { ...settingsStore.settings };
     }
@@ -81,11 +69,7 @@
       </div>
       <div class="field col-span-6 md:col-span-2">
         <label for="state">State</label>
-        <select name="state" id="state" bind:value={mySettings.state}>
-          {#each states as state (state.name)}
-            {@render State(state)}
-          {/each}
-        </select>
+        <States bind:value={mySettings.state} />
       </div>
       <div class="field col-span-6 md:col-span-2">
         <label for="zip">Zip</label>
@@ -101,35 +85,56 @@
       <h2>Update Account Information</h2>
       <p class="mb-8">This information is used to access your account.</p>
     </div>
-    <form class="grid grid-cols-6 gap-x-5">
-      <div class="field col-span-6 md:col-span-3">
-        <label for="email">Email</label>
-        <input type="email" name="email" id="email" />
-      </div>
+    <form
+      method="POST"
+      class="grid grid-cols-6 gap-x-5"
+      use:enhance={() => {
+        isPasswordLoading = true;
+        return async ({ update }) => {
+          isPasswordLoading = false;
+          await update();
+        };
+      }}
+    >
+      <Alert message={form?.error} />
+      <fieldset disabled={isPasswordLoading} class="contents">
+        <div class="field col-span-6 md:col-span-3">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            name="email"
+            id="email"
+            defaultValue={form?.email ?? data?.user?.email}
+          />
+        </div>
 
-      <div class="field col-span-6 md:col-span-3">
-        <label for="currentPassword">Current Password</label>
-        <input type="password" name="currentPassword" id="currentPassword" />
-      </div>
+        <div class="field col-span-6 md:col-span-3">
+          <label for="currentPassword">Current Password</label>
+          <input type="password" name="currentPassword" id="currentPassword" />
+        </div>
 
-      <div class="field col-span-6 md:col-span-3">
-        <label for="newPassword">New Password</label>
-        <input type="password" name="newPassword" id="newPassword" />
-      </div>
+        <div class="field col-span-6 md:col-span-3">
+          <label for="newPassword">New Password</label>
+          <input type="password" name="newPassword" id="newPassword" />
+        </div>
 
-      <div class="field col-span-6 md:col-span-3">
-        <label for="confirmPassword">Confirm Password</label>
-        <input type="password" name="confirmPassword" id="confirmPassword" />
-      </div>
-      <div class="field col-span-full justify-self-end">
-        <Button><Check /> Save</Button>
-      </div>
+        <div class="field col-span-6 md:col-span-3">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" name="confirmPassword" id="confirmPassword" />
+        </div>
+        <div class="field col-span-full justify-self-end">
+          <Button variant="auth" type="submit" disabled={isPasswordLoading}>
+            {#if isPasswordLoading}
+              <Loader />
+            {:else}
+              <Check /> Save
+            {/if}
+          </Button>
+        </div>
+      </fieldset>
     </form>
   </main>
 </div>
-{#snippet State({ value, name }: (typeof states)[number])}
-  <option {value}>{name}</option>
-{/snippet}
 
 <style>
   @reference "../../app.css";

@@ -17,23 +17,20 @@
   import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { InvoiceListResponse } from "$lib/validators";
   import type { MouseEventHandler } from "svelte/elements";
-  import ConfirmDelete from "./ConfirmDelete.svelte";
 
   type Props = {
     invoice: InvoiceListResponse;
     onEdit: (invoice: InvoiceListResponse) => void;
+    onDelete: (invoice: InvoiceListResponse) => void;
   };
 
-  let { invoice, onEdit }: Props = $props();
-  let open = $state<boolean>(false);
+  let { invoice, onEdit, onDelete }: Props = $props();
 
-  const handleDelete: MouseEventHandler<HTMLButtonElement> = () => {
-    open = true;
-  };
+  const handleDelete: MouseEventHandler<HTMLButtonElement> = () =>
+    onDelete(invoice);
 
-  const handleEdit: MouseEventHandler<HTMLButtonElement> = () => {
+  const handleEdit: MouseEventHandler<HTMLButtonElement> = () =>
     onEdit(invoice);
-  };
 
   // TODO: Implement send invoice functionality
   // even if just using dummy money and a transaction table to keep track of it.
@@ -53,7 +50,7 @@
   const isOptionsDisabled = $derived(label !== "draft");
   const resolved = $derived(resolve(`/invoices/${id}`));
 
-  const INVOICE_OPTIONS = [
+  const INVOICE_OPTIONS = $derived([
     {
       label: "Edit",
       icon: Edit,
@@ -74,11 +71,12 @@
       onclick: handleSendInvoice,
       disabled: isOptionsDisabled,
     },
-  ] satisfies Option[];
+  ] satisfies Option[]);
 </script>
 
 <Swipeable
-  contentClass="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentClass="invoice-table invoice-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentViewTransitionName={`invoice-${id}`}
 >
   {#snippet content()}
     <div class="status justify-self-end">{@render tag(label)}</div>
@@ -86,19 +84,19 @@
       {convertDate(dueDate.toISOString())}
     </div>
     <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
-    <div class="clientname text-base font-bold lg:text-xl">{client.name}</div>
+    <div class="clientName text-base font-bold lg:text-xl">{client.name}</div>
     <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
       {totalDisplay}
     </div>
     <div
-      class="hover:text-daisyBush viewbutton text-pastelPurple hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
+      class="viewbutton hidden text-sm text-pastelPurple transition-colors duration-200 hover:text-daisyBush md:place-self-center lg:block lg:text-lg"
     >
       <a href={resolved}><View /></a>
     </div>
-    <AdditionalOptions options={INVOICE_OPTIONS}>
-      {#snippet content(additionalMenu, options)}
+    <AdditionalOptions>
+      {#snippet content(additionalMenu)}
         <AdditionalOptionsButton {additionalMenu} />
-        <AdditionalOptionsList {additionalMenu} {options} />
+        <AdditionalOptionsList {additionalMenu} options={INVOICE_OPTIONS} />
       {/snippet}
     </AdditionalOptions>
   {/snippet}
@@ -122,49 +120,44 @@
 </Swipeable>
 
 {#snippet tag(title: BadgeVariant)}
-  <Badge class="ml-auto lg:ml-0" variant={title} size="small">{title}</Badge>
+  <Badge class="ms-auto lg:ms-0" variant={title} size="small">{title}</Badge>
 {/snippet}
 
-<ConfirmDelete
-  bind:open
-  invoiceId={id}
-  clientName={client.name}
-  {totalDisplay}
-/>
-
 <style>
-  @reference "../../../app.css";
-  :global(.invoice-row) {
-    grid-template-areas:
-      "invoicenumber invoicenumber "
-      "clientname    amount"
-      "duedate       status";
-    @media screen and (width > 1024px) {
-      grid-template-areas: "status duedate invoicenumber clientname amount viewbutton morebutton";
+  @reference "#app.css";
+  :global {
+    .invoice-row {
+      grid-template-areas:
+        "invoicenumber invoicenumber"
+        "clientName    amount"
+        "duedate       status";
+      @media screen and (width > 1024px) {
+        grid-template-areas: "status duedate invoicenumber clientName amount viewbutton morebutton";
+      }
     }
-  }
 
-  .status {
-    grid-area: status;
-  }
-  .duedate {
-    grid-area: duedate;
-  }
-  .invoicenumber {
-    grid-area: invoicenumber;
-  }
-  .clientname {
-    grid-area: clientname;
-  }
+    .status {
+      grid-area: status;
+    }
+    .duedate {
+      grid-area: duedate;
+    }
+    .invoicenumber {
+      grid-area: invoicenumber;
+    }
+    .clientName {
+      grid-area: clientName;
+    }
 
-  .amount {
-    grid-area: amount;
-  }
+    .amount {
+      grid-area: amount;
+    }
 
-  .viewbutton {
-    grid-area: viewbutton;
-  }
-  :global(.morebutton) {
-    grid-area: morebutton;
+    .viewbutton {
+      grid-area: viewbutton;
+    }
+    .morebutton {
+      grid-area: morebutton;
+    }
   }
 </style>

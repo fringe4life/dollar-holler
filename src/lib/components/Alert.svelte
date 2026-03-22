@@ -9,7 +9,7 @@
 
 {#if message}
   <div
-    class="bg-lavenderIndigo mb-8 h-14 rounded-md p-4 text-center text-base text-white"
+    class="mbe-8 rounded-md bg-lavenderIndigo p-4 text-center text-base text-white min-block-14"
   >
     <p>{message}</p>
   </div>

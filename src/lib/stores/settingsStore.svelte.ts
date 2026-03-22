@@ -3,7 +3,7 @@ import type { Maybe } from "$lib/types";
 import { type SettingsResponse } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
-class SettingsStore {
+export class SettingsStore {
   // Use $state for reactive class fields
   settings = $state<Maybe<SettingsResponse>>(null);
   loading = $state(false);
@@ -92,6 +92,3 @@ class SettingsStore {
     this.error = null;
   }
 }
-
-// Create and export a singleton instance
-export const settingsStore = new SettingsStore();

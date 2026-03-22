@@ -19,17 +19,14 @@
 </script>
 
 {#if !option.disabled}
-  <li class="not-last:border-b-whisper not-last:border-b-2">
+  {@const Icon = option.icon || View}
+  <li class="not-last:border-b-2 not-last:border-b-whisper">
     <button
-      class="font-sansserif text-pastelPurple hover:text-daisyBush flex w-full cursor-pointer gap-x-2 p-4 font-bold"
+      class="flex cursor-pointer gap-x-2 p-4 font-sansserif font-bold text-pastelPurple inline-full hover:text-daisyBush"
       type="button"
       onclick={option.onclick}
     >
-      {#if option.icon}
-        <option.icon />
-      {:else}
-        <View />
-      {/if}
+      <Icon />
       {option.label}
     </button>
   </li>

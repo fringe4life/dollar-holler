@@ -8,9 +8,12 @@
     content: Snippet;
     revealed: Snippet;
     contentClass: string;
+    /** Stable name for View Transitions API (e.g. `client-${id}`) so rows morph instead of cross-fading. */
+    contentViewTransitionName?: string;
   };
 
-  let { content, revealed, contentClass }: Props = $props();
+  let { content, revealed, contentClass, contentViewTransitionName }: Props =
+    $props();
   const swipeReset = new Toggle();
 </script>
 
@@ -22,12 +25,13 @@
       onResetComplete: swipeReset.off,
     })}
     class={contentClass}
+    style:view-transition-name={contentViewTransitionName}
   >
     {@render content()}
   </div>
   <!-- REVEALED CONTENT displayed when the user swipes the card -->
   <div
-    class="absolute inset-0 z-1 flex h-full w-full items-center justify-around"
+    class="absolute inset-0 z-1 flex items-center justify-around block-full inline-full"
   >
     <button onclick={swipeReset.toggle} class="action-button">
       <Cancel width={32} height={32} />
@@ -38,8 +42,8 @@
 </div>
 
 <style>
-  @reference "../../app.css";
+  @reference "#app.css";
   :global(.action-button) {
-    @apply text-daisyBush flex flex-col items-center justify-center font-bold;
+    @apply grid justify-items-center font-bold text-daisyBush;
   }
 </style>

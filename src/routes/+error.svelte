@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { page } from '$app/state'
-  import { asset } from '$app/paths'
+  import { asset } from "$app/paths";
+  import { page } from "$app/state";
 </script>
 
 <svelte:head>
@@ -8,12 +8,16 @@
 </svelte:head>
 
 <div
-  class="flex min-h-dvh w-full items-center justify-center bg-center bg-no-repeat"
+  class="flex min-h-dvh items-center justify-center bg-center bg-no-repeat inline-full"
   style="background-image: url('{asset('/images/bg-error.svg')}')"
 >
   <div>
-    <h1 class="text-daisyBush text-5xl leading-none font-black">{page.status}</h1>
-    <p class="text-daisyBush text-center text-lg font-bold">Sorry</p>
-    <p class="text-daisyBush text-center text-base">We can't find the page you're looking for.</p>
+    <h1 class="text-5xl leading-none font-black text-daisyBush">
+      {page.status}
+    </h1>
+    <p class="text-center text-lg font-bold text-daisyBush">Sorry</p>
+    <p class="text-center text-base text-daisyBush">
+      We can't find the page you're looking for.
+    </p>
   </div>
 </div>

@@ -11,7 +11,7 @@ import type {
 } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
-class InvoicesStore {
+export class InvoicesStore {
   // Use $state for reactive class fields
   invoices = $state<InvoiceListResponse[]>([]);
   loading = $state(false);
@@ -36,13 +36,22 @@ class InvoicesStore {
     };
   }
 
-  // Load all invoices (with client name and total)
-  async loadInvoices() {
+  // Load all invoices (with client name and total). Pass q for search.
+  async loadInvoices(searchQuery?: string, options?: { signal?: AbortSignal }) {
     this.loading = true;
     this.error = null;
 
+    const signal = options?.signal;
+    const getOptions =
+      searchQuery || signal
+        ? {
+            ...(searchQuery ? { query: { q: searchQuery } } : {}),
+            ...(signal ? { fetch: { signal } } : {}),
+          }
+        : undefined;
+
     try {
-      const { data: invoiceData } = await client.api.invoices.get();
+      const { data: invoiceData } = await client.api.invoices.get(getOptions);
       if (
         !invoiceData ||
         (typeof invoiceData === "object" && "error" in invoiceData)
@@ -57,6 +66,9 @@ class InvoicesStore {
       this.invoices.length = 0;
       this.invoices.push(...invoiceData);
     } catch (error) {
+      if (error instanceof Error && error.name === "AbortError") {
+        return;
+      }
       const errorMessage =
         error instanceof Error ? error.message : "Failed to load invoices";
       this.error = errorMessage;
@@ -229,9 +241,3 @@ class InvoicesStore {
     this.error = null;
   }
 }
-
-// Create and export a singleton instance
-export const invoicesStore = new InvoicesStore();
-
-// Export store instance and reactive properties
-export const { invoices, loading, error, isLoaded } = invoicesStore;

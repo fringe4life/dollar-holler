@@ -15,13 +15,15 @@
 
 <nav
   class="
-    fixed inset-x-0 top-0 z-50
-    not-supports-scroll-timeline:bg-whisper/95 not-supports-scroll-timeline:shadow-xs not-supports-scroll-timeline:backdrop-blur-xs
+    landing-nav fixed inset-x-0 top-0
+    z-50 not-supports-scroll-timeline:bg-whisper/95 not-supports-scroll-timeline:shadow-xs
     
-    landing-nav
+    not-supports-scroll-timeline:backdrop-blur-xs
   "
 >
-  <div class="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+  <div
+    class="mx-auto flex items-center justify-between px-6 py-4 max-inline-6xl"
+  >
     <!-- Logo -->
     <a
       href={resolve("/")}
@@ -31,10 +33,10 @@
       <img
         src={asset("/images/logo.svg")}
         alt="Dollar Holler"
-        class="h-8 w-8"
+        class="aspect-square inline-8"
       />
       <span
-        class="font-sansserif text-daisyBush text-xl font-black tracking-tight"
+        class="font-sansserif text-xl font-black tracking-tight text-daisyBush"
       >
         Dollar Holler
       </span>
@@ -58,7 +60,7 @@
 
     <!-- Mobile Hamburger -->
     <button
-      class="text-daisyBush flex cursor-pointer items-center md:hidden"
+      class="flex cursor-pointer items-center text-daisyBush md:hidden"
       onclick={mobileOpen.toggle}
       aria-label="Toggle navigation"
     >
@@ -73,7 +75,7 @@
   <!-- Mobile Dropdown -->
   {#if mobileOpen.isOn}
     <div
-      class="bg-whisper border-t border-gray-100 px-6 py-4 shadow-lg md:hidden"
+      class="border-gray-100 border-t bg-whisper px-6 py-4 shadow-lg md:hidden"
     >
       <div class="flex flex-col gap-3">
         {#if user}

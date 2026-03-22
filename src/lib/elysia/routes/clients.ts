@@ -4,7 +4,7 @@ import {
   clients as clientsTable,
   invoices as invoicesTable,
 } from "$lib/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, ilike, or, sql } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 import { clientReceivedBalanceSubquery } from "../clientListHelpers";
@@ -28,13 +28,33 @@ const clientSchema = t.Object({
   ),
 });
 
+const clientStatusPatchSchema = t.Object({
+  clientStatus: t.Union([t.Literal("active"), t.Literal("archive")]),
+});
+
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
   .use(betterAuthPlugin)
   // GET /api/clients - List all clients with received and balance
   .get(
     "/",
-    async ({ user }) => {
+    async ({ user, query }) => {
       try {
+        const baseWhere = eq(clientsTable.userId, user.id);
+        const searchWhere = query.q?.trim()
+          ? or(
+              ilike(clientsTable.name, `%${query.q.trim()}%`),
+              ilike(clientsTable.email, `%${query.q.trim()}%`),
+              ilike(clientsTable.street, `%${query.q.trim()}%`),
+              ilike(clientsTable.city, `%${query.q.trim()}%`),
+              ilike(clientsTable.state, `%${query.q.trim()}%`),
+              ilike(clientsTable.zip, `%${query.q.trim()}%`),
+              ilike(clientsTable.clientStatus, `%${query.q.trim()}%`)
+            )
+          : undefined;
+        const whereClause = searchWhere
+          ? and(baseWhere, searchWhere)
+          : baseWhere;
+
         const rows = await db
           .select({
             id: clientsTable.id,
@@ -56,7 +76,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
             clientReceivedBalanceSubquery,
             eq(clientsTable.id, clientReceivedBalanceSubquery.clientId)
           )
-          .where(eq(clientsTable.userId, user.id));
+          .where(whereClause);
 
         return rows.map((row) => ({
           ...row,
@@ -67,7 +87,12 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         return { error: "Failed to load clients" };
       }
     },
-    { auth: true }
+    {
+      auth: true,
+      query: t.Object({
+        q: t.Optional(t.String()),
+      }),
+    }
   )
   // POST /api/clients - Create client (with upsert on conflict)
   .post(
@@ -161,6 +186,42 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }),
       body: clientSchema,
 
+      auth: true,
+    }
+  )
+  // PATCH /api/clients/:id - Update client status only
+  .patch(
+    "/:id",
+    async ({ params: { id }, body, set, user }) => {
+      try {
+        const [updated] = await db
+          .update(clientsTable)
+          .set({
+            clientStatus: body.clientStatus,
+            updatedAt: new Date(),
+          })
+          .where(and(eq(clientsTable.id, id), eq(clientsTable.userId, user.id)))
+          .returning({
+            id: clientsTable.id,
+            clientStatus: clientsTable.clientStatus,
+            updatedAt: clientsTable.updatedAt,
+          });
+
+        if (!updated) {
+          set.status = 404;
+          return { error: "Client not found" };
+        }
+        return updated;
+      } catch (error) {
+        console.error("Error updating client status:", error);
+        return { error: "Failed to update client status" };
+      }
+    },
+    {
+      params: t.Object({
+        id: t.String(),
+      }),
+      body: clientStatusPatchSchema,
       auth: true,
     }
   )

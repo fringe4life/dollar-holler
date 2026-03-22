@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Icon, { type IconProps } from "$lib/components/Icon.svelte"
+  import Icon, { type IconProps } from "$lib/components/Icon.svelte";
 
-  let { width, height, ...rest }: IconProps = $props()
+  let { width, height, ...rest }: IconProps = $props();
 </script>
 
 <Icon {width} {height} {...rest}>

@@ -1,9 +1,9 @@
+import { resolve } from "$app/paths";
 import { auth } from "$lib/auth";
 import { tryCatch } from "$lib/utils/try-catch";
 import { changePasswordSchema } from "$lib/validators";
 import { fail, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
-import { toast } from "svelte-sonner";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {
@@ -35,7 +35,6 @@ export const actions: Actions = {
     if (error || !data) {
       return fail(400, { error: "Failed to change password", email });
     }
-    toast.success("Password changed successfully");
-    throw redirect(303, "/settings");
+    throw redirect(303, resolve("/settings"));
   },
 };

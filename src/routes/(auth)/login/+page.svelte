@@ -1,30 +1,15 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
   import { resolve } from "$app/paths";
-  import Alert from "$lib/components/Alert.svelte";
-  import Loader from "$lib/components/Loader.svelte";
-  import { Button } from "$lib/components/ui/button";
+  import Form from "$lib/components/Form.svelte";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
-
-  let isLoading = $state<boolean>(false);
 </script>
 
 <h1 class="auth-heading">Login</h1>
 
-<form
-  method="POST"
-  use:enhance={() => {
-    isLoading = true;
-    return async ({ update }) => {
-      isLoading = false;
-      await update();
-    };
-  }}
->
-  <Alert message={form?.error} />
-  <fieldset disabled={isLoading}>
+<Form {form}>
+  {#snippet children()}
     <div class="field">
       <label for="email" class="text-goldenFizz">Email</label>
       <input
@@ -39,25 +24,21 @@
       <div class="flex items-center justify-between">
         <label for="password" class="text-goldenFizz">Password</label>
         <a
-          class="text-sm underline hover:no-underline text-whisper"
+          class="text-sm text-whisper underline hover:no-underline"
           href={resolve("/forgot-password")}>Forgot Password</a
         >
       </div>
       <input required minlength="6" type="password" name="password" />
     </div>
-    <div class="field">
-      <Button variant="auth" type="submit" disabled={isLoading}>
-        {#if isLoading}
-          <Loader />
-        {:else}
-          Let's do this!
-        {/if}
-      </Button>
-      <p class="mt-4 text-center text-sm text-white">
-        <a href={resolve("/signup")} class="underline hover:no-underline"
-          >Don't have an account yet?</a
-        >
-      </p>
-    </div>
-  </fieldset>
-</form>
+  {/snippet}
+  {#snippet submit()}
+    Let's do this!
+  {/snippet}
+  {#snippet footer()}
+    <p class="mbs-4 text-center text-sm text-white">
+      <a href={resolve("/signup")} class="underline hover:no-underline"
+        >Don't have an account yet?</a
+      >
+    </p>
+  {/snippet}
+</Form>

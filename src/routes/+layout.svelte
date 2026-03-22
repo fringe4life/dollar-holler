@@ -1,6 +1,6 @@
 <script>
   import { Toaster } from "$lib/components/ui/sonner";
-  import "../app.css";
+  import "#app.css";
 
   let { children } = $props();
 </script>

@@ -32,15 +32,15 @@
 />
 
 <div
-  class="bg-whisper h-full min-h-dvh w-full pt-16 lg:pt-12 lg:pb-32 print:bg-transparent print:py-0"
+  class="bg-whisper pbs-16 block-full inline-full min-block-dvh lg:pbs-12 lg:pbe-32 print:bg-transparent print:py-0"
 >
   <main
     transition:fly={{ y: 500, duration: 200 }}
-    class="mx-auto min-h-dvh max-w-5xl"
+    class="mx-auto max-inline-5xl min-block-dvh"
   >
     <a
       href={getBackUrl()}
-      class="text-pastelPurple fixed top-7 left-7 print:hidden"><Arrow /></a
+      class="fixed top-7 left-7 text-pastelPurple print:hidden"><Arrow /></a
     >
     {@render children()}
   </main>

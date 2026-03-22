@@ -4,7 +4,7 @@
   import type { Client, NewClient } from "$lib/db/schema";
   import Check from "$lib/icon/Check.svelte";
   import Trash from "$lib/icon/Trash.svelte";
-  import { clientsStore } from "$lib/stores/clientsStore.svelte";
+  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import { onMount } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
 
@@ -25,6 +25,8 @@
   export type Props = CreateProps | EditProps;
 
   let { formState, closePanel, edit = $bindable() }: Props = $props();
+
+  const { clients: clientsStore } = getDashboardStores();
 
   onMount(() => {
     clientsStore.loadClients();

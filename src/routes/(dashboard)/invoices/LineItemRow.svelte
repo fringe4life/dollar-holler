@@ -40,7 +40,7 @@
   };
 </script>
 
-<div class="invoice-line-item border-fog border-b-2 py-4 sm:py-2">
+<div class="invoice-line-item border-b-2 border-fog py-4 sm:py-2">
   <div class="description">
     <label for="description" class="line-item-label">Description</label>
     <input
@@ -99,32 +99,30 @@
       <Button
         onclick={() => removeLineItem(lineItem.id)}
         variant="ghost"
-        class="h-10 w-full text-center"><Trash /></Button
+        class="text-center block-10 inline-full"><Trash /></Button
       >
     {/if}
   </div>
 </div>
 
 <style>
-  @reference "../../../app.css";
-  input[type="text"],
-  input[type="number"] {
-    @apply h-10 w-full border-b-2 border-dashed border-stone-300;
+  @reference "#app.css";
+  input:where([type="text"], [type="number"]) {
+    @apply border-b-2 border-dashed border-stone-300 block-10 inline-full;
   }
   input[type="text"] {
-    @apply font-sansserif h-10 text-xl font-bold;
+    @apply font-sansserif text-xl font-bold block-10;
   }
 
   input[type="number"] {
     @apply font-mono text-base;
   }
 
-  input[type="text"]:focus,
-  input[type="number"]:focus {
-    @apply border-lavenderIndigo border-solid outline-none;
+  input:where([type="text"], [type="number"]):focus {
+    @apply border-solid border-lavenderIndigo outline-none;
   }
 
-  input:is([type="number"], [type="text"]):is(:disabled) {
+  input:where([type="number"], [type="text"]):disabled {
     @apply border-b-0 bg-transparent px-0;
   }
 

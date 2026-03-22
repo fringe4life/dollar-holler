@@ -1,17 +1,17 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
-  import { Dialog, type WithoutChild } from 'bits-ui'
-  import Cancel from '$lib/icon/Cancel.svelte'
-  import Button from './ui/button/button.svelte'
+  import Cancel from "$lib/icon/Cancel.svelte";
+  import { Dialog, type WithoutChild } from "bits-ui";
+  import type { Snippet } from "svelte";
+  import Button from "./ui/button/button.svelte";
 
   type Props = Dialog.RootProps & {
-    buttonText: string
-    title: Snippet
-    description: Snippet
-    contentProps?: WithoutChild<Dialog.ContentProps>
+    buttonText: string;
+    title: Snippet;
+    description: Snippet;
+    contentProps?: WithoutChild<Dialog.ContentProps>;
     // ...other component props if you wish to pass them
-    className?: string
-  }
+    className?: string;
+  };
 
   let {
     open = $bindable(false),
@@ -20,9 +20,9 @@
     contentProps,
     title,
     description,
-    className = '',
+    className = "",
     ...restProps
-  }: Props = $props()
+  }: Props = $props();
 </script>
 
 <svelte:head>
@@ -46,10 +46,10 @@
   </Dialog.Trigger> -->
   <Dialog.Portal>
     <Dialog.Overlay
-      class={`data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-blueGem/60 fixed inset-0 ${className ? className : 'z-50'}`}
+      class={`fixed inset-0 bg-blueGem/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 ${className ? className : "z-50"}`}
     />
     <Dialog.Content
-      class="rounded-card-lg bg-background shadow-popover data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-500 grid min-h-57.5 w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] content-between items-center border px-10 py-7 outline-hidden sm:max-w-122.5  md:w-full"
+      class="rounded-card-lg fixed top-[50%] left-[50%] z-500 grid min-h-57.5 translate-x-[-50%] translate-y-[-50%] content-between items-center border bg-background px-10 py-7 shadow-popover outline-hidden inline-full max-inline-[calc(100%-2rem)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-inline-122.5  md:inline-full"
       {...contentProps}
     >
       <Dialog.Title>
@@ -60,7 +60,7 @@
       </Dialog.Description>
       {@render children?.()}
       <Dialog.Close
-        class=" focus-visible:ring-foreground focus-visible:ring-offset-background text-pastelPurple hover:text-blueGem  absolute rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95 pointer-coarse:top-1 pointer-coarse:right-1 pointer-fine:top-4 pointer-fine:right-4"
+        class=" absolute rounded-md text-pastelPurple hover:text-blueGem  focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-hidden active:scale-95 pointer-coarse:top-1 pointer-coarse:right-1 pointer-fine:top-4 pointer-fine:right-4"
       >
         <Button variant="ghost" size="icon"><Cancel /></Button>
       </Dialog.Close>

@@ -5,7 +5,7 @@ import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "$lib/db/schema";
-import { and, eq } from "drizzle-orm";
+import { and, eq, ilike, or } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 import {
@@ -56,8 +56,22 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // GET /api/invoices - List all invoices with client name and total (single query)
   .get(
     "/",
-    async ({ user }) => {
+    async ({ user, query }) => {
       try {
+        const baseWhere = eq(invoicesTable.userId, user.id);
+        const searchWhere = query.q?.trim()
+          ? or(
+              ilike(invoicesTable.invoiceNumber, `%${query.q.trim()}%`),
+              ilike(invoicesTable.subject, `%${query.q.trim()}%`),
+              ilike(invoicesTable.invoiceStatus, `%${query.q.trim()}%`),
+              ilike(clientsTable.name, `%${query.q.trim()}%`)
+            )
+          : undefined;
+
+        const whereClause = searchWhere
+          ? and(baseWhere, searchWhere)
+          : baseWhere;
+
         const rows = await db
           .select({
             id: invoicesTable.id,
@@ -82,7 +96,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
             lineItemsTotalSubquery,
             eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
           )
-          .where(eq(invoicesTable.userId, user.id));
+          .where(whereClause);
 
         const withTotal = mapRowsWithTotal(rows);
         return withTotal.map((row) => {
@@ -92,11 +106,16 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
             client: { name: clientName ?? "Unknown" },
           };
         });
-      } catch (error) {
+      } catch (_) {
         return { error: "Failed to load invoices" };
       }
     },
-    { auth: true }
+    {
+      auth: true,
+      query: t.Object({
+        q: t.Optional(t.String()),
+      }),
+    }
   )
   // POST /api/invoices - Create invoice (with line items)
   .post(
@@ -235,7 +254,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
               return { error: "Invoice not found" };
             }
             return await db.query.lineItems.findMany({
-              where: { invoiceId: id },
+              where: { invoiceId: id, userId: user.id },
             });
           } catch (error) {
             console.error("Error loading line items:", error);
@@ -307,7 +326,12 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
             // First, delete existing line items for this invoice
             await db
               .delete(lineItemsTable)
-              .where(eq(lineItemsTable.invoiceId, id));
+              .where(
+                and(
+                  eq(lineItemsTable.invoiceId, id),
+                  eq(lineItemsTable.userId, user.id)
+                )
+              );
 
             // Then insert the new ones
             return await db

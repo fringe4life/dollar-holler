@@ -24,6 +24,8 @@
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
+  "tailwindCSS.experimental.configFile": "src/app.css",
+  "tailwindCSS.classFunctions": ["tv", "cn", "clsx", "cva"],
   "tailwindCSS.experimental.classRegex": [
     ["@theme\\(([^)]*)\\)", "([^)]*)"],
     ["@apply\\s+([^;]+)", "([^;]+)"],

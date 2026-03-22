@@ -1,16 +1,23 @@
 <script lang="ts">
-  import type { Snippet } from 'svelte'
+  import type { Snippet } from "svelte";
+
+  export type EmptyStateHeaderSnippet = Snippet<[string, boolean]>;
 
   type TableHeaderProps = {
-    headers: readonly string[]
-    className?: string
-    emptyState?: boolean
-    headerSnippet: Snippet<[string, boolean]>
-  }
+    headers: readonly string[];
+    className?: string;
+    emptyState?: boolean;
+    headerSnippet: EmptyStateHeaderSnippet;
+  };
 
-  export type HeaderProps = Pick<TableHeaderProps, 'className' | 'emptyState'>
+  export type HeaderProps = Pick<TableHeaderProps, "className" | "emptyState">;
 
-  let { headers, className = '', emptyState = false, headerSnippet }: TableHeaderProps = $props()
+  let {
+    headers,
+    className = "",
+    emptyState = false,
+    headerSnippet,
+  }: TableHeaderProps = $props();
 </script>
 
 <div class={`hidden lg:grid ${className}`}>

@@ -1,22 +1,25 @@
 <script lang="ts">
-  import { Toaster as Sonner, type ToasterProps as SonnerProps } from 'svelte-sonner'
-  import { mode } from 'mode-watcher'
+  import {
+    Toaster as Sonner,
+    type ToasterProps as SonnerProps,
+  } from "svelte-sonner";
+  import { mode } from "mode-watcher";
 
   type Props = {
-    className?: 'error' | 'warning' | 'info' | 'success'
-  } & SonnerProps
+    className?: "error" | "warning" | "info" | "success";
+  } & SonnerProps;
 
-  let { className = 'info', ...restProps }: Props = $props()
+  let { className = "info", ...restProps }: Props = $props();
 </script>
 
 <Sonner
   theme={mode.current}
   class={{
-    'toaster group': true,
-    'bg-prim text-daisyBush': className === 'info',
-    'bg-scarlet text-goldenFizz': className === 'error',
-    'bg-robinEggBlue text-daisyBush': className === 'success',
-    'bg-goldenFizz text-scarlet': className === 'warning',
+    "toaster group": true,
+    "bg-prim text-daisyBush": className === "info",
+    "bg-scarlet text-goldenFizz": className === "error",
+    "bg-robinEggBlue text-daisyBush": className === "success",
+    "bg-goldenFizz text-scarlet": className === "warning",
   }}
   style="--normal-bg: var(--popover); --normal-text: var(--popover-foreground); --normal-border: var(--border);"
   {...restProps}

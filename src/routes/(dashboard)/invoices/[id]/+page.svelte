@@ -3,13 +3,15 @@
   import { page } from "$app/state";
   import HtmlContent from "$lib/components/HtmlContent.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { settingsStore } from "$lib/stores/settingsStore.svelte";
+  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { toast } from "svelte-sonner";
   import LineItemRows from "../LineItemRows.svelte";
   import type { PageProps } from "./$types";
   let { data }: PageProps = $props();
+
+  const { settings: settingsStore } = getDashboardStores();
 
   // svelte-ignore state_referenced_locally
   const invoice = $state(data.invoice);
@@ -35,9 +37,9 @@
 </script>
 
 <div
-  class=" fixed z-0 mb-16 flex w-full max-w-5xl flex-col justify-between gap-y-5 px-4 md:flex-row lg:px-0 print:hidden"
+  class=" fixed z-0 mbe-16 flex flex-col justify-between gap-y-5 px-4 inline-full max-inline-5xl md:flex-row lg:px-0 print:hidden"
 >
-  <h1 class="text-daisyBush text-3xl font-bold">Invoice</h1>
+  <h1 class="text-3xl font-bold text-daisyBush">Invoice</h1>
   <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-4">
     <Button size="short" onclick={printInvoice} variant="outline">Print</Button>
     <Button size="short" onclick={copyLink}>Copy Link</Button>
@@ -46,7 +48,7 @@
   </div>
 </div>
 <section
-  class="not-print:shadow-addInvoice relative top-36 z-10 grid grid-cols-6 gap-x-5 gap-y-8 bg-white px-5 py-8 md:px-32 md:py-16 print:top-0"
+  class="relative top-36 z-10 grid grid-cols-6 gap-x-5 gap-y-8 bg-white px-5 py-8 not-print:shadow-addInvoice md:px-32 md:py-16 print:top-0"
 >
   <div class="col-span-full sm:col-span-3 print:col-span-3">
     <img
@@ -56,7 +58,9 @@
     />
   </div>
 
-  <div class="col-span-full pt-4 sm:col-span-2 sm:col-start-5 print:col-span-3">
+  <div
+    class="col-span-full pbs-4 sm:col-span-2 sm:col-start-5 print:col-span-3"
+  >
     <div class="label">From</div>
     {#if settingsStore.settings && settingsStore.settings.myName}
       <p>
@@ -71,7 +75,7 @@
         {/if}
       </p>
     {:else}
-      <div class="bg-gallery flex min-h-17 items-center justify-center rounded">
+      <div class="flex min-h-17 items-center justify-center rounded bg-gallery">
         <!-- svelte-ignore a11y_invalid_attribute -->
         <a href="#" class="text-stone-600 underline hover:no-underline"
           >Add your contact information.</a
@@ -144,8 +148,8 @@
 </section>
 
 <style>
-  @reference "../../../../app.css";
+  @reference "#app.css";
   .label {
-    @apply text-monsoon font-black;
+    @apply font-black text-monsoon;
   }
 </style>

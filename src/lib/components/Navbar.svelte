@@ -6,8 +6,8 @@
   import Close from "$lib/icon/Close.svelte";
   import Hamburger from "$lib/icon/Hamburger.svelte";
   import type { Maybe } from "$lib/types";
+  import { isActive } from "$lib/utils/is-active";
   import type { User } from "better-auth";
-  import type { MouseEventHandler } from "svelte/elements";
 
   type Props = {
     user: Maybe<User>;
@@ -15,41 +15,24 @@
 
   let { user = null }: Props = $props();
 
-  const navItems = $derived([
-    { href: resolve("/invoices"), title: "Invoices" },
-    { href: resolve("/clients"), title: "Clients" },
-    { href: resolve("/settings"), title: "Settings" },
+  const navItems = $derived(
     user
-      ? { href: resolve("/logout"), title: "Logout" }
-      : { href: resolve("/login"), title: "Login" },
-  ]);
+      ? [
+          { href: resolve("/invoices"), title: "Invoices" },
+          { href: resolve("/clients"), title: "Clients" },
+          { href: resolve("/settings"), title: "Settings" },
+          { href: resolve("/logout"), title: "Logout" },
+        ]
+      : [
+          { href: resolve("/"), title: "Home" },
+          { href: resolve("/signup"), title: "Signup" },
+          { href: resolve("/login"), title: "Login" },
+        ]
+  );
   const path = $derived(page.url.pathname);
 
   const nav = new Toggle();
-
-  const onclick: MouseEventHandler<HTMLButtonElement> = () => {
-    nav.toggle();
-  };
-
-  const closeNav: MouseEventHandler<HTMLAnchorElement> = () => {
-    nav.off();
-  };
-
-  afterNavigate(() => {
-    nav.off();
-  });
-
-  // Function to check if a navigation item is active
-  const isActive = (href: string): boolean => {
-    // Exact match for root paths
-    if (href === "/") {
-      return path === "/";
-    }
-
-    // For other paths, check if current path starts with the href
-    // This handles nested routes like /clients/[id] matching /clients
-    return path.startsWith(href);
-  };
+  afterNavigate(() => nav.off());
 </script>
 
 <!-- mobile nav control -->
@@ -59,7 +42,7 @@
     "text-goldenFizz": nav.isOn,
     "text-daisyBush": !nav.isOn,
   }}
-  {onclick}
+  onclick={nav.toggle}
 >
   {#if nav.isOn}
     <Close width={32} height={32} />
@@ -70,12 +53,12 @@
 
 <header
   class={{
-    "  bg-daisyBush fixed inset-0 isolate z-2 w-full -translate-x-full text-center transition-transform duration-200 md:static md:col-span-3 md:translate-x-0 ": true,
+    "fixed inset-0 isolate z-2 -translate-x-full overflow-y-auto bg-daisyBush text-center transition-transform duration-200 inline-full min-block-dvh md:static md:col-span-3 md:translate-x-0 ": true,
     "translate-x-0 ": nav.isOn,
   }}
 >
-  <div class="mt-10 mb-10 md:mb-24">
-    <a href={resolve("/invoices")}>
+  <div class="my-10 md:mbe-24">
+    <a href={resolve("/")}>
       <img
         class="mx-auto"
         src={asset("/images/logo.svg")}
@@ -83,20 +66,29 @@
       />
     </a>
   </div>
-  <ul class="list-none text-2xl font-bold">
+  <ul class="list-none text-2xl font-medium lg:font-bold">
     {#each navItems as { href, title } (title)}
-      {@render listItem(href, title, isActive(href))}
+      {@render listItem(href, title, isActive(href, path))}
     {/each}
   </ul>
 </header>
 
 {#snippet listItem(href: string, title: string, isActive: boolean)}
-  <li class="mb-6">
+  <li class="not-last:mbe-6">
     <a
       aria-current={isActive}
       {href}
-      onclick={closeNav}
-      class="aria-current:text-robinEggBlue hover:text-goldenFizz font-bold text-white transition-[padding] duration-200 ease-out aria-current:px-8 aria-current:[background:url(/images/active-nav--left.svg)_left_top_no-repeat,url(/images/active-nav--right.svg)_right_top_no-repeat] aria-current:hover:px-9"
+      onclick={nav.off}
+      class="relative inline-block px-8 text-white transition-colors duration-200
+     ease-out before:absolute before:top-0 before:left-0 before:bg-[url('/images/active-nav--left.svg')] before:bg-top-left before:bg-no-repeat before:opacity-0 before:transition-[translate,opacity,color] before:duration-200 before:ease-out before:block-7.5
+     before:inline-5 after:absolute after:top-0 after:right-0 after:bg-[url('/images/active-nav--right.svg')] after:bg-top-right after:bg-no-repeat after:opacity-0 after:transition-[translate,opacity,color] after:duration-200 after:ease-out after:block-7.5
+    after:inline-5
+    hover:text-goldenFizz
+     aria-current:text-robinEggBlue
+    aria-current:before:opacity-100 aria-current:after:opacity-100
+    aria-current:hover:text-robinEggBlue aria-current:hover:before:-translate-x-1
+    aria-current:hover:after:translate-x-1
+    supports-linear:before:ease-dramatic supports-linear:after:ease-dramatic"
     >
       {title}
     </a>

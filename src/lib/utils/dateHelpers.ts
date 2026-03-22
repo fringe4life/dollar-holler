@@ -35,3 +35,17 @@ export const splitDate = (myDate: string): string[] => {
 };
 
 export const today = new Date().toISOString().split("T")[0];
+
+/**
+ * Converts a Date or ISO string to "yyyy-MM-dd" for HTML date inputs.
+ * @param date - Date object or ISO date string
+ * @returns "yyyy-MM-dd" string, or today if invalid
+ */
+export const toDateInputValue = (
+  date: Date | string | null | undefined
+): string => {
+  if (date == null) return today;
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (Number.isNaN(d.getTime())) return today;
+  return d.toISOString().split("T")[0];
+};

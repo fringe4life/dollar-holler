@@ -33,11 +33,25 @@
   });
 </script>
 
-<div class="border-daisyBush invoice-line-item border-b-2 pb-2">
-  <div class="table-header">Description</div>
-  <div class="table-header text-right">Unit price</div>
-  <div class="table-header text-center">Qty</div>
-  <div class="table-header text-right">Amount</div>
+<div class="invoice-line-item border-b-2 border-daisyBush pbe-2">
+  <div class="hidden text-sm font-bold text-daisyBush sm:block print:block">
+    Description
+  </div>
+  <div
+    class="hidden text-right text-sm font-bold text-daisyBush sm:block print:block"
+  >
+    Unit price
+  </div>
+  <div
+    class="hidden text-center text-sm font-bold text-daisyBush sm:block print:block"
+  >
+    Qty
+  </div>
+  <div
+    class="hidden text-right text-sm font-bold text-daisyBush sm:block print:block"
+  >
+    Amount
+  </div>
 </div>
 
 {#if lineItems}
@@ -58,7 +72,7 @@
       <Button variant="textOnly" onclick={addLineItem}>+ Line Item</Button>
     {/if}
   </div>
-  <div class="text-monsoon py-5 text-right font-bold print:col-span-3">
+  <div class="py-5 text-right font-bold text-monsoon print:col-span-3">
     Subtotal
   </div>
   <div class="py-5 text-right font-mono">{subTotal}</div>
@@ -66,13 +80,13 @@
 
 <div class="invoice-line-item">
   <p
-    class="text-monsoon col-span-1 py-5 text-right font-bold sm:col-span-2 print:col-span-3"
+    class="col-span-1 py-5 text-right font-bold text-monsoon sm:col-span-2 print:col-span-3"
   >
     Discount
   </p>
   <div class="relative">
     <input
-      class="line-item focus:border-lavenderIndigo h-10 w-full border-b-2 border-dashed border-b-stone-300 text-right not-print:pr-4 focus:border-solid focus:outline-none"
+      class="line-item border-b-2 border-dashed border-b-stone-300 text-right block-10 inline-full not-print:pe-4 focus:border-solid focus:border-lavenderIndigo focus:outline-none"
       type="number"
       name="discount"
       disabled={!isEditible}
@@ -90,10 +104,3 @@
     <CircledAmount amount={total} label="Total." />
   </div>
 </div>
-
-<style>
-  @reference "../../../app.css";
-  .table-header {
-    @apply text-daisyBush hidden text-sm font-bold sm:block print:block;
-  }
-</style>

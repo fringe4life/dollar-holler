@@ -8,4 +8,9 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
+  build: {
+    rolldownOptions: {
+      output: { minify: { compress: { dropConsole: true } } },
+    },
+  },
 });

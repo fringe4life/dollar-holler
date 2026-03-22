@@ -4,7 +4,7 @@ import type { List, Maybe } from "$lib/types";
 import type { LineItemSelect, NewLineItem } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
-class LineItemsStore {
+export class LineItemsStore {
   // Use $state for reactive class fields
   lineItems = $state<LineItemSelect[]>([]);
   loading = $state(false);
@@ -30,14 +30,17 @@ class LineItemsStore {
 
   // Load line items for a specific invoice
   async loadLineItemsByInvoiceId(
-    invoiceId: string
+    invoiceId: string,
+    options?: { signal?: AbortSignal }
   ): Promise<List<LineItemSelect>> {
     this.loading = true;
     this.error = null;
     try {
       const { data: lineItemsData } = await client.api
         .invoices({ id: invoiceId })
-        ["line-items"].get();
+        [
+          "line-items"
+        ].get(options?.signal ? { fetch: { signal: options.signal } } : undefined);
       if (
         !lineItemsData ||
         (typeof lineItemsData === "object" && "error" in lineItemsData)
@@ -47,6 +50,9 @@ class LineItemsStore {
 
       return lineItemsData;
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return null;
+      }
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load line items";
       console.error("Error loading line items:", err);
@@ -187,9 +193,3 @@ class LineItemsStore {
     this.error = null;
   }
 }
-
-// Create and export a singleton instance
-export const lineItemsStore = new LineItemsStore();
-
-// Export store instance and reactive properties
-export const { lineItems, loading, error, isLoaded } = lineItemsStore;

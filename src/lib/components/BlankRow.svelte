@@ -1,1 +1,1 @@
-<div class="bg-prim/40 mb-3 h-19 w-full rounded-lg"></div>
+<div class="mbe-3 rounded-lg bg-prim/40 block-19 inline-full"></div>

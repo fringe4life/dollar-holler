@@ -11,7 +11,7 @@ import type {
 } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
-class ClientsStore {
+export class ClientsStore {
   // Use $state for reactive class fields
   clients = $state<ClientListResponse[]>([]);
   loading = $state(false);
@@ -34,13 +34,22 @@ class ClientsStore {
     };
   }
 
-  // Load all clients (without relations)
-  async loadClients() {
+  // Load all clients (without relations). Pass q for search.
+  async loadClients(searchQuery?: string, options?: { signal?: AbortSignal }) {
     this.loading = true;
     this.error = null;
 
+    const signal = options?.signal;
+    const getOptions =
+      searchQuery || signal
+        ? {
+            ...(searchQuery ? { query: { q: searchQuery } } : {}),
+            ...(signal ? { fetch: { signal } } : {}),
+          }
+        : undefined;
+
     try {
-      const { data: clientData } = await client.api.clients.get();
+      const { data: clientData } = await client.api.clients.get(getOptions);
       if (
         !clientData ||
         (typeof clientData === "object" && "error" in clientData)
@@ -50,6 +59,9 @@ class ClientsStore {
       this.clients.length = 0;
       this.clients.push(...clientData);
     } catch (err) {
+      if (err instanceof Error && err.name === "AbortError") {
+        return;
+      }
       const errorMessage =
         err instanceof Error ? err.message : "Failed to load clients";
       this.error = errorMessage;
@@ -107,6 +119,40 @@ class ClientsStore {
       const errorMessage =
         err instanceof Error ? err.message : "Failed to delete client";
       console.error("Error deleting client:", err);
+      toast.error(errorMessage);
+    }
+  }
+
+  async updateClientStatus(
+    clientId: string,
+    clientStatus: "active" | "archive"
+  ) {
+    try {
+      const { data } = await client.api
+        .clients({ id: clientId })
+        .patch({ clientStatus });
+      if (!data || (typeof data === "object" && "error" in data)) {
+        throw new Error(
+          (data as { error?: string })?.error ||
+            "Failed to update client status"
+        );
+      }
+
+      const index = this.clients.findIndex((c) => c.id === clientId);
+      if (index !== -1) {
+        const status = normalizeToNull(data.clientStatus) ?? clientStatus;
+        this.clients[index] = {
+          ...this.clients[index],
+          clientStatus: status,
+          updatedAt: new Date(data.updatedAt),
+        };
+      }
+
+      toast.success("Client updated successfully");
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error ? err.message : "Failed to update client status";
+      console.error("Error updating client status:", err);
       toast.error(errorMessage);
     }
   }
@@ -194,9 +240,3 @@ class ClientsStore {
     this.error = null;
   }
 }
-
-// Create and export a singleton instance
-export const clientsStore = new ClientsStore();
-
-// Export store instance and reactive properties
-export const { clients, loading, error, isLoaded } = clientsStore;

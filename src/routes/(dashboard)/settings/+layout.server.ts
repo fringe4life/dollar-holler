@@ -2,8 +2,9 @@ import { redirect } from "@sveltejs/kit";
 import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ parent }) => {
-  const { session } = await parent();
-  if (!session) {
+  const { session, user } = await parent();
+  if (!session || !user) {
     throw redirect(303, "/login");
   }
+  return { session, user };
 };

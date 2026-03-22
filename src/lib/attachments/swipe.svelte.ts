@@ -11,6 +11,25 @@ interface SwipeConfig {
   threshold?: number;
 }
 
+const MOBILE_MEDIA_QUERY = new MediaQuery("(max-width: 1024px)");
+// Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
+const transformElement = (
+  x: number,
+  element: HTMLElement,
+  isTypedOm: boolean
+) => {
+  if (isTypedOm) {
+    // CSS Typed OM is supported
+    element.attributeStyleMap.set(
+      "transform",
+      new CSSTranslate(CSS.px(x), CSS.px(0))
+    );
+  } else {
+    // CSS Typed OM is not supported
+    element.style.transform = `translateX(${x}px)`;
+  }
+};
+
 /**
  * Modern Svelte 5 swipe attachment using @attach directive
  * Uses the new Spring class for smooth animations
@@ -30,8 +49,10 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     threshold = 20,
   } = config;
   // Check if we're on mobile
-  const isMobile = new MediaQuery("(max-width: 1024px)").current;
+  const isMobile = MOBILE_MEDIA_QUERY.current;
+  const isTypedOm = Boolean(window.CSS && CSS.px);
 
+  // Use the new Spring class for smooth animations
   const spring = new Spring(
     { x: 0, y: 0 },
     {
@@ -47,25 +68,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     /** Cleanups for document listeners (drag); cleared when drag ends or on attachment cleanup */
     let documentCleanups: (() => void)[] = [];
 
-    // Use the new Spring class for smooth animations
-
-    // Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
-    const useTypedOM =
-      typeof element.attributeStyleMap?.set === "function" &&
-      typeof CSSTranslate === "function" &&
-      typeof CSS !== "undefined" &&
-      typeof CSS.px === "function";
-
     $effect(() => {
       const x = spring.current.x;
-      if (useTypedOM) {
-        element.attributeStyleMap.set(
-          "transform",
-          new CSSTranslate(CSS.px(x), CSS.px(0), CSS.px(0))
-        );
-      } else {
-        element.style.transform = `translateX(${x}px)`;
-      }
+      transformElement(x, element, isTypedOm);
     });
 
     // Reset function
@@ -174,7 +179,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     // Watch for mobile breakpoint changes: use on() so cleanup is returned and order matches declarative handlers
     $effect(() => {
       if (!isMobile) {
-        spring.set({ x: 0, y: 0 });
+        reset();
         return;
       }
       const offMouse = on(element, "mousedown", handleMouseDown);

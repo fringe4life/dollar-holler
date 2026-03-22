@@ -1,60 +1,39 @@
 <script lang="ts">
+  import { page } from "$app/state";
+  import { ItemPanel } from "$lib/attachments/ItemPanel.svelte";
+  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import InvoiceForm from "$lib/components/InvoiceForm.svelte";
+  import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import {
-    error,
-    invoices,
-    invoicesStore,
-    loading,
-  } from "$lib/stores/invoicesStore.svelte";
-  import type { Maybe } from "$lib/types";
+  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
+  import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { InvoiceListResponse, InvoiceSelect } from "$lib/validators";
   import { onMount } from "svelte";
   import BlankState from "./BlankState.svelte";
   import InvoiceRow from "./InvoiceRow.svelte";
   import InvoiceRowHeader from "./InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "./InvoiceRowSkeleton.svelte";
-  import NoSearchResults from "./NoSearchResults.svelte";
 
-  let searchTerms = $state<string>("");
-  let isFormVisible = $state<boolean>(false);
-  let isEditPanelOpen = $state<boolean>(false);
-  let editingInvoice = $state<Maybe<InvoiceSelect>>(null);
   let { data } = $props();
+  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
+  // Class based state to manage modals/dialogs
+  const createForm = new Toggle();
+  const editPanel = new ItemPanel<InvoiceSelect>();
+  const deleteModal = new ItemPanel<InvoiceListResponse>();
 
-  // Derived state for filtered invoices
-  const filteredInvoices = $derived.by(() => {
-    if (!searchTerms) return invoices;
+  const { invoices: invoicesStore } = getDashboardStores();
 
-    return invoices.filter((invoice) => {
-      return (
-        invoice.invoiceNumber
-          ?.toLowerCase()
-          .includes(searchTerms.toLowerCase()) ||
-        invoice.subject?.toLowerCase().includes(searchTerms.toLowerCase()) ||
-        invoice.invoiceStatus?.toLowerCase().includes(searchTerms.toLowerCase())
-      );
-    });
+  onMount(() => {
+    const ac = new AbortController();
+    void invoicesStore.loadInvoices(searchQuery, { signal: ac.signal });
+    return () => ac.abort();
   });
 
-  onMount(async () => {
-    await invoicesStore.loadInvoices();
-  });
-
-  const handleSearch = (terms: string) => {
-    searchTerms = terms;
-  };
-
-  const handleEdit = (invoice: InvoiceListResponse) => {
-    editingInvoice = invoice;
-    isEditPanelOpen = true;
-  };
-
-  const closeEditPanel = () => {
-    isEditPanelOpen = false;
-    editingInvoice = null;
+  const handleSearch = async (terms: string) => {
+    await invoicesStore.loadInvoices(terms);
   };
 </script>
 
@@ -63,55 +42,56 @@
 </svelte:head>
 
 <div
-  class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:py-3 lg:text-lg"
+  class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
 >
-  <!-- search field -->
-  {#if invoices.length > 0}
-    <Search {handleSearch} />
-  {:else}
-    <div></div>
-  {/if}
+  <Search {handleSearch} value={searchQuery} />
   <!-- new invoice button -->
   <div class="z-1">
-    <Button
-      onclick={() => {
-        isFormVisible = true;
-      }}
-      size="lg">+ Invoice</Button
-    >
+    <Button onclick={() => createForm.on()} size="lg">+ Invoice</Button>
   </div>
 </div>
 
 <!-- list of invoices -->
 <div>
-  {#if loading}
-    <InvoiceRowSkeleton />
-    <InvoiceRowSkeleton />
-    <InvoiceRowSkeleton />
-    <InvoiceRowSkeleton />
-    <InvoiceRowSkeleton />
-  {:else if error}
-    <div class="grid place-content-center h-full py-8">
-      <div class="text-lg text-red-500">Error: {error}</div>
+  {#if invoicesStore.loading}
+    <InvoiceRowHeader />
+    <div class="flex flex-col-reverse gap-4">
+      <InvoiceRowSkeleton />
+      <InvoiceRowSkeleton />
+      <InvoiceRowSkeleton />
+      <InvoiceRowSkeleton />
+      <InvoiceRowSkeleton />
     </div>
-  {:else if invoices.length === 0}
+  {:else if invoicesStore.error}
+    <div class="grid place-content-center py-8 block-full">
+      <div class="text-red-500 text-lg">Error: {invoicesStore.error}</div>
+    </div>
+  {:else if invoicesStore.invoices.length === 0 && !searchQuery}
     <BlankState />
-  {:else if filteredInvoices.length === 0}
-    <NoSearchResults />
+  {:else if invoicesStore.invoices.length === 0 && searchQuery}
+    <NoSearchResults>
+      {#snippet header()}
+        <InvoiceRowHeader emptyState={true} />
+      {/snippet}
+    </NoSearchResults>
   {:else}
     <InvoiceRowHeader />
     <div class="flex flex-col-reverse gap-4">
-      {#each filteredInvoices as invoice (invoice.id)}
-        <InvoiceRow {invoice} onEdit={handleEdit} />
+      {#each invoicesStore.invoices as invoice (invoice.id)}
+        <InvoiceRow
+          {invoice}
+          onEdit={editPanel.open}
+          onDelete={deleteModal.open}
+        />
       {/each}
     </div>
   {/if}
 </div>
 
-<SlidePanel bind:open={isFormVisible} buttonText="">
+<SlidePanel bind:open={createForm.isOn} buttonText="">
   {#snippet title()}
     <h2
-      class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0"
+      class="mbs-9 mbe-7 font-sansserif text-3xl font-bold text-daisyBush lg:mbs-0"
     >
       Add an Invoice
     </h2>
@@ -123,17 +103,14 @@
 
   <InvoiceForm
     formState="create"
-    invoiceEdit={undefined}
     userId={data.user?.id ?? ""}
-    closePanel={() => {
-      isFormVisible = false;
-    }}
+    closePanel={() => createForm.off()}
   />
 </SlidePanel>
 
-<SlidePanel bind:open={isEditPanelOpen} buttonText="">
+<SlidePanel bind:open={editPanel.toggle.isOn} buttonText="">
   {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mb-7 text-3xl font-bold">
+    <h2 class="mbe-7 font-sansserif text-3xl font-bold text-daisyBush">
       Edit an Invoice
     </h2>
   {/snippet}
@@ -142,12 +119,36 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  {#if isEditPanelOpen && editingInvoice}
-    <InvoiceForm
-      formState="edit"
-      bind:invoiceEdit={editingInvoice}
-      userId={data.user?.id ?? ""}
-      closePanel={closeEditPanel}
-    />
+  {#if editPanel.item}
+    {#key editPanel.item.id}
+      <InvoiceForm
+        formState="edit"
+        bind:invoiceEdit={editPanel.item}
+        userId={data.user?.id ?? ""}
+        closePanel={() => editPanel.close()}
+      />
+    {/key}
   {/if}
 </SlidePanel>
+
+{#if deleteModal.item}
+  <ConfirmDelete
+    item={deleteModal.item}
+    bind:open={deleteModal.toggle.isOn}
+    titleText="Are you sure you want to delete this invoice?"
+    onCancel={() => deleteModal.close()}
+    onDelete={async () => {
+      if (!deleteModal?.item?.id) return;
+      await invoicesStore.deleteInvoice(deleteModal.item.id);
+      deleteModal.close();
+    }}
+  >
+    {#snippet descriptionSnippet(invoice)}
+      This will delete the invoice to <span class="text-scarlet"
+        >{invoice.client.name}</span
+      >
+      for
+      <span class="text-scarlet">{formatTotal(invoice.total)}</span>
+    {/snippet}
+  </ConfirmDelete>
+{/if}

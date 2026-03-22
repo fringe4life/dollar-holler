@@ -1,14 +1,12 @@
 <script lang="ts">
   import { Toggle } from "$lib/attachments/Toggle.svelte";
   import { type Snippet } from "svelte";
-  import { type Option } from "./additionaloptions/AdditionalOptionsItem.svelte";
   type Props = {
-    options: Option[];
     classes?: string;
-    content: Snippet<[Toggle, Option[]]>;
+    content: Snippet<[Toggle]>;
   };
 
-  let { options, classes = "", content }: Props = $props();
+  let { classes = "", content }: Props = $props();
 
   const additionalMenu = new Toggle();
 </script>
@@ -19,5 +17,5 @@
     [classes]: classes,
   }}
 >
-  {@render content(additionalMenu, options)}
+  {@render content(additionalMenu)}
 </div>

@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.55.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.53.12-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.5.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.27-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.1-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.55.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.54.1-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-5.9.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.5.6-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
 
@@ -30,15 +30,9 @@ A modern invoice management application built with SvelteKit 5, featuring Better
    DATABASE_URL="postgresql://username:password@hostname:port/database"
    PUBLIC_BASE_URL="http://localhost:5173"
    BETTER_AUTH_SECRET="your-strong-secret"
-   PUBLIC_EDEN_URL="localhost:5173"
    ```
 
-   For production, use `.env.production` (and/or your Vercel project settings) and set:
-
-   ```env
-   PUBLIC_BASE_URL="https://dollar-holler.vercel.app"
-   PUBLIC_EDEN_URL="localhost:4173"
-   ```
+   For production, use `.env.production` (and/or your Vercel project settings) and set `PUBLIC_BASE_URL` to your deployed origin (for example `https://dollar-holler.vercel.app`).
 
 3. **Set up the database:**
 
@@ -66,7 +60,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 
 ## Available Scripts
 
-- `bun run dev` - Start development server (Vite 8 beta)
+- `bun run dev` - Start development server (Vite 8)
 - `bun run build` - Build for production
 - `bun run preview` - Preview production build
 - `bun run check` - Run Ultracite checks
@@ -103,10 +97,12 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ```
 src/
 ├── lib/
-│   ├── auth.ts          # Better Auth configuration (UUIDv7 IDs, Neon adapter)
+│   ├── auth.ts          # Better Auth configuration (UUIDv7 IDs, Drizzle adapter)
 │   ├── auth-client.ts   # Client-side auth utilities
+│   ├── client.ts        # Eden Treaty client (Elysia API)
 │   ├── db/
 │   │   ├── index.ts     # Database connection (Neon serverless WebSocket pool)
+│   │   ├── id.ts        # ID generation (Bun UUIDv7)
 │   │   ├── schema.ts    # Drizzle schema definitions
 │   │   ├── seed.ts      # Database seeding script
 │   │   └── migrate.ts   # Migration utilities
@@ -115,13 +111,18 @@ src/
 │   │   └── routes/      # API route modules (clients, invoices, settings)
 │   ├── components/      # Reusable UI components
 │   │   ├── ui/          # Bits UI components
-│   │   └── ...          # Custom components
+│   │   └── ...          # Custom components (Form, Modal, Navbar, etc.)
 │   ├── attachments/     # Svelte 5 @attach directives
-│   ├── stores/          # Svelte stores (clients, invoices, line items, settings)
+│   ├── stores/          # Svelte stores and dashboard context
 │   ├── utils/           # Helper functions
 │   └── validators.ts    # ArkType validation schemas
-├── routes/              # SvelteKit routes
-└── app.html            # HTML template
+├── routes/
+│   ├── (auth)/          # Login, signup, password reset, logout
+│   ├── (dashboard)/     # Clients, invoices, settings (authenticated app shell)
+│   ├── api/             # Elysia catch-all API handler
+│   ├── +layout.svelte   # Root layout
+│   └── +page.svelte     # Landing page
+└── app.html             # HTML template
 ```
 
 ## Database Schema
@@ -160,7 +161,7 @@ The application is configured for Vercel deployment with the Vercel adapter. Ens
 
 ## Notes
 
-- Uses `Vite 8` by aliasing `vite` in `package.json` (drop-in replacement). If issues arise with third-party plugins, see Vite's rolldown guide for `withFilter` and environment APIs.
+- Uses Vite 8 (`vite` in `package.json`). Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
 - ESLint configuration is in `eslint.config.mjs` and uses Svelte 5 rules and Prettier integration. Use `bun run format` before `bun run lint`.
 - The project uses Svelte 5's new `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured to use Bun UUIDv7 for user ID generation and includes session caching for performance.

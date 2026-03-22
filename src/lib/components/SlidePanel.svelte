@@ -36,10 +36,10 @@
 <Dialog.Root bind:open {...restProps}>
   <Dialog.Portal>
     <Dialog.Overlay
-      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 bg-blueGem/60 fixed inset-0 z-50"
+      class="fixed inset-0 z-50 bg-blueGem/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0"
     />
     <Dialog.Content
-      class="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 shadow-addInvoice fixed top-0 right-0  z-80  h-dvh w-full overflow-y-scroll bg-white p-2 lg:w-3/4 lg:px-15 lg:py-12"
+      class="fixed top-0 right-0 z-80 h-dvh overflow-y-scroll bg-white p-2 shadow-addInvoice inline-full  data-[state=closed]:animate-out  data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 lg:px-15 lg:py-12 lg:inline-3/4"
       {...contentProps}
     >
       <Dialog.Title>
@@ -50,7 +50,7 @@
       </Dialog.Description>
       {@render children?.()}
       <Dialog.Close
-        class="text-pastelPurple hover:text-daisyBush  focus-visible:ring-foreground focus-visible:ring-offset-background  absolute top-5  left-7 rounded-md focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95 "
+        class="absolute top-5  left-7 rounded-md  text-pastelPurple hover:text-daisyBush  focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-hidden active:scale-95 "
       >
         <Button variant="ghost" size="sm" class=""><Arrow /></Button>
       </Dialog.Close>

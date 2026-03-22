@@ -13,6 +13,6 @@
 <button
   {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
   onclick={additionalMenu.toggle}
-  class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
+  class="text-pastelPurple transition-colors duration-200 hover:text-daisyBush"
   ><ThreeDots /></button
 >

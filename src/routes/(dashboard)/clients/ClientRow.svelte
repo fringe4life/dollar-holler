@@ -14,36 +14,35 @@
   import { centsToDollars } from "$lib/utils/moneyHelpers";
   import type { ClientListResponse } from "$lib/validators";
   import type { MouseEventHandler } from "svelte/elements";
-  import ConfirmClientDelete from "./ConfirmClientDelete.svelte";
 
   type Props = {
     client: ClientListResponse;
     onEdit: (client: ClientListResponse) => void;
-    onActivate: (client: ClientListResponse) => void;
-    onArchive: (client: ClientListResponse) => void;
+    onDelete: (client: ClientListResponse) => void;
+    onActivate: (clientId: string) => void;
+    onArchive: (clientId: string) => void;
   };
 
-  let { client, onEdit, onActivate, onArchive }: Props = $props();
+  let { client, onEdit, onDelete, onActivate, onArchive }: Props = $props();
   // EVENT HANDLERS
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () =>
-    (open = true);
+    onDelete(client);
 
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () => onEdit(client);
 
   const handleActivation: MouseEventHandler<HTMLButtonElement> = () =>
-    onActivate(client);
+    onActivate(client.id);
 
   const handleArchive: MouseEventHandler<HTMLButtonElement> = () =>
-    onArchive(client);
+    onArchive(client.id);
 
-  let open = $state<boolean>(false);
   // DERIVED STATE
   const receivedDisplay = $derived(centsToDollars(client.received));
   const balanceDisplay = $derived(centsToDollars(client.balance));
   const resolved = $derived(resolve(`/clients/${client.id}`));
 
   // ADDITIONAL OPTIONS
-  const CLIENT_OPTIONS = [
+  const CLIENT_OPTIONS = $derived([
     {
       label: "Edit",
       icon: Edit,
@@ -68,11 +67,12 @@
       onclick: handleArchive,
       disabled: client.clientStatus === "archive",
     },
-  ] satisfies Option[];
+  ] satisfies Option[]);
 </script>
 
 <Swipeable
-  contentClass="client-table client-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentClass="client-table client-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentViewTransitionName={`client-${client.id}`}
 >
   {#snippet content()}
     <div class="status">{@render tag(client.clientStatus)}</div>
@@ -85,20 +85,20 @@
       {receivedDisplay}
     </div>
     <div
-      class="text-scarlet balance text-right font-mono text-sm font-bold lg:text-lg"
+      class="balance text-right font-mono text-sm font-bold text-scarlet lg:text-lg"
     >
       {balanceDisplay}
     </div>
     <div class="view relative hidden place-self-center lg:block">
       <a
-        class="text-pastelPurple hover:text-daisyBush transition-colors duration-200"
+        class="text-pastelPurple transition-colors duration-200 hover:text-daisyBush"
         href={resolved}><View /></a
       >
     </div>
-    <AdditionalOptions options={CLIENT_OPTIONS}>
-      {#snippet content(additionalMenu, options)}
+    <AdditionalOptions>
+      {#snippet content(additionalMenu)}
         <AdditionalOptionsButton {additionalMenu} />
-        <AdditionalOptionsList {additionalMenu} {options} />
+        <AdditionalOptionsList {additionalMenu} options={CLIENT_OPTIONS} />
       {/snippet}
     </AdditionalOptions>
   {/snippet}
@@ -125,45 +125,45 @@
 
 {#snippet tag(title: string | null)}
   {#if title}
-    <Badge class="ml-auto" variant="draft" size="small">{title}</Badge>
+    <Badge class="ms-auto" variant="draft" size="small">{title}</Badge>
   {:else}
-    <Badge class="ml-auto" variant="late" size="small">Error</Badge>
+    <Badge class="ms-auto" variant="late" size="small">Error</Badge>
   {/if}
 {/snippet}
 
-<ConfirmClientDelete bind:open {client} />
-
 <style>
-  @reference "../../../app.css";
-  :global(.client-row) {
-    grid-template-areas:
-      "clientName status"
-      "received balance";
+  @reference "#app.css";
+  :global {
+    .client-row {
+      grid-template-areas:
+        "clientName status"
+        "received balance";
 
-    @media screen and (width > 1024px) {
-      grid-template-areas: "status clientName received balance view threeDots";
+      @media screen and (width > 1024px) {
+        grid-template-areas: "status clientName received balance view threeDots";
+      }
     }
-  }
-  .clientName {
-    grid-area: clientName;
-  }
-  .status {
-    grid-area: status;
-  }
-  .received {
-    grid-area: received;
-    @apply text-left lg:text-right;
-    &::before {
-      content: "Received: " / "your received money is";
-      @apply block text-xs font-bold lg:hidden;
+    .clientName {
+      grid-area: clientName;
     }
-  }
-  .balance {
-    grid-area: balance;
-    @apply text-left lg:text-right;
-    &::before {
-      content: "Balance: " / "Your balance is";
-      @apply block text-xs font-bold lg:hidden;
+    .status {
+      grid-area: status;
+    }
+    .received {
+      grid-area: received;
+      @apply text-left lg:text-right;
+      &::before {
+        content: "Received: " / "your received money is";
+        @apply block text-xs font-bold lg:hidden;
+      }
+    }
+    .balance {
+      grid-area: balance;
+      @apply text-left lg:text-right;
+      &::before {
+        content: "Balance: " / "Your balance is";
+        @apply block text-xs font-bold lg:hidden;
+      }
     }
   }
 </style>

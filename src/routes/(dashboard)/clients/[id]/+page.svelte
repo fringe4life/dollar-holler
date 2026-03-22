@@ -8,7 +8,7 @@
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";
   import Edit from "$lib/icon/Edit.svelte";
-  import { invoices, invoicesStore } from "$lib/stores/invoicesStore.svelte";
+  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
   import { isLate } from "$lib/utils/dateHelpers";
   import { onMount } from "svelte";
@@ -17,6 +17,9 @@
   import ClientForm, { type Props } from "../ClientForm.svelte";
 
   let { data } = $props();
+
+  const { invoices: invoicesStore } = getDashboardStores();
+
   let isFormShowing = $state<boolean>(false);
   let isEditing = $state<Props["formState"]>("create");
   // svelte-ignore state_referenced_locally
@@ -28,7 +31,9 @@
 
   // Get invoices for this client from the invoice store
   const clientInvoices = $derived(
-    invoices.filter((invoice) => invoice.clientId === data.client.id)
+    invoicesStore.invoices.filter(
+      (invoice) => invoice.clientId === data.client.id
+    )
   );
 
   const handleEdit: BitsButton = () => {
@@ -73,7 +78,7 @@
   <title>{client.name} | Doller Holla</title>
 </svelte:head>
 <div
-  class="mb-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mb-16 lg:px-10 lg:py-3 lg:text-lg"
+  class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:px-10 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
   {#if clientInvoices && clientInvoices.length > 0}
@@ -87,15 +92,15 @@
   </div>
 </div>
 
-<div class="mb-7 flex w-full items-center justify-between">
-  <h1 class="font-sansserif text-daisyBush text-3xl font-bold">
+<div class="mbe-7 flex items-center justify-between inline-full">
+  <h1 class="font-sansserif text-3xl font-bold text-daisyBush">
     {client.name}
   </h1>
   <Button variant="textOnly" onclick={handleEdit}><Edit /> Edit</Button>
 </div>
 
 <div
-  class="bg-gallery mb-10 grid grid-cols-1 gap-4 rounded-lg px-10 py-7 lg:grid-cols-4"
+  class="mbe-10 grid grid-cols-1 gap-4 rounded-lg bg-gallery px-10 py-7 lg:grid-cols-4"
 >
   <div class="summary-block">
     <div class="label">Total Overdue</div>
@@ -131,6 +136,7 @@
             total: i.total,
           }}
           onEdit={(inv) => goto(`/invoices/${inv.id}`)}
+          onDelete={(inv) => goto(`/invoices/${inv.id}`)}
         />
       {/each}
     </div>
@@ -146,7 +152,7 @@
 <SlidePanel bind:open={isFormShowing} buttonText="">
   {#snippet title()}
     <h2
-      class="font-sansserif text-daisyBush mt-9 mb-7 text-3xl font-bold lg:mt-0"
+      class="mbs-9 mbe-7 font-sansserif text-3xl font-bold text-daisyBush lg:mbs-0"
     >
       Add a Client
     </h2>
@@ -178,15 +184,15 @@
 </SlidePanel>
 
 <style>
-  @reference "../../../../app.css";
+  @reference "#app.css";
   .summary-block {
     @apply text-center;
   }
 
   .label {
-    @apply text-lightGray text-sm font-black;
+    @apply text-sm font-black text-lightGray;
   }
   .number {
-    @apply text-purple truncate text-4xl font-black;
+    @apply truncate text-4xl font-black text-purple;
   }
 </style>

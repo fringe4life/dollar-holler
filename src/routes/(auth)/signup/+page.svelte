@@ -1,32 +1,19 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Alert from "$lib/components/Alert.svelte";
-  import { Button, buttonVariants } from "$lib/components/ui/button";
-
-  import { enhance } from "$app/forms";
-  import Loader from "$lib/components/Loader.svelte";
+  import Form from "$lib/components/Form.svelte";
+  import { buttonVariants } from "$lib/components/ui/button";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
 
   let isFormShowing = $state<boolean>(true);
-  let isLoading = $state<boolean>(false);
 </script>
 
 {#if isFormShowing}
   <h1 class="auth-heading">Sign up</h1>
-  <Alert message={form?.error} />
-  <form
-    method="POST"
-    use:enhance={() => {
-      isLoading = true;
-      return async ({ update }) => {
-        isLoading = false;
-        await update();
-      };
-    }}
-  >
-    <fieldset disabled={isLoading}>
+  <Form {form}>
+    {#snippet children()}
       <!-- client-side debug: minimal -->
       <input type="hidden" name="__debug_ts" value={Date.now()} />
       <div class="field">
@@ -53,22 +40,20 @@
           required
         />
       </div>
-      <Button variant="auth" type="submit" disabled={isLoading}>
-        {#if isLoading}
-          <Loader />
-        {:else}
-          Count me in!
-        {/if}
-      </Button>
-      <p class="mt-4 text-center text-sm text-white">
+    {/snippet}
+    {#snippet submit()}
+      Count me in!
+    {/snippet}
+    {#snippet footer()}
+      <p class="mbs-4 text-center text-sm text-white">
         <a
           href={resolve("/login")}
           class="underline hover:no-underline"
           data-sveltekit-preload-data="hover">Already have an account?</a
         >
       </p>
-    </fieldset>
-  </form>
+    {/snippet}
+  </Form>
 {:else}
   <Alert message="Check your email for confirmation" />
   <a href={resolve("/login")} class={buttonVariants({ variant: "auth" })}

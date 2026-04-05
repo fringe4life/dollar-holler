@@ -1,6 +1,6 @@
 /* eslint-disable sonarjs/arrow-function-convention */
 /* eslint-disable no-inline-comments */
-import { createId } from "./id";
+import type { CursorRow } from "$lib/types";
 import { defineRelations } from "drizzle-orm";
 import {
   boolean,
@@ -10,6 +10,7 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { createId } from "./id";
 
 // Better Auth tables (using standard names for Better Auth compatibility)
 export const user = pgTable("user", {
@@ -88,6 +89,7 @@ export const verification = pgTable(
 export const clients = pgTable("clients", {
   id: text("id")
     .$defaultFn(() => createId())
+    .$type<CursorRow["id"]>()
     .primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -112,6 +114,7 @@ export const clients = pgTable("clients", {
 export const invoices = pgTable("invoices", {
   id: text("id")
     .$defaultFn(() => createId())
+    .$type<CursorRow["id"]>()
     .primaryKey(),
   userId: text("user_id")
     .notNull()
@@ -140,12 +143,14 @@ export const invoices = pgTable("invoices", {
 export const lineItems = pgTable("line_items", {
   id: text("id")
     .$defaultFn(() => createId())
+    .$type<CursorRow["id"]>()
     .primaryKey(),
   userId: text("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   invoiceId: text("invoice_id")
     .notNull()
+    .$type<CursorRow["id"]>()
     .references(() => invoices.id, { onDelete: "cascade" }),
   description: text("description").notNull(),
   quantity: real("quantity").notNull().default(1),
@@ -159,11 +164,8 @@ export const lineItems = pgTable("line_items", {
 
 // Settings table
 export const settings = pgTable("settings", {
-  id: text("id")
-    .$defaultFn(() => createId())
-    .primaryKey(),
   userId: text("user_id")
-    .notNull()
+    .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
   myName: text("my_name").notNull(),
   email: text("email").notNull(),

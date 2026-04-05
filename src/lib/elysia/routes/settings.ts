@@ -4,10 +4,11 @@ import { settings as settingsTable } from "$lib/db/schema";
 import { eq } from "drizzle-orm";
 import { Elysia, t } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
+import { optionalCursorId } from "../schemas/cursor-id";
 
 // Settings validation schema - userId comes from auth context, not request body
 const settingsSchema = t.Object({
-  id: t.Optional(t.String()),
+  id: optionalCursorId,
   userId: t.Optional(t.String()),
   myName: t.String(),
   email: t.String(),

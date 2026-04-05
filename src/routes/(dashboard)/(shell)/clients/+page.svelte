@@ -1,15 +1,16 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { ItemPanel } from "$lib/attachments/ItemPanel.svelte";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
+  import type { CursorId } from "$lib/types";
   import type { ClientListResponse, ClientSelect } from "$lib/validators";
-  import { onMount } from "svelte";
+  import { onDestroy, onMount } from "svelte";
   import BlankState from "./BlankState.svelte";
   import ClientForm from "./ClientForm.svelte";
   import ClientRow from "./ClientRow.svelte";
@@ -22,20 +23,18 @@
   const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
 
   const { clients: clientsStore } = getDashboardStores();
+  const ac = new AbortController();
 
-  onMount(() => {
-    const ac = new AbortController();
-    void clientsStore.loadClients(searchQuery, { signal: ac.signal });
-    return () => ac.abort();
-  });
+  onMount(
+    async () => await clientsStore.loadItems(searchQuery, { signal: ac.signal })
+  );
 
-  const handleSearch = async (searchTerms: string) =>
-    await clientsStore.loadClients(searchTerms);
+  onDestroy(() => ac.abort());
 
-  const handleActivate = async (clientId: string) =>
+  const handleActivate = async (clientId: CursorId) =>
     await clientsStore.updateClientStatus(clientId, "active");
 
-  const handleArchive = async (clientId: string) =>
+  const handleArchive = async (clientId: CursorId) =>
     await clientsStore.updateClientStatus(clientId, "archive");
 </script>
 
@@ -47,10 +46,10 @@
   class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  <Search {handleSearch} value={searchQuery} />
+  <Search store={clientsStore} />
   <!-- new client button -->
   <div class="z-1">
-    <Button onclick={() => createForm.on()} size="lg">+ Client</Button>
+    <Button onclick={createForm.toggle} size="lg">+ Client</Button>
   </div>
 </div>
 
@@ -58,7 +57,7 @@
 <div>
   {#if clientsStore.loading}
     <ClientRowHeader />
-    <div class="grid gap-4">
+    <div class="flex flex-col-reverse gap-4">
       <ClientRowSkeleton />
       <ClientRowSkeleton />
       <ClientRowSkeleton />
@@ -67,7 +66,7 @@
     </div>
   {:else if clientsStore.error}
     <div class="grid place-content-center py-8 block-full">
-      <div class="text-red-500 text-lg">Error: {clientsStore.error}</div>
+      <div class="text-lg text-red-500">Error: {clientsStore.error}</div>
     </div>
   {:else if clientsStore.clients.length === 0 && !searchQuery}
     <BlankState />
@@ -98,7 +97,7 @@
 <SlidePanel bind:open={createForm.isOn} buttonText="">
   {#snippet title()}
     <h2
-      class="mbs-9 mbe-7 font-sansserif text-3xl font-bold text-daisyBush lg:mbs-0"
+      class="font-sansserif text-daisyBush mbs-9 mbe-7 text-3xl font-bold lg:mbs-0"
     >
       Add a Client
     </h2>
@@ -117,7 +116,7 @@
 
 <SlidePanel bind:open={editPanel.toggle.isOn} buttonText="">
   {#snippet title()}
-    <h2 class="mbe-7 font-sansserif text-3xl font-bold text-daisyBush">
+    <h2 class="font-sansserif text-daisyBush mbe-7 text-3xl font-bold">
       Edit a Client
     </h2>
   {/snippet}
@@ -140,7 +139,7 @@
     item={deleteModal.item}
     bind:open={deleteModal.toggle.isOn}
     titleText="Are you sure you want to delete this client?"
-    onCancel={() => deleteModal.close()}
+    onCancel={deleteModal.close}
     onDelete={async () => {
       if (!deleteModal?.item?.id) return;
       await clientsStore.deleteClient(deleteModal.item.id);

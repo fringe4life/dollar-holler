@@ -1,4 +1,11 @@
-@import url("https://fonts.googleapis.com/css2?family=Kalam&family=Source+Code+Pro:ital,wght@0,200..900;1,200..900&family=Source+Sans+3:ital,wght@0,200..900;1,200..900&display=swap");
+@import "@fontsource/source-sans-3/latin-400.css";
+@import "@fontsource/source-sans-3/latin-500.css";
+@import "@fontsource/source-sans-3/latin-600.css";
+@import "@fontsource/source-sans-3/latin-700.css";
+@import "@fontsource/source-sans-3/latin-900.css";
+@import "@fontsource/source-code-pro/latin-400.css";
+@import "@fontsource/source-code-pro/latin-700.css";
+@import "@fontsource/kalam/latin-700.css";
 
 @import "tailwindcss";
 
@@ -110,6 +117,24 @@
     0.994 68.4%,
     1
   );
+
+  --ease-elastic: linear(
+    0,
+    0.029 1.6%,
+    0.123 3.5%,
+    0.651 10.6%,
+    0.862 14.1%,
+    1.002 17.7%,
+    1.046 19.6%,
+    1.074 21.6%,
+    1.087 23.9%,
+    1.086 26.6%,
+    1.014 38.5%,
+    0.994 46.3%,
+    1
+  );
+
+  --ease-anticipate: cubic-bezier(0.8, -0.4, 0.5, 1);
 }
 
 @layer base {
@@ -134,7 +159,7 @@
     text-wrap: balance;
   }
   label {
-    @apply block font-sansserif text-base font-bold text-monsoon;
+    @apply font-sansserif text-monsoon block text-base font-bold;
   }
 
   input[type="text"]:not(.search, .line-item),
@@ -142,15 +167,15 @@
   input[type="date"],
   input[type="password"],
   input[type="email"] {
-    @apply rounded-lg border-2 border-silver bg-whisper px-4 font-sansserif text-base block-10 inline-full lg:block-14;
+    @apply border-silver bg-whisper font-sansserif rounded-lg border-2 px-4 text-base block-10 inline-full lg:block-14;
   }
 
   textarea {
-    @apply resize-none border-2 border-silver p-4 font-sansserif text-base block-32 inline-full;
+    @apply border-silver font-sansserif resize-none border-2 p-4 text-base transition-colors duration-200 block-32 inline-full;
   }
 
   select {
-    @apply appearance-none rounded-lg border-2 border-silver bg-[url('/images/chevron-down.svg')] bg-position-[97%_center] bg-no-repeat px-4 block-10 inline-full lg:p-4 lg:block-14;
+    @apply border-silver appearance-none rounded-lg border-2 bg-[url('/images/chevron-down.svg')] bg-position-[97%_center] bg-no-repeat px-4 transition-colors duration-200 block-10 inline-full lg:p-4 lg:block-14;
   }
 
   input[type="text"]:not(.search, .line-item):focus-visible,
@@ -160,7 +185,7 @@
   input[type="email"]:focus-visible,
   textarea:focus-visible,
   select:focus-visible {
-    @apply border-2 border-lavenderIndigo outline-none;
+    @apply border-lavenderIndigo focus-visible:outline-lavenderIndigo border-2 focus-visible:outline-2;
   }
 
   input[type="number"]::-webkit-inner-spin-button,
@@ -176,7 +201,7 @@
 
 @layer components {
   .invoice-table {
-    @apply mbe-3 grid grid-cols-[1fr_90px] gap-x-4 px-4 inline-full lg:grid-cols-[max-content_100px_80px_max-content_1fr_32px_32px] lg:px-6;
+    @apply grid grid-cols-[1fr_max-content] gap-x-4 px-4 inline-full lg:grid-cols-[max-content_88px_100px_max-content_1fr_32px_32px] lg:px-6;
   }
 
   .field {
@@ -184,48 +209,11 @@
   }
 
   .auth-heading {
-    @apply mbe-4 text-4xl font-black text-goldenFizz;
-  }
-
-  .invoice-line-item {
-    @apply relative grid gap-x-2 sm:grid-cols-[1fr_100px_100px_100px_65px] md:gap-x-5;
-    grid-template-areas:
-      "description description description"
-      "unitPrice   quantity    amount";
-
-    @media screen and (width > 640px) {
-      grid-template-areas: "description unitPrice quantity amount trash";
-    }
-
-    .description {
-      grid-area: description;
-    }
-    .quantity {
-      grid-area: quantity;
-    }
-    .unitPrice {
-      grid-area: unitPrice;
-    }
-    .amount {
-      grid-area: amount;
-    }
-
-    .trash {
-      grid-area: trash;
-      @apply absolute top-0 right-0 sm:static;
-    }
-
-    .field {
-      @apply mbe-6;
-    }
-
-    @media print {
-      grid-template-areas: "description unitPrice quantity amount trash";
-    }
+    @apply text-goldenFizz mbe-4 text-4xl font-black;
   }
 
   .client-table {
-    @apply mbe-3 grid grid-cols-[1fr_90px] gap-x-4 px-4 inline-full lg:grid-cols-[100px_1fr_125px_125px_32px_32px] lg:px-6;
+    @apply grid grid-cols-[1fr_90px] gap-x-4 px-4 inline-full lg:grid-cols-[60px_1fr_125px_125px_32px_32px] lg:px-6;
   }
 
   .table-row-hover {
@@ -253,6 +241,7 @@
 }
 
 :root {
+  color-scheme: light;
   --radius: 0.625rem;
   --background: oklch(1 0 0);
   --foreground: oklch(0.129 0.042 264.695);

@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { asset } from "$app/paths";
+  import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import HtmlContent from "$lib/components/HtmlContent.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
+  import { tryCatch } from "$lib/utils/try-catch";
   import { toast } from "svelte-sonner";
   import LineItemRows from "../LineItemRows.svelte";
   import type { PageProps } from "./$types";
@@ -13,15 +14,22 @@
 
   const { settings: settingsStore } = getDashboardStores();
 
-  // svelte-ignore state_referenced_locally
-  const invoice = $state(data.invoice);
+  const invoice = $derived(data.invoice);
+  const lineItems = $derived(data.lineItems ?? []);
+  const settingsLink = $derived(resolve("/settings"));
 
   const printInvoice: BitsButton = () => {
     window.print();
   };
 
   const copyLink: BitsButton = async () => {
-    await window.navigator.clipboard.writeText(page.url.href);
+    const { error } = await tryCatch(() =>
+      window.navigator.clipboard.writeText(page.url.href)
+    );
+    if (error) {
+      toast.error("Failed to copy link");
+      return;
+    }
     toast.success("Success!", {
       description: `${page.url.href}`,
     });
@@ -37,9 +45,9 @@
 </script>
 
 <div
-  class=" fixed z-0 mbe-16 flex flex-col justify-between gap-y-5 px-4 inline-full max-inline-5xl md:flex-row lg:px-0 print:hidden"
+  class=" fixed z-0 mbe-16 grid grid-flow-row justify-between gap-y-5 px-4 inline-full max-inline-5xl md:grid-flow-col lg:px-0 print:hidden"
 >
-  <h1 class="text-3xl font-bold text-daisyBush">Invoice</h1>
+  <h1 class="text-daisyBush text-3xl font-bold">Invoice</h1>
   <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-4">
     <Button size="short" onclick={printInvoice} variant="outline">Print</Button>
     <Button size="short" onclick={copyLink}>Copy Link</Button>
@@ -48,7 +56,7 @@
   </div>
 </div>
 <section
-  class="relative top-36 z-10 grid grid-cols-6 gap-x-5 gap-y-8 bg-white px-5 py-8 not-print:shadow-addInvoice md:px-32 md:py-16 print:top-0"
+  class="not-print:shadow-addInvoice relative inset-bs-36 z-10 grid grid-cols-6 gap-x-5 gap-y-8 bg-white px-5 py-8 md:px-32 md:py-16 print:inset-bs-0"
 >
   <div class="col-span-full sm:col-span-3 print:col-span-3">
     <img
@@ -75,9 +83,13 @@
         {/if}
       </p>
     {:else}
-      <div class="flex min-h-17 items-center justify-center rounded bg-gallery">
+      <div
+        class="bg-gallery flex items-center justify-center rounded min-block-17"
+      >
         <!-- svelte-ignore a11y_invalid_attribute -->
-        <a href="#" class="text-stone-600 underline hover:no-underline"
+        <a
+          href={settingsLink}
+          class="text-stone-600 underline hover:no-underline"
           >Add your contact information.</a
         >
       </div>
@@ -99,12 +111,12 @@
   </div>
   <div class="col-span-full sm:col-span-2 sm:col-start-5">
     <div class="label">Invoice Id:</div>
-    <p>{invoice?.invoiceNumber}</p>
+    <p>{invoice.invoiceNumber}</p>
   </div>
   <div class="col-span-3">
     <div class="label">Due Date:</div>
     <p>
-      {convertDate(invoice?.dueDate != null ? String(invoice.dueDate) : null)}
+      {convertDate(invoice.dueDate != null ? String(invoice.dueDate) : null)}
     </p>
   </div>
 
@@ -112,25 +124,19 @@
     <div class="label">Issue Date:</div>
     <p>
       {convertDate(
-        invoice?.issueDate != null ? String(invoice.issueDate) : null
+        invoice.issueDate != null ? String(invoice.issueDate) : null
       )}
     </p>
   </div>
 
   <div class="col-span-full">
     <div class="label">Subject:</div>
-    <p>{invoice?.subject}</p>
+    <p>{invoice.subject}</p>
   </div>
 
   <!-- line items div wrapper -->
   <div class="col-span-full">
-    <LineItemRows
-      lineItems={data.lineItems}
-      isEditible={false}
-      addLineItem={() => {}}
-      removeLineItem={() => {}}
-      discount={invoice?.discount || 0}
-    />
+    <LineItemRows mode="view" {lineItems} discount={invoice.discount || 0} />
   </div>
 
   {#if data.notesHtml}
@@ -150,6 +156,6 @@
 <style>
   @reference "#app.css";
   .label {
-    @apply font-black text-monsoon;
+    @apply text-monsoon font-black;
   }
 </style>

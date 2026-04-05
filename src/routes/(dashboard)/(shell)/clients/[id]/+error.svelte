@@ -18,7 +18,7 @@
   style="background-image: url('{asset('/images/bg-error.svg')}')"
 >
   <div>
-    <h1 class="text-5xl leading-none font-black text-daisyBush">Not Found!</h1>
-    <p class="text-center text-lg text-daisyBush">{page.error?.message}</p>
+    <h1 class="text-daisyBush text-5xl leading-none font-black">Not Found!</h1>
+    <p class="text-daisyBush text-center text-lg">{page.error?.message}</p>
   </div>
 </div>

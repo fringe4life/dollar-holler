@@ -4,9 +4,9 @@ import { isLate } from "./dateHelpers";
 
 // Pure: only returns the label, no mutations
 export const getLabel = (
-  label: BadgeVariant,
+  label: Maybe<BadgeVariant>,
   dueDate: Maybe<string>
-): BadgeVariant => {
+): Exclude<BadgeVariant, undefined> => {
   if (label === "draft") return "draft";
   if (label === "sent" && isLate?.(dueDate)) return "late";
   if (label === "sent" && !isLate?.(dueDate)) return "sent";

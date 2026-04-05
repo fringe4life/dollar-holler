@@ -28,11 +28,11 @@
 
 <Modal bind:open buttonText="" className="z-450">
   {#snippet title()}
-    <h2 class="text-center text-xl font-bold text-daisyBush">{titleText}</h2>
+    <h2 class="text-daisyBush text-center text-xl font-bold">{titleText}</h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="text-center text-lg font-medium text-daisyBush">
+    <h2 class="text-daisyBush text-center text-lg font-medium">
       {#if descriptionSnippet}
         {@render descriptionSnippet?.(item)}
       {/if}

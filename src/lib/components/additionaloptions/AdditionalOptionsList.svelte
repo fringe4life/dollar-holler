@@ -12,7 +12,7 @@
 </script>
 
 {#if additionalMenu.isOn}
-  <ul class="absolute top-4 left-0 rounded-lg bg-white shadow-lg">
+  <ul class="absolute inset-s-0 inset-bs-4 rounded-lg bg-white shadow-lg">
     {#each options as option (option.label)}
       <AdditionalOptionsItem {option} />
     {/each}

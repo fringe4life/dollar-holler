@@ -1,5 +1,6 @@
-import type { Invoice, LineItem } from "$lib/db/schema";
+import type { LineItem } from "$lib/db/schema";
 import type { List, Maybe } from "$lib/types";
+import type { NewLineItemWithId } from "$lib/types/invoiceLineItems";
 import type { InvoiceSelect } from "$lib/validators";
 
 /**
@@ -7,7 +8,9 @@ import type { InvoiceSelect } from "$lib/validators";
  * @param {List<LineItem>} lineItems found on Invoices
  * @returns {number} the sum cost of the invoice
  */
-export const sumLineItems = (lineItems: List<LineItem>): number => {
+export const sumLineItems = (
+  lineItems: List<LineItem | NewLineItemWithId>
+): number => {
   if (!lineItems) return 0;
 
   return lineItems.reduce((acc, cur) => {

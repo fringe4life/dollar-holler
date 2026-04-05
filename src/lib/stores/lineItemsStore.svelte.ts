@@ -1,7 +1,13 @@
 import { client } from "$lib/client";
 import type { LineItem } from "$lib/db/schema";
-import type { List, Maybe } from "$lib/types";
-import type { LineItemSelect, NewLineItem } from "$lib/validators";
+import type { CursorId, List, Maybe } from "$lib/types";
+import type {
+  Key,
+  LineItemUpdate,
+  NewLineItemWithId,
+  NormalizedLineItem,
+} from "$lib/types/invoiceLineItems";
+import type { LineItemSelect } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
 export class LineItemsStore {
@@ -13,16 +19,39 @@ export class LineItemsStore {
   // Use $derived for computed values
   isLoaded = $derived(this.lineItems.length > 0 || this.error !== null);
 
+  /** Immutable update of one row in a local line-items array (e.g. InvoiceForm). */
+  patchLineItem(
+    items: Array<LineItem | NewLineItemWithId>,
+    id: CursorId | number,
+    patch: LineItemUpdate
+  ): Array<LineItem | NewLineItemWithId> {
+    return items.map((item) => {
+      if (item.id !== id) return item;
+      return { ...item, ...patch, updatedAt: new Date() };
+    });
+  }
+
+  /** Line amount from quantity × unit price. */
+  amountFromUnitPrice(quantity: number, unitPrice: number): number {
+    return quantity * unitPrice;
+  }
+
   /** Returns a blank LineItem for form rows (new id and timestamps each call). */
-  newLineItem(): LineItem {
+  newLineItem({
+    id,
+    invoiceId,
+  }: {
+    id: number;
+    invoiceId?: CursorId;
+  }): NewLineItemWithId {
     const now = new Date();
     return {
-      id: crypto.randomUUID(),
+      id,
       createdAt: now,
       updatedAt: now,
       userId: "",
       description: "",
-      invoiceId: "",
+      invoiceId,
       quantity: 0,
       amount: 0,
     };
@@ -91,23 +120,33 @@ export class LineItemsStore {
     }
   }
 
+  normalizeLineItems(
+    items: Array<LineItem | NewLineItemWithId>,
+    userId: string,
+    invoiceId: CursorId
+  ): Array<NormalizedLineItem> {
+    if (items.length === 0) return [];
+    return items.reduce<Array<NormalizedLineItem>>((acc, item) => {
+      if ((item.description?.trim() ?? "").length > 0) {
+        acc.push({
+          ...item,
+          userId,
+          id: typeof item.id === "number" ? undefined : item.id,
+          invoiceId,
+        });
+      }
+      return acc;
+    }, []);
+  }
   // Create line items for an invoice
   async createLineItems(
-    invoiceId: string,
-    items: NewLineItem[]
+    invoiceId: CursorId,
+    items: Array<NormalizedLineItem>
   ): Promise<List<LineItemSelect>> {
     try {
-      // Map to only include fields expected by the API schema
-      const body = items.map((item) => ({
-        id: item.id,
-        userId: item.userId,
-        description: item.description,
-        quantity: item.quantity ?? 0,
-        amount: item.amount,
-      }));
       const { data: lineItemsData } = await client.api
         .invoices({ id: invoiceId })
-        ["line-items"].post(body);
+        ["line-items"].post({ lineItems: items });
       if (
         !lineItemsData ||
         (typeof lineItemsData === "object" && "error" in lineItemsData)
@@ -128,21 +167,13 @@ export class LineItemsStore {
 
   // Update line items for an invoice (replace all)
   async updateLineItems(
-    invoiceId: string,
-    items: NewLineItem[]
+    invoiceId: CursorId,
+    items: Array<NormalizedLineItem>
   ): Promise<List<LineItemSelect>> {
     try {
-      // Map to only include fields expected by the API schema
-      const body = items.map((item) => ({
-        id: item.id,
-        userId: item.userId,
-        description: item.description,
-        quantity: item.quantity ?? 0,
-        amount: item.amount,
-      }));
       const { data: lineItemsData } = await client.api
         .invoices({ id: invoiceId })
-        ["line-items"].put(body);
+        ["line-items"].put({ lineItems: items });
       if (
         !lineItemsData ||
         (typeof lineItemsData === "object" && "error" in lineItemsData)
@@ -162,7 +193,7 @@ export class LineItemsStore {
   }
 
   // Delete a line item
-  async deleteLineItem(lineItemId: string) {
+  async deleteLineItem(lineItemId: Key) {
     try {
       const { data } = await client.api["line-items"]({
         id: lineItemId,

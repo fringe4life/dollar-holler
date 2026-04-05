@@ -1,3 +1,3 @@
 <div
-  class="aspect-square h-5 animate-spin rounded-full border-2 border-current border-b-transparent"
+  class="aspect-square animate-spin rounded-full border-2 border-current border-b-transparent block-5"
 ></div>

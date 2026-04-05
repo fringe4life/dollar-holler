@@ -7,11 +7,11 @@
 </svelte:head>
 
 <div
-  class="flex min-h-dvh items-center justify-center bg-center bg-no-repeat inline-full"
+  class="flex items-center justify-center bg-center bg-no-repeat inline-full min-block-dvh"
   style="background-image: url('{asset('/images/bg-thankYou.svg')}')"
 >
   <div>
-    <h1 class="text-5xl leading-none font-black text-daisyBush">Thank You!</h1>
-    <p class="text-lg text-daisyBush">Your payment has been received!</p>
+    <h1 class="text-daisyBush text-5xl leading-none font-black">Thank You!</h1>
+    <p class="text-daisyBush text-lg">Your payment has been received!</p>
   </div>
 </div>

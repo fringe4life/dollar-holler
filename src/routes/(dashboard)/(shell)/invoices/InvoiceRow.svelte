@@ -5,9 +5,7 @@
   import type { Option } from "$lib/components/additionaloptions/AdditionalOptionsItem.svelte";
   import AdditionalOptionsList from "$lib/components/additionaloptions/AdditionalOptionsList.svelte";
   import Swipeable from "$lib/components/Swipeable.svelte";
-  import Badge, {
-    type BadgeVariant,
-  } from "$lib/components/ui/badge/badge.svelte";
+  import Badge from "$lib/components/ui/badge/badge.svelte";
   import Edit from "$lib/icon/Edit.svelte";
   import Send from "$lib/icon/Send.svelte";
   import Trash from "$lib/icon/Trash.svelte";
@@ -44,9 +42,7 @@
   const totalDisplay = $derived(formatTotal(total));
   const invoiceStatus = $derived(invoice.invoiceStatus);
 
-  const label = $derived(
-    getLabel(invoiceStatus ?? "draft", dueDate.toISOString())
-  );
+  const label = $derived(getLabel(invoiceStatus, dueDate.toISOString()));
   const isOptionsDisabled = $derived(label !== "draft");
   const resolved = $derived(resolve(`/invoices/${id}`));
 
@@ -75,21 +71,26 @@
 </script>
 
 <Swipeable
-  contentClass="invoice-table invoice-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentClass="group/row invoice-table invoice-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   contentViewTransitionName={`invoice-${id}`}
 >
   {#snippet content()}
-    <div class="status justify-self-end">{@render tag(label)}</div>
-    <div class="duedate text-sm lg:text-lg">
+    <div class="status justify-self-end">
+      <Badge class="ms-auto md:ms-0" variant={label} size="small">{label}</Badge
+      >
+    </div>
+    <div class="duedate truncate text-sm lg:text-lg">
       {convertDate(dueDate.toISOString())}
     </div>
-    <div class="invoicenumber text-sm lg:text-lg">{invoiceNumber}</div>
-    <div class="clientName text-base font-bold lg:text-xl">{client.name}</div>
+    <div class="invoicenumber truncate text-sm lg:text-lg">{invoiceNumber}</div>
+    <div class="clientName truncate text-base font-bold lg:text-xl">
+      {client.name}
+    </div>
     <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
       {totalDisplay}
     </div>
     <div
-      class="viewbutton hidden text-sm text-pastelPurple transition-colors duration-200 hover:text-daisyBush md:place-self-center lg:block lg:text-lg"
+      class="group-hover/row:text-daisyBush/50 viewbutton text-pastelPurple hover:text-daisyBush hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
     >
       <a href={resolved}><View /></a>
     </div>
@@ -118,10 +119,6 @@
     <a class="action-button" href={resolved}><View height={32} width={32} /></a>
   {/snippet}
 </Swipeable>
-
-{#snippet tag(title: BadgeVariant)}
-  <Badge class="ms-auto lg:ms-0" variant={title} size="small">{title}</Badge>
-{/snippet}
 
 <style>
   @reference "#app.css";

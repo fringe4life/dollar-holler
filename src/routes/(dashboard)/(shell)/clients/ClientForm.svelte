@@ -29,7 +29,7 @@
   const { clients: clientsStore } = getDashboardStores();
 
   onMount(() => {
-    clientsStore.loadClients();
+    clientsStore.loadItems();
   });
 
   // Form data using NewClient type

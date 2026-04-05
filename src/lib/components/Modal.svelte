@@ -36,20 +36,12 @@
 </svelte:head>
 
 <Dialog.Root bind:open {...restProps}>
-  <!-- <Dialog.Trigger
-    onclick={() => (open = !open)}
-    class="bg-dark text-pastelPurple hover:text-blueGem shadow-mini hover:bg-dark/95
-  focus-visible:ring-foreground focus-visible:ring-offset-background inline-flex h-12 cursor-pointer
-  items-center justify-center rounded-md px-[21px] text-[15px] font-semibold whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95"
-  >
-    {buttonText}
-  </Dialog.Trigger> -->
   <Dialog.Portal>
     <Dialog.Overlay
-      class={`fixed inset-0 bg-blueGem/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 ${className ? className : "z-50"}`}
+      class={`bg-blueGem/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 ${className ? className : "z-50"}`}
     />
     <Dialog.Content
-      class="rounded-card-lg fixed top-[50%] left-[50%] z-500 grid min-h-57.5 translate-x-[-50%] translate-y-[-50%] content-between items-center border bg-background px-10 py-7 shadow-popover outline-hidden inline-full max-inline-[calc(100%-2rem)] data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-inline-122.5  md:inline-full"
+      class="rounded-card-lg bg-background shadow-popover data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed inset-s-1/2 inset-bs-1/2 z-500 grid -translate-1/2 content-between items-center border px-10 py-7 outline-hidden inline-full max-inline-[calc(100%-2rem)] min-block-57.5 sm:max-inline-122.5  md:inline-full"
       {...contentProps}
     >
       <Dialog.Title>
@@ -60,10 +52,19 @@
       </Dialog.Description>
       {@render children?.()}
       <Dialog.Close
-        class=" absolute rounded-md text-pastelPurple hover:text-blueGem  focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:outline-hidden active:scale-95 pointer-coarse:top-1 pointer-coarse:right-1 pointer-fine:top-4 pointer-fine:right-4"
+        class="text-pastelPurple hover:text-blueGem focus-visible:ring-foreground focus-visible:ring-offset-background absolute rounded-md transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95 pointer-coarse:inset-e-1 pointer-coarse:inset-bs-1 pointer-fine:inset-e-4 pointer-fine:inset-bs-4"
       >
         <Button variant="ghost" size="icon"><Cancel /></Button>
       </Dialog.Close>
     </Dialog.Content>
   </Dialog.Portal>
 </Dialog.Root>
+
+<!-- <Dialog.Trigger
+        onclick={() => (open = !open)}
+        class="bg-dark text-pastelPurple hover:text-blueGem shadow-mini hover:bg-dark/95
+      focus-visible:ring-foreground focus-visible:ring-offset-background inline-flex h-12 cursor-pointer
+      items-center justify-center rounded-md px-[21px] text-[15px] font-semibold whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95"
+      >
+        {buttonText}
+      </Dialog.Trigger> -->

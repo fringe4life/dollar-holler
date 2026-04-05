@@ -16,7 +16,6 @@ export class SettingsStore {
   newSettings(): SettingsResponse {
     const now = new Date();
     return {
-      id: "",
       userId: "",
       myName: "",
       email: "",

@@ -105,10 +105,10 @@
   <section class="relative flex items-center pbs-20 pbe-16 min-block-dvh">
     <!-- Aurora background blobs -->
     <div
-      class="pointer-events-none absolute top-0 right-0 translate-x-1/4 -translate-y-1/4 rounded-full bg-lavenderIndigo opacity-15 blur-3xl block-[600px] inline-[600px]"
+      class="bg-lavenderIndigo pointer-events-none absolute inset-s-0 inset-bs-0 translate-1/4 rounded-full opacity-15 blur-3xl block-[600px] inline-[600px]"
     ></div>
     <div
-      class="pointer-events-none absolute bottom-0 left-0 -translate-x-1/4 translate-y-1/3 rounded-full bg-daisyBush opacity-10 blur-3xl block-[400px] inline-[400px]"
+      class="bg-daisyBush pointer-events-none absolute inset-s-0 inset-be-0 -translate-x-1/4 translate-y-1/3 rounded-full opacity-10 blur-3xl block-[400px] inline-[400px]"
     ></div>
 
     <div
@@ -118,18 +118,18 @@
       <div class="flex flex-col items-start gap-6">
         <!-- Eyebrow badge -->
         <span
-          class="inline-flex items-center gap-2 rounded-full border border-lavenderIndigo/20 bg-lavenderIndigo/10 px-4 py-1.5 text-sm font-semibold tracking-wide text-lavenderIndigo"
+          class="border-lavenderIndigo/20 bg-lavenderIndigo/10 text-lavenderIndigo inline-flex items-center gap-2 rounded-full border px-4 py-1.5 text-sm font-semibold tracking-wide"
         >
           ✨ Invoice management, simplified
         </span>
 
         <h1
-          class="font-sansserif text-5xl leading-[1.1] font-black tracking-tight text-daisyBush sm:text-6xl lg:text-7xl"
+          class="font-sansserif text-daisyBush text-5xl leading-[1.1] font-black tracking-tight sm:text-6xl lg:text-7xl"
         >
           Get Paid,<br />Faster Than<br />Ever Before.
         </h1>
 
-        <p class="max-w-lg text-lg leading-relaxed text-stone-600">
+        <p class="text-lg leading-relaxed text-stone-600 max-inline-lg">
           Stop chasing payments. Create professional invoices, track payments,
           and manage clients — all from one beautiful dashboard.
         </p>
@@ -164,7 +164,7 @@
           {/if}
         </div>
 
-        <p class="text-stone-400 text-sm">
+        <p class="text-sm text-stone-400">
           No credit card required · Cancel anytime
         </p>
       </div>
@@ -173,38 +173,38 @@
       <div class="relative flex justify-center lg:justify-end">
         <!-- Floating badge: Payment -->
         <div
-          class="absolute -top-6 -left-4 z-10 flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 shadow-lg lg:-left-8"
+          class="absolute -inset-s-4 -inset-bs-6 z-10 flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 shadow-lg lg:-inset-s-8"
         >
           <div
-            class="bg-green-100 flex aspect-square items-center justify-center rounded-full text-sm inline-8"
+            class="flex aspect-square items-center justify-center rounded-full bg-green-100 text-sm inline-8"
           >
             💰
           </div>
           <div>
-            <p class="text-green-700 text-xs font-semibold">Payment Received</p>
-            <p class="text-green-600 text-xs">$4,200.00</p>
+            <p class="text-xs font-semibold text-green-700">Payment Received</p>
+            <p class="text-xs text-green-600">$4,200.00</p>
           </div>
         </div>
 
         <!-- Floating badge: Rating -->
         <div
-          class="absolute right-0 -bottom-4 z-10 flex items-center gap-2 rounded-xl bg-goldenFizz/90 px-4 py-2.5 shadow-lg lg:-right-4"
+          class="bg-goldenFizz/90 absolute inset-e-0 -inset-be-4 z-10 flex items-center gap-2 rounded-xl px-4 py-2.5 shadow-lg lg:-inset-e-4"
         >
           <StarIcon size={16} class="text-daisyBush" />
-          <p class="text-sm font-bold text-daisyBush">4.9 Client Rating</p>
+          <p class="text-daisyBush text-sm font-bold">4.9 Client Rating</p>
         </div>
 
         <!-- Mock Invoice Card -->
         <div
-          class="border-gray-200 rounded-2xl border bg-whisper shadow-2xl inline-full max-inline-md"
+          class="bg-whisper rounded-2xl border border-gray-200 shadow-2xl inline-full max-inline-md"
           style="box-shadow: 0 25px 60px oklch(38.26% 0.202 288.17 / 0.18), 0 8px 20px oklch(0% 0 0 / 0.08);"
         >
           <!-- Invoice Header -->
-          <div class="rounded-t-2xl bg-daisyBush px-6 py-4">
+          <div class="bg-daisyBush rounded-t-2xl px-6 py-4">
             <div class="flex items-center justify-between">
               <div>
                 <p
-                  class="font-sansserif text-xs font-bold tracking-widest text-goldenFizz uppercase"
+                  class="font-sansserif text-goldenFizz text-xs font-bold tracking-widest uppercase"
                 >
                   Dollar Holler
                 </p>
@@ -229,8 +229,8 @@
                 >
                   Bill To
                 </p>
-                <p class="text-sm font-bold text-daisyBush">Acme Design Co.</p>
-                <p class="text-gray-500 text-xs">sarah@acme.com</p>
+                <p class="text-daisyBush text-sm font-bold">Acme Design Co.</p>
+                <p class="text-xs text-gray-500">sarah@acme.com</p>
               </div>
               <div class="text-right">
                 <p
@@ -238,38 +238,38 @@
                 >
                   Due Date
                 </p>
-                <p class="text-sm font-semibold text-daisyBush">Mar 30, 2026</p>
+                <p class="text-daisyBush text-sm font-semibold">Mar 30, 2026</p>
               </div>
             </div>
 
             <!-- Line items -->
             <div
-              class="border-gray-100 mbe-5 overflow-hidden rounded-xl border"
+              class="mbe-5 overflow-hidden rounded-xl border border-gray-100"
             >
               <div
-                class="border-gray-100 bg-gray-50 grid grid-cols-[1fr_auto] border-b px-4 py-2 text-xs font-semibold tracking-wide text-gray-400 uppercase"
+                class="grid grid-cols-[1fr_auto] border-b border-gray-100 bg-gray-50 px-4 py-2 text-xs font-semibold tracking-wide text-gray-400 uppercase"
               >
                 <span>Description</span>
                 <span class="text-right">Amount</span>
               </div>
-              <div class="divide-gray-50 divide-y">
+              <div class="divide-y divide-gray-50">
                 <div class="grid grid-cols-[1fr_auto] px-4 py-3 text-sm">
                   <div>
-                    <p class="text-gray-800 font-medium">
+                    <p class="font-medium text-gray-800">
                       Brand Identity Package
                     </p>
                     <p class="text-xs text-gray-400">20 hrs × $150/hr</p>
                   </div>
-                  <span class="self-center font-semibold text-daisyBush"
+                  <span class="text-daisyBush self-center font-semibold"
                     >$3,000.00</span
                   >
                 </div>
                 <div class="grid grid-cols-[1fr_auto] px-4 py-3 text-sm">
                   <div>
-                    <p class="text-gray-800 font-medium">Website Redesign</p>
+                    <p class="font-medium text-gray-800">Website Redesign</p>
                     <p class="text-xs text-gray-400">8 hrs × $150/hr</p>
                   </div>
-                  <span class="self-center font-semibold text-daisyBush"
+                  <span class="text-daisyBush self-center font-semibold"
                     >$1,200.00</span
                   >
                 </div>
@@ -284,12 +284,12 @@
                 >
                   Total
                 </p>
-                <p class="font-sansserif text-2xl font-black text-daisyBush">
+                <p class="font-sansserif text-daisyBush text-2xl font-black">
                   $4,200.00
                 </p>
               </div>
               <span
-                class="bg-green-100 text-green-700 rounded-full px-4 py-1.5 text-xs font-bold tracking-widest uppercase"
+                class="rounded-full bg-green-100 px-4 py-1.5 text-xs font-bold tracking-widest text-green-700 uppercase"
               >
                 ✓ Paid
               </span>
@@ -306,12 +306,12 @@
       <!-- Section header -->
       <div class="mbe-16 text-center">
         <p
-          class="mbe-3 text-sm font-bold tracking-widest text-lavenderIndigo uppercase"
+          class="text-lavenderIndigo mbe-3 text-sm font-bold tracking-widest uppercase"
         >
           Why Dollar Holler?
         </p>
         <h2
-          class="font-sansserif text-4xl font-black text-daisyBush sm:text-5xl"
+          class="font-sansserif text-daisyBush text-4xl font-black sm:text-5xl"
         >
           Everything you need<br class="hidden sm:block" /> to get paid on time
         </h2>
@@ -323,7 +323,7 @@
           {@const Icon = feature.icon}
           <div
             class={[
-              "group flex flex-col gap-4 rounded-2xl border p-6 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg",
+              "group after:rounded-inherit after:ease-glide supports-linear:ease-anticipate flex flex-col gap-4 rounded-2xl border p-6 transition-[translate] duration-200 after:absolute  after:inset-0 after:opacity-0 after:shadow-lg after:transition-opacity after:duration-200 hover:-translate-y-1 hover:after:opacity-100",
               feature.accent,
               feature.border,
             ].join(" ")}
@@ -337,7 +337,7 @@
               <Icon size={24} class={feature.iconColor} />
             </div>
             <div>
-              <h3 class="mbe-2 text-lg font-black text-daisyBush">
+              <h3 class="text-daisyBush mbe-2 text-lg font-black">
                 {feature.title}
               </h3>
               <p class="text-sm leading-relaxed text-stone-600">
@@ -351,27 +351,27 @@
   </section>
 
   <!-- ══════════════════════════════════════════════ REVIEWS -->
-  <section class="relative overflow-hidden bg-daisyBush py-24">
+  <section class="bg-daisyBush relative overflow-hidden py-24">
     <!-- Subtle aurora blob -->
     <div
-      class="pointer-events-none absolute top-0 right-0 rounded-full bg-lavenderIndigo opacity-20 blur-3xl block-96 inline-96"
+      class="bg-lavenderIndigo pointer-events-none absolute inset-e-0 inset-bs-0 rounded-full opacity-20 blur-3xl block-96 inline-96"
     ></div>
     <div
-      class="bg-black/20 pointer-events-none absolute bottom-0 left-0 rounded-full blur-3xl block-64 inline-64"
+      class="pointer-events-none absolute inset-s-0 inset-be-0 rounded-full bg-black/20 blur-3xl block-64 inline-64"
     ></div>
 
     <div class="relative mx-auto px-6 max-inline-6xl">
       <!-- Section header -->
       <div class="mbe-16 text-center">
         <p
-          class="mbe-3 text-sm font-bold tracking-widest text-goldenFizz uppercase"
+          class="text-goldenFizz mbe-3 text-sm font-bold tracking-widest uppercase"
         >
           Real People, Real Results
         </p>
         <h2 class="font-sansserif text-4xl font-black text-white sm:text-5xl">
           What our customers say
         </h2>
-        <p class="mbs-3 text-base text-pastelPurple">
+        <p class="text-pastelPurple mbs-3 text-base">
           Trusted by freelancers and small businesses worldwide
         </p>
       </div>
@@ -410,7 +410,7 @@
                 <p class="font-sansserif text-sm font-bold text-white">
                   {review.name}
                 </p>
-                <p class="text-xs text-pastelPurple">{review.role}</p>
+                <p class="text-pastelPurple text-xs">{review.role}</p>
               </div>
             </div>
           </div>
@@ -420,18 +420,18 @@
   </section>
 
   <!-- ══════════════════════════════════════════════════ CTA -->
-  <section class="relative overflow-hidden bg-lavenderIndigo py-28">
+  <section class="bg-lavenderIndigo relative overflow-hidden py-28">
     <!-- Aurora blobs -->
     <div
-      class="pointer-events-none absolute top-0 left-1/2 h-96 -translate-x-1/2 -translate-y-1/2 rounded-full bg-daisyBush opacity-40 blur-3xl inline-96"
+      class="bg-daisyBush pointer-events-none absolute inset-s-1/2 inset-bs-0 -translate-1/2 rounded-full opacity-40 blur-3xl block-96 inline-96"
     ></div>
     <div
-      class="pointer-events-none absolute right-0 bottom-0 h-72 translate-x-1/3 translate-y-1/3 rounded-full bg-robinEggBlue opacity-20 blur-3xl inline-72"
+      class="bg-robinEggBlue pointer-events-none absolute inset-e-0 inset-be-0 translate-1/3 rounded-full opacity-20 blur-3xl block-72 inline-72"
     ></div>
 
     <div class="relative mx-auto px-6 text-center max-inline-3xl">
       <h2
-        class="mbe-5 font-sansserif text-5xl leading-tight font-black text-goldenFizz sm:text-6xl"
+        class="font-sansserif text-goldenFizz mbe-5 text-5xl leading-tight font-black sm:text-6xl"
       >
         Ready to get paid faster?
       </h2>
@@ -459,32 +459,32 @@
   </section>
 </main>
 <!-- ══════════════════════════════════════════════ FOOTER -->
-<footer class="col-span-full border-t border-white/10 bg-daisyBush py-10">
+<footer class="bg-daisyBush col-span-full border-t border-white/10 py-10">
   <div
     class="mx-auto flex flex-col items-center justify-between gap-4 px-6 max-inline-6xl sm:flex-row"
   >
-    <p class="text-sm text-pastelPurple">
+    <p class="text-pastelPurple text-sm">
       © 2026 Dollar Holler. All rights reserved.
     </p>
     <nav class="flex items-center gap-6 text-sm">
       <a
         href={resolve("/invoices")}
-        class="text-pastelPurple transition-colors duration-150 hover:text-white"
+        class="text-pastelPurple transition-colors duration-200 hover:text-white"
         >Invoices</a
       >
       <a
         href={resolve("/clients")}
-        class="text-pastelPurple transition-colors duration-150 hover:text-white"
+        class="text-pastelPurple transition-colors duration-200 hover:text-white"
         >Clients</a
       >
       <a
         href={resolve("/login")}
-        class="text-pastelPurple transition-colors duration-150 hover:text-white"
+        class="text-pastelPurple transition-colors duration-200 hover:text-white"
         >Login</a
       >
       <a
         href={resolve("/signup")}
-        class="font-semibold text-goldenFizz transition-colors duration-150 hover:text-white"
+        class="text-goldenFizz font-semibold transition-colors duration-200 hover:text-white"
         >Sign Up</a
       >
     </nav>

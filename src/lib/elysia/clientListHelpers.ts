@@ -1,3 +1,27 @@
+/**
+ * List-query join contract (clients list + received/balance aggregates)
+ *
+ * The clients list is paginated with `ORDER BY` + `LIMIT` on `clients.id`.
+ * The join to financial totals must not multiply rows per client.
+ *
+ * This module MUST keep one SQL row per client at the pagination layer:
+ *
+ * - `invoiceTotalsSubquery`: one row per invoice (invoices ⋈
+ *   `lineItemsTotalSubquery`, which is grouped by `invoiceId` in
+ *   invoiceListHelpers).
+ * - `clientReceivedBalanceSubquery`: `GROUP BY clientId` over invoice totals,
+ *   so at most one row per client before the clients list joins it.
+ *
+ * Do not:
+ * 1. Join raw `line_items` or unaggregated invoice rows into the outer clients
+ *    list query.
+ * 2. Remove `GROUP BY clientId` from the received/balance subquery without an
+ *    equivalent one-row-per-client guarantee.
+ * 3. Add M:N joins (e.g. tags) without collapsing to one row per client before
+ *    `LIMIT` (see plan §2a: cursor pagination lists).
+ *
+ * @see ./invoiceListHelpers.ts for `lineItemsTotalSubquery`.
+ */
 import { db } from "$lib/db";
 import { invoices as invoicesTable } from "$lib/db/schema";
 import { eq, sql } from "drizzle-orm";

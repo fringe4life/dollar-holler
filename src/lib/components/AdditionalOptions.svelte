@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import { type Snippet } from "svelte";
   type Props = {
     classes?: string;

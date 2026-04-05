@@ -40,7 +40,8 @@
   >
     <a
       href={getBackUrl()}
-      class="fixed top-7 left-7 text-pastelPurple print:hidden"><Arrow /></a
+      class="text-pastelPurple hover:text-daisyBush fixed inset-s-7 inset-bs-5 transition-colors duration-200 max-inline-full print:hidden"
+      ><Arrow /></a
     >
     {@render children()}
   </main>

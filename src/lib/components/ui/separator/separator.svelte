@@ -13,7 +13,7 @@
   bind:ref
   data-slot="separator-root"
   class={cn(
-    "shrink-0 bg-border data-[orientation=horizontal]:block-px data-[orientation=horizontal]:inline-full data-[orientation=vertical]:block-full data-[orientation=vertical]:inline-px",
+    "bg-border shrink-0 data-[orientation=horizontal]:block-px data-[orientation=horizontal]:inline-full data-[orientation=vertical]:block-full data-[orientation=vertical]:inline-px",
     className
   )}
   {...restProps}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { asset, resolve } from "$app/paths";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import { Button } from "$lib/components/ui/button";
   import type { Maybe } from "$lib/types";
   import MenuIcon from "@lucide/svelte/icons/menu";
@@ -15,8 +15,8 @@
 
 <nav
   class="
-    landing-nav fixed inset-x-0 top-0
-    z-50 not-supports-scroll-timeline:bg-whisper/95 not-supports-scroll-timeline:shadow-xs
+    landing-nav not-supports-scroll-timeline:bg-whisper/95 fixed inset-x-0
+    inset-bs-0 z-50 not-supports-scroll-timeline:shadow-xs
     
     not-supports-scroll-timeline:backdrop-blur-xs
   "
@@ -36,7 +36,7 @@
         class="aspect-square inline-8"
       />
       <span
-        class="font-sansserif text-xl font-black tracking-tight text-daisyBush"
+        class="font-sansserif text-daisyBush text-xl font-black tracking-tight"
       >
         Dollar Holler
       </span>
@@ -60,7 +60,7 @@
 
     <!-- Mobile Hamburger -->
     <button
-      class="flex cursor-pointer items-center text-daisyBush md:hidden"
+      class="text-daisyBush flex cursor-pointer items-center md:hidden"
       onclick={mobileOpen.toggle}
       aria-label="Toggle navigation"
     >
@@ -75,7 +75,7 @@
   <!-- Mobile Dropdown -->
   {#if mobileOpen.isOn}
     <div
-      class="border-gray-100 border-t bg-whisper px-6 py-4 shadow-lg md:hidden"
+      class="bg-whisper border-t border-gray-100 px-6 py-4 shadow-lg md:hidden"
     >
       <div class="flex flex-col gap-3">
         {#if user}

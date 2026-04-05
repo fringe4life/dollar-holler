@@ -42,11 +42,6 @@ function randomDateWithinLast3Months(): Date {
   return new Date(randomTime);
 }
 
-// Helper function to get random user from array
-function getRandomUser<T>(users: T[]): T {
-  return users[Math.floor(Math.random() * users.length)];
-}
-
 async function main() {
   // 1) Load existing users from Better Auth tables
   const users = await db.query.user.findMany();
@@ -64,7 +59,7 @@ async function main() {
   }
 
   console.log(
-    `Found ${users.length} users. Distributing data randomly among them.`
+    `Found ${users.length} users. Each gets ${users.length - 1} clients (other users); invoices round-robin per user.`
   );
 
   // 2) Clear non-user tables
@@ -75,9 +70,8 @@ async function main() {
 
   // 3) Create settings for each user
   const settingsData: NewSettings[] = users.map((u) => ({
-    id: createId(),
     userId: u.id,
-    myName: `User ${u.name || u.email}`,
+    myName: `${u.name || u.email}`,
     email: u.email,
     street: `${Math.floor(Math.random() * 9999) + 1} Main Street`,
     city: ["Coolville", "Tech City", "Dev Town", "Code Springs"][
@@ -90,33 +84,28 @@ async function main() {
   await db.insert(settings).values(settingsData);
   console.log(`✅ Created settings for ${settingsData.length} users`);
 
-  // 4) Create clients with random user assignment
-  const clientNames = [
-    "Compressed.fm",
-    "Everything Svelte",
-    "ZEAL",
-    "TechCorp Inc",
-    "Design Studio",
-    "Web Solutions LLC",
-    "Digital Agency",
-    "Creative Co",
-  ];
-
-  const clientsData: NewClient[] = clientNames.map((name) => ({
-    id: createId(),
-    userId: getRandomUser(users).id,
-    name,
-    email: `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}@example.com`,
-    street: `${Math.floor(Math.random() * 9999) + 1} ${["Main", "Oak", "Pine", "Cedar"][Math.floor(Math.random() * 4)]} Street`,
-    city: ["Somewhereville", "Nowhere", "Anywhere", "Tech City"][
-      Math.floor(Math.random() * 4)
-    ],
-    state: ["TN", "CA", "NY", "FL"][Math.floor(Math.random() * 4)],
-    zip: `${Math.floor(Math.random() * 90000) + 10000}`,
-    clientStatus: (Math.random() > 0.2 ? "active" : "archive") as
-      | "active"
-      | "archive",
-  }));
+  // 4) Each user gets one client per *other* user (contact = that user’s settings)
+  const clientsData: NewClient[] = [];
+  for (let i = 0; i < users.length; i++) {
+    const u = users[i];
+    for (let j = 0; j < users.length; j++) {
+      if (j === i) continue;
+      const peer = settingsData[j];
+      clientsData.push({
+        id: createId(),
+        userId: u.id,
+        name: peer.myName,
+        email: peer.email,
+        street: peer.street,
+        city: peer.city,
+        state: peer.state,
+        zip: peer.zip,
+        clientStatus: (Math.random() > 0.2 ? "active" : "archive") as
+          | "active"
+          | "archive",
+      });
+    }
+  }
 
   const insertedClients = await db
     .insert(clients)
@@ -124,7 +113,7 @@ async function main() {
     .returning();
   console.log(`✅ Created ${insertedClients.length} clients`);
 
-  // 5) Create invoices with random user and client assignment
+  // 5) At least 15 invoices per user (pagination / list density)
   const invoiceSubjects = [
     "Website Development",
     "Podcast Episodes",
@@ -134,25 +123,56 @@ async function main() {
     "Software Development",
     "Marketing Campaign",
     "Brand Identity",
+    "Retainer — Q1",
+    "Retainer — Q2",
+    "Bugfix sprint",
+    "UX audit",
+    "Infrastructure",
+    "Content migration",
+    "Training workshop",
   ];
 
   const invoicesData: NewInvoice[] = [];
   const lineItemsData: NewLineItem[] = [];
 
-  // Create 2-4 invoices per client
+  const clientsByUserId = new Map<string, (typeof insertedClients)[number][]>();
   for (const client of insertedClients) {
-    const invoiceCount = Math.floor(Math.random() * 3) + 2; // 2-4 invoices
+    const list = clientsByUserId.get(client.userId) ?? [];
+    list.push(client);
+    clientsByUserId.set(client.userId, list);
+  }
 
-    for (let i = 0; i < invoiceCount; i++) {
+  const descriptions = [
+    "Development Hours",
+    "Design Work",
+    "Consulting Services",
+    "Content Creation",
+    "Project Management",
+    "Quality Assurance",
+    "Documentation",
+    "Training",
+  ];
+
+  const invoicesPerUser = 15;
+
+  for (const u of users) {
+    const ownedClients = clientsByUserId.get(u.id) ?? [];
+    if (ownedClients.length === 0) continue;
+
+    let invoiceSeq = 0;
+    for (let n = 0; n < invoicesPerUser; n++) {
+      // Spread across this user’s clients (one per other user), round-robin
+      const client = ownedClients[n % ownedClients.length];
       const invoiceId = createId();
       const issueDate = randomDateWithinLast6Months();
       const dueDate = randomDateWithinLast3Months();
+      invoiceSeq += 1;
 
       invoicesData.push({
         id: invoiceId,
-        userId: getRandomUser(users).id, // Random user assignment
+        userId: u.id,
         clientId: client.id,
-        invoiceNumber: `${Math.floor(Math.random() * 90000) + 10000}`,
+        invoiceNumber: `${u.id.slice(0, 6).toUpperCase()}-${String(invoiceSeq).padStart(4, "0")}`,
         subject:
           invoiceSubjects[Math.floor(Math.random() * invoiceSubjects.length)],
         issueDate,
@@ -165,23 +185,11 @@ async function main() {
         ],
       });
 
-      // Create 1-3 line items per invoice
       const lineItemCount = Math.floor(Math.random() * 3) + 1;
-      const descriptions = [
-        "Development Hours",
-        "Design Work",
-        "Consulting Services",
-        "Content Creation",
-        "Project Management",
-        "Quality Assurance",
-        "Documentation",
-        "Training",
-      ];
-
       for (let j = 0; j < lineItemCount; j++) {
         lineItemsData.push({
           id: createId(),
-          userId: getRandomUser(users).id, // Random user assignment
+          userId: u.id,
           invoiceId,
           description:
             descriptions[Math.floor(Math.random() * descriptions.length)],

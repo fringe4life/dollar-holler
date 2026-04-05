@@ -1,5 +1,5 @@
 import { client } from "$lib/client";
-import type { List, Maybe } from "$lib/types";
+import type { CursorId, List, Maybe, SearchableListStore } from "$lib/types";
 import {
   normalizeToNull,
   transformNullToUndefined,
@@ -11,7 +11,7 @@ import type {
 } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
-export class InvoicesStore {
+export class InvoicesStore implements SearchableListStore {
   // Use $state for reactive class fields
   invoices = $state<InvoiceListResponse[]>([]);
   loading = $state(false);
@@ -36,8 +36,22 @@ export class InvoicesStore {
     };
   }
 
+  normalizeInvoice(
+    invoice: NewInvoice,
+    discount: number = 0,
+    userId: string
+  ): NewInvoice {
+    return {
+      ...invoice,
+      issueDate: new Date(invoice.issueDate),
+      dueDate: new Date(invoice.dueDate),
+      discount,
+      userId,
+    };
+  }
+
   // Load all invoices (with client name and total). Pass q for search.
-  async loadInvoices(searchQuery?: string, options?: { signal?: AbortSignal }) {
+  async loadItems(searchQuery?: string, options?: { signal?: AbortSignal }) {
     this.loading = true;
     this.error = null;
 
@@ -164,34 +178,37 @@ export class InvoicesStore {
   }
 
   // Upsert invoice (create or update)
-  async upsertInvoice(invoiceData: NewInvoice): Promise<Maybe<string>> {
+  async upsertInvoice(invoiceData: NewInvoice): Promise<Maybe<CursorId>> {
     try {
       const isUpdate = Boolean(invoiceData.id);
       const body = transformNullToUndefined(invoiceData);
 
-      let responseData: { id?: string; error?: string } | InvoiceSelect;
+      /** Success payloads only — error responses throw above. */
+      let responseData: InvoiceSelect | { id: CursorId };
       if (isUpdate && invoiceData.id) {
         const { data } = await client.api.invoices({ id: invoiceData.id }).put({
           ...body,
-          client: {
-            id: invoiceData.clientId,
-          },
+          clientId: invoiceData.clientId,
+          client: { id: invoiceData.clientId },
+          invoiceStatus: invoiceData.invoiceStatus ?? "draft",
         });
         if (!data || (typeof data === "object" && "error" in data)) {
           throw new Error(data?.error || "Failed to update invoice");
         }
-        responseData = data;
+        responseData = data as InvoiceSelect;
       } else {
         const { data } = await client.api.invoices.post({
           ...body,
+          clientId: invoiceData.clientId,
           client: {
             id: invoiceData.clientId,
           },
+          invoiceStatus: invoiceData.invoiceStatus ?? "draft",
         });
         if (!data || (typeof data === "object" && "error" in data)) {
           throw new Error(data?.error || "Failed to create invoice");
         }
-        responseData = data as { id: string };
+        responseData = data as { id: CursorId };
       }
 
       if (isUpdate && invoiceData.id) {
@@ -215,8 +232,8 @@ export class InvoicesStore {
         toast.success("Invoice updated successfully");
         return invoiceData.id;
       }
-      // Add new invoice to state - form will call loadInvoices after line items are created
-      const { id } = responseData as { id: string };
+      // Add new invoice to state - form will call loadItems after line items are created
+      const { id } = responseData;
       toast.success("Invoice created successfully");
       return id;
     } catch (error_) {

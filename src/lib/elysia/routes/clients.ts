@@ -1,11 +1,13 @@
 /* eslint-disable new-cap */
 import { db } from "$lib/db";
+import { cursorSchema } from "$lib/db/id";
 import {
   clients as clientsTable,
   invoices as invoicesTable,
 } from "$lib/db/schema";
+import { type } from "arktype";
 import { and, eq, ilike, or, sql } from "drizzle-orm";
-import { Elysia, t } from "elysia";
+import { Elysia } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 import { clientReceivedBalanceSubquery } from "../clientListHelpers";
 import {
@@ -14,22 +16,37 @@ import {
 } from "../invoiceListHelpers";
 
 // Client validation schema
-const clientSchema = t.Object({
-  id: t.Optional(t.String()),
-  userId: t.String(),
-  name: t.String(),
-  email: t.Optional(t.Nullable(t.String())),
-  street: t.Optional(t.Nullable(t.String())),
-  city: t.Optional(t.Nullable(t.String())),
-  state: t.Optional(t.Nullable(t.String())),
-  zip: t.Optional(t.Nullable(t.String())),
-  clientStatus: t.Optional(
-    t.Nullable(t.Union([t.Literal("active"), t.Literal("archive")]))
-  ),
+// const clientSchema = t.Object({
+//   id: optionalCursorId,
+//   userId: t.String(),
+//   name: t.String(),
+//   email: t.Optional(t.Nullable(t.String())),
+//   street: t.Optional(t.Nullable(t.String())),
+//   city: t.Optional(t.Nullable(t.String())),
+//   state: t.Optional(t.Nullable(t.String())),
+//   zip: t.Optional(t.Nullable(t.String())),
+//   clientStatus: t.Optional(
+//     t.Nullable(t.Union([t.Literal("active"), t.Literal("archive")]))
+//   ),
+// });
+const clientStatusSchema = type({
+  clientStatus: "'active' | 'archive'",
 });
 
-const clientStatusPatchSchema = t.Object({
-  clientStatus: t.Union([t.Literal("active"), t.Literal("archive")]),
+const querySchema = type({
+  q: "string?",
+});
+
+const clientSchema = type({
+  id: cursorSchema.optional(),
+  userId: "string",
+  name: "string",
+  email: "string?",
+  street: "string?",
+  city: "string?",
+  state: "string?",
+  zip: "string?",
+  "clientStatus?": "'active' | 'archive' | null | undefined",
 });
 
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
@@ -89,9 +106,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     },
     {
       auth: true,
-      query: t.Object({
-        q: t.Optional(t.String()),
-      }),
+      query: querySchema,
     }
   )
   // POST /api/clients - Create client (with upsert on conflict)
@@ -137,7 +152,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     async ({ params: { id }, set, user }) => {
       try {
         const client = await db.query.clients.findFirst({
-          where: { id, userId: user.id },
+          where: { id: { eq: id }, userId: { eq: user.id } },
         });
         if (!client) {
           set.status = 404;
@@ -150,9 +165,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: t.Object({
-        id: t.String(),
-      }),
+      params: type({ id: cursorSchema }),
       auth: true,
     }
   )
@@ -181,9 +194,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: t.Object({
-        id: t.String(),
-      }),
+      params: type({ id: cursorSchema }),
       body: clientSchema,
 
       auth: true,
@@ -213,15 +224,14 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         }
         return updated;
       } catch (error) {
+        console.log({ id });
         console.error("Error updating client status:", error);
         return { error: "Failed to update client status" };
       }
     },
     {
-      params: t.Object({
-        id: t.String(),
-      }),
-      body: clientStatusPatchSchema,
+      params: type({ id: cursorSchema }),
+      body: clientStatusSchema,
       auth: true,
     }
   )
@@ -246,9 +256,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: t.Object({
-        id: t.String(),
-      }),
+      params: type({ id: cursorSchema }),
       auth: true,
     }
   )
@@ -258,7 +266,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     async ({ params: { id }, set, user }) => {
       try {
         const client = await db.query.clients.findFirst({
-          where: { id, userId: user.id },
+          where: { id: { eq: id }, userId: { eq: user.id } },
         });
         if (!client) {
           set.status = 404;
@@ -310,9 +318,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: t.Object({
-        id: t.String(),
-      }),
+      params: type({ id: cursorSchema }),
       auth: true,
     }
   );

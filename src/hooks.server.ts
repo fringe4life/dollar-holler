@@ -52,4 +52,15 @@ export const authGuard: Handle = async ({ event, resolve }) => {
   return resolve(event);
 };
 
-export const handle: Handle = sequence(authHandler, localsHandler, authGuard);
+/** Preload self-hosted fonts from bundled CSS (not invoked in vite dev). */
+export const fontPreloadHandler: Handle = async ({ event, resolve }) =>
+  resolve(event, {
+    preload: ({ type }) => type === "js" || type === "css" || type === "font",
+  });
+
+export const handle: Handle = sequence(
+  authHandler,
+  localsHandler,
+  authGuard,
+  fontPreloadHandler
+);

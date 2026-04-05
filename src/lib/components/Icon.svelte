@@ -11,6 +11,7 @@
 </script>
 
 <svg
+  aria-hidden="true"
   {width}
   {height}
   viewBox="0 0 24 24"

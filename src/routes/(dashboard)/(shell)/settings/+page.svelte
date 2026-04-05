@@ -4,6 +4,7 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import Check from "$lib/icon/Check.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
+  import type { CursorId } from "$lib/types";
   import type { SettingsResponse } from "$lib/validators";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
@@ -37,7 +38,7 @@
 <main
   class="col-span-12 px-4 pbs-4 md:col-span-8 md:col-start-4 md:pbs-20 lg:col-span-6 lg:col-start-5"
 >
-  <h2 class="mbe-1 text-3xl font-black text-daisyBush">Invoice Details</h2>
+  <h2 class="text-daisyBush mbe-1 text-3xl font-black">Invoice Details</h2>
   <p class="mbe-8">This information gets included on each invoice.</p>
 
   <form class="grid grid-cols-6 gap-x-5">
@@ -85,7 +86,7 @@
     </div>
   </form>
   <div class="col-span-6">
-    <h2 class="mbe-1 text-3xl font-black text-daisyBush">
+    <h2 class="text-daisyBush mbe-1 text-3xl font-black">
       Update Account Information
     </h2>
     <p class="mbe-8">This information is used to access your account.</p>

@@ -1,6 +1,6 @@
 import type { Attachment } from "svelte/attachments";
 import { on } from "svelte/events";
-import { Spring } from "svelte/motion";
+import { Spring, type SpringOptions } from "svelte/motion";
 import { MediaQuery } from "svelte/reactivity";
 
 interface SwipeConfig {
@@ -12,12 +12,12 @@ interface SwipeConfig {
 }
 
 const MOBILE_MEDIA_QUERY = new MediaQuery("(max-width: 1024px)");
-// Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
 const transformElement = (
   x: number,
   element: HTMLElement,
   isTypedOm: boolean
 ) => {
+  // Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
   if (isTypedOm) {
     // CSS Typed OM is supported
     element.attributeStyleMap.set(
@@ -28,6 +28,12 @@ const transformElement = (
     // CSS Typed OM is not supported
     element.style.transform = `translateX(${x}px)`;
   }
+};
+
+const INITIAL_SPRING_STATE = { x: 0, y: 0 };
+const SPRING_CONFIG: SpringOptions = {
+  stiffness: 0.2,
+  damping: 0.4,
 };
 
 /**
@@ -53,13 +59,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
   const isTypedOm = Boolean(window.CSS && CSS.px);
 
   // Use the new Spring class for smooth animations
-  const spring = new Spring(
-    { x: 0, y: 0 },
-    {
-      stiffness: 0.2,
-      damping: 0.4,
-    }
-  );
+  const spring = new Spring(INITIAL_SPRING_STATE, SPRING_CONFIG);
   return (element) => {
     let startX = 0;
     let currentX = 0;
@@ -75,7 +75,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Reset function
     function reset() {
-      spring.set({ x: 0, y: 0 });
+      spring.set(INITIAL_SPRING_STATE);
     }
 
     // Handle swipe completion
@@ -84,7 +84,6 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
       const movement = startX - currentX;
       const leftSnapX = elementWidth * -0.95;
-      const rightSnapX = 0;
 
       if (movement > threshold) {
         // Swiped left
@@ -92,7 +91,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
         onSwipeLeft?.();
       } else {
         // Swiped right or insufficient movement
-        spring.set({ x: rightSnapX, y: 0 });
+        spring.set(INITIAL_SPRING_STATE);
         onSwipeRight?.();
       }
 
@@ -194,6 +193,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     return () => {
       documentCleanups.forEach((off) => off());
       documentCleanups = [];
+      isDragging = false;
     };
   };
 }

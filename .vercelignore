@@ -5,6 +5,7 @@ node_modules
 components.json
 prettier.config.mjs
 stylelint.config.mjs
+AGENTS.md
 
 .cursor
 .qodo

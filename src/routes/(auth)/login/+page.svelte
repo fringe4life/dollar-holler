@@ -24,7 +24,7 @@
       <div class="flex items-center justify-between">
         <label for="password" class="text-goldenFizz">Password</label>
         <a
-          class="text-sm text-whisper underline hover:no-underline"
+          class="text-whisper text-sm underline hover:no-underline"
           href={resolve("/forgot-password")}>Forgot Password</a
         >
       </div>

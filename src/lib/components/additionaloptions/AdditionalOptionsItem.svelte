@@ -20,9 +20,9 @@
 
 {#if !option.disabled}
   {@const Icon = option.icon || View}
-  <li class="not-last:border-b-2 not-last:border-b-whisper">
+  <li class="not-last:border-b-whisper not-last:border-b-2">
     <button
-      class="flex cursor-pointer gap-x-2 p-4 font-sansserif font-bold text-pastelPurple inline-full hover:text-daisyBush"
+      class="font-sansserif text-pastelPurple hover:text-daisyBush flex cursor-pointer gap-x-2 p-4 font-bold transition-colors duration-200 inline-full"
       type="button"
       onclick={option.onclick}
     >

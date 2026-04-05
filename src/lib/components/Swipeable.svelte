@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import { swipe } from "$lib/attachments/swipe.svelte";
   import Cancel from "$lib/icon/Cancel.svelte";
   import type { Snippet } from "svelte";
@@ -9,7 +9,7 @@
     revealed: Snippet;
     contentClass: string;
     /** Stable name for View Transitions API (e.g. `client-${id}`) so rows morph instead of cross-fading. */
-    contentViewTransitionName?: string;
+    contentViewTransitionName: string;
   };
 
   let { content, revealed, contentClass, contentViewTransitionName }: Props =
@@ -17,7 +17,10 @@
   const swipeReset = new Toggle();
 </script>
 
-<div class="relative isolate">
+<div
+  class="relative isolate"
+  style:view-transition-name={contentViewTransitionName}
+>
   <!-- CONTENT displayed by default -->
   <div
     {@attach swipe({
@@ -25,7 +28,6 @@
       onResetComplete: swipeReset.off,
     })}
     class={contentClass}
-    style:view-transition-name={contentViewTransitionName}
   >
     {@render content()}
   </div>
@@ -44,6 +46,6 @@
 <style>
   @reference "#app.css";
   :global(.action-button) {
-    @apply grid justify-items-center font-bold text-daisyBush;
+    @apply text-daisyBush grid justify-items-center font-bold;
   }
 </style>

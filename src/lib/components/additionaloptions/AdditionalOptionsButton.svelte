@@ -1,6 +1,6 @@
 <script lang="ts">
   import { clickOutside } from "$lib/attachments/clickOutside";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import ThreeDots from "$lib/icon/ThreeDots.svelte";
 
   type Props = {
@@ -13,6 +13,6 @@
 <button
   {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
   onclick={additionalMenu.toggle}
-  class="text-pastelPurple transition-colors duration-200 hover:text-daisyBush"
+  class="text-pastelPurple hover:text-daisyBush group-hover/row:text-daisyBush/50 transition-colors duration-200"
   ><ThreeDots /></button
 >

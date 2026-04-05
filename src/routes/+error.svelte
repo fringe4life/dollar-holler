@@ -8,15 +8,15 @@
 </svelte:head>
 
 <div
-  class="flex min-h-dvh items-center justify-center bg-center bg-no-repeat inline-full"
+  class="flex items-center justify-center bg-center bg-no-repeat inline-full min-block-dvh"
   style="background-image: url('{asset('/images/bg-error.svg')}')"
 >
   <div>
-    <h1 class="text-5xl leading-none font-black text-daisyBush">
+    <h1 class="text-daisyBush text-center text-5xl leading-none font-black">
       {page.status}
     </h1>
-    <p class="text-center text-lg font-bold text-daisyBush">Sorry</p>
-    <p class="text-center text-base text-daisyBush">
+    <p class="text-daisyBush text-center text-lg font-bold">Sorry</p>
+    <p class="text-daisyBush text-center text-base">
       We can't find the page you're looking for.
     </p>
   </div>

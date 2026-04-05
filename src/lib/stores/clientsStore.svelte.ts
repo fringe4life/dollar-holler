@@ -1,5 +1,5 @@
 import { client } from "$lib/client";
-import type { Maybe } from "$lib/types";
+import type { CursorId, Maybe, SearchableListStore } from "$lib/types";
 import {
   normalizeToNull,
   transformNullToUndefined,
@@ -11,7 +11,7 @@ import type {
 } from "$lib/validators";
 import { toast } from "svelte-sonner";
 
-export class ClientsStore {
+export class ClientsStore implements SearchableListStore {
   // Use $state for reactive class fields
   clients = $state<ClientListResponse[]>([]);
   loading = $state(false);
@@ -35,7 +35,7 @@ export class ClientsStore {
   }
 
   // Load all clients (without relations). Pass q for search.
-  async loadClients(searchQuery?: string, options?: { signal?: AbortSignal }) {
+  async loadItems(searchQuery?: string, options?: { signal?: AbortSignal }) {
     this.loading = true;
     this.error = null;
 
@@ -124,7 +124,7 @@ export class ClientsStore {
   }
 
   async updateClientStatus(
-    clientId: string,
+    clientId: CursorId,
     clientStatus: "active" | "archive"
   ) {
     try {
@@ -163,21 +163,24 @@ export class ClientsStore {
       const isUpdate = !!clientData.id;
       const body = transformNullToUndefined(clientData);
 
-      let responseData: { id?: string; error?: string } | ClientSelect;
+      /** Success payloads only — error responses throw above. */
+      let responseData: ClientSelect | { id: CursorId };
       if (isUpdate && clientData.id) {
         const { data } = await client.api
           .clients({ id: clientData.id })
-          .put(body);
+          .put({ ...body });
         if (!data || (typeof data === "object" && "error" in data)) {
           throw new Error(data?.error || "Failed to update client");
         }
-        responseData = data;
+        responseData = data as ClientSelect;
       } else {
-        const { data } = await client.api.clients.post(body);
+        const { data } = await client.api.clients.post({
+          ...body,
+        });
         if (!data || (typeof data === "object" && "error" in data)) {
           throw new Error(data?.error || "Failed to create client");
         }
-        responseData = data;
+        responseData = data as { id: CursorId };
       }
 
       if (isUpdate && clientData.id) {
@@ -202,7 +205,10 @@ export class ClientsStore {
         return clientData.id;
       } else {
         // Add new client to state
-        const id = (responseData as { id: string }).id;
+        const id = responseData.id;
+        if (!id) {
+          throw new Error("Failed to create client");
+        }
         const newClient: ClientListResponse = {
           ...clientData,
           id,

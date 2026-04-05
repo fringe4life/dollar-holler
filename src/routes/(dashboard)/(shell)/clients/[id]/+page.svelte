@@ -1,26 +1,26 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Search from "$lib/components/Search.svelte";
-  import { centsToDollars, sumInvoiceTotals } from "$lib/utils/moneyHelpers";
-  import BlankState from "../BlankState.svelte";
-
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";
   import Edit from "$lib/icon/Edit.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton } from "$lib/types";
+  import type { BitsButton, SearchableListStore } from "$lib/types";
   import { isLate } from "$lib/utils/dateHelpers";
+  import { centsToDollars, sumInvoiceTotals } from "$lib/utils/moneyHelpers";
   import { onMount } from "svelte";
   import InvoiceRow from "../../invoices/InvoiceRow.svelte";
   import InvoiceRowHeader from "../../invoices/InvoiceRowHeader.svelte";
+  import BlankState from "../BlankState.svelte";
   import ClientForm, { type Props } from "../ClientForm.svelte";
 
   let { data } = $props();
 
   const { invoices: invoicesStore } = getDashboardStores();
 
-  let isFormShowing = $state<boolean>(false);
+  let isFormShowing = new Toggle();
   let isEditing = $state<Props["formState"]>("create");
   // svelte-ignore state_referenced_locally
   const client = $state(data.client);
@@ -38,7 +38,7 @@
 
   const handleEdit: BitsButton = () => {
     isEditing = "edit";
-    isFormShowing = true;
+    isFormShowing.toggle();
   };
 
   const getDraft = (): string => {
@@ -69,8 +69,14 @@
     return centsToDollars(sumInvoiceTotals(outstandingInvoices));
   };
 
-  const handleSearch = async (searchTerms: string) => {
-    console.log(searchTerms);
+  /** Do not pass `invoicesStore` here — `loadItems` would fetch the global list. Client-scoped search is not implemented yet. */
+  const detailInvoiceSearch: SearchableListStore = {
+    get loading() {
+      return invoicesStore.loading;
+    },
+    async loadItems() {
+      // noop until client-scoped invoice search exists
+    },
   };
 </script>
 
@@ -78,29 +84,25 @@
   <title>{client.name} | Doller Holla</title>
 </svelte:head>
 <div
-  class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 px-5 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:px-10 lg:py-3 lg:text-lg"
+  class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
 >
   <!-- search field -->
-  {#if clientInvoices && clientInvoices.length > 0}
-    <Search {handleSearch} />
-  {:else}
-    <div></div>
-  {/if}
+  <Search store={detailInvoiceSearch} />
   <!-- new invoice button -->
   <div class="z-1">
-    <Button onclick={() => (isFormShowing = true)} size="lg">+ Client</Button>
+    <Button onclick={isFormShowing.toggle} size="lg">+ Client</Button>
   </div>
 </div>
 
 <div class="mbe-7 flex items-center justify-between inline-full">
-  <h1 class="font-sansserif text-3xl font-bold text-daisyBush">
+  <h1 class="font-sansserif text-daisyBush text-3xl font-bold">
     {client.name}
   </h1>
   <Button variant="textOnly" onclick={handleEdit}><Edit /> Edit</Button>
 </div>
 
 <div
-  class="mbe-10 grid grid-cols-1 gap-4 rounded-lg bg-gallery px-10 py-7 lg:grid-cols-4"
+  class="bg-gallery mbe-10 grid grid-cols-1 gap-4 rounded-lg px-10 py-7 lg:grid-cols-4"
 >
   <div class="summary-block">
     <div class="label">Total Overdue</div>
@@ -127,7 +129,7 @@
     <p>Loading...</p>
   {:else if clientInvoices.length > 0}
     <InvoiceRowHeader />
-    <div class="flex flex-col-reverse">
+    <div class="flex flex-col-reverse gap-y-4">
       {#each clientInvoices as i (i.invoiceNumber)}
         <InvoiceRow
           invoice={{
@@ -149,10 +151,10 @@
   {/if}
 </div>
 
-<SlidePanel bind:open={isFormShowing} buttonText="">
+<SlidePanel bind:open={isFormShowing.isOn} buttonText="">
   {#snippet title()}
     <h2
-      class="mbs-9 mbe-7 font-sansserif text-3xl font-bold text-daisyBush lg:mbs-0"
+      class="font-sansserif text-daisyBush mbs-9 mbe-7 text-3xl font-bold lg:mbs-0"
     >
       Add a Client
     </h2>
@@ -167,7 +169,7 @@
       edit={client}
       formState="edit"
       closePanel={() => {
-        isFormShowing = false;
+        isFormShowing.off();
         isEditing = "edit";
       }}
     />
@@ -176,7 +178,7 @@
       edit={undefined}
       formState="create"
       closePanel={() => {
-        isFormShowing = false;
+        isFormShowing.off();
         isEditing = "create";
       }}
     />
@@ -190,9 +192,9 @@
   }
 
   .label {
-    @apply text-sm font-black text-lightGray;
+    @apply text-lightGray text-sm font-black;
   }
   .number {
-    @apply truncate text-4xl font-black text-purple;
+    @apply text-purple truncate text-4xl font-black;
   }
 </style>

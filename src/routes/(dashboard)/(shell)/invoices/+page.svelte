@@ -1,7 +1,7 @@
 <script lang="ts">
   import { page } from "$app/state";
-  import { ItemPanel } from "$lib/attachments/ItemPanel.svelte";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import InvoiceForm from "$lib/components/InvoiceForm.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
@@ -26,15 +26,11 @@
 
   const { invoices: invoicesStore } = getDashboardStores();
 
-  onMount(() => {
+  onMount(async () => {
     const ac = new AbortController();
-    void invoicesStore.loadInvoices(searchQuery, { signal: ac.signal });
+    await invoicesStore.loadItems(searchQuery, { signal: ac.signal });
     return () => ac.abort();
   });
-
-  const handleSearch = async (terms: string) => {
-    await invoicesStore.loadInvoices(terms);
-  };
 </script>
 
 <svelte:head>
@@ -44,10 +40,10 @@
 <div
   class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
 >
-  <Search {handleSearch} value={searchQuery} />
+  <Search store={invoicesStore} />
   <!-- new invoice button -->
   <div class="z-1">
-    <Button onclick={() => createForm.on()} size="lg">+ Invoice</Button>
+    <Button onclick={createForm.toggle} size="lg">+ Invoice</Button>
   </div>
 </div>
 
@@ -64,7 +60,7 @@
     </div>
   {:else if invoicesStore.error}
     <div class="grid place-content-center py-8 block-full">
-      <div class="text-red-500 text-lg">Error: {invoicesStore.error}</div>
+      <div class="text-lg text-red-500">Error: {invoicesStore.error}</div>
     </div>
   {:else if invoicesStore.invoices.length === 0 && !searchQuery}
     <BlankState />
@@ -91,7 +87,7 @@
 <SlidePanel bind:open={createForm.isOn} buttonText="">
   {#snippet title()}
     <h2
-      class="mbs-9 mbe-7 font-sansserif text-3xl font-bold text-daisyBush lg:mbs-0"
+      class="font-sansserif text-daisyBush mbs-9 mbe-7 text-3xl font-bold lg:mbs-0"
     >
       Add an Invoice
     </h2>
@@ -102,15 +98,15 @@
   {/snippet}
 
   <InvoiceForm
-    formState="create"
+    mode="create"
     userId={data.user?.id ?? ""}
-    closePanel={() => createForm.off()}
+    closePanel={createForm.off}
   />
 </SlidePanel>
 
 <SlidePanel bind:open={editPanel.toggle.isOn} buttonText="">
   {#snippet title()}
-    <h2 class="mbe-7 font-sansserif text-3xl font-bold text-daisyBush">
+    <h2 class="font-sansserif text-daisyBush mbe-7 text-3xl font-bold">
       Edit an Invoice
     </h2>
   {/snippet}
@@ -122,10 +118,10 @@
   {#if editPanel.item}
     {#key editPanel.item.id}
       <InvoiceForm
-        formState="edit"
+        mode="edit"
         bind:invoiceEdit={editPanel.item}
         userId={data.user?.id ?? ""}
-        closePanel={() => editPanel.close()}
+        closePanel={editPanel.close}
       />
     {/key}
   {/if}
@@ -136,7 +132,7 @@
     item={deleteModal.item}
     bind:open={deleteModal.toggle.isOn}
     titleText="Are you sure you want to delete this invoice?"
-    onCancel={() => deleteModal.close()}
+    onCancel={deleteModal.close}
     onDelete={async () => {
       if (!deleteModal?.item?.id) return;
       await invoicesStore.deleteInvoice(deleteModal.item.id);

@@ -2,7 +2,7 @@
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { Toggle } from "$lib/attachments/Toggle.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import Close from "$lib/icon/Close.svelte";
   import Hamburger from "$lib/icon/Hamburger.svelte";
   import type { Maybe } from "$lib/types";
@@ -38,7 +38,7 @@
 <!-- mobile nav control -->
 <button
   class={{
-    "fixed top-6 right-6 z-10 cursor-pointer transition-colors duration-200 md:hidden": true,
+    "fixed inset-e-6 inset-bs-6 z-10 cursor-pointer transition-colors duration-200 md:hidden": true,
     "text-goldenFizz": nav.isOn,
     "text-daisyBush": !nav.isOn,
   }}
@@ -53,7 +53,7 @@
 
 <header
   class={{
-    "fixed inset-0 isolate z-2 -translate-x-full overflow-y-auto bg-daisyBush text-center transition-transform duration-200 inline-full min-block-dvh md:static md:col-span-3 md:translate-x-0 ": true,
+    "bg-daisyBush fixed inset-0 isolate z-2 -translate-x-full overflow-y-auto text-center transition-transform duration-200 inline-full min-block-dvh md:static md:col-span-3 md:translate-x-0 ": true,
     "translate-x-0 ": nav.isOn,
   }}
 >
@@ -79,16 +79,16 @@
       aria-current={isActive}
       {href}
       onclick={nav.off}
-      class="relative inline-block px-8 text-white transition-colors duration-200
-     ease-out before:absolute before:top-0 before:left-0 before:bg-[url('/images/active-nav--left.svg')] before:bg-top-left before:bg-no-repeat before:opacity-0 before:transition-[translate,opacity,color] before:duration-200 before:ease-out before:block-7.5
-     before:inline-5 after:absolute after:top-0 after:right-0 after:bg-[url('/images/active-nav--right.svg')] after:bg-top-right after:bg-no-repeat after:opacity-0 after:transition-[translate,opacity,color] after:duration-200 after:ease-out after:block-7.5
-    after:inline-5
-    hover:text-goldenFizz
-     aria-current:text-robinEggBlue
-    aria-current:before:opacity-100 aria-current:after:opacity-100
-    aria-current:hover:text-robinEggBlue aria-current:hover:before:-translate-x-1
-    aria-current:hover:after:translate-x-1
-    supports-linear:before:ease-dramatic supports-linear:after:ease-dramatic"
+      class="hover:text-goldenFizz aria-current:text-robinEggBlue aria-current:hover:text-robinEggBlue supports-linear:before:ease-dramatic supports-linear:after:ease-dramatic relative
+     inline-block px-8 text-white transition-colors duration-200 ease-out before:absolute before:inset-s-0 before:inset-bs-0 before:bg-[url('/images/active-nav--left.svg')] before:bg-top-left before:bg-no-repeat
+     before:opacity-0 before:transition-[translate,opacity,color] before:duration-200 before:ease-out before:block-7.5 before:inline-5 after:absolute after:inset-e-0 after:inset-bs-0 after:bg-[url('/images/active-nav--right.svg')] after:bg-top-right after:bg-no-repeat
+    after:opacity-0
+    after:transition-[translate,opacity,color]
+     after:duration-200
+    after:ease-out after:block-7.5
+    after:inline-5 aria-current:before:opacity-100
+    aria-current:after:opacity-100
+    aria-current:hover:before:-translate-x-1 aria-current:hover:after:translate-x-1"
     >
       {title}
     </a>

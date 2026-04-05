@@ -1,44 +1,35 @@
 <script lang="ts">
+  import { Counter } from "$lib/runes/Counter.svelte";
+  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
   import type { LineItem, NewClient, NewInvoice } from "$lib/db/schema";
   import Trash from "$lib/icon/Trash.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton, Maybe } from "$lib/types";
+  import type { BitsButton } from "$lib/types";
+  import type {
+    InvoiceFormProps,
+    Key,
+    LineItemUpdate,
+    NewLineItemWithId,
+  } from "$lib/types/invoiceLineItems";
   import { toDateInputValue, today } from "$lib/utils/dateHelpers";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
-  import type { InvoiceSelect } from "$lib/validators";
+  import type { InvoiceListResponse } from "$lib/validators";
   import { onDestroy, onMount } from "svelte";
   import { toast } from "svelte-sonner";
   import type { FormEventHandler } from "svelte/elements";
   import { slide } from "svelte/transition";
   import LineItemRows from "../../routes/(dashboard)/invoices/LineItemRows.svelte";
+  import LineItemSkeleton from "../../routes/(dashboard)/invoices/LineItemSkeleton.svelte";
   import ConfirmDelete from "./ConfirmDelete.svelte";
   import States from "./States.svelte";
   import Button from "./ui/button/button.svelte";
 
-  type Panel = {
-    closePanel: () => void;
-  };
-
-  type EditProps = {
-    invoiceEdit: InvoiceSelect;
-    formState: "edit";
-  } & Panel;
-
-  type CreateProps = {
-    formState: "create";
-    invoiceEdit?: undefined;
-  } & Panel;
-
-  type Props = (CreateProps | EditProps) & {
-    userId?: Maybe<string>;
-  };
-
   let {
-    formState = "create",
+    mode = "create",
     closePanel,
     invoiceEdit = $bindable(),
     userId = null,
-  }: Props = $props();
+  }: InvoiceFormProps = $props();
 
   const {
     clients: clientsStore,
@@ -49,7 +40,14 @@
   // Form data using NewInvoice type
   let invoice: NewInvoice = $state(invoicesStore.newInvoice());
 
-  let lineItems: LineItem[] = $state([lineItemsStore.newLineItem()]);
+  const counter = new Counter();
+
+  let lineItems: Array<NewLineItemWithId | LineItem> = $state([
+    lineItemsStore.newLineItem({
+      id: counter.increment(),
+      invoiceId: invoice.id,
+    }),
+  ]);
   let lineItemsLoaded = $state(true);
   let discount = $state<number>(0);
 
@@ -57,9 +55,9 @@
   let isMounted = true;
 
   onMount(async () => {
-    clientsStore.loadClients();
+    clientsStore.loadItems();
 
-    if (formState === "edit" && invoiceEdit?.id) {
+    if (mode === "edit" && invoiceEdit?.id) {
       const editId = invoiceEdit.id;
       // Date inputs require "yyyy-MM-dd"; convert from Date objects
       const issueDate = toDateInputValue(invoiceEdit.issueDate);
@@ -78,7 +76,12 @@
         if (items && items.length > 0) {
           lineItems = items;
         } else {
-          lineItems = [lineItemsStore.newLineItem()];
+          lineItems = [
+            lineItemsStore.newLineItem({
+              id: counter?.increment(),
+              invoiceId: invoice.id,
+            }),
+          ];
         }
         lineItemsLoaded = true;
       }
@@ -88,14 +91,30 @@
   onDestroy(() => {
     isMounted = false;
     abortController?.abort();
+    // TODO: delete the counter to free up memory
+    counter.reset();
   });
 
   const addLineItem: BitsButton = () => {
-    lineItems = [...lineItems, lineItemsStore.newLineItem()];
+    lineItems = [
+      ...lineItems,
+      lineItemsStore.newLineItem({
+        id: counter.increment(),
+        invoiceId: invoice.id,
+      }),
+    ];
   };
 
-  const removeLineItem = (id: string) => {
+  const removeLineItem = (id: Key) => {
     lineItems = lineItems.filter((lineItem) => lineItem.id !== id);
+  };
+
+  const updateLineItem = (id: Key, patch: LineItemUpdate) => {
+    lineItems = lineItemsStore.patchLineItem(lineItems, id, patch);
+  };
+
+  const setDiscount = (value: number) => {
+    discount = value;
   };
 
   let isNewClient = $state<boolean>(false);
@@ -134,46 +153,40 @@
       invoice.clientId = clientId;
     }
 
-    // Sync discount back to invoice before saving
-    invoice.discount = discount;
-
     // Single upsert call - much simpler!
-    const normalizedInvoice = {
-      ...invoice,
-      userId: resolvedUserId,
-      invoiceNumber: String(invoice.invoiceNumber ?? ""),
-      issueDate: new Date(invoice.issueDate),
-      dueDate: new Date(invoice.dueDate),
-    };
+    const normalizedInvoice: NewInvoice = invoicesStore.normalizeInvoice(
+      invoice,
+      discount,
+      resolvedUserId
+    );
     const invoiceId = await invoicesStore.upsertInvoice(normalizedInvoice);
     if (!invoiceId) {
+      toast.error("Failed to create invoice");
       return;
     }
 
-    const normalizedLineItems = $state
-      .snapshot(lineItems)
-      .map((item) => ({
-        id: item.id,
-        userId: resolvedUserId,
-        invoiceId,
-        description: item.description?.trim() ?? "",
-        quantity: Number(item.quantity ?? 0),
-        amount: Number(item.amount ?? 0),
-      }))
-      .filter((item) => item.description.length > 0);
+    const normalizedLineItems = lineItemsStore.normalizeLineItems(
+      lineItems,
+      resolvedUserId,
+      invoiceId
+    );
 
     if (normalizedLineItems.length > 0) {
-      if (formState === "edit") {
+      if (mode === "edit") {
         await lineItemsStore.updateLineItems(invoiceId, normalizedLineItems);
       } else {
         await lineItemsStore.createLineItems(invoiceId, normalizedLineItems);
       }
     }
-    await invoicesStore.loadInvoices();
+    await invoicesStore.loadItems();
     closePanel();
   };
 
-  let open = $state<boolean>(false);
+  type InvoiceDeleteConfirmItem = Pick<
+    InvoiceListResponse,
+    "id" | "client" | "total"
+  >;
+  const deleteModal = new ItemPanel<InvoiceDeleteConfirmItem>();
 </script>
 
 <form class="grid grid-cols-6 gap-x-2 md:gap-x-5" onsubmit={handleSubmit}>
@@ -194,7 +207,7 @@
             <option value={id}>{name}</option>
           {/each}
         </select>
-        <p class="text-base leading-9 font-bold text-monsoon lg:leading-14">
+        <p class="text-monsoon text-base leading-9 font-bold lg:leading-14">
           or
         </p>
         <Button
@@ -228,11 +241,11 @@
     {/if}
   </div>
 
-  <!-- invoiceid -->
+  <!-- invoicenumber -->
   <div class="field -order-1 col-span-6 self-end sm:order-0 sm:col-span-2">
     <label for="invoiceNumber">InvoiceNumber</label>
     <input
-      type="number"
+      type="text"
       name="invoiceNumber"
       required
       bind:value={invoice.invoiceNumber}
@@ -313,24 +326,14 @@
   <!-- line items -->
   <div class="field col-span-6">
     {#if !lineItemsLoaded}
-      <div class="space-y-4">
-        <div class="flex justify-between border-b-2 pbe-2">
-          <div class="bg-gray-200 rounded block-4 inline-24"></div>
-          <div class="bg-gray-200 rounded block-4 inline-16"></div>
-          <div class="bg-gray-200 rounded block-4 inline-12"></div>
-          <div class="bg-gray-200 rounded block-4 inline-16"></div>
-        </div>
-        <div
-          class="bg-gray-100 animate-pulse rounded block-10 inline-full"
-        ></div>
-        <div
-          class="bg-gray-100 animate-pulse rounded block-10 inline-full"
-        ></div>
-      </div>
+      <LineItemSkeleton />
     {:else}
       <LineItemRows
-        bind:discount
-        bind:lineItems
+        {mode}
+        {lineItems}
+        {discount}
+        {updateLineItem}
+        {setDiscount}
         {addLineItem}
         {removeLineItem}
       />
@@ -359,9 +362,17 @@
   <!-- buttons -->
   <div class="field col-span-2">
     <!-- delete button only visible if editing -->
-    {#if formState === "edit"}
-      <Button variant="textOnlyDestructive" onclick={() => (open = true)}
-        ><Trash />Delete</Button
+    {#if mode === "edit"}
+      <Button
+        variant="textOnlyDestructive"
+        onclick={() => {
+          if (!invoice.id) return;
+          deleteModal.open({
+            id: invoice.id,
+            client: { name: clientName },
+            total: sumLineItems(lineItems),
+          });
+        }}><Trash />Delete</Button
       >
     {/if}
   </div>
@@ -371,20 +382,16 @@
   </div>
 </form>
 
-{#if invoice.id}
+{#if deleteModal.item}
   <ConfirmDelete
-    item={{
-      id: invoice.id,
-      client: { name: clientName },
-      total: sumLineItems(lineItems),
-    }}
-    bind:open
+    item={deleteModal.item}
+    bind:open={deleteModal.toggle.isOn}
     titleText="Are you sure you want to delete this invoice?"
-    onCancel={() => (open = false)}
+    onCancel={deleteModal.close}
     onDelete={async () => {
-      if (!invoice.id) return;
-      await invoicesStore.deleteInvoice(invoice.id);
-      open = false;
+      if (!deleteModal.item?.id) return;
+      await invoicesStore.deleteInvoice(deleteModal.item.id);
+      deleteModal.close();
       closePanel();
     }}
   >

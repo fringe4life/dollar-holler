@@ -11,6 +11,7 @@
   import Edit from "$lib/icon/Edit.svelte";
   import Trash from "$lib/icon/Trash.svelte";
   import View from "$lib/icon/View.svelte";
+  import type { CursorId } from "$lib/types";
   import { centsToDollars } from "$lib/utils/moneyHelpers";
   import type { ClientListResponse } from "$lib/validators";
   import type { MouseEventHandler } from "svelte/elements";
@@ -19,8 +20,8 @@
     client: ClientListResponse;
     onEdit: (client: ClientListResponse) => void;
     onDelete: (client: ClientListResponse) => void;
-    onActivate: (clientId: string) => void;
-    onArchive: (clientId: string) => void;
+    onActivate: (clientId: CursorId) => void;
+    onArchive: (clientId: CursorId) => void;
   };
 
   let { client, onEdit, onDelete, onActivate, onArchive }: Props = $props();
@@ -71,11 +72,13 @@
 </script>
 
 <Swipeable
-  contentClass="client-table client-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentClass="group/row  client-table client-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   contentViewTransitionName={`client-${client.id}`}
 >
   {#snippet content()}
-    <div class="status">{@render tag(client.clientStatus)}</div>
+    <div class="status justify-self-end lg:justify-self-start">
+      {@render tag(client.clientStatus)}
+    </div>
     <div
       class="clientName truncate text-base font-bold whitespace-nowrap lg:text-xl"
     >
@@ -85,17 +88,17 @@
       {receivedDisplay}
     </div>
     <div
-      class="balance text-right font-mono text-sm font-bold text-scarlet lg:text-lg"
+      class="balance text-scarlet justify-self-end text-right font-mono text-sm font-bold lg:justify-self-end lg:text-lg"
     >
       {balanceDisplay}
     </div>
     <div class="view relative hidden place-self-center lg:block">
       <a
-        class="text-pastelPurple transition-colors duration-200 hover:text-daisyBush"
+        class="text-pastelPurple hover:text-daisyBush group-hover/row:text-daisyBush/50 transition-colors duration-200"
         href={resolved}><View /></a
       >
     </div>
-    <AdditionalOptions>
+    <AdditionalOptions classes="threeDots">
       {#snippet content(additionalMenu)}
         <AdditionalOptionsButton {additionalMenu} />
         <AdditionalOptionsList {additionalMenu} options={CLIENT_OPTIONS} />
@@ -152,18 +155,19 @@
     .received {
       grid-area: received;
       @apply text-left lg:text-right;
-      &::before {
-        content: "Received: " / "your received money is";
-        @apply block text-xs font-bold lg:hidden;
-      }
     }
     .balance {
       grid-area: balance;
       @apply text-left lg:text-right;
-      &::before {
-        content: "Balance: " / "Your balance is";
-        @apply block text-xs font-bold lg:hidden;
-      }
     }
+  }
+  /* scoped specifically so the loading skeleton doesn't show these */
+  .balance::before {
+    content: "Balance: " / "Your balance is";
+    @apply block text-xs font-bold lg:hidden;
+  }
+  .received::before {
+    content: "Received: " / "your received money is";
+    @apply block text-xs font-bold lg:hidden;
   }
 </style>

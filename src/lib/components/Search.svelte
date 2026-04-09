@@ -1,27 +1,20 @@
 <script lang="ts">
   /**
-   * Controlled search input that syncs with the URL query param `q`.
-   *
-   * Pass a store implementing `SearchableListStore` and the current `q` from the URL.
-   *
-   * @example
-   * import { page } from "$app/state";
-   * import Search from "$lib/components/Search.svelte";
-   *
-   * const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
-   * onMount(() => myStore.loadItems(searchQuery || undefined, { signal }));
-   *
-   * <Search store={myStore} value={searchQuery} />
+   * Search input: calls `store.loadItems` then shallow `pushState` (no full navigation).
    */
-  import { goto } from "$app/navigation";
+  import { pushState } from "$app/navigation";
   import { page } from "$app/state";
+  import Search from "$lib/components/icons/Search.svelte";
+  import type { SearchableListStore } from "$lib/features/pagination/types";
+  import {
+    parseLimitParam,
+    toNormalizedListQuery,
+  } from "$lib/features/pagination/utils/list-query";
+  import { buildListSearchString } from "$lib/features/pagination/utils/url";
   import { Toggle } from "$lib/runes/Toggle.svelte";
-  import Search from "$lib/icon/Search.svelte";
-  import type { SearchableListStore } from "$lib/types";
   import type { KeyboardEventHandler } from "svelte/elements";
 
   type Props = {
-    /** Implements `loadItems` + `loading` (e.g. dashboard clients or invoices store). */
     store: SearchableListStore;
   };
 
@@ -38,18 +31,22 @@
 
   const runSearch = async () => {
     loading.toggle();
-    if (typeof document.startViewTransition === "function") {
-      await document.startViewTransition(async () => {
-        await store.loadItems(searchTerm);
-      }).finished;
-    } else {
-      await store.loadItems(searchTerm);
-    }
-    loading.off();
-    if (searchTerm) {
-      await goto(`${page.url.pathname}?q=${encodeURIComponent(searchTerm)}`);
-    } else {
-      await goto(`${page.url.pathname}`);
+    const limit = parseLimitParam(page.url.searchParams.get("limit"));
+    const n = toNormalizedListQuery(searchTerm || undefined, { limit });
+    const url = `${page.url.pathname}${buildListSearchString(n)}`;
+    try {
+      store.presetClientListQueryKey?.(n);
+      if (typeof document.startViewTransition === "function") {
+        await document.startViewTransition(async () => {
+          pushState(url, {});
+          await store.loadItems(n);
+        }).finished;
+      } else {
+        pushState(url, {});
+        await store.loadItems(n);
+      }
+    } finally {
+      loading.off();
     }
   };
 
@@ -124,7 +121,6 @@
     }
   }
 
-  /* Shared-element morph between magnifier and spinner during programmatic VT */
   :global {
     ::view-transition-group(search-icon-loader) {
       animation-duration: 0.35s;

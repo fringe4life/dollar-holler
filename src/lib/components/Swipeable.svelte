@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { Toggle } from "$lib/runes/Toggle.svelte";
   import { swipe } from "$lib/attachments/swipe.svelte";
-  import Cancel from "$lib/icon/Cancel.svelte";
+  import Cancel from "$lib/components/icons/Cancel.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import type { Snippet } from "svelte";
 
   type Props = {

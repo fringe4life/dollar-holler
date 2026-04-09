@@ -1,5 +1,5 @@
 import { auth } from "$lib/auth";
-import { forgotPassword } from "$lib/validators";
+import { forgotPassword } from "$lib/features/auth/schemas";
 import { fail, isRedirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";

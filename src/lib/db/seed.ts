@@ -1,5 +1,5 @@
 import { drizzle } from "drizzle-orm/neon-serverless";
-import { createId } from "./id";
+
 import type { NewClient, NewInvoice, NewLineItem, NewSettings } from "./schema";
 import {
   clients,
@@ -10,6 +10,7 @@ import {
   tableRelations,
 } from "./schema";
 // eslint-disable-next-line sonarjs/no-implicit-dependencies
+import { createId } from "$lib/features/pagination/utils/create-uuidv7";
 import { neonConfig, Pool } from "@neondatabase/serverless";
 
 neonConfig.webSocketConstructor = globalThis.WebSocket;

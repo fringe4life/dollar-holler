@@ -1,7 +1,7 @@
 <script lang="ts">
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import Arrow from "$lib/icon/Arrow.svelte";
+  import Arrow from "$lib/components/icons/Arrow.svelte";
   import type { Maybe } from "$lib/types";
   import { fly } from "svelte/transition";
   let { children } = $props();

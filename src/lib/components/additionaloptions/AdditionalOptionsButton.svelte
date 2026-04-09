@@ -1,7 +1,7 @@
 <script lang="ts">
   import { clickOutside } from "$lib/attachments/clickOutside";
+  import ThreeDots from "$lib/components/icons/ThreeDots.svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
-  import ThreeDots from "$lib/icon/ThreeDots.svelte";
 
   type Props = {
     additionalMenu: Toggle;

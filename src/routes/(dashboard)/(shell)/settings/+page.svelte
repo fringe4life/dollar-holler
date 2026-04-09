@@ -1,23 +1,21 @@
 <script lang="ts">
   import Form from "$lib/components/Form.svelte";
+  import Check from "$lib/components/icons/Check.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import Check from "$lib/icon/Check.svelte";
+  import type { SettingsSelect } from "$lib/features/settings/types";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { CursorId } from "$lib/types";
-  import type { SettingsResponse } from "$lib/validators";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
-
   const { form } = $props();
 
   const { settings: settingsStore } = getDashboardStores();
 
-  let mySettings = $state<SettingsResponse>(settingsStore.newSettings());
+  let mySettings = $state<SettingsSelect>(settingsStore.newSettings());
   onMount(async () => {
     await settingsStore.loadSettings();
-    if (settingsStore.settings) {
-      mySettings = { ...settingsStore.settings };
+    if (settingsStore.items.length > 0) {
+      mySettings = { ...settingsStore.items[0] };
     }
   });
 
@@ -35,7 +33,7 @@
   }
 </script>
 
-<main
+<section
   class="col-span-12 px-4 pbs-4 md:col-span-8 md:col-start-4 md:pbs-20 lg:col-span-6 lg:col-start-5"
 >
   <h2 class="text-daisyBush mbe-1 text-3xl font-black">Invoice Details</h2>
@@ -124,4 +122,4 @@
       <Check /> Save
     {/snippet}
   </Form>
-</main>
+</section>

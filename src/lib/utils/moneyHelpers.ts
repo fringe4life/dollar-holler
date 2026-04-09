@@ -1,7 +1,7 @@
 import type { LineItem } from "$lib/db/schema";
+import type { InvoiceSelect } from "$lib/features/invoices/types";
+import type { NewLineItemWithId } from "$lib/features/line-items/types";
 import type { List, Maybe } from "$lib/types";
-import type { NewLineItemWithId } from "$lib/types/invoiceLineItems";
-import type { InvoiceSelect } from "$lib/validators";
 
 /**
  * @abstract calculates the cost of a part of the invoice

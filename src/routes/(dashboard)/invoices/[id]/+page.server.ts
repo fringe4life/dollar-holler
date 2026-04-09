@@ -1,19 +1,24 @@
 import { db } from "$lib/db";
+import { cursorSchema } from "$lib/features/pagination/schemas";
 import { markdownToHtml } from "$lib/utils/markdown.server";
 import { tryCatch } from "$lib/utils/try-catch";
 import { error, redirect } from "@sveltejs/kit";
+import { ArkErrors } from "arktype";
 import type { PageServerLoad } from "./$types";
-
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;
-
-  if (!locals.user) {
+  if (!locals?.user?.id) {
     throw redirect(303, "/login");
+  }
+
+  const parsedId = cursorSchema(id);
+  if (parsedId instanceof ArkErrors) {
+    throw error(400, { message: "Invalid invoice ID" });
   }
 
   const { data: invoice } = await tryCatch(() =>
     db.query.invoices.findFirst({
-      where: { id, userId: locals.user.id },
+      where: { id: { eq: parsedId }, userId: { eq: locals?.user?.id } },
     })
   );
 
@@ -24,12 +29,18 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   const [{ data: client }, { data: lineItems }] = await Promise.all([
     tryCatch(() =>
       db.query.clients.findFirst({
-        where: { id: invoice.clientId, userId: locals.user.id },
+        where: {
+          id: { eq: invoice.clientId },
+          userId: locals?.user?.id,
+        },
       })
     ),
     tryCatch(() =>
       db.query.lineItems.findMany({
-        where: { invoiceId: invoice.id, userId: locals.user.id },
+        where: {
+          invoiceId: { eq: invoice.id },
+          userId: locals?.user?.id,
+        },
       })
     ),
   ]);

@@ -1,6 +1,7 @@
 /* eslint-disable sonarjs/arrow-function-convention */
 /* eslint-disable no-inline-comments */
-import type { CursorRow } from "$lib/types";
+import type { CursorRow } from "$lib/features/pagination/types";
+import { createId } from "$lib/features/pagination/utils/create-uuidv7";
 import { defineRelations } from "drizzle-orm";
 import {
   boolean,
@@ -10,7 +11,6 @@ import {
   text,
   timestamp,
 } from "drizzle-orm/pg-core";
-import { createId } from "./id";
 
 // Better Auth tables (using standard names for Better Auth compatibility)
 export const user = pgTable("user", {
@@ -122,6 +122,7 @@ export const invoices = pgTable("invoices", {
   invoiceNumber: text("invoice_number").notNull(),
   clientId: text("client_id")
     .notNull()
+    .$type<CursorRow["id"]>()
     .references(() => clients.id, { onDelete: "cascade" }),
   subject: text("subject"),
   issueDate: timestamp("issue_date").notNull(),

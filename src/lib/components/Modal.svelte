@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Cancel from "$lib/icon/Cancel.svelte";
+  import Cancel from "$lib/components/icons/Cancel.svelte";
   import { Dialog, type WithoutChild } from "bits-ui";
   import type { Snippet } from "svelte";
   import Button from "./ui/button/button.svelte";

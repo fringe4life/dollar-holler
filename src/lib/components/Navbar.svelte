@@ -2,9 +2,9 @@
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
+  import Close from "$lib/components/icons/Close.svelte";
+  import Hamburger from "$lib/components/icons/Hamburger.svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
-  import Close from "$lib/icon/Close.svelte";
-  import Hamburger from "$lib/icon/Hamburger.svelte";
   import type { Maybe } from "$lib/types";
   import { isActive } from "$lib/utils/is-active";
   import type { User } from "better-auth";
@@ -32,7 +32,7 @@
   const path = $derived(page.url.pathname);
 
   const nav = new Toggle();
-  afterNavigate(() => nav.off());
+  afterNavigate(nav.off);
 </script>
 
 <!-- mobile nav control -->

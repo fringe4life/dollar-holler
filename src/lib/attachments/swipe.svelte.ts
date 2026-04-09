@@ -30,7 +30,9 @@ const transformElement = (
   }
 };
 
+// Initial spring state
 const INITIAL_SPRING_STATE = { x: 0, y: 0 };
+// Spring configuration
 const SPRING_CONFIG: SpringOptions = {
   stiffness: 0.2,
   damping: 0.4,
@@ -54,7 +56,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     onSwipeRight,
     threshold = 20,
   } = config;
-  // Check if we're on mobile
+  // Check if we're on mobile and CSS Typed OM is supported
   const isMobile = MOBILE_MEDIA_QUERY.current;
   const isTypedOm = Boolean(window.CSS && CSS.px);
 
@@ -191,9 +193,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Cleanup: remove any active document listeners (e.g. drag in progress) when attachment is detached
     return () => {
+      isDragging = false;
       documentCleanups.forEach((off) => off());
       documentCleanups = [];
-      isDragging = false;
     };
   };
 }

@@ -1,5 +1,4 @@
 import { defineConfig } from "drizzle-kit";
-// @ts-expect-error no types for process
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error(

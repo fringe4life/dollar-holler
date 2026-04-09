@@ -1,5 +1,5 @@
 import { auth } from "$lib/auth";
-import { signupSchema } from "$lib/validators";
+import { signupSchema } from "$lib/features/auth/schemas";
 import { fail, isRedirect, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";

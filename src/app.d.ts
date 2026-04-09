@@ -1,5 +1,5 @@
+import type { Maybe } from "$lib/types";
 import type { Session, User } from "better-auth";
-
 declare global {
   namespace App {
     // interface Error {}

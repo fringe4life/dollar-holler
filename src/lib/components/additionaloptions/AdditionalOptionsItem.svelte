@@ -1,5 +1,5 @@
 <script lang="ts">
-  import View from "$lib/icon/View.svelte";
+  import View from "$lib/components/icons/View.svelte";
   import type { Component } from "svelte";
   import type { MouseEventHandler } from "svelte/elements";
   import type { IconProps } from "../Icon.svelte";

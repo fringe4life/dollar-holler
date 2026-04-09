@@ -1,3 +1,4 @@
+import type { Maybe } from "$lib/types";
 import { Toggle } from "./Toggle.svelte";
 
 /**
@@ -16,7 +17,7 @@ import { Toggle } from "./Toggle.svelte";
  */
 export class ItemPanel<T> {
   toggle = new Toggle();
-  item = $state<T | null>(null);
+  item = $state<Maybe<T>>(undefined);
 
   open = (item: T) => {
     this.item = item;

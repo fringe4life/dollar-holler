@@ -1,5 +1,5 @@
 <script lang="ts">
-  import Arrow from "$lib/icon/Arrow.svelte";
+  import Arrow from "$lib/components/icons/Arrow.svelte";
   import { Dialog, type WithoutChild } from "bits-ui";
   import type { Snippet } from "svelte";
   import Button from "./ui/button/button.svelte";

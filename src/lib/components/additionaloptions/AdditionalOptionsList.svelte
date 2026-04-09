@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { Toggle } from "$lib/attachments/Toggle.svelte";
+  import type { Toggle } from "$lib/runes/Toggle.svelte";
   import type { Option } from "./AdditionalOptionsItem.svelte";
   import AdditionalOptionsItem from "./AdditionalOptionsItem.svelte";
 

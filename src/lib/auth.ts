@@ -2,7 +2,7 @@ import { getRequestEvent } from "$app/server";
 import { PUBLIC_BASE_URL } from "$env/static/public";
 import { db } from "$lib/db";
 import { schemaTables } from "$lib/db/schema";
-import { createId } from "$lib/db/id";
+import { createId } from "$lib/features/pagination/utils/create-uuidv7";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { betterAuth } from "better-auth/minimal";
 import { sveltekitCookies } from "better-auth/svelte-kit";
@@ -10,11 +10,7 @@ import { sveltekitCookies } from "better-auth/svelte-kit";
 export const auth = betterAuth({
   appName: "Dollar Holler",
   baseURL: PUBLIC_BASE_URL,
-  trustedOrigins: [
-    PUBLIC_BASE_URL,
-    "http://localhost:4173",
-    "http://localhost:5173",
-  ],
+  trustedOrigins: [PUBLIC_BASE_URL],
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: schemaTables,

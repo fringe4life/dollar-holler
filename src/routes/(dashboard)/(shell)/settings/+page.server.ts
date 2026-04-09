@@ -1,7 +1,7 @@
 import { resolve } from "$app/paths";
 import { auth } from "$lib/auth";
+import { changePasswordSchema } from "$lib/features/auth/schemas";
 import { tryCatch } from "$lib/utils/try-catch";
-import { changePasswordSchema } from "$lib/validators";
 import { fail, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";

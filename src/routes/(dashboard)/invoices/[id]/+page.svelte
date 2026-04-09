@@ -3,12 +3,12 @@
   import { page } from "$app/state";
   import HtmlContent from "$lib/components/HtmlContent.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import LineItemRows from "$lib/features/line-items/components/LineItemRows.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { tryCatch } from "$lib/utils/try-catch";
   import { toast } from "svelte-sonner";
-  import LineItemRows from "../LineItemRows.svelte";
   import type { PageProps } from "./$types";
   let { data }: PageProps = $props();
 

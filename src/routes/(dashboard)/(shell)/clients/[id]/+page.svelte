@@ -1,20 +1,24 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
+  import Edit from "$lib/components/icons/Edit.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";
-  import Edit from "$lib/icon/Edit.svelte";
+  import BlankState from "$lib/features/clients/components/BlankState.svelte";
+  import ClientForm, {
+    type Props,
+  } from "$lib/features/clients/components/ClientForm.svelte";
+  import InvoiceRow from "$lib/features/invoices/components/InvoiceRow.svelte";
+  import InvoiceRowHeader from "$lib/features/invoices/components/InvoiceRowHeader.svelte";
+  import type { SearchableListStore } from "$lib/features/pagination/types";
+  import type { ListQueryNormalized } from "$lib/features/pagination/utils/list-query";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton, SearchableListStore } from "$lib/types";
+  import type { BitsButton } from "$lib/types";
   import { isLate } from "$lib/utils/dateHelpers";
   import { centsToDollars, sumInvoiceTotals } from "$lib/utils/moneyHelpers";
   import { onMount } from "svelte";
-  import InvoiceRow from "../../invoices/InvoiceRow.svelte";
-  import InvoiceRowHeader from "../../invoices/InvoiceRowHeader.svelte";
-  import BlankState from "../BlankState.svelte";
-  import ClientForm, { type Props } from "../ClientForm.svelte";
 
   let { data } = $props();
 
@@ -31,9 +35,7 @@
 
   // Get invoices for this client from the invoice store
   const clientInvoices = $derived(
-    invoicesStore.invoices.filter(
-      (invoice) => invoice.clientId === data.client.id
-    )
+    invoicesStore.items.filter((invoice) => invoice.clientId === data.client.id)
   );
 
   const handleEdit: BitsButton = () => {
@@ -74,7 +76,7 @@
     get loading() {
       return invoicesStore.loading;
     },
-    async loadItems() {
+    async loadItems(_normalized: ListQueryNormalized) {
       // noop until client-scoped invoice search exists
     },
   };

@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { ClientsStore } from "$lib/stores/clientsStore.svelte";
+  import { ClientsStore } from "$lib/features/clients/stores/clientsStore.svelte";
+  import { InvoicesStore } from "$lib/features/invoices/stores/invoicesStore.svelte";
+  import { LineItemsStore } from "$lib/features/line-items/stores/lineItemsStore.svelte";
+  import { SettingsStore } from "$lib/features/settings/stores/settingsStore.svelte";
   import { setDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import { InvoicesStore } from "$lib/stores/invoicesStore.svelte";
-  import { LineItemsStore } from "$lib/stores/lineItemsStore.svelte";
-  import { SettingsStore } from "$lib/stores/settingsStore.svelte";
   import { onDestroy } from "svelte";
 
   let { children } = $props();
@@ -16,8 +16,8 @@
   setDashboardStores({ clients, invoices, lineItems, settings });
 
   onDestroy(() => {
-    clients.resetClients();
-    invoices.resetInvoices();
+    clients.resetList();
+    invoices.resetList();
     lineItems.resetLineItems();
     settings.reset();
   });

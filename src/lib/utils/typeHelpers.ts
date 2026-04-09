@@ -11,9 +11,9 @@
 import type { Maybe } from "$lib/types";
 
 // Utility function to convert undefined to null for consistent null handling
-export function normalizeToNull<T>(value: Maybe<T>): T | null {
+export const normalizeToNull = <T>(value: Maybe<T>): T | null => {
   return value ?? null;
-}
+};
 
 // Type helper to transform null to undefined in object types
 // Converts properties like `string | null` to `string | undefined`
@@ -24,35 +24,12 @@ type NullToUndefined<T> = {
 // Transform null values to undefined for Drizzle insert operations
 // This handles the exactOptionalPropertyTypes issue where Drizzle expects
 // undefined for optional fields, not null
-export function transformNullToUndefined<T extends object>(
+export const transformNullToUndefined = <T extends object>(
   data: T
-): NullToUndefined<T> {
+): NullToUndefined<T> => {
   const entries = Object.entries(data).map(([key, value]) => {
-    if (value === null) {
-      return [key, undefined];
-    } else {
-      return [key, value];
-    }
+    const normalizedValue = normalizeToNull(value);
+    return [key, normalizedValue];
   });
   return Object.fromEntries(entries) as NullToUndefined<T>;
-}
-
-export function normalizeObjToNull<T extends object>(data: T): T {
-  const entries = Object.entries(data).map(([key, value]) => {
-    if (value === undefined) {
-      return [key, null];
-    } else {
-      return [key, value];
-    }
-  });
-  return Object.fromEntries(entries) as T;
-}
-
-// For upsert operations, we want optional fields to be null instead of undefined
-// This is a simpler approach than complex type manipulation
-export type UpsertType<T> = T;
-
-// Example usage:
-// const cleanValue = normalizeToNull(invoiceData.subject);
-// const insertData = transformNullToUndefined(formData);
-// This ensures consistent null handling without complex type gymnastics
+};

@@ -1,35 +1,48 @@
 <script lang="ts">
+  import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
-  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import BlankState from "$lib/features/clients/components/BlankState.svelte";
+  import ClientForm from "$lib/features/clients/components/ClientForm.svelte";
+  import ClientRow from "$lib/features/clients/components/ClientRow.svelte";
+  import ClientRowHeader from "$lib/features/clients/components/ClientRowHeader.svelte";
+  import ClientRowSkeleton from "$lib/features/clients/components/ClientRowSkeleton.svelte";
+  import type {
+    ClientListResponse,
+    ClientSelect,
+  } from "$lib/features/clients/types";
+  import Pagination from "$lib/features/pagination/components/Pagination.svelte";
+  import type { CursorPaginatedList } from "$lib/features/pagination/types";
+  import { listUrlKey } from "$lib/features/pagination/utils/url";
+  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { CursorId } from "$lib/types";
-  import type { ClientListResponse, ClientSelect } from "$lib/validators";
-  import { onDestroy, onMount } from "svelte";
-  import BlankState from "./BlankState.svelte";
-  import ClientForm from "./ClientForm.svelte";
-  import ClientRow from "./ClientRow.svelte";
-  import ClientRowHeader from "./ClientRowHeader.svelte";
-  import ClientRowSkeleton from "./ClientRowSkeleton.svelte";
+  import type { PageData } from "./$types";
+
+  let { data }: { data: PageData } = $props();
+
+  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
 
   const createForm = new Toggle();
   const editPanel = new ItemPanel<ClientSelect>();
   const deleteModal = new ItemPanel<ClientListResponse>();
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
 
   const { clients: clientsStore } = getDashboardStores();
-  const ac = new AbortController();
-
-  onMount(
-    async () => await clientsStore.loadItems(searchQuery, { signal: ac.signal })
-  );
-
-  onDestroy(() => ac.abort());
+  // this is to prevent the loading state from being false when the page is loaded
+  clientsStore.loading = true;
+  const currentData = $derived({
+    items: data.items,
+    paginationMetadata: data.paginationMetadata,
+  } satisfies CursorPaginatedList<ClientListResponse>);
+  /** Re-sync store when `page.url` / `data` change after navigation (e.g. browser back). */
+  afterNavigate(() => {
+    clientsStore.hydrateFromLoad(currentData, listUrlKey(page.url));
+  });
 
   const handleActivate = async (clientId: CursorId) =>
     await clientsStore.updateClientStatus(clientId, "active");
@@ -45,16 +58,13 @@
 <div
   class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
 >
-  <!-- search field -->
   <Search store={clientsStore} />
-  <!-- new client button -->
   <div class="z-1">
     <Button onclick={createForm.toggle} size="lg">+ Client</Button>
   </div>
 </div>
 
-<!-- list of clients -->
-<div>
+<div class="flex grow flex-col">
   {#if clientsStore.loading}
     <ClientRowHeader />
     <div class="flex flex-col-reverse gap-4">
@@ -68,19 +78,21 @@
     <div class="grid place-content-center py-8 block-full">
       <div class="text-lg text-red-500">Error: {clientsStore.error}</div>
     </div>
-  {:else if clientsStore.clients.length === 0 && !searchQuery}
+  {:else if clientsStore.items.length === 0 && !searchQuery}
     <BlankState />
-  {:else if clientsStore.clients.length === 0 && searchQuery}
+  {:else if clientsStore.items.length === 0 && searchQuery}
     <NoSearchResults>
       {#snippet header()}
         <ClientRowHeader emptyState={true} />
       {/snippet}
     </NoSearchResults>
   {:else}
-    <div>
+    <div
+      class="grid min-h-full grid-rows-[1fr_min-content] items-start gap-y-4 lg:grid-rows-[min-content_1fr_min-content]"
+    >
       <ClientRowHeader />
-      <div class="flex flex-col-reverse gap-4">
-        {#each clientsStore.clients as client (client.id)}
+      <div class="flex h-full flex-col-reverse justify-end gap-4">
+        {#each clientsStore.items as client (client.id)}
           <ClientRow
             {client}
             onEdit={editPanel.open}
@@ -90,6 +102,7 @@
           />
         {/each}
       </div>
+      <Pagination store={clientsStore} />
     </div>
   {/if}
 </div>

@@ -1,10 +1,10 @@
 import { client } from "$lib/client";
+import { LoadableListStoreBase } from "$lib/stores/loadable-list-store-base.svelte";
 import type { Maybe } from "$lib/types";
 import { getErrorMessage } from "$lib/utils/error-message";
 import { unwrapTreaty } from "$lib/utils/unwrap";
 import { toast } from "svelte-sonner";
-import { LoadableListStoreBase } from "../../../stores/loadable-list-store-base.svelte";
-import type { SettingsSelect } from "../types";
+import type { SettingsInsert, SettingsSelect, SettingsUpdate } from "../types";
 
 export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
   /** Single loaded row (settings are one row per user). */
@@ -52,23 +52,48 @@ export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
   }
 
   // Update settings via API
-  async updateSettings(settingsToUpdate: SettingsSelect) {
+  async updateSettings(settingsToUpdate: SettingsUpdate) {
     this.loading = true;
     this.error = null;
 
     const updateFallback = "Failed to update settings";
     try {
-      await unwrapTreaty(client.api.settings.put(settingsToUpdate), {
-        fallbackMessage: updateFallback,
-      });
-
-      this.items.length = 0;
-      this.items.push(settingsToUpdate);
+      const updated = await unwrapTreaty(
+        client.api.settings.patch(settingsToUpdate),
+        {
+          fallbackMessage: updateFallback,
+        }
+      );
+      this.items[0] = updated;
       toast.success("Settings updated successfully");
-      return settingsToUpdate;
+      return updated;
     } catch (error) {
       const errorMessage = getErrorMessage(error, updateFallback);
       console.error("Error updating settings:", error);
+      this.error = errorMessage;
+      toast.error(errorMessage);
+    } finally {
+      this.loading = false;
+    }
+  }
+
+  async createSettings(settingsToCreate: SettingsInsert) {
+    this.loading = true;
+    this.error = null;
+    const createFallback = "Failed to create settings";
+    try {
+      const createdSettings = await unwrapTreaty(
+        client.api.settings.post(settingsToCreate),
+        {
+          fallbackMessage: createFallback,
+        }
+      );
+      this.items.push(createdSettings);
+      toast.success("Settings created successfully");
+      return createdSettings;
+    } catch (error) {
+      const errorMessage = getErrorMessage(error, createFallback);
+      console.error("Error creating settings:", error);
       this.error = errorMessage;
       toast.error(errorMessage);
     } finally {

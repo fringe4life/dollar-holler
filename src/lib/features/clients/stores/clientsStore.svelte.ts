@@ -1,4 +1,5 @@
 import { client } from "$lib/client";
+import type { ClientStatus } from "$lib/db/schema";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
@@ -18,6 +19,7 @@ import type {
   ClientListResponse,
   ClientPickerOption,
   ClientSelect,
+  ClientUpdate,
 } from "../types";
 
 export class ClientsStore extends CursorPaginatedListStoreBase<ClientListResponse> {
@@ -29,12 +31,12 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
 
   newClient(): ClientInsert {
     return {
-      city: null,
-      email: null,
+      city: "",
+      email: "",
       name: "",
-      state: null,
-      street: null,
-      zip: null,
+      state: "",
+      street: "",
+      zip: "",
       clientStatus: "active",
       userId: "",
     };
@@ -119,10 +121,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
     }
   }
 
-  async updateClientStatus(
-    clientId: CursorId,
-    clientStatus: "active" | "archive"
-  ) {
+  async updateClientStatus(clientId: CursorId, clientStatus: ClientStatus) {
     try {
       const data = await unwrapTreaty(
         client.api.clients({ id: clientId }).patch({ clientStatus }),
@@ -148,57 +147,25 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
     }
   }
 
-  async upsertClient(clientData: ClientInsert): Promise<Maybe<CursorId>> {
+  async createClient(clientData: ClientInsert): Promise<Maybe<CursorId>> {
     try {
-      const isUpdate = !!clientData.id;
       const body = transformNullToUndefined(clientData);
-
-      let responseData: ClientSelect | { id: CursorId };
-      if (isUpdate && clientData.id) {
-        responseData = await unwrapTreaty(
-          client.api.clients({ id: clientData.id }).put({ ...body }),
-          { fallbackMessage: this.fallbackFor(StoreOperation.updateOne) }
-        );
-      } else {
-        responseData = await unwrapTreaty(
-          client.api.clients.post({ ...body }),
-          {
-            fallbackMessage: this.fallbackFor(StoreOperation.createOne),
-          }
-        );
-      }
-
-      if (isUpdate && body?.id) {
-        const index = this.items.findIndex((c) => c.id === body.id);
-        if (index !== -1) {
-          this.items[index] = {
-            ...this.items[index],
-            ...body,
-            updatedAt: new Date(),
-          };
-        }
-        this.upsertPickerOption({
-          id: body.id,
-          name: body.name,
-        });
-        toast.success("Client updated successfully");
-        return responseData.id;
-      }
+      const { id: _omitId, ...insertBody } = body;
+      const responseData = await unwrapTreaty(
+        client.api.clients.post(insertBody),
+        { fallbackMessage: this.fallbackFor(StoreOperation.createOne) }
+      );
       const id = responseData.id;
       if (!id) {
         throw new Error("Failed to create client");
       }
+      const now = new Date();
       const newClient = {
-        ...body,
+        ...insertBody,
         id,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        email: body.email ?? null,
-        street: body.street ?? null,
-        city: body.city ?? null,
-        state: body.state ?? null,
-        zip: body.zip ?? null,
-        clientStatus: body.clientStatus ?? null,
+        clientStatus: insertBody.clientStatus ?? "active",
+        createdAt: now,
+        updatedAt: now,
         received: 0,
         balance: 0,
       } satisfies ClientListResponse;
@@ -207,12 +174,42 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
       toast.success("Client created successfully");
       return id;
     } catch (err) {
-      const isUpdate = !!clientData.id;
-      const fallback = this.fallbackFor(
-        isUpdate ? StoreOperation.updateOne : StoreOperation.createOne
-      );
+      const fallback = this.fallbackFor(StoreOperation.createOne);
       const errorMessage = getErrorMessage(err, fallback);
-      console.error(`Error ${isUpdate ? "updating" : "creating"} client:`, err);
+      console.error("Error creating client:", err);
+      toast.error(errorMessage);
+      return null;
+    }
+  }
+
+  async updateClient(
+    id: CursorId,
+    patch: ClientUpdate
+  ): Promise<Maybe<CursorId>> {
+    try {
+      const body = transformNullToUndefined(patch);
+      const responseData = await unwrapTreaty(
+        client.api.clients({ id }).put(body),
+        { fallbackMessage: this.fallbackFor(StoreOperation.updateOne) }
+      );
+      const index = this.items.findIndex((c) => c.id === responseData.id);
+      if (index !== -1) {
+        this.items[index] = {
+          ...this.items[index],
+          ...body,
+          updatedAt: new Date(),
+        };
+      }
+      this.upsertPickerOption({
+        id: responseData.id,
+        name: responseData.name,
+      });
+      toast.success("Client updated successfully");
+      return responseData.id;
+    } catch (err) {
+      const fallback = this.fallbackFor(StoreOperation.updateOne);
+      const errorMessage = getErrorMessage(err, fallback);
+      console.error("Error updating client:", err);
       toast.error(errorMessage);
       return null;
     }

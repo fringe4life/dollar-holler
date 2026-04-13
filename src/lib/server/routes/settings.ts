@@ -1,15 +1,23 @@
 /* eslint-disable new-cap */
 import { db } from "$lib/db";
 import { settings as settingsTable } from "$lib/db/schema";
-import { settingsPutBodySchema } from "$lib/features/settings/schemas/schemas";
 import { apiErrorBodySchema } from "$lib/server/api-response-schemas";
-import { settingsSelectSchema } from "$lib/validators";
+import {
+  settingsInsertSchema,
+  settingsSelectSchema,
+  settingsUpdateSchema,
+} from "$lib/validators";
 import { eq } from "drizzle-orm";
 import { Elysia, status } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 
 export const settingsRoutes = new Elysia({ prefix: "/settings" })
   .use(betterAuthPlugin)
+  .guard({
+    detail: {
+      tags: ["Settings"],
+    },
+  })
   // GET /api/settings - Get user settings (requires auth)
   .get(
     "/",
@@ -39,28 +47,44 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
       },
     }
   )
-  // PUT /api/settings - Update or create user settings (requires auth)
-  .put(
+  // PATCH /api/settings - Update settings
+  .patch(
     "/",
     async ({ user, body }) => {
       try {
-        const existing = await db.query.settings.findFirst({
-          where: { userId: user.id },
-        });
-
-        if (existing) {
-          const [updated] = await db
-            .update(settingsTable)
-            .set({
-              ...body,
-              userId: user.id,
-              updatedAt: new Date(),
-            })
-            .where(eq(settingsTable.userId, user.id))
-            .returning();
-
-          return updated;
+        const [updated] = await db
+          .update(settingsTable)
+          .set({
+            ...body,
+            userId: user.id,
+          })
+          .where(eq(settingsTable.userId, user.id))
+          .returning();
+        if (!updated) {
+          return status(404, { message: "Not found" });
         }
+        return updated;
+      } catch (error) {
+        console.error("Error updating settings:", error);
+        return status(500, { message: "Failed to update settings" });
+      }
+    },
+    {
+      authMutation: true,
+      body: settingsUpdateSchema,
+      response: {
+        200: settingsSelectSchema,
+        401: apiErrorBodySchema,
+        404: apiErrorBodySchema,
+        500: apiErrorBodySchema,
+      },
+    }
+  )
+  // POST /api/settings - Create
+  .post(
+    "/",
+    async ({ user, body }) => {
+      try {
         const [created] = await db
           .insert(settingsTable)
           .values({
@@ -68,16 +92,15 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
             userId: user.id,
           })
           .returning();
-
         return created;
       } catch (error) {
-        console.error("Error updating settings:", error);
-        return status(500, { message: "Failed to update settings" });
+        console.error("Error creating settings:", error);
+        return status(500, { message: "Failed to create settings" });
       }
     },
     {
-      auth: true,
-      body: settingsPutBodySchema,
+      authMutation: true,
+      body: settingsInsertSchema,
       response: {
         200: settingsSelectSchema,
         401: apiErrorBodySchema,

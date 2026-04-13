@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.2-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0%20beta.20-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.0-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.0.2-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.3-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0%20beta.21-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.2-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.0.2-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
 
@@ -24,17 +24,16 @@ A modern invoice management application built with SvelteKit 5, featuring Better
    bun install
    ```
 
-2. **Set up environment variables:** Create a `.env` file in the root directory for local development. SvelteKit loads these for `$env/static/private` and `$env/static/public`. The database client uses `DATABASE_URL` from `$env/static/private` (`src/lib/db/index.ts`).
+2. **Set up environment variables ([Varlock](https://varlock.dev/)):** The committed [`.env.schema`](./.env.schema) is the source of truth for variable names, validation, and (optional) [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/) lookups.
+   - **Bun:** [`bunfig.toml`](./bunfig.toml) sets `env = false` and `preload = ["varlock/auto-load"]` so Bun does not load `.env` on its own before Varlock (see [Varlock + Bun](https://varlock.dev/integrations/bun/)).
+   - **Vite / SvelteKit:** [`vite.config.ts`](./vite.config.ts) uses `@varlock/vite-integration` with `ssrInjectMode: "auto-load"` so dev and SSR resolve the same schema ([Varlock + Vite](https://varlock.dev/integrations/vite/)).
+   - **Bitwarden:** Install the app deps (already in `package.json`), then in Bitwarden Secrets Manager create a **machine account**, copy its **access token** once, and grant it read access to the secrets you need. Put the token in a **gitignored** file such as `.env.local` as `BITWARDEN_ACCESS_TOKEN=...`. In `.env.schema`, replace the placeholder UUIDs in `bitwarden("...")` with your real secret IDs ([Bitwarden plugin](https://varlock.dev/plugins/bitwarden/)).
+   - **Without Bitwarden (e.g. quick local setup):** Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `PUBLIC_BASE_URL` in `.env` or `.env.local`. Host and CI variables still override resolved values when set.
+   - **Types:** After changing `.env.schema`, run `bun run env:typegen` to refresh [`src/env-varlock.d.ts`](./src/env-varlock.d.ts).
 
-   ```env
-   DATABASE_URL="postgresql://username:password@hostname:port/database"
-   PUBLIC_BASE_URL="http://localhost:5173"
-   BETTER_AUTH_SECRET="your-strong-secret"
-   ```
+   The app reads secrets via SvelteKit’s `$env/static/private` and `$env/static/public` (for example `DATABASE_URL` in [`src/lib/db/index.ts`](./src/lib/db/index.ts)).
 
-   For production, use `.env.production` (and/or your Vercel project settings) and set `PUBLIC_BASE_URL` to your deployed origin (for example `https://dollar-holler.vercel.app`).
-
-3. **Set up the database:** Drizzle Kit reads `DATABASE_URL` from the environment (`drizzle.config.ts` points at `./src/lib/db/schema.ts` and writes migrations under `./drizzle`).
+3. **Set up the database:** Drizzle Kit reads `DATABASE_URL` from the environment (`drizzle.config.ts` points at `./src/lib/db/schema.ts` and writes migrations under `./src/lib/db/migrations`).
 
    ```bash
    # Generate migrations
@@ -65,6 +64,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run preview` - Preview production build
 - `bun run check` - Run Ultracite checks
 - `bun run check:watch` - Run Svelte check in watch mode
+- `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations
 - `bun run db:migrate` - Run database migrations
 - `bun run db:seed` - Seed database with sample data
@@ -74,7 +74,6 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run format` - Format source with Prettier
 - `bun run lint` - Run Prettier check and ESLint
 - `bun run lint:fix` - Auto-fix lint and formatting issues
-- `bun run ultracite:check` - Run Ultracite checks directly
 - `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
 - `bun run fix` - Run Ultracite fix (`ultracite fix`)
 
@@ -104,12 +103,14 @@ src/
 │   ├── client.ts            # Eden Treaty client for the Elysia API
 │   ├── db/
 │   │   ├── index.ts         # Database connection (Neon serverless WebSocket pool)
-│   │   ├── schema.ts        # Drizzle schema and relations
+│   │   ├── schema.ts        # Drizzle tables and enums
+│   │   ├── relations.ts     # Drizzle relations v2 (`defineRelations`)
 │   │   ├── seed.ts          # Database seeding
 │   │   ├── clear-app-data.ts
 │   │   └── migrate.ts
 │   ├── server/
 │   │   ├── auth-plugin.ts   # Better Auth integration for Elysia
+│   │   ├── better-auth-openapi.ts
 │   │   ├── api-response-schemas.ts
 │   │   └── routes/        # API modules (clients, invoices, settings)
 │   ├── features/          # Domain features: components, stores, schemas, list helpers
@@ -144,12 +145,12 @@ The application uses the following main tables:
 - `session` - User sessions
 - `account` - OAuth accounts
 - `verification` - Email verification tokens
-- `clients` - Client information
-- `invoices` - Invoice records
+- `clients` - Client information (`client_status`: active, archive)
+- `invoices` - Invoice records (`invoice_status`: draft, sent, paid; optional discount)
 - `line_items` - Invoice line items
 - `settings` - User settings
 
-Primary keys use Bun UUIDv7 strings (`createId`) and include proper foreign key relationships with cascade deletes.
+Primary keys use PostgreSQL `uuid` columns; IDs are Bun UUIDv7 strings from `createId` (including Better Auth `generateId` in [`src/lib/auth.ts`](./src/lib/auth.ts)). Foreign keys use cascade deletes where appropriate.
 
 The application uses Drizzle's relations v2 (`defineRelations`) to simplify nested queries (e.g., `db.query.invoices.findMany({ with: { client: true, lineItems: true } })`) and avoid manual joins in API routes.
 
@@ -168,7 +169,10 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application is configured for Vercel deployment with the Vercel adapter. Ensure your `DATABASE_URL` and `BETTER_AUTH_SECRET` environment variables are set in your Vercel project settings.
+The application is configured for Vercel deployment with the Vercel adapter. Choose one approach:
+
+- **Platform env vars:** Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `PUBLIC_BASE_URL` in the Vercel project (and any other keys your schema requires). You can rely on Varlock for validation while storing values only in Vercel.
+- **Bitwarden at build time:** Add `BITWARDEN_ACCESS_TOKEN` to Vercel so the build can resolve `bitwarden(...)` entries in `.env.schema`. If the host cannot run Varlock the same way as local dev, you may need `ssrInjectMode: "resolved-env"` in `vite.config.ts` for production builds ([Varlock Vite SSR options](https://varlock.dev/integrations/vite/)).
 
 ## Notes
 

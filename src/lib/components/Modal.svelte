@@ -41,7 +41,7 @@
       class={`bg-blueGem/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 ${className ? className : "z-50"}`}
     />
     <Dialog.Content
-      class="rounded-card-lg bg-background shadow-popover data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed inset-s-1/2 inset-bs-1/2 z-500 grid -translate-1/2 content-between items-center border px-10 py-7 outline-hidden inline-full max-inline-[calc(100%-2rem)] min-block-57.5 sm:max-inline-122.5  md:inline-full"
+      class="rounded-card-lg bg-background shadow-popover data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed inset-s-1/2 inset-bs-1/2 z-500 grid -translate-1/2 content-between items-center border px-10 py-7 outline-hidden inline-full max-inline-[calc(100%-2rem)] min-block-57.5 sm:max-inline-122.5 md:inline-full"
       {...contentProps}
     >
       <Dialog.Title>
@@ -52,7 +52,7 @@
       </Dialog.Description>
       {@render children?.()}
       <Dialog.Close
-        class="text-pastelPurple hover:text-blueGem focus-visible:ring-foreground focus-visible:ring-offset-background absolute rounded-md transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95 pointer-coarse:inset-e-1 pointer-coarse:inset-bs-1 pointer-fine:inset-e-4 pointer-fine:inset-bs-4"
+        class="text-pastelPurple hover:text-blueGem focus-visible:outline-ring/50 absolute rounded-md outline-2 outline-transparent transition-[color,outline-color,scale] duration-200 active:scale-95 pointer-coarse:inset-e-1 pointer-coarse:inset-bs-1 pointer-fine:inset-e-4 pointer-fine:inset-bs-4"
       >
         <Button variant="ghost" size="icon"><Cancel /></Button>
       </Dialog.Close>

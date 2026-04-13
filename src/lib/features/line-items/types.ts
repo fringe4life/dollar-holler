@@ -1,5 +1,5 @@
 import type { LineItem } from "$lib/db/schema";
-import type { BitsButton, CursorId, List, Maybe } from "$lib/types";
+import type { BitsButton, CursorId, List } from "$lib/types";
 import type {
   lineItemInsertSchema,
   lineItemSelectSchema,
@@ -34,7 +34,6 @@ export type NormalizedLineItem = Omit<LineItem, "id" | "invoiceId"> & {
 
 type InvoiceFormPanel = {
   closePanel: () => void;
-  userId?: Maybe<string>;
 };
 
 export type InvoiceFormEditProps = InvoiceFormPanel & {
@@ -60,10 +59,10 @@ export type LineItemRowsEditProps = {
   mode: "edit" | "create";
   lineItems: List<LineItem | NewLineItemWithId>;
   discount: number;
-  updateLineItem: (id: CursorId | number, patch: LineItemUpdate) => void;
+  updateLineItem: (id: Key, patch: LineItemUpdate) => void;
   setDiscount: (value: number) => void;
   addLineItem: BitsButton;
-  removeLineItem: (id: CursorId | number) => void;
+  removeLineItem: (id: Key) => void;
 };
 
 export type LineItemRowsProps = LineItemRowsViewProps | LineItemRowsEditProps;
@@ -80,8 +79,8 @@ export type LineItemRowViewProps = {
 
 export type LineItemRowEditProps = {
   mode: "edit" | "create";
-  updateLineItem: (id: CursorId | number, patch: LineItemUpdate) => void;
-  removeLineItem: (id: CursorId | number) => void;
+  updateLineItem: (id: Key, patch: LineItemUpdate) => void;
+  removeLineItem: (id: Key) => void;
 };
 
 export type LineItemRowProps = LineItemRowBase &

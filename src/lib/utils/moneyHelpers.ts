@@ -54,28 +54,6 @@ export const formatTotal = (
 };
 
 /**
- * @abstract returns the sum of the line items (uses getTotal with lineItems)
- * @param {List<InvoiceSelect>} invoices invoices with lineItems
- * @returns {number} the sum of all the Invoices in cents
- */
-export const sumInvoices = (invoices: List<InvoiceSelect>): number => {
-  if (!invoices) return 0;
-  return invoices.reduce((acc, cur) => (acc += getTotal(cur)), 0);
-};
-
-/**
- * @abstract returns the sum of pre-computed totals (for InvoiceListResponse etc.)
- * @param {List<{ total?: number }>} invoices invoices with total property
- * @returns {number} the sum of all invoice totals in cents
- */
-export const sumInvoiceTotals = <T extends { total?: number }>(
-  invoices: List<T>
-): number => {
-  if (!invoices) return 0;
-  return invoices.reduce((acc, cur) => acc + (cur.total ?? 0), 0);
-};
-
-/**
  * @abstract turns money amounts expressed in dollars into money expressed in cents
  * @param {number} dollars the amount of dollars to be converted into cents
  * @returns {number} the money in cents

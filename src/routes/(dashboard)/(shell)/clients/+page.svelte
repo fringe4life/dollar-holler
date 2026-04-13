@@ -3,9 +3,8 @@
   import { page } from "$app/state";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import Search from "$lib/components/Search.svelte";
+  import ItemsHeader from "$lib/components/items-header.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
   import BlankState from "$lib/features/clients/components/BlankState.svelte";
   import ClientForm from "$lib/features/clients/components/ClientForm.svelte";
   import ClientRow from "$lib/features/clients/components/ClientRow.svelte";
@@ -55,14 +54,11 @@
   <title>Clients | Dollar Holler</title>
 </svelte:head>
 
-<div
-  class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
->
-  <Search store={clientsStore} />
-  <div class="z-1">
-    <Button onclick={createForm.toggle} size="lg">+ Client</Button>
-  </div>
-</div>
+<ItemsHeader store={clientsStore} toggle={createForm.toggle}>
+  {#snippet button()}
+    + Client
+  {/snippet}
+</ItemsHeader>
 
 <div class="flex grow flex-col">
   {#if clientsStore.loading}

@@ -1,6 +1,7 @@
 import { neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
-import { schemaTables, tableRelations } from "./schema";
+import { schemaTables } from "./schema";
+import { tableRelations } from "./relations";
 // eslint-disable-next-line sonarjs/no-implicit-dependencies
 import { DATABASE_URL } from "$env/static/private";
 

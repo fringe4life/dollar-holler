@@ -13,13 +13,7 @@ This document lists places in the codebase where **hover**, **focus** / **focus-
 
 ## Components — no transition on interactive states
 
-| Location | Notes |
-| --- | --- |
-| [`src/lib/components/Modal.svelte`](../src/lib/components/Modal.svelte#L54-L57) — `Dialog.Close` | `hover:text-*`, `focus-visible:ring-*`, `active:scale-95`: **no** `transition-*` / `duration` / `ease`. |
-| [`src/lib/components/SlidePanel.svelte`](../src/lib/components/SlidePanel.svelte#L52-L55) — `Dialog.Close` | Same pattern as Modal close control. |
-| [`src/lib/components/additionaloptions/AdditionalOptionsItem.svelte`](../src/lib/components/additionaloptions/AdditionalOptionsItem.svelte#L25) | `hover:text-daisyBush` only — no transition. |
-| [`src/lib/components/ui/badge/badge.svelte`](../src/lib/components/ui/badge/badge.svelte#L4-L11) | `focus-visible:border-ring`, `focus-visible:ring-*` on base / `late` variant — **no** transition for ring/border. |
-| [`src/lib/components/Search.svelte`](../src/lib/components/Search.svelte#L70-L72) — search `<input>` | `focus-visible:border-solid`, `focus-visible:outline-*` — **no** transition on the input (label/button row has transitions separately). |
+`Dialog.Close` in [`Modal.svelte`](../src/lib/components/Modal.svelte#L54-L56) and [`SlidePanel.svelte`](../src/lib/components/SlidePanel.svelte#L52-L54): **closed** — fixed `outline-2` + `outline-color` in `transition-*` (see **Reference — already covered**).
 
 ### Button variants ([`src/lib/components/ui/button/button.svelte`](../src/lib/components/ui/button/button.svelte))
 
@@ -55,9 +49,8 @@ These use `underline` / `hover:no-underline` (or similar) **without** a `transit
 
 | Location | Notes |
 | --- | --- |
-| [`src/app.css`](../src/app.css#L156-L164) | `input`…`textarea`…`select` `:focus-visible` — border changes via `@apply`; **no** `transition` on these rules. |
-| [`src/routes/(dashboard)/invoices/LineItemRow.svelte`](<../src/routes/(dashboard)/invoices/LineItemRow.svelte#L120-L123>) | `input:where(…):focus` — border change **without** transition. |
-| [`src/routes/(dashboard)/invoices/LineItemRows.svelte`](<../src/routes/(dashboard)/invoices/LineItemRows.svelte#L89>) | `.line-item` inputs: `focus:border-solid`, `focus:border-lavenderIndigo` — **no** transition on the same class string. |
+| [`src/app.css`](../src/app.css#L181-L188) | `input` (text/number/date/password/email, excluding `.search` / `.line-item`) `:focus-visible` — border/outline changes via `@apply`; **no** `transition` on this rule, and the shared base block for those inputs ([L165–L170](../src/app.css#L165-L170)) also omits `transition-*`. (`textarea` / `select` use the same `:focus-visible` selector but already have `transition-colors duration-200` on their base rules [L173–L178](../src/app.css#L173-L178), so their focus border change is covered.) |
+| [`src/lib/features/line-items/components/LineItemRows.svelte`](../src/lib/features/line-items/components/LineItemRows.svelte#L93-L94) | Discount `.line-item` input: `focus:border-solid`, `focus:border-lavenderIndigo` — **no** `transition-*` on the same class string (still abrupt vs. neighbors). |
 
 ---
 
@@ -80,8 +73,12 @@ These were checked and **do** use `transition-*` with explicit `duration-*` (and
 
 - [`src/lib/components/Navbar.svelte`](../src/lib/components/Navbar.svelte#L82-L91) — nav links (`transition-colors duration-200`, `before`/`after` transitions, `supports-linear:ease-dramatic`).
 - [`src/routes/+page.svelte`](../src/routes/+page.svelte#L326) — marketing cards (`transition-all duration-200`, etc.).
-- [`src/lib/components/additionaloptions/AdditionalOptionsButton.svelte`](../src/lib/components/additionaloptions/AdditionalOptionsButton.svelte#L16), [`InvoiceRow.svelte`](<../src/routes/(dashboard)/invoices/InvoiceRow.svelte#L92>), [`ClientRow.svelte`](<../src/routes/(dashboard)/clients/ClientRow.svelte#L94>) — `transition-colors duration-200` + hover.
-- [`src/lib/components/Search.svelte`](../src/lib/components/Search.svelte#L83) — floating label: `transition-transform duration-200 ease-out`.
+- [`src/lib/components/additionaloptions/AdditionalOptionsButton.svelte`](../src/lib/components/additionaloptions/AdditionalOptionsButton.svelte#L16), [`AdditionalOptionsItem.svelte`](../src/lib/components/additionaloptions/AdditionalOptionsItem.svelte#L25) — `transition-[color] duration-200` + hover (text color only; default easing is enough).
+- [`src/lib/features/invoices/components/InvoiceRow.svelte`](../src/lib/features/invoices/components/InvoiceRow.svelte#L93), [`src/lib/features/clients/components/ClientRow.svelte`](../src/lib/features/clients/components/ClientRow.svelte#L97) — `transition-colors duration-200` + hover.
+- [`src/lib/features/line-items/components/LineItemRow.svelte`](../src/lib/features/line-items/components/LineItemRow.svelte#L150-L151) — line-item text/number inputs: `transition-colors duration-200` on the scoped base rule; decorative underlines use `transition-[opacity,scale] duration-200` ([L74–L75](../src/lib/features/line-items/components/LineItemRow.svelte#L74-L75), etc.). (Previously flagged for `:focus` border without transition; scoped `:focus` border styling is now commented out.)
+- [`src/lib/components/Search.svelte`](../src/lib/components/Search.svelte#L79-L96) — search `<input>`: `outline-transparent` + `focus-visible:outline-2` + `focus-visible:outline-lavenderIndigo` with `transition-colors duration-200` so the focus ring is a **color** transition (no `outline-none`, which would drop the outline and block interpolation). Decorative underline span: `transition-[opacity,scale] duration-200`; search button: `transition-transform duration-200 ease-out`.
+- [`src/lib/components/ui/badge/badge.svelte`](../src/lib/components/ui/badge/badge.svelte#L4-L11) — **Closed:** `outline-transparent` + `transition-colors duration-200` + `focus-visible:outline-2` + `focus-visible:outline-ring/50` (base) / `focus-visible:outline-destructive/*` (`late`), replacing `ring-*` so focus animates like [`Search.svelte`](../src/lib/components/Search.svelte#L80).
+- [`src/lib/components/Modal.svelte`](../src/lib/components/Modal.svelte#L54-L56), [`SlidePanel.svelte`](../src/lib/components/SlidePanel.svelte#L52-L54) — **Closed:** `Dialog.Close` with `outline-2` / `outline-transparent` / `focus-visible:outline-ring/50` and `transition-[color,outline-color,scale] duration-200`. With constant width, animating **`outline-color`** is enough for the focus ring; `color` and `scale` cover hover text and `active:scale-95`.
 
 ---
 

@@ -50,7 +50,7 @@
       </Dialog.Description>
       {@render children?.()}
       <Dialog.Close
-        class="text-pastelPurple hover:text-daisyBush focus-visible:ring-foreground focus-visible:ring-offset-background absolute inset-e-7  inset-bs-5 rounded-md  transition-colors duration-200 focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95 "
+        class="text-pastelPurple hover:text-daisyBush focus-visible:outline-ring/50 absolute inset-e-7 inset-bs-5 rounded-md outline-2 outline-transparent transition-[color,scale,outline-color] duration-200 active:scale-95 "
       >
         <Button variant="ghost" size="sm" class=""><Arrow /></Button>
       </Dialog.Close>

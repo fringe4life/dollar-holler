@@ -6,10 +6,9 @@
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
+  import ItemsHeader from "$lib/components/items-header.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import Search from "$lib/components/Search.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
   import BlankState from "$lib/features/invoices/components/BlankState.svelte";
   import InvoiceForm from "$lib/features/invoices/components/InvoiceForm.svelte";
   import InvoiceRow from "$lib/features/invoices/components/InvoiceRow.svelte";
@@ -52,14 +51,11 @@
   <title>Invoices | Dollar Holler</title>
 </svelte:head>
 
-<div
-  class="mbe-7 flex flex-col-reverse items-start justify-between gap-y-6 py-2 text-base md:flex-row md:items-center md:gap-y-4 lg:mbe-16 lg:py-3 lg:text-lg"
->
-  <Search store={invoicesStore} />
-  <div class="z-1">
-    <Button onclick={createForm.toggle} size="lg">+ Invoice</Button>
-  </div>
-</div>
+<ItemsHeader store={invoicesStore} toggle={createForm.toggle}>
+  {#snippet button()}
+    + Invoice
+  {/snippet}
+</ItemsHeader>
 
 <div class="flex grow flex-col">
   {#if invoicesStore.loading}
@@ -115,11 +111,7 @@
     <h2 class="hidden">""</h2>
   {/snippet}
 
-  <InvoiceForm
-    mode="create"
-    userId={data.user?.id ?? ""}
-    closePanel={createForm.off}
-  />
+  <InvoiceForm mode="create" closePanel={createForm.off} />
 </SlidePanel>
 
 <SlidePanel bind:open={editPanel.toggle.isOn} buttonText="">
@@ -138,7 +130,6 @@
       <InvoiceForm
         mode="edit"
         bind:invoiceEdit={editPanel.item}
-        userId={data.user?.id ?? ""}
         closePanel={editPanel.close}
       />
     {/key}
@@ -159,7 +150,7 @@
   >
     {#snippet descriptionSnippet(invoice)}
       This will delete the invoice to <span class="text-scarlet"
-        >{invoice.client.name}</span
+        >{invoice.name}</span
       >
       for
       <span class="text-scarlet">{formatTotal(invoice.total)}</span>

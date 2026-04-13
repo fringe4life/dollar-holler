@@ -22,7 +22,7 @@
   {@const Icon = option.icon || View}
   <li class="not-last:border-b-whisper not-last:border-b-2">
     <button
-      class="font-sansserif text-pastelPurple hover:text-daisyBush flex cursor-pointer gap-x-2 p-4 font-bold transition-colors duration-200 inline-full"
+      class="font-sansserif text-pastelPurple hover:text-daisyBush flex cursor-pointer gap-x-2 p-4 font-bold transition-[color] duration-200 inline-full"
       type="button"
       onclick={option.onclick}
     >

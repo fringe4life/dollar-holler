@@ -90,7 +90,6 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
 
   normalizeLineItems(
     items: Array<LineItem | NewLineItemWithId>,
-    userId: string,
     invoiceId: CursorId
   ): Array<NormalizedLineItem> {
     if (items.length === 0) return [];
@@ -98,7 +97,6 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
       if ((item.description?.trim() ?? "").length > 0) {
         acc.push({
           ...item,
-          userId,
           id: typeof item.id === "number" ? undefined : item.id,
           invoiceId,
         });
@@ -112,10 +110,14 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
     items: Array<NormalizedLineItem>
   ): Promise<List<LineItemSelect>> {
     const fallback = this.fallbackFor(StoreOperation.createMany);
+    const body = items.map((item) => ({
+      ...item,
+      invoiceId,
+    }));
     try {
       const lineItemsData = await unwrapTreaty(
         client.api.invoices({ id: invoiceId })["line-items"].post({
-          lineItems: items,
+          lineItems: body,
         }),
         { fallbackMessage: fallback }
       );

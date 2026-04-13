@@ -1,26 +1,36 @@
-/* eslint-disable sonarjs/arrow-function-convention */
-/* eslint-disable no-inline-comments */
-import type { CursorRow } from "$lib/features/pagination/types";
-import { createId } from "$lib/features/pagination/utils/create-uuidv7";
-import { defineRelations } from "drizzle-orm";
+import type { CursorId } from "$lib/types";
 import {
   boolean,
   index,
+  integer,
+  pgEnum,
   pgTable,
   real,
   text,
   timestamp,
+  uuid,
+  varchar,
 } from "drizzle-orm/pg-core";
+import { createId } from "../features/pagination/utils/create-uuidv7";
 
-// Better Auth tables (using standard names for Better Auth compatibility)
+export const clientStatusEnum = pgEnum("client_status", ["active", "archive"]);
+
+export const invoiceStatusEnum = pgEnum("invoice_status", [
+  "draft",
+  "sent",
+  "paid",
+]);
+
 export const user = pgTable("user", {
-  id: text("id").primaryKey(),
+  id: uuid("id").primaryKey(),
   name: text("name").notNull(),
-  email: text("email").notNull().unique(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
   emailVerified: boolean("email_verified").default(false).notNull(),
   image: text("image"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
+  createdAt: timestamp("created_at", { precision: 6, withTimezone: true })
+    .defaultNow()
+    .notNull(),
+  updatedAt: timestamp("updated_at", { precision: 6, withTimezone: true })
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
@@ -29,18 +39,24 @@ export const user = pgTable("user", {
 export const session = pgTable(
   "session",
   {
-    id: text("id").primaryKey(),
-    expiresAt: timestamp("expires_at").notNull(),
-    token: text("token").notNull().unique(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
-      .$onUpdate(() => /* @__PURE__ */ new Date())
-      .notNull(),
-    ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    userId: text("user_id")
+    id: uuid("id").primaryKey(),
+    userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    token: varchar("token", { length: 255 }).notNull().unique(),
+    expiresAt: timestamp("expires_at", {
+      precision: 6,
+      withTimezone: true,
+    }).notNull(),
+    ipAddress: text("ip_address"),
+    userAgent: text("user_agent"),
+    createdAt: timestamp("created_at", { precision: 6, withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { precision: 6, withTimezone: true })
+      .defaultNow()
+      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .notNull(),
   },
   (table) => [index("session_userId_idx").on(table.userId)]
 );
@@ -48,21 +64,35 @@ export const session = pgTable(
 export const account = pgTable(
   "account",
   {
-    id: text("id").primaryKey(),
-    accountId: text("account_id").notNull(),
-    providerId: text("provider_id").notNull(),
-    userId: text("user_id")
+    id: uuid("id").primaryKey(),
+    userId: uuid("user_id")
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
+    accountId: text("account_id").notNull(),
+    providerId: text("provider_id").notNull(),
     accessToken: text("access_token"),
     refreshToken: text("refresh_token"),
-    idToken: text("id_token"),
-    accessTokenExpiresAt: timestamp("access_token_expires_at"),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
+    accessTokenExpiresAt: timestamp("access_token_expires_at", {
+      precision: 6,
+      withTimezone: true,
+    }),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      precision: 6,
+      withTimezone: true,
+    }),
     scope: text("scope"),
+    idToken: text("id_token"),
     password: text("password"),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
+    createdAt: timestamp("created_at", {
+      precision: 6,
+      withTimezone: true,
+    })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 6,
+      withTimezone: true,
+    })
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
@@ -72,13 +102,23 @@ export const account = pgTable(
 export const verification = pgTable(
   "verification",
   {
-    id: text("id").primaryKey(),
+    id: uuid("id").primaryKey(),
     identifier: text("identifier").notNull(),
     value: text("value").notNull(),
-    expiresAt: timestamp("expires_at").notNull(),
-    createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at")
+    expiresAt: timestamp("expires_at", {
+      precision: 6,
+      withTimezone: true,
+    }).notNull(),
+    createdAt: timestamp("created_at", {
+      precision: 6,
+      withTimezone: true,
+    })
       .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", {
+      precision: 6,
+      withTimezone: true,
+    })
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
   },
@@ -87,98 +127,94 @@ export const verification = pgTable(
 
 // Clients table
 export const clients = pgTable("clients", {
-  id: text("id")
+  id: uuid("id")
     .$defaultFn(() => createId())
-    .$type<CursorRow["id"]>()
+    .$type<CursorId>()
     .primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  email: text("email"),
-  street: text("street"),
-  city: text("city"),
-  state: text("state"),
-  zip: text("zip"),
-  clientStatus: text("client_status", { enum: ["active", "archive"] }).default(
-    "active"
-  ),
+  name: varchar("name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  street: varchar("street", { length: 255 }).notNull(),
+  city: varchar("city", { length: 255 }).notNull(),
+  state: varchar("state", { length: 255 }).notNull(),
+  zip: varchar("zip", { length: 255 }).notNull(),
+  clientStatus: clientStatusEnum("client_status").default("active"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => /* @__PURE__ */ new Date()),
 });
 
 // Invoices table
 export const invoices = pgTable("invoices", {
-  id: text("id")
+  id: uuid("id")
     .$defaultFn(() => createId())
-    .$type<CursorRow["id"]>()
+    .$type<CursorId>()
     .primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   invoiceNumber: text("invoice_number").notNull(),
-  clientId: text("client_id")
+  clientId: uuid("client_id")
     .notNull()
-    .$type<CursorRow["id"]>()
+    .$type<CursorId>()
     .references(() => clients.id, { onDelete: "cascade" }),
-  subject: text("subject"),
+  subject: text("subject").notNull(),
   issueDate: timestamp("issue_date").notNull(),
   dueDate: timestamp("due_date").notNull(),
-  discount: real("discount").default(0),
+  discount: real("discount").notNull().default(0),
   notes: text("notes"),
   terms: text("terms"),
-  invoiceStatus: text("invoice_status", {
-    enum: ["draft", "sent", "paid"],
-  }).default("draft"),
+  invoiceStatus: invoiceStatusEnum("invoice_status").default("draft"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => /* @__PURE__ */ new Date()),
 });
 
 // Line items table
 export const lineItems = pgTable("line_items", {
-  id: text("id")
+  id: uuid("id")
     .$defaultFn(() => createId())
-    .$type<CursorRow["id"]>()
+    .$type<CursorId>()
     .primaryKey(),
-  userId: text("user_id")
+  userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  invoiceId: text("invoice_id")
+  invoiceId: uuid("invoice_id")
     .notNull()
-    .$type<CursorRow["id"]>()
+    .$type<CursorId>()
     .references(() => invoices.id, { onDelete: "cascade" }),
   description: text("description").notNull(),
-  quantity: real("quantity").notNull().default(1),
+  quantity: integer("quantity").notNull().default(1),
   amount: real("amount").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => /* @__PURE__ */ new Date()),
 });
 
 // Settings table
 export const settings = pgTable("settings", {
-  userId: text("user_id")
+  userId: uuid("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
-  myName: text("my_name").notNull(),
-  email: text("email").notNull(),
-  street: text("street").notNull(),
-  city: text("city").notNull(),
-  state: text("state").notNull(),
-  zip: text("zip").notNull(),
+  myName: varchar("my_name", { length: 255 }).notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  street: varchar("street", { length: 255 }).notNull(),
+  city: varchar("city", { length: 255 }).notNull(),
+  state: varchar("state", { length: 255 }).notNull(),
+  zip: varchar("zip", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
-    .$onUpdate(() => new Date()),
+    .$onUpdate(() => /* @__PURE__ */ new Date()),
 });
 
 // Relations (Drizzle Relations v2 - defineRelations)
@@ -193,82 +229,8 @@ export const schemaTables = {
   settings,
 };
 
-export const tableRelations = defineRelations(schemaTables, (relations) => ({
-  user: {
-    settings: relations.one.settings({
-      from: relations.user.id,
-      to: relations.settings.userId,
-    }),
-    clients: relations.many.clients(),
-    invoices: relations.many.invoices(),
-    lineItems: relations.many.lineItems(),
-    sessions: relations.many.session(),
-    accounts: relations.many.account(),
-  },
-  settings: {
-    user: relations.one.user({
-      from: relations.settings.userId,
-      to: relations.user.id,
-    }),
-  },
-  clients: {
-    user: relations.one.user({
-      from: relations.clients.userId,
-      to: relations.user.id,
-    }),
-    invoices: relations.many.invoices(),
-  },
-  invoices: {
-    user: relations.one.user({
-      from: relations.invoices.userId,
-      to: relations.user.id,
-    }),
-    client: relations.one.clients({
-      from: relations.invoices.clientId,
-      to: relations.clients.id,
-    }),
-    lineItems: relations.many.lineItems(),
-  },
-  lineItems: {
-    user: relations.one.user({
-      from: relations.lineItems.userId,
-      to: relations.user.id,
-    }),
-    invoice: relations.one.invoices({
-      from: relations.lineItems.invoiceId,
-      to: relations.invoices.id,
-    }),
-  },
-  session: {
-    user: relations.one.user({
-      from: relations.session.userId,
-      to: relations.user.id,
-    }),
-  },
-  account: {
-    user: relations.one.user({
-      from: relations.account.userId,
-      to: relations.user.id,
-    }),
-  },
-  verification: {},
-}));
-
-// Export enums for use in the application
-export const InvoiceStatus = {
-  DRAFT: "draft",
-  SENT: "sent",
-  PAID: "paid",
-} as const;
-
-export const ClientStatus = {
-  ACTIVE: "active",
-  ARCHIVE: "archive",
-} as const;
-
-export type InvoiceStatusType =
-  (typeof InvoiceStatus)[keyof typeof InvoiceStatus];
-export type ClientStatusType = (typeof ClientStatus)[keyof typeof ClientStatus];
+export type ClientStatus = (typeof clientStatusEnum.enumValues)[number];
+export type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number];
 
 // Export types for use in the application
 export type User = typeof user.$inferSelect;

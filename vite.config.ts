@@ -1,3 +1,4 @@
+import { varlockVitePlugin } from "@varlock/vite-integration";
 import { sveltekit } from "@sveltejs/kit/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
@@ -6,7 +7,12 @@ import { defineConfig } from "vite";
 import devToolsJson from "vite-plugin-devtools-json";
 
 export default defineConfig({
-  plugins: [tailwindcss(), sveltekit(), devToolsJson()],
+  plugins: [
+    varlockVitePlugin({ ssrInjectMode: "auto-load" }),
+    tailwindcss(),
+    sveltekit(),
+    devToolsJson(),
+  ],
   preview: {
     port: 5173,
   },

@@ -1,4 +1,6 @@
+/// <reference path="./src/env-varlock.d.ts" />
 import { defineConfig } from "drizzle-kit";
+// @ts-expect-error No types for process.env
 const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error(
@@ -9,7 +11,7 @@ if (!databaseUrl) {
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/lib/db/schema.ts",
-  out: "./drizzle",
+  out: "./src/lib/db/migrations",
   verbose: true,
   strict: true,
   dbCredentials: {

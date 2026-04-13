@@ -1,37 +1,48 @@
 /* eslint-disable new-cap */
 import { db } from "$lib/db";
-import {
-  clients as clientsTable,
-  invoices as invoicesTable,
-} from "$lib/db/schema";
+import { clients as clientsTable } from "$lib/db/schema";
 import {
   clientPaginatedListSchema,
   clientPickerOptionsResponseSchema,
-  clientSchema,
   clientStatusPatchResponseSchema,
   clientStatusSchema,
 } from "$lib/features/clients/schemas";
-import { invoiceListRowSchema } from "$lib/features/invoices/schemas";
-import { listQueryWireSchema } from "$lib/features/pagination/schemas";
+import {
+  clientInvoiceSummarySchema,
+  invoicePaginatedListSchema,
+} from "$lib/features/invoices/schemas";
+import {
+  listQueryWireSchema,
+  querySchema,
+} from "$lib/features/pagination/schemas";
 import { fetchPaginatedClients } from "$lib/features/pagination/utils/clients-list.server";
 import { fetchClientPickerOptions } from "$lib/features/pagination/utils/clients-options.server";
+import {
+  fetchClientInvoiceSummary,
+  fetchPaginatedInvoicesForClient,
+} from "$lib/features/pagination/utils/invoices-list.server";
 import { normalizeListQuery } from "$lib/features/pagination/utils/list-query";
 import {
   apiErrorBodySchema,
   deleteSuccessSchema,
   idResponseSchema,
 } from "$lib/server/api-response-schemas";
-import { clientSelectSchema } from "$lib/validators";
-import { and, eq, sql } from "drizzle-orm";
-import { Elysia, status } from "elysia";
 import {
-  lineItemsTotalSubquery,
-  mapRowsWithTotal,
-} from "../../features/invoices/queries/invoiceListHelpers";
+  clientInsertSchema,
+  clientSelectSchema,
+  clientUpdateSchema,
+} from "$lib/validators";
+import { and, eq } from "drizzle-orm";
+import { Elysia, status } from "elysia";
 import { betterAuthPlugin } from "../auth-plugin";
 
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
   .use(betterAuthPlugin)
+  .guard({
+    detail: {
+      tags: ["Clients"],
+    },
+  })
   // GET /api/clients - List clients with received and balance (cursor pagination)
   .get(
     "/",
@@ -59,7 +70,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       },
     }
   )
-  // POST /api/clients - Create client (with upsert on conflict)
+  // POST /api/clients - Create client
   .post(
     "/",
     async ({ body, user }) => {
@@ -70,19 +81,6 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
             ...body,
             userId: user.id,
           })
-          .onConflictDoUpdate({
-            target: clientsTable.id,
-            set: {
-              userId: sql`excluded.user_id`,
-              name: sql`excluded.name`,
-              email: sql`excluded.email`,
-              street: sql`excluded.street`,
-              city: sql`excluded.city`,
-              state: sql`excluded.state`,
-              zip: sql`excluded.zip`,
-              clientStatus: sql`excluded.client_status`,
-            },
-          })
           .returning({ id: clientsTable.id });
 
         return { id: inserted.id };
@@ -92,8 +90,8 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      body: clientSchema,
-      auth: true,
+      body: clientInsertSchema,
+      authMutation: true,
       response: {
         200: idResponseSchema,
         401: apiErrorBodySchema,
@@ -157,10 +155,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       try {
         const [updated] = await db
           .update(clientsTable)
-          .set({
-            ...body,
-            updatedAt: new Date(),
-          })
+          .set(body)
           .where(and(eq(clientsTable.id, id), eq(clientsTable.userId, user.id)))
           .returning();
 
@@ -175,9 +170,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     },
     {
       params: idResponseSchema,
-      body: clientSchema,
+      body: clientUpdateSchema,
 
-      auth: true,
+      authMutation: true,
       response: {
         200: clientSelectSchema,
         401: apiErrorBodySchema,
@@ -216,7 +211,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     {
       params: idResponseSchema,
       body: clientStatusSchema,
-      auth: true,
+      authMutation: true,
       response: {
         200: clientStatusPatchResponseSchema,
         401: apiErrorBodySchema,
@@ -246,7 +241,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     },
     {
       params: idResponseSchema,
-      auth: true,
+      authMutation: true,
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,
@@ -255,10 +250,10 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       },
     }
   )
-  // GET /api/clients/:id/invoices - Get client's invoices with total
+  // GET /api/clients/:id/invoices/summary - Bucket totals (cents) for filtered set
   .get(
-    "/:id/invoices",
-    async ({ params: { id }, user }) => {
+    "/:id/invoices/summary",
+    async ({ params: { id }, user, query }) => {
       try {
         const client = await db.query.clients.findFirst({
           where: { id: { eq: id }, userId: { eq: user.id } },
@@ -266,46 +261,44 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         if (!client) {
           return status(404, { message: "Client not found" });
         }
-
-        const rows = await db
-          .select({
-            id: invoicesTable.id,
-            userId: invoicesTable.userId,
-            invoiceNumber: invoicesTable.invoiceNumber,
-            clientId: invoicesTable.clientId,
-            subject: invoicesTable.subject,
-            issueDate: invoicesTable.issueDate,
-            dueDate: invoicesTable.dueDate,
-            discount: invoicesTable.discount,
-            notes: invoicesTable.notes,
-            terms: invoicesTable.terms,
-            invoiceStatus: invoicesTable.invoiceStatus,
-            createdAt: invoicesTable.createdAt,
-            updatedAt: invoicesTable.updatedAt,
-            clientName: clientsTable.name,
-            subtotal: lineItemsTotalSubquery.subtotal,
-          })
-          .from(invoicesTable)
-          .leftJoin(clientsTable, eq(invoicesTable.clientId, clientsTable.id))
-          .leftJoin(
-            lineItemsTotalSubquery,
-            eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
-          )
-          .where(
-            and(
-              eq(invoicesTable.clientId, id),
-              eq(invoicesTable.userId, user.id)
-            )
-          );
-
-        const withTotal = mapRowsWithTotal(rows);
-        return withTotal.map((row) => {
-          const { clientName, ...rest } = row;
-          return {
-            ...rest,
-            client: { name: clientName ?? "Unknown" },
-          };
+        return await fetchClientInvoiceSummary(user.id, id, query.q);
+      } catch (error) {
+        console.error("Error loading client invoice summary:", error);
+        return status(500, {
+          message: "Failed to load client invoice summary",
         });
+      }
+    },
+    {
+      params: idResponseSchema,
+      auth: true,
+      query: querySchema,
+      response: {
+        200: clientInvoiceSummarySchema,
+        401: apiErrorBodySchema,
+        404: apiErrorBodySchema,
+        500: apiErrorBodySchema,
+      },
+    }
+  )
+  // GET /api/clients/:id/invoices - Client's invoices (cursor pagination)
+  .get(
+    "/:id/invoices",
+    async ({ params: { id }, user, query }) => {
+      try {
+        const client = await db.query.clients.findFirst({
+          where: { id: { eq: id }, userId: { eq: user.id } },
+        });
+        if (!client) {
+          return status(404, { message: "Client not found" });
+        }
+        const { normalized } = normalizeListQuery({
+          q: query.q,
+          cursor: query.cursor,
+          direction: query.direction,
+          limit: query.limit,
+        });
+        return await fetchPaginatedInvoicesForClient(user.id, id, normalized);
       } catch (error) {
         console.error("Error loading client invoices:", error);
         return status(500, { message: "Failed to load client invoices" });
@@ -314,8 +307,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     {
       params: idResponseSchema,
       auth: true,
+      query: listQueryWireSchema,
       response: {
-        200: invoiceListRowSchema.array(),
+        200: invoicePaginatedListSchema,
         401: apiErrorBodySchema,
         404: apiErrorBodySchema,
         500: apiErrorBodySchema,

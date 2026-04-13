@@ -3,7 +3,14 @@
   import Check from "$lib/components/icons/Check.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import type { SettingsSelect } from "$lib/features/settings/types";
+  import {
+    computeSettingsEditableDelta,
+    pickSettingsEditableSnapshot,
+  } from "$lib/features/settings/settings-diff";
+  import type {
+    SettingsEditableSnapshot,
+    SettingsSelect,
+  } from "$lib/features/settings/types";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";
@@ -12,15 +19,52 @@
   const { settings: settingsStore } = getDashboardStores();
 
   let mySettings = $state<SettingsSelect>(settingsStore.newSettings());
+  let isNewSettings = $state(false);
+  /** Last saved invoice-details fields; used to send only PATCH deltas. */
+  let baselineInvoiceDetails = $state<SettingsEditableSnapshot | null>(null);
+
   onMount(async () => {
     await settingsStore.loadSettings();
     if (settingsStore.items.length > 0) {
       mySettings = { ...settingsStore.items[0] };
+      baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
+      isNewSettings = false;
+    } else {
+      isNewSettings = true;
+      baselineInvoiceDetails = null;
     }
   });
 
   const saveSettings = async () => {
-    await settingsStore.updateSettings(mySettings);
+    if (isNewSettings) {
+      await settingsStore.createSettings(mySettings);
+      if (settingsStore.settings) {
+        mySettings = { ...settingsStore.settings };
+        baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
+        isNewSettings = false;
+      }
+      return;
+    }
+
+    if (baselineInvoiceDetails === null) {
+      baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
+    }
+
+    const delta = computeSettingsEditableDelta(
+      baselineInvoiceDetails,
+      pickSettingsEditableSnapshot(mySettings)
+    );
+
+    if (Object.keys(delta).length === 0) {
+      toast.info("No changes to save");
+      return;
+    }
+
+    await settingsStore.updateSettings(delta);
+    if (settingsStore.settings) {
+      mySettings = { ...settingsStore.settings };
+    }
+    baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
   };
 
   function handlePasswordSuccess(result: { type: string; data?: unknown }) {

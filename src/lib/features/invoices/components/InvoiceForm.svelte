@@ -3,7 +3,7 @@
   import Trash from "$lib/components/icons/Trash.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import type { LineItem, NewClient, NewInvoice } from "$lib/db/schema";
+  import type { LineItem, NewClient } from "$lib/db/schema";
   import type {
     InvoiceFormProps,
     Key,
@@ -14,7 +14,7 @@
   import { Counter } from "$lib/runes/Counter.svelte";
   import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton, CursorId } from "$lib/types";
+  import type { BitsButton, CursorId, Maybe } from "$lib/types";
   import { toDateInputValue, today } from "$lib/utils/dateHelpers";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
   import { onDestroy, onMount } from "svelte";
@@ -23,13 +23,18 @@
   import { slide } from "svelte/transition";
   import LineItemRows from "../../line-items/components/LineItemRows.svelte";
   import LineItemSkeleton from "../../line-items/components/LineItemSkeleton.svelte";
-  import type { InvoiceInsert, InvoiceListResponse } from "../types";
+  import {
+    computeInvoicePatchDelta,
+    pickInvoicePatchSnapshot,
+    serializedNormalizedLineItemsForCompare,
+    type InvoicePatchSnapshot,
+  } from "../invoice-diff";
+  import type { InvoiceListResponse, NewInvoice } from "../types";
 
   let {
     mode = "create",
     closePanel,
     invoiceEdit = $bindable(),
-    userId = null,
   }: InvoiceFormProps = $props();
 
   const {
@@ -39,9 +44,7 @@
   } = getDashboardStores();
 
   // Form data using NewInvoice type
-  let invoice: Omit<InvoiceInsert, "clientId"> & {
-    clientId: CursorId | undefined;
-  } = $state(invoicesStore.newInvoice());
+  let invoice: NewInvoice = $state(invoicesStore.newInvoice());
 
   const counter = new Counter();
 
@@ -53,6 +56,11 @@
   ]);
   let lineItemsLoaded = $state(true);
   let discount = $state<number>(0);
+
+  /** Edit mode: last saved header snapshot for PATCH deltas. */
+  let baselineInvoiceSnapshot: InvoicePatchSnapshot | null = null;
+  /** Edit mode: serialized normalized line items at load (see invoice-diff). */
+  let baselineLineItemsSnapshot: string | null = null;
 
   let abortController: AbortController | null = null;
   let isMounted = true;
@@ -69,8 +77,7 @@
       // Date inputs require "yyyy-MM-dd"; convert from Date objects
       const issueDate = toDateInputValue(invoiceEdit.issueDate);
       const dueDate = toDateInputValue(invoiceEdit.dueDate);
-      invoice = { ...invoiceEdit, issueDate, dueDate } as unknown as NewInvoice;
-      discount = invoiceEdit.discount ?? 0;
+      invoice = { ...invoiceEdit, issueDate, dueDate };
 
       lineItemsLoaded = false;
       abortController = new AbortController();
@@ -91,6 +98,11 @@
           ];
         }
         lineItemsLoaded = true;
+
+        baselineInvoiceSnapshot = pickInvoicePatchSnapshot(invoiceEdit);
+        baselineLineItemsSnapshot = serializedNormalizedLineItemsForCompare(
+          lineItemsStore.normalizeLineItems(lineItems, invoiceEdit.id)
+        );
       }
     }
   });
@@ -100,6 +112,8 @@
     abortController?.abort();
     // TODO: delete the counter to free up memory
     counter.reset();
+    baselineInvoiceSnapshot = null;
+    baselineLineItemsSnapshot = null;
   });
 
   const addLineItem: BitsButton = () => {
@@ -137,55 +151,109 @@
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    // check if the client is new and create it
+    // --- Resolve client id (inline "new client" flow or existing select) ---
+    let clientId: Maybe<CursorId> = invoiceEdit?.clientId ?? null;
     if (isNewClient) {
-      const clientId = await clientsStore.upsertClient(newClient);
+      clientId = await clientsStore.createClient(newClient);
       if (!clientId) {
         toast.error("Failed to create client");
         return;
       }
-      invoice.clientId = clientId;
     }
-    // make sure there is a clientId
-    if (!invoice.clientId) {
+    if (!clientId) {
       toast.error("Client is required");
       return;
     }
 
-    const resolvedUserId = userId ?? invoice.userId;
-    if (!resolvedUserId) {
-      toast.error("User not available");
+    // --- Wire-shaped invoice for API + diff: Date fields (form uses yyyy-MM-dd strings) ---
+    const updatedInvoice = {
+      ...invoice,
+      clientId,
+      issueDate: new Date(invoice.issueDate),
+      dueDate: new Date(invoice.dueDate),
+    };
+
+    if (mode === "edit") {
+      // Edit: PATCH invoice header only if it changed; line items are a separate update.
+      // Baselines were captured after load so we can compute minimal deltas.
+
+      if (!lineItemsLoaded) {
+        toast.error("Still loading invoice");
+        return;
+      }
+      if (
+        baselineInvoiceSnapshot === null ||
+        baselineLineItemsSnapshot === null ||
+        !invoice.id
+      ) {
+        toast.error("Invoice not ready");
+        return;
+      }
+
+      // Header: compare current snapshot to baseline → partial InvoiceUpdate (or empty).
+      const currentSnapshot = pickInvoicePatchSnapshot(updatedInvoice);
+      const delta = computeInvoicePatchDelta(
+        baselineInvoiceSnapshot,
+        currentSnapshot
+      );
+      // Line items: normalize for API shape, then stable JSON string for equality with baseline.
+      const normalizedLineItemsNow = lineItemsStore.normalizeLineItems(
+        lineItems,
+        invoice.id
+      );
+      const lineItemsSnap = serializedNormalizedLineItemsForCompare(
+        normalizedLineItemsNow
+      );
+
+      const invoiceUnchanged = Object.keys(delta).length === 0;
+      const lineItemsUnchanged = lineItemsSnap === baselineLineItemsSnapshot;
+
+      if (invoiceUnchanged && lineItemsUnchanged) {
+        toast.info("No changes to save");
+        return;
+      }
+
+      let effectiveInvoiceId: CursorId = invoice.id;
+
+      // Order: PATCH header first (if needed), then line items, so line items always see final invoice id.
+      if (!invoiceUnchanged) {
+        const updatedId = await invoicesStore.updateInvoice(invoice.id, delta);
+        if (!updatedId) {
+          toast.error("Failed to update invoice");
+          return;
+        }
+        effectiveInvoiceId = updatedId;
+      }
+
+      if (!lineItemsUnchanged) {
+        const lineResult = await lineItemsStore.updateLineItems(
+          effectiveInvoiceId,
+          normalizedLineItemsNow
+        );
+        if (lineResult === null) {
+          return;
+        }
+      }
+      await invoicesStore.loadItems(toNormalizedListQuery(undefined, {}));
+      closePanel();
       return;
     }
 
-    invoice.userId = resolvedUserId;
-    newClient.userId = resolvedUserId;
-
-    // this as assertion relies on the check above to ensure the clientId is set
-    const normalizedInvoice: NewInvoice = invoicesStore.normalizeInvoice(
-      invoice as NewInvoice,
-      discount,
-      resolvedUserId
-    );
-    // upsert the invoice
-    const invoiceId = await invoicesStore.upsertInvoice(normalizedInvoice);
+    // --- Create: POST full invoice, then POST line items (nested resource) ---
+    const invoiceId = await invoicesStore.createInvoice(updatedInvoice);
     if (!invoiceId) {
       toast.error("Failed to create invoice");
       return;
     }
-
+    // --- Line items: normalize for API shape, then POST (nested resource) ---
     const normalizedLineItems = lineItemsStore.normalizeLineItems(
       lineItems,
-      resolvedUserId,
       invoiceId
     );
 
+    // POST line items only if there are any (empty array is valid for API).
     if (normalizedLineItems.length > 0) {
-      if (mode === "edit") {
-        await lineItemsStore.updateLineItems(invoiceId, normalizedLineItems);
-      } else {
-        await lineItemsStore.createLineItems(invoiceId, normalizedLineItems);
-      }
+      await lineItemsStore.createLineItems(invoiceId, normalizedLineItems);
     }
     await invoicesStore.loadItems(toNormalizedListQuery(undefined, {}));
     closePanel();
@@ -193,7 +261,7 @@
 
   type InvoiceDeleteConfirmItem = Pick<
     InvoiceListResponse,
-    "id" | "client" | "total"
+    "id" | "name" | "total"
   >;
   const deleteModal = new ItemPanel<InvoiceDeleteConfirmItem>();
 </script>
@@ -224,7 +292,7 @@
           onclick={() => {
             isNewClient = true;
             newClient.name = "";
-            newClient.email = null;
+            newClient.email = "";
           }}>+ Client</Button
         >
       </div>
@@ -378,7 +446,7 @@
           if (!invoice.id) return;
           deleteModal.open({
             id: invoice.id,
-            client: { name: clientName },
+            name: clientName,
             total: sumLineItems(lineItems),
           });
         }}><Trash />Delete</Button
@@ -406,7 +474,7 @@
   >
     {#snippet descriptionSnippet(inv)}
       This will delete the invoice to <span class="text-scarlet"
-        >{inv.client.name}</span
+        >{inv.name}</span
       >
       for
       <span class="text-scarlet">{totalDisplay}</span>

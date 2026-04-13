@@ -1,53 +1,38 @@
 import { client } from "$lib/client";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
-import type { CursorId, List, Maybe } from "$lib/types";
+import type { CursorId, Maybe } from "$lib/types";
+import { today } from "$lib/utils/dateHelpers";
 import {
   StoreOperation,
   getErrorMessage,
   isAbortError,
 } from "$lib/utils/error-message";
-import { transformNullToUndefined } from "$lib/utils/typeHelpers";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import { toast } from "svelte-sonner";
 import type {
   InvoiceInsert,
   InvoiceListResponse,
   InvoiceSelect,
+  InvoiceUpdate,
+  NewInvoice,
 } from "../types";
 
 export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListResponse> {
   protected readonly resourceSingular = "invoice";
   protected readonly resourcePlural = "invoices";
 
-  newInvoice(): Omit<InvoiceInsert, "clientId"> & {
-    clientId: CursorId | undefined;
-  } {
+  newInvoice(): NewInvoice {
     return {
       clientId: undefined,
       invoiceNumber: "",
-      subject: null,
-      issueDate: new Date(),
-      dueDate: new Date(),
-      discount: null,
+      subject: "",
+      discount: 0,
+      issueDate: today,
+      dueDate: today,
       notes: null,
       terms: null,
       invoiceStatus: "draft",
-      userId: "",
-    };
-  }
-
-  normalizeInvoice(
-    invoice: InvoiceInsert,
-    discount: number = 0,
-    userId: string
-  ): InvoiceInsert {
-    return {
-      ...invoice,
-      issueDate: new Date(invoice.issueDate),
-      dueDate: new Date(invoice.dueDate),
-      discount,
-      userId,
     };
   }
 
@@ -70,38 +55,14 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
       return await unwrapTreaty(client.api.invoices({ id }).get(), {
         fallbackMessage: fallback,
       });
-    } catch (error_) {
-      if (isAbortError(error_)) {
+    } catch (error) {
+      if (isAbortError(error)) {
         return null;
       }
-      const errorMessage = getErrorMessage(error_, fallback);
-      console.error("Error loading invoice:", error_);
+      const errorMessage = getErrorMessage(error, fallback);
+      console.error("Error loading invoice:", error);
       toast.error(errorMessage);
       return null;
-    }
-  }
-
-  async getInvoicesByClientId(
-    clientId: string
-  ): Promise<List<InvoiceListResponse>> {
-    this.loading = true;
-    this.error = null;
-    const fallback = "Failed to load client invoices";
-    try {
-      return await unwrapTreaty(
-        client.api.clients({ id: clientId }).invoices.get(),
-        { fallbackMessage: fallback }
-      );
-    } catch (error_) {
-      if (isAbortError(error_)) {
-        return null;
-      }
-      const errorMessage = getErrorMessage(error_, fallback);
-      console.error("Error loading client invoices:", error_);
-      toast.error(errorMessage);
-      return null;
-    } finally {
-      this.loading = false;
     }
   }
 
@@ -116,57 +77,56 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
       if (index !== -1) {
         this.items.splice(index, 1);
       }
-
       toast.success("Invoice deleted successfully");
-    } catch (error_) {
-      const errorMessage = getErrorMessage(error_, fallback);
-      console.error("Error deleting invoice:", error_);
+    } catch (err) {
+      const errorMessage = getErrorMessage(err, fallback);
+      console.error("Error deleting invoice:", err);
       toast.error(errorMessage);
     }
   }
 
-  async upsertInvoice(invoiceData: InvoiceInsert): Promise<Maybe<CursorId>> {
+  async updateInvoice(
+    id: CursorId,
+    patch: InvoiceUpdate
+  ): Promise<Maybe<CursorId>> {
     try {
-      const isUpdate = Boolean(invoiceData.id);
-      const body = transformNullToUndefined(invoiceData);
-
-      let responseData: InvoiceSelect | { id: CursorId };
-      if (isUpdate && body.id) {
-        responseData = await unwrapTreaty(
-          client.api.invoices({ id: body.id }).put(body),
-          { fallbackMessage: this.fallbackFor(StoreOperation.updateOne) }
-        );
-      } else {
-        responseData = await unwrapTreaty(client.api.invoices.post(body), {
-          fallbackMessage: this.fallbackFor(StoreOperation.createOne),
-        });
+      const responseData = await unwrapTreaty(
+        client.api.invoices({ id }).patch(patch),
+        { fallbackMessage: this.fallbackFor(StoreOperation.updateOne) }
+      );
+      toast.success("Invoice updated successfully");
+      const index = this.items.findIndex(
+        (invoice) => invoice.id === responseData.id
+      );
+      if (index !== -1) {
+        this.items[index] = {
+          ...this.items[index],
+          ...patch,
+          updatedAt: new Date(),
+        };
       }
+      return responseData.id;
+    } catch (err) {
+      const fallback = this.fallbackFor(StoreOperation.updateOne);
+      const errorMessage = getErrorMessage(err, fallback);
+      console.error("Error updating invoice:", err);
+      toast.error(errorMessage);
+      return null;
+    }
+  }
 
-      if (isUpdate && body.id) {
-        const index = this.items.findIndex((index_) => index_.id === body.id);
-        if (index !== -1) {
-          this.items[index] = {
-            ...this.items[index],
-            ...body,
-            updatedAt: new Date(),
-          };
-        }
-        toast.success("Invoice updated successfully");
-        return body.id;
-      }
-      const { id } = responseData;
+  async createInvoice(invoiceData: InvoiceInsert): Promise<Maybe<CursorId>> {
+    try {
+      const responseData = await unwrapTreaty(
+        client.api.invoices.post(invoiceData),
+        { fallbackMessage: this.fallbackFor(StoreOperation.createOne) }
+      );
       toast.success("Invoice created successfully");
-      return id;
-    } catch (error_) {
-      const isUpdate = Boolean(invoiceData.id);
-      const fallback = this.fallbackFor(
-        isUpdate ? StoreOperation.updateOne : StoreOperation.createOne
-      );
-      const errorMessage = getErrorMessage(error_, fallback);
-      console.error(
-        `Error ${isUpdate ? "updating" : "creating"} invoice:`,
-        error_
-      );
+      return responseData.id;
+    } catch (err) {
+      const fallback = this.fallbackFor(StoreOperation.createOne);
+      const errorMessage = getErrorMessage(err, fallback);
+      console.error("Error creating invoice:", err);
       toast.error(errorMessage);
       return null;
     }

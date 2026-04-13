@@ -30,8 +30,8 @@ export abstract class CursorPaginatedListStoreBase<T extends CursorRow>
 
   lastSuccessfulListKey = $state<Maybe<string>>(null);
 
-  private listAbortController: AbortController | null = null;
-  private listLoadGeneration = 0;
+  protected listAbortController: AbortController | null = null;
+  protected listLoadGeneration = 0;
 
   protected abstract fetchList(
     query: Record<string, string>,

@@ -41,8 +41,12 @@
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    // Single upsert call - much simpler!
-    await clientsStore.upsertClient(client);
+    if (formState === "edit" && edit) {
+      const { id: _id, userId: _userId, ...patch } = client;
+      await clientsStore.updateClient(edit.id, patch);
+    } else {
+      await clientsStore.createClient(client);
+    }
     closePanel();
   };
 </script>

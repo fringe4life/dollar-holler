@@ -1,11 +1,16 @@
 import { db } from "$lib/db";
 import { cursorSchema } from "$lib/features/pagination/schemas";
+import {
+  fetchClientInvoiceSummary,
+  fetchPaginatedInvoicesForClient,
+} from "$lib/features/pagination/utils/invoices-list.server";
+import { normalizeListQueryFromUrl } from "$lib/features/pagination/utils/list-query";
 import { tryCatch } from "$lib/utils/try-catch";
 import { error, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params, locals }) => {
+export const load: PageServerLoad = async ({ params, locals, url }) => {
   const { id } = params;
 
   const parsedId = cursorSchema(id);
@@ -17,9 +22,11 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw redirect(303, "/login");
   }
 
+  const user = locals.user;
+
   const { data: client } = await tryCatch(() =>
     db.query.clients.findFirst({
-      where: { id: { eq: parsedId }, userId: { eq: locals?.user?.id } },
+      where: { id: { eq: parsedId }, userId: { eq: user.id } },
     })
   );
 
@@ -27,5 +34,23 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     throw error(404, { message: "Client not found" });
   }
 
-  return { client };
+  const { normalized, listCursorWasNormalized } =
+    normalizeListQueryFromUrl(url);
+
+  try {
+    const [listResult, summary] = await Promise.all([
+      fetchPaginatedInvoicesForClient(user.id, parsedId, normalized),
+      fetchClientInvoiceSummary(user.id, parsedId, normalized.q),
+    ]);
+
+    return {
+      client,
+      items: listResult.items,
+      paginationMetadata: listResult.paginationMetadata,
+      summary,
+      listCursorWasNormalized,
+    };
+  } catch {
+    throw error(500, { message: "Failed to load client invoices" });
+  }
 };

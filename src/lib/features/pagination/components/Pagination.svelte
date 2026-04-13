@@ -7,8 +7,8 @@
   import { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import type {
     CursorRow,
-    ListQueryNormalized,
     PaginatableItems,
+    PaginationSearchParams,
   } from "$lib/features/pagination/types";
   import {
     parseLimitParam,
@@ -37,7 +37,7 @@
     pageMeta.hasNextPage || pageMeta.hasPreviousPage
   );
 
-  const navigateWithQuery = async (next: ListQueryNormalized) => {
+  const navigateWithQuery = async (next: PaginationSearchParams) => {
     store.presetClientListQueryKey?.(next);
     pushState(`${page.url.pathname}${buildListSearchString(next)}`, {});
     await store.loadItems(next);

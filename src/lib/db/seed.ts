@@ -1,18 +1,17 @@
-import { drizzle } from "drizzle-orm/neon-serverless";
-
-import type { NewClient, NewInvoice, NewLineItem, NewSettings } from "./schema";
-import {
-  clients,
-  invoices,
-  lineItems,
-  schemaTables,
-  settings,
-  tableRelations,
-} from "./schema";
-// eslint-disable-next-line sonarjs/no-implicit-dependencies
 import { createId } from "$lib/features/pagination/utils/create-uuidv7";
 import { neonConfig, Pool } from "@neondatabase/serverless";
-
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { tableRelations } from "./relations";
+import type {
+  Client,
+  ClientStatus,
+  InvoiceStatus,
+  NewClient,
+  NewInvoice,
+  NewLineItem,
+  NewSettings,
+} from "./schema";
+import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 // Create the Pool client (WebSocket-based for transaction support)
 const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
@@ -101,9 +100,9 @@ async function main() {
         city: peer.city,
         state: peer.state,
         zip: peer.zip,
-        clientStatus: (Math.random() > 0.2 ? "active" : "archive") as
-          | "active"
-          | "archive",
+        clientStatus: (Math.random() > 0.2
+          ? "active"
+          : "archive") as ClientStatus,
       });
     }
   }
@@ -136,7 +135,7 @@ async function main() {
   const invoicesData: NewInvoice[] = [];
   const lineItemsData: NewLineItem[] = [];
 
-  const clientsByUserId = new Map<string, (typeof insertedClients)[number][]>();
+  const clientsByUserId = new Map<string, Client[]>();
   for (const client of insertedClients) {
     const list = clientsByUserId.get(client.userId) ?? [];
     list.push(client);
@@ -183,7 +182,7 @@ async function main() {
         terms: Math.random() > 0.6 ? "_Payment due within 30 days._" : null,
         invoiceStatus: (["draft", "sent", "paid"] as const)[
           Math.floor(Math.random() * 3)
-        ],
+        ] as InvoiceStatus,
       });
 
       const lineItemCount = Math.floor(Math.random() * 3) + 1;

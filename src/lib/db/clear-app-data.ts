@@ -2,17 +2,10 @@
  * Removes all rows from app tables (clients, invoices, line_items, settings).
  * Better Auth tables (`user`, `session`, `account`, `verification`) are left intact.
  */
-import { drizzle } from "drizzle-orm/neon-serverless";
-import {
-  clients,
-  invoices,
-  lineItems,
-  schemaTables,
-  settings,
-  tableRelations,
-} from "./schema";
-// eslint-disable-next-line sonarjs/no-implicit-dependencies
 import { neonConfig, Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { tableRelations } from "./relations";
+import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
 
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 const pool = new Pool({ connectionString: process.env.DATABASE_URL! });

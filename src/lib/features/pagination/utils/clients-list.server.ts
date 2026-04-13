@@ -1,9 +1,11 @@
 import { db } from "$lib/db";
 import { clients as clientsTable } from "$lib/db/schema";
 import { clientReceivedBalanceSubquery } from "$lib/features/clients/queries/clientListHelpers";
-import type { ClientListResponse } from "$lib/features/clients/types";
+import type {
+  ClientListResponse,
+  ClientSelect,
+} from "$lib/features/clients/types";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
-import type { CursorId } from "$lib/types";
 import { and, eq, ilike, or } from "drizzle-orm";
 import type { PaginationSearchParams } from "../types";
 import { resolveCursorListQuery } from "./cursor-list-query.server";
@@ -32,26 +34,12 @@ const baseFilter = (userId: string, q: string | undefined) => {
 };
 
 const mapRows = (
-  rows: {
-    id: CursorId;
-    userId: string;
-    name: string;
-    email: string | null;
-    street: string | null;
-    city: string | null;
-    state: string | null;
-    zip: string | null;
-    clientStatus: string | null;
-    createdAt: Date;
-    updatedAt: Date;
-    received: unknown;
-    balance: unknown;
-  }[]
+  rows: Array<ClientSelect & { received: number; balance: number }>
 ): ClientListResponse[] => {
   return rows.map(
     (row): ClientListResponse => ({
       ...row,
-      clientStatus: row.clientStatus as ClientListResponse["clientStatus"],
+      clientStatus: row.clientStatus,
       received: Math.round(Number(row.received ?? 0)),
       balance: Math.round(Number(row.balance ?? 0)),
     })

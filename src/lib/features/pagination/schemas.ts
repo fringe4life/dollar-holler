@@ -14,8 +14,12 @@ export const listDirectionSchema = type("'forward' | 'backward' | undefined");
 // Concept: join into one TS-style union string, then pass to type(...)
 const limitUnion = LIMITS.map((n) => `'${n}'`).join(
   " | "
-) as "'10' | '25' | '50'";
+) as unknown as `'${(typeof LIMITS)[number]}'`;
 export const limitSchema = type(limitUnion);
+
+export const querySchema = type({
+  "q?": "string",
+});
 
 /** Loose wire shape for Elysia query (all string | undefined). */
 export const listQueryWireSchema = type({

@@ -1,10 +1,12 @@
 import { getRequestEvent } from "$app/server";
+import { BETTER_AUTH_SECRET } from "$env/static/private";
 import { PUBLIC_BASE_URL } from "$env/static/public";
-import { db } from "$lib/db";
+import { db } from "$lib/db/index";
 import { schemaTables } from "$lib/db/schema";
 import { createId } from "$lib/features/pagination/utils/create-uuidv7";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth } from "better-auth/minimal";
+import { openAPI } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 
 export const auth = betterAuth({
@@ -15,7 +17,7 @@ export const auth = betterAuth({
     provider: "pg",
     schema: schemaTables,
   }),
-  secret: process.env.BETTER_AUTH_SECRET,
+  secret: BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
@@ -26,19 +28,11 @@ export const auth = betterAuth({
       maxAge: 5 * 60,
     },
   },
-  plugins: [sveltekitCookies(getRequestEvent)],
-
-  databaseHooks: {
-    user: {
-      create: {
-        // eslint-disable-next-line @typescript-eslint/require-await, sonarjs/arrow-function-convention
-        before: async (user) => ({
-          data: {
-            ...user,
-            id: createId(),
-          },
-        }),
-      },
+  // sveltekit must be the last plugin
+  plugins: [openAPI(), sveltekitCookies(getRequestEvent)],
+  advanced: {
+    database: {
+      generateId: () => createId(),
     },
   },
 });

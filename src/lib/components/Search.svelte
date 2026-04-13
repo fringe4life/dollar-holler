@@ -14,7 +14,7 @@
   import { Toggle } from "$lib/runes/Toggle.svelte";
   import type { KeyboardEventHandler } from "svelte/elements";
 
-  type Props = {
+  export type Props = {
     store: SearchableListStore;
   };
 
@@ -77,7 +77,7 @@
   </span>
   <div class="relative isolate z-0 flex items-baseline inline-full">
     <input
-      class="peer search border-b-pastelPurple font-sansserif focus-visible:outline-lavenderIndigo border-b-2 border-dashed bg-transparent pe-16 text-black transition-colors duration-200 outline-none inline-full placeholder:text-transparent focus-visible:outline-2 md:pe-0 md:inline-52 lg:text-xl lg:inline-72"
+      class="peer search border-b-pastelPurple font-sansserif focus-visible:outline-lavenderIndigo border-b-2 border-dashed bg-transparent pe-16 text-black outline-transparent transition-colors duration-200 inline-full placeholder:text-transparent focus-visible:outline-2 md:pe-0 md:inline-52 lg:text-xl lg:inline-72"
       type="search"
       name="search"
       placeholder="Search by keyword"

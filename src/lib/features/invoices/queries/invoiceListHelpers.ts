@@ -33,7 +33,7 @@ export const lineItemsTotalSubquery = db
   .groupBy(lineItemsTable.invoiceId)
   .as("line_items_total");
 
-type RowWithSubtotal = {
+export type RowWithSubtotal = {
   subtotal: Maybe<string | number>;
   discount: Maybe<string | number>;
 };

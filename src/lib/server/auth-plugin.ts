@@ -5,7 +5,8 @@ import { Elysia } from "elysia";
 
 /**
  * Better Auth plugin for ElysiaJS
- * Provides authentication macro that injects user and session into route context
+ * - `auth`: GET-safe; uses cookie cache when enabled (see auth config).
+ * - `authMutation`: POST/PUT/PATCH/DELETE; bypasses cookie cache so the session is validated against the DB.
  */
 export const betterAuthPlugin = new Elysia({ name: "better-auth" })
   .mount(auth.handler)
@@ -13,6 +14,21 @@ export const betterAuthPlugin = new Elysia({ name: "better-auth" })
     auth: {
       async resolve({ status, request: { headers } }) {
         const session = await auth.api.getSession({ headers });
+        if (!session) {
+          return status(401, { message: "Unauthorized" });
+        }
+        return {
+          user: session.user,
+          session: session.session,
+        };
+      },
+    },
+    authMutation: {
+      async resolve({ status, request: { headers } }) {
+        const session = await auth.api.getSession({
+          headers,
+          query: { disableCookieCache: true },
+        });
         if (!session) {
           return status(401, { message: "Unauthorized" });
         }

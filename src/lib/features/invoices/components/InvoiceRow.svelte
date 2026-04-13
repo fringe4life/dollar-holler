@@ -37,7 +37,7 @@
   const id = $derived(invoice.id);
   const dueDate = $derived(invoice.dueDate);
   const invoiceNumber = $derived(invoice.invoiceNumber);
-  const client = $derived(invoice.client);
+  const client = $derived(invoice.name);
   const total = $derived(invoice.total);
   const totalDisplay = $derived(formatTotal(total));
   const invoiceStatus = $derived(invoice.invoiceStatus);
@@ -84,7 +84,7 @@
     </div>
     <div class="invoicenumber truncate text-sm lg:text-lg">{invoiceNumber}</div>
     <div class="clientName truncate text-base font-bold lg:text-xl">
-      {client.name}
+      {client}
     </div>
     <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
       {totalDisplay}

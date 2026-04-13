@@ -2,12 +2,12 @@
   import { tv, type VariantProps } from "tailwind-variants";
 
   export const badgeVariants = tv({
-    base: "text-md rounded-full border text-center font-bold whitespace-nowrap capitalize inline-20 focus-visible:border-ring focus-visible:ring-ring/50",
+    base: "text-md rounded-full border text-center font-bold whitespace-nowrap capitalize inline-20 outline-transparent transition-colors duration-200 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-ring/50",
     variants: {
       variant: {
         sent: "border-robinEggBlue bg-robinEggBlue text-blueGem",
         draft: "border-pastelPurple text-pastelPurple",
-        late: "border-scarlet border-transparent bg-scarlet text-goldenFizz text-white focus-visible:ring-destructive/20 dark:bg-destructive/70 dark:focus-visible:ring-destructive/40",
+        late: "border-scarlet border-transparent bg-scarlet text-goldenFizz text-white focus-visible:outline-destructive/20 dark:bg-destructive/70 dark:focus-visible:outline-destructive/40",
         paid: "border-pastelPurple bg-pastelPurple text-white",
       },
       size: {

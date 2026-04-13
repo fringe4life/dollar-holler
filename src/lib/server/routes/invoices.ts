@@ -4,15 +4,7 @@ import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "$lib/db/schema";
-import {
-  invoicePaginatedListSchema,
-  invoiceSchema,
-  invoiceUpsertBodySchema,
-} from "$lib/features/invoices/schemas";
-import {
-  lineItemSchema,
-  newLineItemSchema,
-} from "$lib/features/line-items/schemas/schemas";
+import { invoicePaginatedListSchema } from "$lib/features/invoices/schemas";
 import { listQueryWireSchema } from "$lib/features/pagination/schemas";
 import { fetchPaginatedInvoices } from "$lib/features/pagination/utils/invoices-list.server";
 import { normalizeListQuery } from "$lib/features/pagination/utils/list-query";
@@ -21,7 +13,13 @@ import {
   deleteSuccessSchema,
   idResponseSchema,
 } from "$lib/server/api-response-schemas";
-import { invoiceSelectSchema, lineItemSelectSchema } from "$lib/validators";
+import {
+  invoiceInsertSchema,
+  invoiceSelectSchema,
+  invoiceUpdateSchema,
+  lineItemInsertSchema,
+  lineItemSelectSchema,
+} from "$lib/validators";
 import { type } from "arktype";
 import { and, eq } from "drizzle-orm";
 import { Elysia, status } from "elysia";
@@ -29,6 +27,11 @@ import { betterAuthPlugin } from "../auth-plugin";
 
 export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   .use(betterAuthPlugin)
+  .guard({
+    detail: {
+      tags: ["Invoices"],
+    },
+  })
   // GET /api/invoices - List invoices with client name and total (cursor pagination)
   .get(
     "/",
@@ -41,7 +44,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           limit: query.limit,
         });
         return await fetchPaginatedInvoices(user.id, normalized);
-      } catch (_) {
+      } catch {
         return status(500, { message: "Failed to load invoices" });
       }
     },
@@ -55,34 +58,30 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       },
     }
   )
-  // POST /api/invoices - Create invoice (with line items)
+  // POST /api/invoices - Create invoice
   .post(
     "/",
     async ({ body, user }) => {
       try {
-        const { lineItems: _lineItems, ...invoice } = body;
-
         const [inserted] = await db
           .insert(invoicesTable)
           .values({
-            ...invoice,
+            ...body,
             userId: user.id,
-            issueDate: new Date(invoice.issueDate),
-            dueDate: new Date(invoice.dueDate),
           })
-          .returning({ id: invoicesTable.id });
+          .returning();
 
-        return { id: inserted.id };
+        return inserted;
       } catch (error) {
         console.error("Error adding invoice:", error);
         return status(500, { message: "Failed to add invoice" });
       }
     },
     {
-      body: invoiceUpsertBodySchema,
-      auth: true,
+      body: invoiceInsertSchema,
+      authMutation: true,
       response: {
-        200: idResponseSchema,
+        200: invoiceSelectSchema,
         401: apiErrorBodySchema,
         500: apiErrorBodySchema,
       },
@@ -115,8 +114,8 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       },
     }
   )
-  // PUT /api/invoices/:id - Update invoice
-  .put(
+  // PATCH /api/invoices/:id - Update invoice
+  .patch(
     "/:id",
     async ({ params: { id }, body, user }) => {
       try {
@@ -124,20 +123,17 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           .update(invoicesTable)
           .set({
             ...body,
-            updatedAt: new Date(),
-            issueDate: new Date(body.issueDate),
-            dueDate: new Date(body.dueDate),
             invoiceStatus: body.invoiceStatus ?? "draft",
           })
           .where(
             and(eq(invoicesTable.id, id), eq(invoicesTable.userId, user.id))
           )
-          .returning();
+          .returning({ id: invoicesTable.id });
 
         if (!updated) {
           return status(404, { message: "Invoice not found" });
         }
-        return { id: updated.id };
+        return updated;
       } catch (error) {
         console.error("Error updating invoice:", error);
         return status(500, { message: "Failed to update invoice" });
@@ -145,8 +141,8 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     },
     {
       params: idResponseSchema,
-      body: invoiceSchema,
-      auth: true,
+      body: invoiceUpdateSchema,
+      authMutation: true,
       response: {
         200: idResponseSchema,
         401: apiErrorBodySchema,
@@ -178,7 +174,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     },
     {
       params: idResponseSchema,
-      auth: true,
+      authMutation: true,
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,
@@ -190,6 +186,11 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // Line items routes nested under invoices
   .group("/:id/line-items", (app) =>
     app
+      .guard({
+        detail: {
+          tags: ["Line items"],
+        },
+      })
       // GET /api/invoices/:id/line-items - Get invoice line items
       .get(
         "/",
@@ -247,8 +248,8 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         },
         {
           params: idResponseSchema,
-          body: type({ lineItems: newLineItemSchema.array().required() }),
-          auth: true,
+          body: type({ lineItems: lineItemInsertSchema.array().required() }),
+          authMutation: true,
           response: {
             200: lineItemSelectSchema.array(),
             401: apiErrorBodySchema,
@@ -283,8 +284,8 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
               .values(
                 body.lineItems.map((item) => ({
                   ...item,
-                  invoiceId: id,
                   userId: user.id,
+                  invoiceId: id,
                 }))
               )
               .returning();
@@ -295,8 +296,8 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         },
         {
           params: idResponseSchema,
-          body: type({ lineItems: lineItemSchema.array().required() }),
-          auth: true,
+          body: type({ lineItems: lineItemInsertSchema.array().required() }),
+          authMutation: true,
           response: {
             200: lineItemSelectSchema.array(),
             401: apiErrorBodySchema,
@@ -310,6 +311,11 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
 // Standalone line items routes (not nested under invoices)
 export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
   .use(betterAuthPlugin)
+  .guard({
+    detail: {
+      tags: ["Line items"],
+    },
+  })
   // GET /api/line-items - List all line items (for admin purposes)
   .get(
     "/",
@@ -355,7 +361,7 @@ export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
     },
     {
       params: idResponseSchema,
-      auth: true,
+      authMutation: true,
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,

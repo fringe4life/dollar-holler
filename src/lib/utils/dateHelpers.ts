@@ -1,5 +1,6 @@
 import type { Maybe } from "$lib/types";
 
+const DATE_FORMATTER = new Intl.DateTimeFormat();
 /**
  * @abstract converts the date to one to be presented to a user
  * @param {Maybe<string>} myDate a string representation of a date
@@ -7,9 +8,8 @@ import type { Maybe } from "$lib/types";
  */
 export const convertDate = (myDate: Maybe<string>): string => {
   if (!myDate) return "Unknown";
-  const dateFormatter = new Intl.DateTimeFormat();
   const date = new Date(myDate);
-  return dateFormatter.format(date);
+  return DATE_FORMATTER.format(date);
 };
 
 /**
@@ -41,9 +41,7 @@ export const today = new Date().toISOString().split("T")[0];
  * @param date - Date object or ISO date string
  * @returns "yyyy-MM-dd" string, or today if invalid
  */
-export const toDateInputValue = (
-  date: Date | string | null | undefined
-): string => {
+export const toDateInputValue = (date: Maybe<Date | string>): string => {
   if (date == null) return today;
   const d = typeof date === "string" ? new Date(date) : date;
   if (Number.isNaN(d.getTime())) return today;

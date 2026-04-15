@@ -17,6 +17,7 @@ import {
   invoiceInsertSchema,
   invoiceSelectSchema,
   invoiceUpdateSchema,
+  lineItemEditRowSchema,
   lineItemInsertSchema,
   lineItemSelectSchema,
 } from "$lib/validators";
@@ -218,6 +219,46 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           auth: true,
           response: {
             200: lineItemSelectSchema.array(),
+            401: apiErrorBodySchema,
+            404: apiErrorBodySchema,
+            500: apiErrorBodySchema,
+          },
+        }
+      )
+      // GET /api/invoices/:id/line-items/edit — id, description, quantity, amount only
+      .get(
+        "/edit",
+        async ({ params: { id }, user }) => {
+          try {
+            const invoice = await db.query.invoices.findFirst({
+              where: { id: { eq: id }, userId: { eq: user.id } },
+            });
+            if (!invoice) {
+              return status(404, { message: "Invoice not found" });
+            }
+            const rows = await db.query.lineItems.findMany({
+              where: {
+                invoiceId: { eq: id },
+                userId: { eq: user.id },
+              },
+              columns: {
+                id: true,
+                description: true,
+                quantity: true,
+                amount: true,
+              },
+            });
+            return rows;
+          } catch (error) {
+            console.error("Error loading line items for edit:", error);
+            return status(500, { message: "Failed to load line items" });
+          }
+        },
+        {
+          params: idResponseSchema,
+          auth: true,
+          response: {
+            200: lineItemEditRowSchema.array(),
             401: apiErrorBodySchema,
             404: apiErrorBodySchema,
             500: apiErrorBodySchema,

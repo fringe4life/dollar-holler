@@ -12,7 +12,6 @@
   } = $props();
 </script>
 
-<!-- style={`--arrow-right: url('${asset("/images/arrow-right-up.svg")}')`} -->
 <div class="mbs-20 lg:-mbs-14">
   <div
     class="ms-2 mbe-10 bg-(--arrow-right) bg-no-repeat ps-28 pbs-14"

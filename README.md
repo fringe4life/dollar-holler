@@ -33,7 +33,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 
    The app reads secrets via SvelteKit’s `$env/static/private` and `$env/static/public` (for example `DATABASE_URL` in [`src/lib/db/index.ts`](./src/lib/db/index.ts)).
 
-3. **Set up the database:** Drizzle Kit reads `DATABASE_URL` from the environment (`drizzle.config.ts` points at `./src/lib/db/schema.ts` and writes migrations under `./src/lib/db/migrations`).
+3. **Set up the database:** The `bun run db:*` scripts wrap Drizzle Kit with `varlock run` so `DATABASE_URL` is resolved the same way as the app (see `.env.schema`). `drizzle.config.ts` points at `./src/lib/db/schema.ts` and writes migrations under `./src/lib/db/migrations`.
 
    ```bash
    # Generate migrations
@@ -104,6 +104,7 @@ src/
 │   ├── db/
 │   │   ├── index.ts         # Database connection (Neon serverless WebSocket pool)
 │   │   ├── schema.ts        # Drizzle tables and enums
+│   │   ├── types.ts         # Enum-derived types (e.g. client/invoice status)
 │   │   ├── relations.ts     # Drizzle relations v2 (`defineRelations`)
 │   │   ├── seed.ts          # Database seeding
 │   │   ├── clear-app-data.ts

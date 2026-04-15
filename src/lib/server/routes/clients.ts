@@ -190,7 +190,6 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
           .update(clientsTable)
           .set({
             clientStatus: body.clientStatus,
-            updatedAt: new Date(),
           })
           .where(and(eq(clientsTable.id, id), eq(clientsTable.userId, user.id)))
           .returning({
@@ -202,6 +201,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         if (!updated) {
           return status(404, { message: "Client not found" });
         }
+
         return updated;
       } catch (error) {
         console.error("Error updating client status:", error);

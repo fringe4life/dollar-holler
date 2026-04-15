@@ -1,35 +1,26 @@
-import type { LineItem } from "$lib/db/schema";
 import type { BitsButton, CursorId, List } from "$lib/types";
 import type {
+  lineItemEditRowSchema,
   lineItemInsertSchema,
   lineItemSelectSchema,
+  lineItemUpdateSchema,
 } from "$lib/validators";
 import type { InvoiceSelect } from "../invoices/types";
 
 export type LineItemInsert = typeof lineItemInsertSchema.infer;
+export type LineItemEditRow = typeof lineItemEditRowSchema.infer;
 export type LineItemSelect = typeof lineItemSelectSchema.infer;
-// export type LineItemUpdate = typeof lineItemUpdateSchema.infer;
+export type LineItemUpdate = Omit<typeof lineItemUpdateSchema.infer, "id">;
 
 /** Used by LineItemRows / LineItemRow (including public invoice view). */
 export type LineItemsSectionMode = "edit" | "create" | "view";
-
-/** Fields editable from line-item rows before save. */
-export type LineItemUpdate = Partial<
-  Pick<LineItem, "description" | "quantity" | "amount">
->;
 
 export type UIKey = number;
 
 export type Key = UIKey | CursorId;
 
-export type NewLineItemWithId = Omit<LineItem, "id" | "invoiceId"> & {
+export type NewLineItemWithId = Omit<LineItemInsert, "id"> & {
   id: Key;
-  invoiceId?: CursorId;
-};
-
-export type NormalizedLineItem = Omit<LineItem, "id" | "invoiceId"> & {
-  invoiceId?: CursorId;
-  id: undefined | CursorId;
 };
 
 type InvoiceFormPanel = {
@@ -51,13 +42,13 @@ export type InvoiceFormProps = InvoiceFormEditProps | InvoiceFormCreateProps;
 /** Line-item table: view mode has no mutation callbacks. */
 export type LineItemRowsViewProps = {
   mode: "view";
-  lineItems: List<LineItem>;
+  lineItems: List<LineItemEditRow>;
   discount: number;
 };
 
 export type LineItemRowsEditProps = {
   mode: "edit" | "create";
-  lineItems: List<LineItem | NewLineItemWithId>;
+  lineItems: List<LineItemEditRow | NewLineItemWithId>;
   discount: number;
   updateLineItem: (id: Key, patch: LineItemUpdate) => void;
   setDiscount: (value: number) => void;
@@ -68,7 +59,7 @@ export type LineItemRowsEditProps = {
 export type LineItemRowsProps = LineItemRowsViewProps | LineItemRowsEditProps;
 
 type LineItemRowBase = {
-  lineItem: LineItem | NewLineItemWithId;
+  lineItem: LineItemEditRow | NewLineItemWithId;
   canDelete: boolean;
   isRequired: boolean;
 };

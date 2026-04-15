@@ -1,11 +1,10 @@
 import { client } from "$lib/client";
-import type { LineItem } from "$lib/db/schema";
 import type {
   Key,
-  LineItemUpdate,
+  LineItemInsert,
   NewLineItemWithId,
-  NormalizedLineItem,
 } from "$lib/features/line-items/types";
+import { StoreResourceErrorBase } from "$lib/stores/store-resource-error-base.svelte";
 import type { CursorId, List } from "$lib/types";
 import {
   StoreOperation,
@@ -14,23 +13,11 @@ import {
 } from "$lib/utils/error-message";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import { toast } from "svelte-sonner";
-import { StoreResourceErrorBase } from "../../../stores/store-resource-error-base.svelte";
-import type { LineItemSelect } from "../types";
+import type { LineItemEditRow } from "../types";
 
-export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
+export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
   protected readonly resourceSingular = "line item";
   protected readonly resourcePlural = "line items";
-  /** Immutable update of one row in a local line-items array (e.g. InvoiceForm). */
-  patchLineItem(
-    items: Array<LineItem | NewLineItemWithId>,
-    id: CursorId | number,
-    patch: LineItemUpdate
-  ): Array<LineItem | NewLineItemWithId> {
-    return items.map((item) => {
-      if (item.id !== id) return item;
-      return { ...item, ...patch, updatedAt: new Date() };
-    });
-  }
 
   /** Line amount from quantity × unit price. */
   amountFromUnitPrice(quantity: number, unitPrice: number): number {
@@ -38,21 +25,10 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
   }
 
   /** Returns a blank LineItem for form rows (new id and timestamps each call). */
-  newLineItem({
-    id,
-    invoiceId,
-  }: {
-    id: number;
-    invoiceId?: CursorId;
-  }): NewLineItemWithId {
-    const now = new Date();
+  newLineItem({ id }: { id: number }): NewLineItemWithId {
     return {
       id,
-      createdAt: now,
-      updatedAt: now,
-      userId: "",
       description: "",
-      invoiceId,
       quantity: 0,
       amount: 0,
     };
@@ -62,7 +38,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
   async loadLineItemsByInvoiceId(
     invoiceId: string,
     options?: { signal?: AbortSignal }
-  ): Promise<List<LineItemSelect>> {
+  ): Promise<List<LineItemEditRow>> {
     this.loading = true;
     this.error = null;
     const fallback = this.fallbackFor(StoreOperation.loadMany);
@@ -72,7 +48,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
           .invoices({ id: invoiceId })
           [
             "line-items"
-          ].get(options?.signal ? { fetch: { signal: options.signal } } : undefined),
+          ].edit.get(options?.signal ? { fetch: { signal: options.signal } } : undefined),
         { fallbackMessage: fallback }
       );
     } catch (err) {
@@ -89,16 +65,14 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
   }
 
   normalizeLineItems(
-    items: Array<LineItem | NewLineItemWithId>,
-    invoiceId: CursorId
-  ): Array<NormalizedLineItem> {
+    items: Array<LineItemEditRow | NewLineItemWithId>
+  ): Array<LineItemInsert> {
     if (items.length === 0) return [];
-    return items.reduce<Array<NormalizedLineItem>>((acc, item) => {
+    return items.reduce<Array<LineItemInsert>>((acc, item) => {
       if ((item.description?.trim() ?? "").length > 0) {
         acc.push({
           ...item,
           id: typeof item.id === "number" ? undefined : item.id,
-          invoiceId,
         });
       }
       return acc;
@@ -107,17 +81,14 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
   // Create line items for an invoice
   async createLineItems(
     invoiceId: CursorId,
-    items: Array<NormalizedLineItem>
-  ): Promise<List<LineItemSelect>> {
+    items: Array<LineItemInsert>
+  ): Promise<List<LineItemEditRow>> {
     const fallback = this.fallbackFor(StoreOperation.createMany);
-    const body = items.map((item) => ({
-      ...item,
-      invoiceId,
-    }));
+
     try {
       const lineItemsData = await unwrapTreaty(
         client.api.invoices({ id: invoiceId })["line-items"].post({
-          lineItems: body,
+          lineItems: items,
         }),
         { fallbackMessage: fallback }
       );
@@ -135,8 +106,8 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemSelect> {
   // Update line items for an invoice (replace all)
   async updateLineItems(
     invoiceId: CursorId,
-    items: Array<NormalizedLineItem>
-  ): Promise<List<LineItemSelect>> {
+    items: Array<LineItemInsert>
+  ): Promise<List<LineItemEditRow>> {
     const fallback = this.fallbackFor(StoreOperation.updateMany);
     try {
       const lineItemsData = await unwrapTreaty(

@@ -3,16 +3,16 @@
   import Trash from "$lib/components/icons/Trash.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import type { Client, NewClient } from "$lib/db/schema";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { FormEventHandler } from "svelte/elements";
+  import type { ClientInsert, ClientSelect } from "../types";
 
   type Panel = {
     closePanel: () => void;
   };
 
   type EditProps = {
-    edit: Client;
+    edit: ClientSelect;
     formState: "edit";
   } & Panel;
 
@@ -28,7 +28,7 @@
   const { clients: clientsStore } = getDashboardStores();
 
   // Form data using NewClient type
-  let client: NewClient = $state(clientsStore.newClient());
+  let client: ClientInsert = $state(clientsStore.newClient());
 
   // Initialize form data based on edit mode
   // svelte-ignore state_referenced_locally
@@ -42,7 +42,7 @@
     e.preventDefault();
 
     if (formState === "edit" && edit) {
-      const { id: _id, userId: _userId, ...patch } = client;
+      const { id: _id, ...patch } = client;
       await clientsStore.updateClient(edit.id, patch);
     } else {
       await clientsStore.createClient(client);

@@ -14,16 +14,17 @@ export const clientListRowSchema = clientSelectSchema.merge({
   balance: "number",
 });
 
+export const clientPickerOptionSchema = type({
+  id: cursorSchema,
+  name: "string",
+});
+
 export const clientPaginatedListSchema = paginationSchema(clientListRowSchema);
 export const clientPickerOptionsResponseSchema = type({
-  options: type({
-    id: cursorSchema,
-    name: "string",
-  }).array(),
+  options: clientPickerOptionSchema.array(),
 });
 /** PATCH /clients/:id status-only response shape. */
 export const clientStatusPatchResponseSchema = type({
   id: cursorSchema,
-  clientStatus: "'active' | 'archive' | null",
   updatedAt: "Date",
-});
+}).merge(clientStatusSchema);

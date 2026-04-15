@@ -3,10 +3,13 @@
   import Trash from "$lib/components/icons/Trash.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import type { LineItem, NewClient } from "$lib/db/schema";
+  import type { ClientInsert } from "$lib/features/clients/types";
+  import LineItemRows from "$lib/features/line-items/components/LineItemRows.svelte";
+  import LineItemSkeleton from "$lib/features/line-items/components/LineItemSkeleton.svelte";
   import type {
     InvoiceFormProps,
     Key,
+    LineItemEditRow,
     LineItemUpdate,
     NewLineItemWithId,
   } from "$lib/features/line-items/types";
@@ -21,15 +24,13 @@
   import { toast } from "svelte-sonner";
   import type { FormEventHandler } from "svelte/elements";
   import { slide } from "svelte/transition";
-  import LineItemRows from "../../line-items/components/LineItemRows.svelte";
-  import LineItemSkeleton from "../../line-items/components/LineItemSkeleton.svelte";
   import {
     computeInvoicePatchDelta,
     pickInvoicePatchSnapshot,
     serializedNormalizedLineItemsForCompare,
     type InvoicePatchSnapshot,
   } from "../invoice-diff";
-  import type { InvoiceListResponse, NewInvoice } from "../types";
+  import type { InvoiceDeleteConfirmItem, NewInvoice } from "../types";
 
   let {
     mode = "create",
@@ -48,14 +49,12 @@
 
   const counter = new Counter();
 
-  let lineItems: Array<NewLineItemWithId | LineItem> = $state([
+  let lineItems: Array<NewLineItemWithId | LineItemEditRow> = $state([
     lineItemsStore.newLineItem({
       id: counter.increment(),
-      invoiceId: invoice.id,
     }),
   ]);
   let lineItemsLoaded = $state(true);
-  let discount = $state<number>(0);
 
   /** Edit mode: last saved header snapshot for PATCH deltas. */
   let baselineInvoiceSnapshot: InvoicePatchSnapshot | null = null;
@@ -93,7 +92,6 @@
           lineItems = [
             lineItemsStore.newLineItem({
               id: counter?.increment(),
-              invoiceId: invoice.id,
             }),
           ];
         }
@@ -101,7 +99,7 @@
 
         baselineInvoiceSnapshot = pickInvoicePatchSnapshot(invoiceEdit);
         baselineLineItemsSnapshot = serializedNormalizedLineItemsForCompare(
-          lineItemsStore.normalizeLineItems(lineItems, invoiceEdit.id)
+          lineItemsStore.normalizeLineItems(lineItems)
         );
       }
     }
@@ -117,36 +115,38 @@
   });
 
   const addLineItem: BitsButton = () => {
-    lineItems = [
-      ...lineItems,
+    lineItems.push(
       lineItemsStore.newLineItem({
         id: counter.increment(),
-        invoiceId: invoice.id,
-      }),
-    ];
+      })
+    );
   };
 
   const removeLineItem = (id: Key) => {
-    lineItems = lineItems.filter((lineItem) => lineItem.id !== id);
+    const index = lineItems.findIndex((lineItem) => lineItem.id === id);
+    if (index !== -1) lineItems.splice(index, 1);
   };
 
   const updateLineItem = (id: Key, patch: LineItemUpdate) => {
-    lineItems = lineItemsStore.patchLineItem(lineItems, id, patch);
+    const index = lineItems.findIndex((lineItem) => lineItem.id === id);
+    if (index !== -1) lineItems[index] = { ...lineItems[index], ...patch };
   };
 
   const setDiscount = (value: number) => {
-    discount = value;
+    invoice = { ...invoice, discount: value };
   };
 
   let isNewClient = $state<boolean>(false);
 
-  let newClient: NewClient = $state(clientsStore.newClient());
+  let newClient: ClientInsert = $state(clientsStore.newClient());
 
   const clientName = $derived(
     clientsStore.clientPickerOptions.find((c) => c.id === invoice.clientId)
       ?.name ?? "Unknown"
   );
-  const totalDisplay = $derived(formatTotal(sumLineItems(lineItems), discount));
+  const totalDisplay = $derived(
+    formatTotal(sumLineItems(lineItems), invoice.discount)
+  );
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
@@ -197,10 +197,8 @@
         currentSnapshot
       );
       // Line items: normalize for API shape, then stable JSON string for equality with baseline.
-      const normalizedLineItemsNow = lineItemsStore.normalizeLineItems(
-        lineItems,
-        invoice.id
-      );
+      const normalizedLineItemsNow =
+        lineItemsStore.normalizeLineItems(lineItems);
       const lineItemsSnap = serializedNormalizedLineItemsForCompare(
         normalizedLineItemsNow
       );
@@ -246,10 +244,7 @@
       return;
     }
     // --- Line items: normalize for API shape, then POST (nested resource) ---
-    const normalizedLineItems = lineItemsStore.normalizeLineItems(
-      lineItems,
-      invoiceId
-    );
+    const normalizedLineItems = lineItemsStore.normalizeLineItems(lineItems);
 
     // POST line items only if there are any (empty array is valid for API).
     if (normalizedLineItems.length > 0) {
@@ -259,10 +254,6 @@
     closePanel();
   };
 
-  type InvoiceDeleteConfirmItem = Pick<
-    InvoiceListResponse,
-    "id" | "name" | "total"
-  >;
   const deleteModal = new ItemPanel<InvoiceDeleteConfirmItem>();
 </script>
 
@@ -408,7 +399,7 @@
       <LineItemRows
         {mode}
         {lineItems}
-        {discount}
+        discount={invoice.discount}
         {updateLineItem}
         {setDiscount}
         {addLineItem}

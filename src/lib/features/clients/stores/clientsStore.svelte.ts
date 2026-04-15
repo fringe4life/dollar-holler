@@ -1,5 +1,5 @@
 import { client } from "$lib/client";
-import type { ClientStatus } from "$lib/db/schema";
+import type { ClientStatus } from "$lib/db/types";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
@@ -8,10 +8,7 @@ import {
   getErrorMessage,
   isAbortError,
 } from "$lib/utils/error-message";
-import {
-  normalizeToNull,
-  transformNullToUndefined,
-} from "$lib/utils/typeHelpers";
+import { transformNullToUndefined } from "$lib/utils/typeHelpers";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import { toast } from "svelte-sonner";
 import type {
@@ -38,7 +35,6 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
       street: "",
       zip: "",
       clientStatus: "active",
-      userId: "",
     };
   }
 
@@ -123,19 +119,19 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
 
   async updateClientStatus(clientId: CursorId, clientStatus: ClientStatus) {
     try {
-      const data = await unwrapTreaty(
+      const { id, ...rest } = await unwrapTreaty(
         client.api.clients({ id: clientId }).patch({ clientStatus }),
         { fallbackMessage: "Failed to update client status" }
       );
 
       const index = this.items.findIndex((c) => c.id === clientId);
       if (index !== -1) {
-        const status = normalizeToNull(data.clientStatus) ?? clientStatus;
         this.items[index] = {
           ...this.items[index],
-          clientStatus: status,
-          updatedAt: new Date(data.updatedAt),
+          ...rest,
         };
+      } else {
+        throw new Error("Client not found");
       }
 
       toast.success("Client updated successfully");

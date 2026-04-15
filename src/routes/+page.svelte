@@ -171,21 +171,6 @@
 
       <!-- Right: Mock Invoice Card -->
       <div class="relative flex justify-center lg:justify-end">
-        <!-- Floating badge: Payment -->
-        <div
-          class="absolute -inset-s-4 -inset-bs-6 z-10 flex items-center gap-2 rounded-xl bg-white px-4 py-2.5 shadow-lg lg:-inset-s-8"
-        >
-          <div
-            class="flex aspect-square items-center justify-center rounded-full bg-green-100 text-sm inline-8"
-          >
-            💰
-          </div>
-          <div>
-            <p class="text-xs font-semibold text-green-700">Payment Received</p>
-            <p class="text-xs text-green-600">$4,200.00</p>
-          </div>
-        </div>
-
         <!-- Floating badge: Rating -->
         <div
           class="bg-goldenFizz/90 absolute inset-e-0 -inset-be-4 z-10 flex items-center gap-2 rounded-xl px-4 py-2.5 shadow-lg lg:-inset-e-4"
@@ -196,9 +181,25 @@
 
         <!-- Mock Invoice Card -->
         <div
-          class="bg-whisper rounded-2xl border border-gray-200 shadow-2xl inline-full max-inline-md"
+          class="bg-whisper relative rounded-2xl border border-gray-200 shadow-2xl inline-full max-inline-md"
           style="box-shadow: 0 25px 60px oklch(38.26% 0.202 288.17 / 0.18), 0 8px 20px oklch(0% 0 0 / 0.08);"
         >
+          <!-- Floating badge: Payment -->
+          <div
+            class="absolute inset-s-1/2 -inset-bs-6 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-white px-4 py-2.5 shadow-lg"
+          >
+            <div
+              class="flex aspect-square items-center justify-center rounded-full bg-green-100 text-sm inline-8"
+            >
+              💰
+            </div>
+            <div>
+              <p class="text-xs font-semibold text-green-700">
+                Payment Received
+              </p>
+              <p class="text-xs text-green-600">$4,200.00</p>
+            </div>
+          </div>
           <!-- Invoice Header -->
           <div class="bg-daisyBush rounded-t-2xl px-6 py-4">
             <div class="flex items-center justify-between">
@@ -319,11 +320,11 @@
 
       <!-- Feature Cards Grid -->
       <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {#each features as feature}
+        {#each features as feature (feature.title)}
           {@const Icon = feature.icon}
           <div
             class={[
-              "group after:rounded-inherit after:ease-glide supports-linear:ease-anticipate flex flex-col gap-4 rounded-2xl border p-6 transition-[translate] duration-200 after:absolute  after:inset-0 after:opacity-0 after:shadow-lg after:transition-opacity after:duration-200 hover:-translate-y-1 hover:after:opacity-100",
+              "group after:ease-glide supports-linear:ease-anticipate relative flex flex-col gap-4 rounded-2xl border p-6 transition-[translate] duration-200 after:absolute after:inset-0  after:rounded-[inherit] after:opacity-0 after:shadow-lg after:transition-opacity after:duration-200 hover:-translate-y-1 hover:after:opacity-100",
               feature.accent,
               feature.border,
             ].join(" ")}

@@ -1,15 +1,17 @@
-import type { LineItem } from "$lib/db/schema";
 import type { InvoiceSelect } from "$lib/features/invoices/types";
-import type { NewLineItemWithId } from "$lib/features/line-items/types";
+import type {
+  LineItemEditRow,
+  NewLineItemWithId,
+} from "$lib/features/line-items/types";
 import type { List, Maybe } from "$lib/types";
 
 /**
  * @abstract calculates the cost of a part of the invoice
- * @param {List<LineItem>} lineItems found on Invoices
+ * @param {List<LineItemEditRow>} lineItems found on Invoices
  * @returns {number} the sum cost of the invoice
  */
 export const sumLineItems = (
-  lineItems: List<LineItem | NewLineItemWithId>
+  lineItems: List<LineItemEditRow | NewLineItemWithId>
 ): number => {
   if (!lineItems) return 0;
 
@@ -68,7 +70,7 @@ export const dollarsToCents = (dollars: number): number => {
  * @returns {number} total in cents
  */
 export const getTotal = (
-  invoice: Maybe<InvoiceSelect & { lineItems?: List<LineItem> }>
+  invoice: Maybe<InvoiceSelect & { lineItems?: List<LineItemEditRow> }>
 ): number => {
   if (!invoice) {
     return 0;

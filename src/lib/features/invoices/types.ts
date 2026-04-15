@@ -1,25 +1,29 @@
-import type { CursorId, Total } from "$lib/types";
+import type { CursorId } from "$lib/types";
 import type {
   invoiceInsertSchema,
   invoiceSelectSchema,
   invoiceUpdateSchema,
 } from "$lib/validators";
-import type { ClientSelect } from "../clients/types";
+import type { invoiceListRowSchema } from "./schemas";
 
 export type InvoiceInsert = typeof invoiceInsertSchema.infer;
 export type InvoiceSelect = typeof invoiceSelectSchema.infer;
 export type InvoiceUpdate = typeof invoiceUpdateSchema.infer;
 
 // List view: only what InvoiceRow needs (client name + total)
-export type InvoiceListResponse = InvoiceSelect &
-  Pick<ClientSelect, "name"> &
-  Total;
+export type InvoiceListResponse = typeof invoiceListRowSchema.infer;
 
 export type NewInvoice = Omit<
   InvoiceInsert,
-  "clientId" | "updatedAt" | "createdAt" | "issueDate" | "dueDate"
+  "clientId" | "issueDate" | "dueDate" | "discount"
 > & {
   clientId: CursorId | undefined;
   issueDate: string;
   dueDate: string;
+  discount: number;
 };
+
+export type InvoiceDeleteConfirmItem = Pick<
+  InvoiceListResponse,
+  "id" | "name" | "total"
+>;

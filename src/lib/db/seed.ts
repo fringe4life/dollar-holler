@@ -1,17 +1,14 @@
+import type { ClientInsert, ClientSelect } from "$lib/features/clients/types";
+import type { InvoiceInsert } from "$lib/features/invoices/types";
+import type { LineItemInsert } from "$lib/features/line-items/types";
 import { createId } from "$lib/features/pagination/utils/create-uuidv7";
+import type { SettingsInsert } from "$lib/features/settings/types";
+import type { CursorId } from "$lib/types";
 import { neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { tableRelations } from "./relations";
-import type {
-  Client,
-  ClientStatus,
-  InvoiceStatus,
-  NewClient,
-  NewInvoice,
-  NewLineItem,
-  NewSettings,
-} from "./schema";
 import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
+import type { ClientStatus, InvoiceStatus } from "./types";
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 // Create the Pool client (WebSocket-based for transaction support)
 const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
@@ -69,23 +66,25 @@ async function main() {
   await db.delete(settings);
 
   // 3) Create settings for each user
-  const settingsData: NewSettings[] = users.map((u) => ({
-    userId: u.id,
-    myName: `${u.name || u.email}`,
-    email: u.email,
-    street: `${Math.floor(Math.random() * 9999) + 1} Main Street`,
-    city: ["Coolville", "Tech City", "Dev Town", "Code Springs"][
-      Math.floor(Math.random() * 4)
-    ],
-    state: ["TN", "CA", "NY", "TX"][Math.floor(Math.random() * 4)],
-    zip: `${Math.floor(Math.random() * 90000) + 10000}`,
-  }));
+  const settingsData: Array<SettingsInsert & { userId: string }> = users.map(
+    (u) => ({
+      userId: u.id,
+      myName: `${u.name || u.email}`,
+      email: u.email,
+      street: `${Math.floor(Math.random() * 9999) + 1} Main Street`,
+      city: ["Coolville", "Tech City", "Dev Town", "Code Springs"][
+        Math.floor(Math.random() * 4)
+      ],
+      state: ["TN", "CA", "NY", "TX"][Math.floor(Math.random() * 4)],
+      zip: `${Math.floor(Math.random() * 90000) + 10000}`,
+    })
+  );
 
   await db.insert(settings).values(settingsData);
   console.log(`✅ Created settings for ${settingsData.length} users`);
 
   // 4) Each user gets one client per *other* user (contact = that user’s settings)
-  const clientsData: NewClient[] = [];
+  const clientsData: Array<ClientInsert & { userId: string }> = [];
   for (let i = 0; i < users.length; i++) {
     const u = users[i];
     for (let j = 0; j < users.length; j++) {
@@ -132,10 +131,12 @@ async function main() {
     "Training workshop",
   ];
 
-  const invoicesData: NewInvoice[] = [];
-  const lineItemsData: NewLineItem[] = [];
+  const invoicesData: Array<InvoiceInsert & { userId: string }> = [];
+  const lineItemsData: Array<
+    LineItemInsert & { userId: string; invoiceId: CursorId }
+  > = [];
 
-  const clientsByUserId = new Map<string, Client[]>();
+  const clientsByUserId = new Map<string, ClientSelect[]>();
   for (const client of insertedClients) {
     const list = clientsByUserId.get(client.userId) ?? [];
     list.push(client);

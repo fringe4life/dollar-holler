@@ -140,7 +140,7 @@ export const clients = pgTable("clients", {
   city: varchar("city", { length: 255 }).notNull(),
   state: varchar("state", { length: 255 }).notNull(),
   zip: varchar("zip", { length: 255 }).notNull(),
-  clientStatus: clientStatusEnum("client_status").default("active"),
+  clientStatus: clientStatusEnum("client_status").default("active").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -228,18 +228,3 @@ export const schemaTables = {
   lineItems,
   settings,
 };
-
-export type ClientStatus = (typeof clientStatusEnum.enumValues)[number];
-export type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number];
-
-// Export types for use in the application
-export type User = typeof user.$inferSelect;
-export type NewUser = typeof user.$inferInsert;
-export type Client = typeof clients.$inferSelect;
-export type NewClient = typeof clients.$inferInsert;
-export type Invoice = typeof invoices.$inferSelect;
-export type NewInvoice = typeof invoices.$inferInsert;
-export type LineItem = typeof lineItems.$inferSelect;
-export type NewLineItem = typeof lineItems.$inferInsert;
-export type Settings = typeof settings.$inferSelect;
-export type NewSettings = typeof settings.$inferInsert;

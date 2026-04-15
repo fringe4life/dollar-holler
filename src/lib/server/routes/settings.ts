@@ -92,6 +92,9 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
             userId: user.id,
           })
           .returning();
+        if (!created) {
+          throw new Error("Failed to create settings");
+        }
         return created;
       } catch (error) {
         console.error("Error creating settings:", error);

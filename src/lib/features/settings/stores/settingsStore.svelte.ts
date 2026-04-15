@@ -9,22 +9,18 @@ import type { SettingsInsert, SettingsSelect, SettingsUpdate } from "../types";
 export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
   /** Single loaded row (settings are one row per user). */
   get settings(): Maybe<SettingsSelect> {
-    return this.items[0];
+    return this.items.at(0);
   }
 
   /** Returns a blank Settings for forms (before load or when no settings exist). */
   newSettings(): SettingsSelect {
-    const now = new Date();
     return {
-      userId: "",
       myName: "",
       email: "",
       street: "",
       city: "",
       state: "",
       zip: "",
-      createdAt: now,
-      updatedAt: now,
     };
   }
 

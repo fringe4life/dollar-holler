@@ -46,7 +46,7 @@
       return;
     }
 
-    if (baselineInvoiceDetails === null) {
+    if (!baselineInvoiceDetails) {
       baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
     }
 

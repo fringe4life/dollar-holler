@@ -1,4 +1,4 @@
-import type { NormalizedLineItem } from "$lib/features/line-items/types";
+import type { LineItemInsert } from "$lib/features/line-items/types";
 import { stripNullishEntries } from "$lib/utils/strip-nullish-entries";
 import type { InvoiceInsert, InvoiceSelect, InvoiceUpdate } from "./types";
 
@@ -79,7 +79,7 @@ export const computeInvoicePatchDelta = (
 
 /** Stable serialization for comparing normalized line-item payloads (edit flow). */
 export const serializedNormalizedLineItemsForCompare = (
-  items: NormalizedLineItem[]
+  items: LineItemInsert[]
 ): string => {
   const rows = items
     .map((item) => ({

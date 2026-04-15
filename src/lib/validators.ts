@@ -25,27 +25,62 @@ const invoiceDateRefinement = {
 } as const;
 
 // Business logic schemas
-export const clientInsertSchema = createInsertSchema(clients);
-export const clientSelectSchema = createSelectSchema(clients);
-export const clientUpdateSchema = createUpdateSchema(clients);
+export const clientInsertSchema = createInsertSchema(clients).omit(
+  "createdAt",
+  "updatedAt",
+  "userId"
+);
+export const clientSelectSchema = createSelectSchema(clients).omit("userId");
+export const clientUpdateSchema = createUpdateSchema(clients).omit(
+  "createdAt",
+  "updatedAt",
+  "userId"
+);
 
 export const invoiceInsertSchema = createInsertSchema(
   invoices,
   invoiceDateRefinement
 ).omit("userId", "createdAt", "updatedAt");
-export const invoiceSelectSchema = createSelectSchema(invoices);
+export const invoiceSelectSchema = createSelectSchema(invoices).omit("userId");
 export const invoiceUpdateSchema = createUpdateSchema(
   invoices,
   invoiceDateRefinement
-);
+).omit("createdAt", "updatedAt", "userId");
 
 export const lineItemInsertSchema = createInsertSchema(lineItems).omit(
   "invoiceId",
+  "userId",
+  "createdAt",
+  "updatedAt"
+);
+export const lineItemSelectSchema = createSelectSchema(lineItems).omit(
+  "userId",
+  "invoiceId"
+);
+/** Invoice edit form / GET .../line-items/edit — no timestamps on the wire. */
+export const lineItemEditRowSchema = lineItemSelectSchema.omit(
+  "createdAt",
+  "updatedAt"
+);
+export const lineItemUpdateSchema = createUpdateSchema(lineItems).omit(
+  "createdAt",
+  "updatedAt",
+  "userId",
+  "invoiceId"
+);
+
+export const settingsInsertSchema = createInsertSchema(settings).omit(
+  "createdAt",
+  "updatedAt",
   "userId"
 );
-export const lineItemSelectSchema = createSelectSchema(lineItems);
-export const lineItemUpdateSchema = createUpdateSchema(lineItems);
-
-export const settingsInsertSchema = createInsertSchema(settings);
-export const settingsSelectSchema = createSelectSchema(settings);
-export const settingsUpdateSchema = createUpdateSchema(settings);
+export const settingsSelectSchema = createSelectSchema(settings).omit(
+  "userId",
+  "updatedAt",
+  "createdAt"
+);
+export const settingsUpdateSchema = createUpdateSchema(settings).omit(
+  "createdAt",
+  "updatedAt",
+  "userId"
+);

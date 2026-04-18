@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "bun --bun run build",
+  "buildCommand": "varlock run -- bun --bun run build",
   "installCommand": "bun install",
   "framework": "sveltekit",
   "git": {

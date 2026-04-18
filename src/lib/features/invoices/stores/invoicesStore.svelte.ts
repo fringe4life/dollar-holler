@@ -1,4 +1,4 @@
-import { client } from "$lib/client";
+import { apiClient } from "$lib/api";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
@@ -41,7 +41,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
     signal: AbortSignal
   ): Promise<CursorPaginatedList<InvoiceListResponse>> {
     return unwrapTreatyResult(
-      await client.api.invoices.get({
+      await apiClient.invoices.get({
         query,
         fetch: { signal },
       }),
@@ -52,7 +52,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
   async loadInvoiceById(id: string): Promise<Maybe<InvoiceSelect>> {
     const fallback = this.fallbackFor(StoreOperation.loadOne);
     try {
-      return await unwrapTreaty(client.api.invoices({ id }).get(), {
+      return await unwrapTreaty(apiClient.invoices({ id }).get(), {
         fallbackMessage: fallback,
       });
     } catch (error) {
@@ -69,7 +69,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
   async deleteInvoice(invoiceId: string) {
     const fallback = this.fallbackFor(StoreOperation.deleteOne);
     try {
-      await unwrapTreaty(client.api.invoices({ id: invoiceId }).delete(), {
+      await unwrapTreaty(apiClient.invoices({ id: invoiceId }).delete(), {
         fallbackMessage: fallback,
       });
 
@@ -91,7 +91,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
   ): Promise<Maybe<CursorId>> {
     try {
       const responseData = await unwrapTreaty(
-        client.api.invoices({ id }).patch(patch),
+        apiClient.invoices({ id }).patch(patch),
         { fallbackMessage: this.fallbackFor(StoreOperation.updateOne) }
       );
       toast.success("Invoice updated successfully");
@@ -118,8 +118,10 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
   async createInvoice(invoiceData: InvoiceInsert): Promise<Maybe<CursorId>> {
     try {
       const responseData = await unwrapTreaty(
-        client.api.invoices.post(invoiceData),
-        { fallbackMessage: this.fallbackFor(StoreOperation.createOne) }
+        apiClient.invoices.post(invoiceData),
+        {
+          fallbackMessage: this.fallbackFor(StoreOperation.createOne),
+        }
       );
       toast.success("Invoice created successfully");
       return responseData.id;

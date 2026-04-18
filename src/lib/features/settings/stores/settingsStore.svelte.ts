@@ -1,4 +1,4 @@
-import { client } from "$lib/client";
+import { apiClient } from "$lib/api";
 import { LoadableListStoreBase } from "$lib/stores/loadable-list-store-base.svelte";
 import type { Maybe } from "$lib/types";
 import { getErrorMessage } from "$lib/utils/error-message";
@@ -31,7 +31,7 @@ export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
 
     const loadFallback = "Failed to load settings";
     try {
-      const settingsData = await unwrapTreaty(client.api.settings.get(), {
+      const settingsData = await unwrapTreaty(apiClient.settings.get(), {
         fallbackMessage: loadFallback,
       });
 
@@ -55,7 +55,7 @@ export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
     const updateFallback = "Failed to update settings";
     try {
       const updated = await unwrapTreaty(
-        client.api.settings.patch(settingsToUpdate),
+        apiClient.settings.patch(settingsToUpdate),
         {
           fallbackMessage: updateFallback,
         }
@@ -79,7 +79,7 @@ export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
     const createFallback = "Failed to create settings";
     try {
       const createdSettings = await unwrapTreaty(
-        client.api.settings.post(settingsToCreate),
+        apiClient.settings.post(settingsToCreate),
         {
           fallbackMessage: createFallback,
         }

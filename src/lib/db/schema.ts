@@ -20,7 +20,7 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
   "sent",
   "paid",
 ]);
-
+// better auth tables
 export const user = pgTable("user", {
   id: uuid("id").primaryKey(),
   name: text("name").notNull(),

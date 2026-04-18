@@ -9,9 +9,10 @@ import { drizzle } from "drizzle-orm/neon-serverless";
 import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
+import { ENV } from "varlock/env";
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 // Create the Pool client (WebSocket-based for transaction support)
-const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+const pool = new Pool({ connectionString: ENV.DATABASE_URL });
 
 const db = drizzle({
   client: pool,

@@ -9,7 +9,7 @@ export const paginationMetadataSchema = type({
 /** ArkType rule for UUIDv7-shaped ids (DB row ids and list `cursor` values). */
 export const cursorSchema = type("(string.uuid.v7)").as<CursorId>();
 
-export const listDirectionSchema = type("'forward' | 'backward' | undefined");
+export const listDirectionSchema = type("'forward' | 'backward'");
 
 // Concept: join into one TS-style union string, then pass to type(...)
 const limitUnion = LIMITS.map((n) => `'${n}'`).join(

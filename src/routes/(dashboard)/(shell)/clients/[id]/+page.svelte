@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Edit from "$lib/components/icons/Edit.svelte";
-  import ItemsHeader from "$lib/components/items-header.svelte";
+  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";

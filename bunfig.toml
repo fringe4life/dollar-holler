@@ -1,7 +1,6 @@
 [install]
-minimumReleaseAge = 172800
+minimumReleaseAge = 259200
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).
 env = false
-# Load Varlock before other code so `bun` scripts (Drizzle, seeds) resolve env without `varlock run --`.
-preload = ["varlock/auto-load"]
+

@@ -19,7 +19,7 @@ export type CursorListQueryResolved =
 export const resolveCursorListQuery = (
   baseWhere: SQL | undefined,
   cursor: CursorId | undefined,
-  direction: ListDirection,
+  direction: ListDirection | undefined = "forward",
   idColumn: AnyColumn
 ): CursorListQueryResolved => {
   const ws = baseWhere ?? sql`true`;

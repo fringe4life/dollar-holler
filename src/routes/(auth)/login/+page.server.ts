@@ -12,7 +12,9 @@ export const actions: Actions = {
 
     // Validate input with ArkType
     const validationResult = loginSchema(entries);
+    console.log({ validationResult });
     if (validationResult instanceof ArkErrors) {
+      console.log({ validationResult });
       return fail(400, {
         error: validationResult.summary ?? "Invalid input",
         email,
@@ -30,6 +32,7 @@ export const actions: Actions = {
 
       throw redirect(303, "/invoices");
     } catch (error) {
+      console.log({ error });
       if (isRedirect(error)) throw error;
       console.error("Login error:", error);
       return fail(400, { error: "Login failed", email });

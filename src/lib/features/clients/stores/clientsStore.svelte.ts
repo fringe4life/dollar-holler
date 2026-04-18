@@ -1,4 +1,4 @@
-import { client } from "$lib/client";
+import { apiClient } from "$lib/api";
 import type { ClientStatus } from "$lib/db/types";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
@@ -23,7 +23,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   protected readonly resourceSingular = "client";
   protected readonly resourcePlural = "clients";
 
-  /** Id + name for invoice client `<select>` (GET /api/clients/options). */
+  /** Id + name for invoice client `<select>` (GET /clients/options). */
   clientPickerOptions = $state<ClientPickerOption[]>([]);
 
   newClient(): ClientInsert {
@@ -43,7 +43,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
     signal: AbortSignal
   ): Promise<CursorPaginatedList<ClientListResponse>> {
     return unwrapTreatyResult(
-      await client.api.clients.get({
+      await apiClient.clients.get({
         query,
         fetch: { signal },
       }),
@@ -53,7 +53,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
 
   async loadClientPickerOptions(signal?: AbortSignal): Promise<void> {
     const data = await unwrapTreaty(
-      client.api.clients.options.get({
+      apiClient.clients.options.get({
         fetch: signal ? { signal } : undefined,
       }),
       { fallbackMessage: "Failed to load client options" }
@@ -77,7 +77,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   async getClientById(id: string): Promise<Maybe<ClientSelect>> {
     const fallback = this.fallbackFor(StoreOperation.loadOne);
     try {
-      return await unwrapTreaty(client.api.clients({ id }).get(), {
+      return await unwrapTreaty(apiClient.clients({ id }).get(), {
         fallbackMessage: fallback,
       });
     } catch (err) {
@@ -94,7 +94,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   async deleteClient(clientId: string) {
     const fallback = this.fallbackFor(StoreOperation.deleteOne);
     try {
-      unwrapTreatyResult(await client.api.clients({ id: clientId }).delete(), {
+      unwrapTreatyResult(await apiClient.clients({ id: clientId }).delete(), {
         fallbackMessage: fallback,
       });
 
@@ -120,7 +120,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   async updateClientStatus(clientId: CursorId, clientStatus: ClientStatus) {
     try {
       const { id, ...rest } = await unwrapTreaty(
-        client.api.clients({ id: clientId }).patch({ clientStatus }),
+        apiClient.clients({ id: clientId }).patch({ clientStatus }),
         { fallbackMessage: "Failed to update client status" }
       );
 
@@ -148,8 +148,10 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
       const body = transformNullToUndefined(clientData);
       const { id: _omitId, ...insertBody } = body;
       const responseData = await unwrapTreaty(
-        client.api.clients.post(insertBody),
-        { fallbackMessage: this.fallbackFor(StoreOperation.createOne) }
+        apiClient.clients.post(insertBody),
+        {
+          fallbackMessage: this.fallbackFor(StoreOperation.createOne),
+        }
       );
       const id = responseData.id;
       if (!id) {
@@ -185,8 +187,10 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
     try {
       const body = transformNullToUndefined(patch);
       const responseData = await unwrapTreaty(
-        client.api.clients({ id }).put(body),
-        { fallbackMessage: this.fallbackFor(StoreOperation.updateOne) }
+        apiClient.clients({ id }).put(body),
+        {
+          fallbackMessage: this.fallbackFor(StoreOperation.updateOne),
+        }
       );
       const index = this.items.findIndex((c) => c.id === responseData.id);
       if (index !== -1) {

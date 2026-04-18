@@ -10,6 +10,7 @@ export const actions: Actions = {
     const validationResult = signupSchema(
       Object.fromEntries(formData.entries())
     );
+    console.log({ validationResult });
     if (validationResult instanceof ArkErrors) {
       return fail(400, { error: validationResult.summary ?? "Invalid input" });
     }
@@ -31,6 +32,7 @@ export const actions: Actions = {
       }
       throw redirect(303, "/login");
     } catch (error) {
+      console.log({ error });
       if (isRedirect(error)) throw error;
       return fail(400, { error: "Signup failed" });
     }

@@ -6,7 +6,7 @@
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
-  import ItemsHeader from "$lib/components/items-header.svelte";
+  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import BlankState from "$lib/features/invoices/components/BlankState.svelte";

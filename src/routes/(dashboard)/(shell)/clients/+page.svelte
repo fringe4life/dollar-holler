@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import ItemsHeader from "$lib/components/items-header.svelte";
+  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import BlankState from "$lib/features/clients/components/BlankState.svelte";
   import ClientForm from "$lib/features/clients/components/ClientForm.svelte";

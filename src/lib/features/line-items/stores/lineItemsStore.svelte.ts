@@ -1,4 +1,4 @@
-import { client } from "$lib/client";
+import { apiClient } from "$lib/api";
 import type {
   Key,
   LineItemInsert,
@@ -44,7 +44,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
     const fallback = this.fallbackFor(StoreOperation.loadMany);
     try {
       return await unwrapTreaty(
-        client.api
+        apiClient
           .invoices({ id: invoiceId })
           [
             "line-items"
@@ -87,7 +87,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
 
     try {
       const lineItemsData = await unwrapTreaty(
-        client.api.invoices({ id: invoiceId })["line-items"].post({
+        apiClient.invoices({ id: invoiceId })["line-items"].post({
           lineItems: items,
         }),
         { fallbackMessage: fallback }
@@ -111,7 +111,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
     const fallback = this.fallbackFor(StoreOperation.updateMany);
     try {
       const lineItemsData = await unwrapTreaty(
-        client.api.invoices({ id: invoiceId })["line-items"].put({
+        apiClient.invoices({ id: invoiceId })["line-items"].put({
           lineItems: items,
         }),
         { fallbackMessage: fallback }
@@ -132,7 +132,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
     const fallback = this.fallbackFor(StoreOperation.deleteOne);
     try {
       unwrapTreatyResult(
-        await client.api["line-items"]({
+        await apiClient["line-items"]({
           id: lineItemId,
         }).delete(),
         { fallbackMessage: fallback }

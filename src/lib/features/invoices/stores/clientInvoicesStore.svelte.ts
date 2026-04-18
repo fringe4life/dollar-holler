@@ -1,4 +1,4 @@
-import { client } from "$lib/client";
+import { apiClient } from "$lib/api";
 import type { ClientInvoiceSummaryCents } from "$lib/features/invoices/client-invoice-summary";
 import type { InvoiceListResponse } from "$lib/features/invoices/types";
 import type {
@@ -34,7 +34,7 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
     signal: AbortSignal
   ): Promise<CursorPaginatedList<InvoiceListResponse>> {
     return unwrapTreatyResult(
-      await client.api.clients({ id: this.clientId }).invoices.get({
+      await apiClient.clients({ id: this.clientId }).invoices.get({
         query,
         fetch: { signal },
       }),
@@ -47,7 +47,7 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
     signal: AbortSignal
   ): Promise<ClientInvoiceSummaryCents> {
     return unwrapTreatyResult(
-      await client.api.clients({ id: this.clientId }).invoices.summary.get({
+      await apiClient.clients({ id: this.clientId }).invoices.summary.get({
         query: normalized.q ? { q: normalized.q } : {},
         fetch: { signal },
       }),

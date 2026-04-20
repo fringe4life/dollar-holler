@@ -5,15 +5,7 @@ import { type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 
-// auth handler for better auth routes and to populate locals
-export const authHandler: Handle = async ({ event, resolve }) =>
-  svelteKitHandler({
-    event,
-    resolve,
-    auth,
-    building,
-  });
-
+// get session from better auth and populate locals
 export const localsHandler: Handle = async ({ event, resolve }) => {
   const { data: result } = await tryCatch(() =>
     auth.api.getSession({
@@ -26,6 +18,15 @@ export const localsHandler: Handle = async ({ event, resolve }) => {
   }
   return resolve(event);
 };
+
+// auth handler for better auth routes
+export const authHandler: Handle = async ({ event, resolve }) =>
+  svelteKitHandler({
+    event,
+    resolve,
+    auth,
+    building,
+  });
 
 const PROTECTED_ROUTES = ["/invoices", "/clients", "/settings"];
 
@@ -59,8 +60,8 @@ export const fontPreloadHandler: Handle = async ({ event, resolve }) =>
   });
 
 export const handle: Handle = sequence(
-  authHandler,
   localsHandler,
+  authHandler,
   authGuard,
   fontPreloadHandler
 );

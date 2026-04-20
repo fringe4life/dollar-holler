@@ -1,71 +1,47 @@
 /**
- * List-query join contract (clients list + received/balance aggregates)
+ * List-query contract (clients list + received/balance aggregates)
  *
- * The clients list is paginated with `ORDER BY` + `LIMIT` on `clients.id`.
- * The join to financial totals must not multiply rows per client.
+ * Paginated list handlers use `ORDER BY` + `LIMIT` on `clients.id`.
+ * Financial totals are **scalar correlated subqueries** in RQB `extras` so there
+ * is at most one SQL row per client before `LIMIT`.
  *
- * This module MUST keep one SQL row per client at the pagination layer:
+ * Do not join raw `line_items` or unaggregated invoice rows into the outer
+ * clients list query in a way that multiplies rows per client.
  *
- * - `invoiceTotalsSubquery`: one row per invoice (invoices ⋈
- *   `lineItemsTotalSubquery`, which is grouped by `invoiceId` in
- *   invoiceListHelpers).
- * - `clientReceivedBalanceSubquery`: `GROUP BY clientId` over invoice totals,
- *   so at most one row per client before the clients list joins it.
- *
- * Do not:
- * 1. Join raw `line_items` or unaggregated invoice rows into the outer clients
- *    list query.
- * 2. Remove `GROUP BY clientId` from the received/balance subquery without an
- *    equivalent one-row-per-client guarantee.
- * 3. Add M:N joins (e.g. tags) without collapsing to one row per client before
- *    `LIMIT` (see plan §2a: cursor pagination lists).
- *
- * @see ./invoiceListHelpers.ts for `lineItemsTotalSubquery`.
+ * @see ../../invoices/queries/invoiceListHelpers.ts for `lineItemsSubtotalSqlForInvoiceId`.
  */
-import { db } from "$lib/db";
-import { invoices as invoicesTable } from "$lib/db/schema";
-import { eq, sql } from "drizzle-orm";
-import { lineItemsTotalSubquery } from "../../invoices/queries/invoiceListHelpers";
+import { clients as clientsTable } from "$lib/db/schema";
+import { sql } from "drizzle-orm";
 
 /**
- * Subquery: per-invoice total (subtotal - discount) with clientId and status.
- * Used to aggregate received (paid) and balance (unpaid) per client.
+ * RQB `extras`: received (paid) and balance (unpaid) per client, matching the
+ * previous `GROUP BY clientId` CASE/SUM semantics over per-invoice totals.
  */
-const invoiceTotalsSubquery = db
-  .select({
-    clientId: invoicesTable.clientId,
-    invoiceStatus: invoicesTable.invoiceStatus,
-    subtotal: lineItemsTotalSubquery.subtotal,
-    discount: invoicesTable.discount,
-  })
-  .from(invoicesTable)
-  .leftJoin(
-    lineItemsTotalSubquery,
-    eq(invoicesTable.id, lineItemsTotalSubquery.invoiceId)
-  )
-  .as("invoice_totals");
-
-/**
- * Subquery: received and balance per client.
- * received = sum of invoice totals where status = 'paid'
- * balance = sum of invoice totals where status != 'paid'
- */
-export const clientReceivedBalanceSubquery = db
-  .select({
-    clientId: invoiceTotalsSubquery.clientId,
-    received: sql<number>`COALESCE(SUM(
-      CASE WHEN ${invoiceTotalsSubquery.invoiceStatus} = 'paid'
-      THEN ROUND(COALESCE(${invoiceTotalsSubquery.subtotal}, 0) - COALESCE(${invoiceTotalsSubquery.subtotal}, 0) * COALESCE(${invoiceTotalsSubquery.discount}, 0) / 100)
-      ELSE 0
-      END
-    ), 0)::bigint`.as("received"),
-    balance: sql<number>`COALESCE(SUM(
-      CASE WHEN ${invoiceTotalsSubquery.invoiceStatus} IS NULL OR ${invoiceTotalsSubquery.invoiceStatus} != 'paid'
-      THEN ROUND(COALESCE(${invoiceTotalsSubquery.subtotal}, 0) - COALESCE(${invoiceTotalsSubquery.subtotal}, 0) * COALESCE(${invoiceTotalsSubquery.discount}, 0) / 100)
-      ELSE 0
-      END
-    ), 0)::bigint`.as("balance"),
-  })
-  .from(invoiceTotalsSubquery)
-  .groupBy(invoiceTotalsSubquery.clientId)
-  .as("client_received_balance");
+export const clientReceivedBalanceExtras = {
+  received: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
+    sq<number>`(
+      SELECT COALESCE(SUM(
+        CASE WHEN i.invoice_status = 'paid'
+        THEN ROUND(
+          COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0)
+          - COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0) * COALESCE(i.discount, 0) / 100
+        )
+        ELSE 0 END
+      ), 0)::bigint
+      FROM invoices i
+      WHERE i.client_id = ${clients.id}
+    )`,
+  balance: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
+    sq<number>`(
+      SELECT COALESCE(SUM(
+        CASE WHEN i.invoice_status IS NULL OR i.invoice_status <> 'paid'
+        THEN ROUND(
+          COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0)
+          - COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0) * COALESCE(i.discount, 0) / 100
+        )
+        ELSE 0 END
+      ), 0)::bigint
+      FROM invoices i
+      WHERE i.client_id = ${clients.id}
+    )`,
+};

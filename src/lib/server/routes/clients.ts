@@ -1,6 +1,8 @@
 /* eslint-disable new-cap */
 import { db } from "$lib/db";
 import { clients as clientsTable } from "$lib/db/schema";
+import { fetchPaginatedClients } from "$lib/features/clients/queries/clients-list.server";
+import { fetchClientPickerOptions } from "$lib/features/clients/queries/clients-options.server";
 import {
   clientPaginatedListSchema,
   clientPickerOptionsResponseSchema,
@@ -8,36 +10,33 @@ import {
   clientStatusSchema,
 } from "$lib/features/clients/schemas";
 import {
+  fetchClientInvoiceSummary,
+  fetchPaginatedInvoicesForClient,
+} from "$lib/features/invoices/queries/invoices-list.server";
+import {
   clientInvoiceSummarySchema,
   invoicePaginatedListSchema,
 } from "$lib/features/invoices/schemas";
-import {
-  listQueryWireSchema,
-  querySchema,
-} from "$lib/features/pagination/schemas";
-import { fetchPaginatedClients } from "$lib/features/pagination/utils/clients-list.server";
-import { fetchClientPickerOptions } from "$lib/features/pagination/utils/clients-options.server";
-import {
-  fetchClientInvoiceSummary,
-  fetchPaginatedInvoicesForClient,
-} from "$lib/features/pagination/utils/invoices-list.server";
-import { normalizeListQuery } from "$lib/features/pagination/utils/list-query";
+import { querySchema } from "$lib/features/pagination/schemas";
 import {
   apiErrorBodySchema,
   deleteSuccessSchema,
   idResponseSchema,
-} from "$lib/server/api-response-schemas";
+} from "$lib/server/schemas";
 import {
   clientInsertSchema,
   clientSelectSchema,
   clientUpdateSchema,
 } from "$lib/validators";
 import { and, eq } from "drizzle-orm";
-import { Elysia, status } from "elysia";
-import { betterAuthPlugin } from "../auth-plugin";
+import { Elysia } from "elysia";
+import { protectedApiPlugin } from "../plugins/auth-plugin";
+import { listQueryPlugin } from "../plugins/list-query-plugin";
+import { InternalServerError, NotFoundError } from "../utils/errors";
 
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
-  .use(betterAuthPlugin)
+  .use(protectedApiPlugin)
+  .use(listQueryPlugin)
   .guard({
     detail: {
       tags: ["Clients"],
@@ -46,23 +45,23 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // GET /api/clients - List clients with received and balance (cursor pagination)
   .get(
     "/",
-    async ({ user, query }) => {
+    async ({ user, normalized }) => {
       try {
-        const { normalized } = normalizeListQuery({
-          q: query.q,
-          cursor: query.cursor,
-          direction: query.direction,
-          limit: query.limit,
-        });
         return await fetchPaginatedClients(user.id, normalized);
       } catch (error) {
         console.error("Error loading clients:", error);
-        return status(500, { message: "Failed to load clients" });
+        throw new InternalServerError("Failed to load clients");
       }
     },
     {
       auth: true,
-      query: listQueryWireSchema,
+      listQuery: true,
+      detail: {
+        operationId: "listClients",
+        summary: "List clients",
+        description:
+          "Cursor-paginated list of clients for the authenticated user, including received amount and balance. Supports optional search and cursor query params (`cursor`, `direction`, `limit`, `q`). Unauthenticated requests return 401.",
+      },
       response: {
         200: clientPaginatedListSchema,
         401: apiErrorBodySchema,
@@ -86,12 +85,18 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         return { id: inserted.id };
       } catch (error) {
         console.error("Error adding client:", error);
-        return status(500, { message: "Failed to add client" });
+        throw new InternalServerError("Failed to add client");
       }
     },
     {
       body: clientInsertSchema,
       authMutation: true,
+      detail: {
+        operationId: "createClient",
+        summary: "Create client",
+        description:
+          "Creates a client owned by the authenticated user (`userId` from session). Mutations validate the session without cookie cache. Returns the new client's id.",
+      },
       response: {
         200: idResponseSchema,
         401: apiErrorBodySchema,
@@ -108,11 +113,17 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         return { options };
       } catch (error) {
         console.error("Error loading client options:", error);
-        return status(500, { message: "Failed to load client options" });
+        throw new InternalServerError("Failed to load client options");
       }
     },
     {
       auth: true,
+      detail: {
+        operationId: "getClientPickerOptions",
+        summary: "Client picker options",
+        description:
+          "Returns id and display fields for every client belonging to the user, for dropdowns and pickers. Not paginated.",
+      },
       response: {
         200: clientPickerOptionsResponseSchema,
         401: apiErrorBodySchema,
@@ -129,17 +140,24 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
           where: { id: { eq: id }, userId: { eq: user.id } },
         });
         if (!client) {
-          return status(404, { message: "Client not found" });
+          throw new NotFoundError("Client not found");
         }
         return client;
       } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error("Error loading client:", error);
-        return status(500, { message: "Failed to load client" });
+        throw new InternalServerError("Failed to load client");
       }
     },
     {
       params: idResponseSchema,
       auth: true,
+      detail: {
+        operationId: "getClient",
+        summary: "Get client by id",
+        description:
+          "Returns a single client if it exists and belongs to the authenticated user. Missing or other users' clients return 404.",
+      },
       response: {
         200: clientSelectSchema,
         401: apiErrorBodySchema,
@@ -160,12 +178,13 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
           .returning();
 
         if (!updated) {
-          return status(404, { message: "Client not found" });
+          throw new NotFoundError("Client not found");
         }
         return updated;
       } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error("Error updating client:", error);
-        return status(500, { message: "Failed to update client" });
+        throw new InternalServerError("Failed to update client");
       }
     },
     {
@@ -173,6 +192,12 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       body: clientUpdateSchema,
 
       authMutation: true,
+      detail: {
+        operationId: "updateClient",
+        summary: "Update client",
+        description:
+          "Full update of client fields. The client must belong to the authenticated user; otherwise returns 404.",
+      },
       response: {
         200: clientSelectSchema,
         401: apiErrorBodySchema,
@@ -199,19 +224,26 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
           });
 
         if (!updated) {
-          return status(404, { message: "Client not found" });
+          throw new NotFoundError("Client not found");
         }
 
         return updated;
       } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error("Error updating client status:", error);
-        return status(500, { message: "Failed to update client status" });
+        throw new InternalServerError("Failed to update client status");
       }
     },
     {
       params: idResponseSchema,
       body: clientStatusSchema,
       authMutation: true,
+      detail: {
+        operationId: "patchClientStatus",
+        summary: "Update client status",
+        description:
+          "Updates only the client status. The client must belong to the authenticated user; otherwise returns 404.",
+      },
       response: {
         200: clientStatusPatchResponseSchema,
         401: apiErrorBodySchema,
@@ -231,17 +263,24 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
           .returning({ id: clientsTable.id });
 
         if (!deleted) {
-          return status(404, { message: "Client not found" });
+          throw new NotFoundError("Client not found");
         }
         return { success: true as const };
       } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error("Error deleting client:", error);
-        return status(500, { message: "Failed to delete client" });
+        throw new InternalServerError("Failed to delete client");
       }
     },
     {
       params: idResponseSchema,
       authMutation: true,
+      detail: {
+        operationId: "deleteClient",
+        summary: "Delete client",
+        description:
+          "Deletes the client if it belongs to the authenticated user. Missing client returns 404.",
+      },
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,
@@ -255,24 +294,22 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     "/:id/invoices/summary",
     async ({ params: { id }, user, query }) => {
       try {
-        const client = await db.query.clients.findFirst({
-          where: { id: { eq: id }, userId: { eq: user.id } },
-        });
-        if (!client) {
-          return status(404, { message: "Client not found" });
-        }
         return await fetchClientInvoiceSummary(user.id, id, query.q);
       } catch (error) {
         console.error("Error loading client invoice summary:", error);
-        return status(500, {
-          message: "Failed to load client invoice summary",
-        });
+        throw new InternalServerError("Failed to load client invoice summary");
       }
     },
     {
       params: idResponseSchema,
-      auth: true,
+      verifyClientGet: true,
       query: querySchema,
+      detail: {
+        operationId: "getClientInvoiceSummary",
+        summary: "Invoice summary for client",
+        description:
+          "Returns aggregated invoice totals (cents) for the client's invoices. Optional `q` narrows the invoice set. Returns 404 if the client does not exist or is not owned by the user.",
+      },
       response: {
         200: clientInvoiceSummarySchema,
         401: apiErrorBodySchema,
@@ -284,30 +321,24 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   // GET /api/clients/:id/invoices - Client's invoices (cursor pagination)
   .get(
     "/:id/invoices",
-    async ({ params: { id }, user, query }) => {
+    async ({ params: { id }, user, normalized }) => {
       try {
-        const client = await db.query.clients.findFirst({
-          where: { id: { eq: id }, userId: { eq: user.id } },
-        });
-        if (!client) {
-          return status(404, { message: "Client not found" });
-        }
-        const { normalized } = normalizeListQuery({
-          q: query.q,
-          cursor: query.cursor,
-          direction: query.direction,
-          limit: query.limit,
-        });
         return await fetchPaginatedInvoicesForClient(user.id, id, normalized);
       } catch (error) {
         console.error("Error loading client invoices:", error);
-        return status(500, { message: "Failed to load client invoices" });
+        throw new InternalServerError("Failed to load client invoices");
       }
     },
     {
       params: idResponseSchema,
-      auth: true,
-      query: listQueryWireSchema,
+      verifyClientGet: true,
+      listQuery: true,
+      detail: {
+        operationId: "listClientInvoices",
+        summary: "List invoices for client",
+        description:
+          "Cursor-paginated invoices for this client (`cursor`, `direction`, `limit`, optional `q`). Returns 404 if the client does not exist or is not owned by the user.",
+      },
       response: {
         200: invoicePaginatedListSchema,
         401: apiErrorBodySchema,

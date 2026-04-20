@@ -7,6 +7,7 @@ import type {
   clientListRowSchema,
   clientPickerOptionSchema,
   clientPickerOptionsResponseSchema,
+  clientReceivedBalanceSchema,
 } from "./schemas";
 export type ClientInsert = typeof clientInsertSchema.infer;
 export type ClientSelect = typeof clientSelectSchema.infer;
@@ -20,3 +21,5 @@ export type ClientPickerOptionsResponse =
 
 /** Invoice client `<select>`: id + name only (GET /api/clients/options). */
 export type ClientPickerOption = typeof clientPickerOptionSchema.infer;
+
+export type ClientReceivedBalance = typeof clientReceivedBalanceSchema.infer;

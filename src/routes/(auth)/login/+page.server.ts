@@ -1,41 +1,37 @@
 import { auth } from "$lib/auth";
 import { loginSchema } from "$lib/features/auth/schemas";
-import { fail, isRedirect, redirect } from "@sveltejs/kit";
+import { fail, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";
+import { tryCatch } from "$lib/utils/try-catch";
+import { resolve } from "$app/paths";
 
 export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
-    const email = formData.get("email") as string | undefined;
-    const entries = Object.fromEntries(formData.entries());
-
+    const email = (formData?.get("email") as string | undefined) ?? "";
     // Validate input with ArkType
-    const validationResult = loginSchema(entries);
-    console.log({ validationResult });
+    const validationResult = loginSchema(
+      Object.fromEntries(formData.entries())
+    );
     if (validationResult instanceof ArkErrors) {
-      console.log({ validationResult });
       return fail(400, {
         error: validationResult.summary ?? "Invalid input",
         email,
       });
     }
 
-    try {
-      await auth.api.signInEmail({
-        body: {
-          email: validationResult.email,
-          password: validationResult.password,
-        },
+    const { data, error } = await tryCatch(() =>
+      auth.api.signInEmail({
+        body: validationResult,
         headers: request.headers,
-      });
-
-      throw redirect(303, "/invoices");
-    } catch (error) {
-      console.log({ error });
-      if (isRedirect(error)) throw error;
-      console.error("Login error:", error);
+      })
+    );
+    if (!data || error) {
+      console.error("error ", error);
       return fail(400, { error: "Login failed", email });
     }
+
+    throw redirect(303, resolve("/invoices"));
   },
 };

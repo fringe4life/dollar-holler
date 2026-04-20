@@ -1,4 +1,4 @@
-import { fetchPaginatedInvoices } from "$lib/features/pagination/utils/invoices-list.server";
+import { fetchPaginatedInvoices } from "$lib/features/invoices/queries/invoices-list.server";
 import { normalizeListQueryFromUrl } from "$lib/features/pagination/utils/list-query";
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";

@@ -10,17 +10,6 @@ export const apiErrorBodySchema = type({
   message: "string",
 });
 
-export type ApiErrorBody = typeof apiErrorBodySchema.infer;
-
-/** Validated `{ message }` for `status()` and global `onError` handlers. */
-export const apiErrorBody = (message: string): ApiErrorBody => {
-  const result = apiErrorBodySchema({ message });
-  if (result instanceof type.errors) {
-    throw new Error(result.summary);
-  }
-  return result;
-};
-
 export const idResponseSchema = type({
   id: cursorSchema,
 });

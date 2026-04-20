@@ -1,18 +1,19 @@
 /* eslint-disable new-cap */
 import { db } from "$lib/db";
 import { settings as settingsTable } from "$lib/db/schema";
-import { apiErrorBodySchema } from "$lib/server/api-response-schemas";
+import { apiErrorBodySchema } from "$lib/server/schemas";
 import {
   settingsInsertSchema,
   settingsSelectSchema,
   settingsUpdateSchema,
 } from "$lib/validators";
 import { eq } from "drizzle-orm";
-import { Elysia, status } from "elysia";
-import { betterAuthPlugin } from "../auth-plugin";
+import { Elysia } from "elysia";
+import { protectedApiPlugin } from "../plugins/auth-plugin";
+import { InternalServerError, NotFoundError } from "../utils/errors";
 
 export const settingsRoutes = new Elysia({ prefix: "/settings" })
-  .use(betterAuthPlugin)
+  .use(protectedApiPlugin)
   .guard({
     detail: {
       tags: ["Settings"],
@@ -28,17 +29,24 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
         });
 
         if (!userSettings) {
-          return status(404, { message: "Not found" });
+          throw new NotFoundError("Not found");
         }
 
         return userSettings;
       } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error("Error loading settings:", error);
-        return status(500, { message: "Failed to load settings" });
+        throw new InternalServerError("Failed to load settings");
       }
     },
     {
       auth: true,
+      detail: {
+        operationId: "getSettings",
+        summary: "Get settings",
+        description:
+          "Returns the authenticated user's settings row. If no row exists yet, responds with 404.",
+      },
       response: {
         200: settingsSelectSchema,
         401: apiErrorBodySchema,
@@ -61,17 +69,24 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
           .where(eq(settingsTable.userId, user.id))
           .returning();
         if (!updated) {
-          return status(404, { message: "Not found" });
+          throw new NotFoundError("Not found");
         }
         return updated;
       } catch (error) {
+        if (error instanceof NotFoundError) throw error;
         console.error("Error updating settings:", error);
-        return status(500, { message: "Failed to update settings" });
+        throw new InternalServerError("Failed to update settings");
       }
     },
     {
       authMutation: true,
       body: settingsUpdateSchema,
+      detail: {
+        operationId: "updateSettings",
+        summary: "Update settings",
+        description:
+          "Patches fields on the user's settings. Returns 404 if no settings row exists for the user.",
+      },
       response: {
         200: settingsSelectSchema,
         401: apiErrorBodySchema,
@@ -92,18 +107,21 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
             userId: user.id,
           })
           .returning();
-        if (!created) {
-          throw new Error("Failed to create settings");
-        }
         return created;
       } catch (error) {
         console.error("Error creating settings:", error);
-        return status(500, { message: "Failed to create settings" });
+        throw new InternalServerError("Failed to create settings");
       }
     },
     {
       authMutation: true,
       body: settingsInsertSchema,
+      detail: {
+        operationId: "createSettings",
+        summary: "Create settings",
+        description:
+          "Creates the settings row for the authenticated user with the provided fields.",
+      },
       response: {
         200: settingsSelectSchema,
         401: apiErrorBodySchema,

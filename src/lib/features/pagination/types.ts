@@ -16,6 +16,10 @@ export type ListDirection = typeof listDirectionSchema.infer;
 /** Normalized list query (API + SSR + URL canonicalization). */
 export type ListQueryNormalized = typeof listQueryWireSchema.infer;
 
+export type ListQueryRaw = {
+  [K in keyof ListQueryNormalized]?: string;
+};
+
 export type PaginationSearchParams = Omit<ListQueryNormalized, "limit"> & {
   limit: number;
 };

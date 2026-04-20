@@ -1,9 +1,9 @@
 import { auth } from "$lib/auth";
 import { forgotPassword } from "$lib/features/auth/schemas";
-import { fail, isRedirect } from "@sveltejs/kit";
+import { fail } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";
-
+import { tryCatch } from "$lib/utils/try-catch";
 export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
@@ -15,28 +15,26 @@ export const actions: Actions = {
       });
     }
 
-    try {
-      const passwordReset = await auth.api.requestPasswordReset({
+    const { data: passwordReset, error } = await tryCatch(() =>
+      auth.api.requestPasswordReset({
         body: { email: result.email },
         headers: request.headers,
-      });
-
-      if (!passwordReset.status) {
-        return fail(400, {
-          error: "Failed to send reset email",
-          email: result.email,
-        });
-      }
-
-      return { success: true, email: result.email };
-    } catch (error) {
-      if (isRedirect(error)) {
-        throw error;
-      }
+      })
+    );
+    if (error) {
       return fail(400, {
         error: "Failed to send reset email",
         email: result.email,
       });
     }
+
+    if (!passwordReset?.status) {
+      return fail(400, {
+        error: "Failed to send reset email",
+        email: result.email,
+      });
+    }
+
+    return { success: true, email: result.email };
   },
 };

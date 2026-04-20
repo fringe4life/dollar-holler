@@ -8,11 +8,16 @@ import { type } from "arktype";
 export const clientStatusSchema = type({
   clientStatus: "'active' | 'archive'",
 });
-/** Cursor list row: client + aggregates from list queries. */
-export const clientListRowSchema = clientSelectSchema.merge({
+
+export const clientReceivedBalanceSchema = type({
   received: "number",
   balance: "number",
 });
+
+/** Cursor list row: client + aggregates from list queries. */
+export const clientListRowSchema = clientSelectSchema.merge(
+  clientReceivedBalanceSchema
+);
 
 export const clientPickerOptionSchema = type({
   id: cursorSchema,

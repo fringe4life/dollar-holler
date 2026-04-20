@@ -1,16 +1,27 @@
 import type { CursorId, Maybe } from "$lib/types";
 import { DEFAULT_LIMIT, LIMITS } from "../constants";
-import type { ListDirection, PaginationSearchParams } from "../types";
+import type {
+  ListDirection,
+  NormalizeListQueryResult,
+  PaginationSearchParams,
+} from "../types";
+import { tryParseCursorId } from "./parse-cursor-id";
 
-import { ArkErrors } from "arktype";
-import { cursorSchema } from "../schemas";
-import type { NormalizeListQueryResult } from "../types";
-
-const parseLimit = (raw: string | undefined): number => {
+/**
+ * @description Parses a limit parameter from a string.
+ * @param raw - The raw limit parameter.
+ * @returns The parsed limit parameter.
+ */
+const parseLimit = (raw: Maybe<string>): number => {
   return parseLimitParam(raw);
 };
 
-const parseDirection = (raw: string | undefined): ListDirection => {
+/**
+ * @description Parses a direction parameter from a string.
+ * @param raw - The raw direction parameter.
+ * @returns The parsed direction parameter.
+ */
+const parseDirection = (raw: Maybe<string>): ListDirection => {
   return raw === "backward" ? "backward" : "forward";
 };
 
@@ -22,23 +33,32 @@ export const normalizeListQuery = (raw: {
   q?: string;
   cursor?: string;
   direction?: string;
-  limit?: string;
+  /** Elysia/ArkType wire may narrow `limit` to numeric literals. */
+  limit?: string | number;
 }): NormalizeListQueryResult => {
   let listCursorWasNormalized = false;
   const q = raw.q?.trim() || undefined;
 
   let cursor: CursorId | undefined;
   if (raw.cursor !== undefined && raw.cursor !== "") {
-    const parsed = cursorSchema(raw.cursor);
-    if (parsed instanceof ArkErrors) {
+    const parsed = tryParseCursorId(String(raw.cursor));
+    if (parsed === false) {
       listCursorWasNormalized = true;
     } else {
       cursor = parsed;
     }
   }
 
-  const direction = parseDirection(raw.direction);
-  const limit = parseLimit(raw.limit);
+  const direction = parseDirection(
+    raw.direction === undefined ? undefined : String(raw.direction)
+  );
+  const limitWire =
+    raw.limit === undefined || raw.limit === ""
+      ? undefined
+      : typeof raw.limit === "number"
+        ? String(raw.limit)
+        : raw.limit;
+  const limit = parseLimit(limitWire);
 
   /** Backward without cursor: first page (same as forward, no cursor). */
   const effectiveDirection: ListDirection =
@@ -86,17 +106,32 @@ export const parseSearchParamsToRaw = (
   };
 };
 
+/**
+ * @description Parses a limit parameter from a string.
+ * @param raw - The raw limit parameter.
+ * @returns The parsed limit parameter.
+ */
 export const parseLimitParam = (raw: Maybe<string>): number => {
   if (!raw) {
     return DEFAULT_LIMIT;
   }
   const n = Number(raw);
-  return LIMITS.includes(n as (typeof LIMITS)[number]) ? n : DEFAULT_LIMIT;
+  return LIMITS.includes(
+    // @ts-expect-error
+    n
+  )
+    ? n
+    : DEFAULT_LIMIT;
 };
 
-/** Build normalized query from store/API args (defaults match URL + server). */
+/**
+ * @description Builds a normalized query from store/API args (defaults match URL + server).
+ * @param q - The query parameter.
+ * @param options - The options parameter.
+ * @returns The normalized query.
+ */
 export const toNormalizedListQuery = (
-  q: string | undefined,
+  q: Maybe<string>,
   options?: {
     cursor?: CursorId;
     direction?: ListDirection;

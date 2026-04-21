@@ -1,15 +1,15 @@
 import type { ClientInsert, ClientSelect } from "$lib/features/clients/types";
 import type { InvoiceInsert } from "$lib/features/invoices/types";
 import type { LineItemInsert } from "$lib/features/line-items/types";
-import { createId } from "$lib/features/pagination/utils/create-uuidv7";
+import { createId } from "$lib/features/pagination/utils/create-uuidv7.server";
 import type { SettingsInsert } from "$lib/features/settings/types";
 import type { CursorId } from "$lib/types";
 import { neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { ENV } from "varlock/env";
 import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
-import { ENV } from "varlock/env";
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 // Create the Pool client (WebSocket-based for transaction support)
 const pool = new Pool({ connectionString: ENV.DATABASE_URL });

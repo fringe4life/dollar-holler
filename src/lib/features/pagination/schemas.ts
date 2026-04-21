@@ -2,6 +2,7 @@ import type { CursorId } from "$lib/types";
 import { type } from "arktype";
 import { LIMITS } from "./constants";
 import type { CursorRow } from "./types";
+/** Pagination metadata for cursor-paginated lists. */
 export const paginationMetadataSchema = type({
   hasNextPage: "boolean",
   hasPreviousPage: "boolean",
@@ -15,7 +16,7 @@ export const listDirectionSchema = type("'forward' | 'backward'");
 const limitUnion = LIMITS.map((n) => `'${n}'`).join(
   " | "
 ) as unknown as `'${(typeof LIMITS)[number]}'`;
-export const limitSchema = type(limitUnion);
+const limitSchema = type(limitUnion);
 
 export const querySchema = type({
   "q?": "string",

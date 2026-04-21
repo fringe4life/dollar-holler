@@ -1,6 +1,4 @@
 /* eslint-disable new-cap */
-import { db } from "$lib/db";
-import { clients as clientsTable } from "$lib/db/schema";
 import { fetchPaginatedClients } from "$lib/features/clients/queries/clients-list.server";
 import { fetchClientPickerOptions } from "$lib/features/clients/queries/clients-options.server";
 import {
@@ -18,16 +16,16 @@ import {
   invoicePaginatedListSchema,
 } from "$lib/features/invoices/schemas";
 import { querySchema } from "$lib/features/pagination/schemas";
+import { db } from "$lib/server/db";
+import { clients as clientsTable } from "$lib/server/db/schema";
 import {
   apiErrorBodySchema,
-  deleteSuccessSchema,
-  idResponseSchema,
-} from "$lib/server/schemas";
-import {
   clientInsertSchema,
   clientSelectSchema,
   clientUpdateSchema,
-} from "$lib/validators";
+  deleteSuccessSchema,
+  idResponseSchema,
+} from "$lib/server/schemas";
 import { and, eq } from "drizzle-orm";
 import { Elysia } from "elysia";
 import { protectedApiPlugin } from "../plugins/auth-plugin";

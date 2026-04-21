@@ -1,10 +1,10 @@
-import { db } from "$lib/db";
-import { cursorSchema } from "$lib/features/pagination/schemas";
 import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
 } from "$lib/features/invoices/queries/invoices-list.server";
+import { cursorSchema } from "$lib/features/pagination/schemas";
 import { normalizeListQueryFromUrl } from "$lib/features/pagination/utils/list-query";
+import { db } from "$lib/server/db";
 import { tryCatch } from "$lib/utils/try-catch";
 import { error, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";

@@ -29,7 +29,7 @@
     pickInvoicePatchSnapshot,
     serializedNormalizedLineItemsForCompare,
     type InvoicePatchSnapshot,
-  } from "../invoice-diff";
+  } from "../utils/invoice-diff";
   import type { InvoiceDeleteConfirmItem, NewInvoice } from "../types";
 
   let {

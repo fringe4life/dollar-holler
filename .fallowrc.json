@@ -1,0 +1,48 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignoreDependencies": ["@varlock/bitwarden-plugin"],
+  "rules": {
+    "boundary-violation": "warn"
+  },
+  "boundaries": {
+    "zones": [
+      { "name": "features", "patterns": ["src/lib/features/**"] },
+      {
+        "name": "server-db",
+        "patterns": ["src/lib/server/db/**"]
+      },
+      { "name": "server", "patterns": ["src/lib/server/**"] },
+      { "name": "components", "patterns": ["src/lib/components/**"] },
+      { "name": "attachments", "patterns": ["src/lib/attachments/**"] },
+      {
+        "name": "shared",
+        "patterns": [
+          "src/lib/runes/**",
+          "src/lib/stores/**",
+          "src/lib/utils/**"
+        ]
+      },
+      { "name": "routes", "patterns": ["src/routes/**", "src/hooks.server.ts"] }
+    ],
+    "rules": [
+      {
+        "from": "routes",
+        "allow": ["features", "components", "shared", "server", "server-db"]
+      },
+      {
+        "from": "features",
+        "allow": ["components", "shared", "attachments", "server-db"]
+      },
+      {
+        "from": "server",
+        "allow": ["features", "shared", "server-db"]
+      },
+      {
+        "from": "components",
+        "allow": ["features", "shared", "attachments"]
+      },
+      { "from": "attachments", "allow": ["shared"] },
+      { "from": "shared", "allow": ["features"] }
+    ]
+  }
+}

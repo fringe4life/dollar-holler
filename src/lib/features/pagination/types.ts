@@ -14,11 +14,7 @@ export interface NormalizeListQueryResult {
 export type ListDirection = typeof listDirectionSchema.infer;
 
 /** Normalized list query (API + SSR + URL canonicalization). */
-export type ListQueryNormalized = typeof listQueryWireSchema.infer;
-
-export type ListQueryRaw = {
-  [K in keyof ListQueryNormalized]?: string;
-};
+type ListQueryNormalized = typeof listQueryWireSchema.infer;
 
 export type PaginationSearchParams = Omit<ListQueryNormalized, "limit"> & {
   limit: number;
@@ -46,6 +42,7 @@ export interface SearchableListStore {
    */
   presetClientListQueryKey?(normalized: PaginationSearchParams): void;
   readonly loading: boolean;
+  readonly error?: string | null;
 }
 
 /** Cursor-paginated list store: list rows, URL sync key, and pagination flags for UI. */

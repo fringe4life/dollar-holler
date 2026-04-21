@@ -1,4 +1,4 @@
-import { auth } from "$lib/auth";
+import { auth } from "$lib/auth.server";
 import { openApiPlugin } from "$lib/server/plugins/openapi-plugin";
 import { clientsRoutes } from "$lib/server/routes/clients";
 import { invoicesRoutes, lineItemsRoutes } from "$lib/server/routes/invoices";

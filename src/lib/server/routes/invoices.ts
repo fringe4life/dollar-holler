@@ -1,24 +1,22 @@
 /* eslint-disable new-cap */
-import { db } from "$lib/db";
+import { fetchPaginatedInvoices } from "$lib/features/invoices/queries/invoices-list.server";
+import { invoicePaginatedListSchema } from "$lib/features/invoices/schemas";
+import { db } from "$lib/server/db";
 import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
-} from "$lib/db/schema";
-import { fetchPaginatedInvoices } from "$lib/features/invoices/queries/invoices-list.server";
-import { invoicePaginatedListSchema } from "$lib/features/invoices/schemas";
+} from "$lib/server/db/schema";
 import {
   apiErrorBodySchema,
   deleteSuccessSchema,
   idResponseSchema,
-} from "$lib/server/schemas";
-import {
   invoiceInsertSchema,
   invoiceSelectSchema,
   invoiceUpdateSchema,
   lineItemEditRowSchema,
   lineItemInsertSchema,
   lineItemSelectSchema,
-} from "$lib/validators";
+} from "$lib/server/schemas";
 import { type } from "arktype";
 import { and, eq } from "drizzle-orm";
 import { Elysia } from "elysia";

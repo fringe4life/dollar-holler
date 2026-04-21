@@ -1,6 +1,6 @@
 import type { LineItemInsert } from "$lib/features/line-items/types";
 import { stripNullishEntries } from "$lib/utils/strip-nullish-entries";
-import type { InvoiceInsert, InvoiceSelect, InvoiceUpdate } from "./types";
+import type { InvoiceInsert, InvoiceSelect, InvoiceUpdate } from "../types";
 
 /** Invoice columns allowed on PATCH (excludes id, userId, timestamps). */
 export const INVOICE_PATCH_KEYS = [

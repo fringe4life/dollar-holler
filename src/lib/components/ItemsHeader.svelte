@@ -9,13 +9,13 @@
   /** Same signature as `new Toggle().toggle`. */
   export type ItemsHeaderToggle = InstanceType<typeof Toggle>["toggle"];
 
-  export type Props = {
+  export type ItemsHeaderProps = {
     store: SearchProps["store"];
     toggle: ItemsHeaderToggle;
     button: Snippet;
   };
 
-  let { store, toggle, button }: Props = $props();
+  let { store, toggle, button }: ItemsHeaderProps = $props();
 </script>
 
 <div

@@ -1,6 +1,6 @@
 import { apiClient } from "$lib/api";
-import type { ClientInvoiceSummaryCents } from "$lib/features/invoices/client-invoice-summary";
 import type { InvoiceListResponse } from "$lib/features/invoices/types";
+import type { ClientInvoiceSummaryCents } from "$lib/features/invoices/utils/client-invoice-summary";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,

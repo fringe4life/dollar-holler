@@ -14,7 +14,7 @@
  *
  * @see ../clients/queries/clientListHelpers.ts for per-client received/balance.
  */
-import { lineItems as lineItemsTable } from "$lib/db/schema";
+import { lineItems as lineItemsTable } from "$lib/server/db/schema";
 import type { Maybe, Total } from "$lib/types";
 import type { AnyColumn } from "drizzle-orm";
 import { sql } from "drizzle-orm";

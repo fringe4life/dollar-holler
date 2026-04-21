@@ -21,9 +21,9 @@
     edit?: undefined;
   } & Panel;
 
-  export type Props = CreateProps | EditProps;
+  export type ClientFormProps = CreateProps | EditProps;
 
-  let { formState, closePanel, edit = $bindable() }: Props = $props();
+  let { formState, closePanel, edit = $bindable() }: ClientFormProps = $props();
 
   const { clients: clientsStore } = getDashboardStores();
 

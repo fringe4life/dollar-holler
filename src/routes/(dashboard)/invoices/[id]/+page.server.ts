@@ -1,5 +1,5 @@
-import { db } from "$lib/db";
 import { cursorSchema } from "$lib/features/pagination/schemas";
+import { db } from "$lib/server/db";
 import { markdownToHtml } from "$lib/utils/markdown.server";
 import { tryCatch } from "$lib/utils/try-catch";
 import { error, redirect } from "@sveltejs/kit";

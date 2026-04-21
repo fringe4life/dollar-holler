@@ -1,9 +1,9 @@
-import { auth } from "$lib/auth";
+import { auth } from "$lib/auth.server";
 import { forgotPassword } from "$lib/features/auth/schemas";
+import { tryCatch } from "$lib/utils/try-catch";
 import { fail } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";
-import { tryCatch } from "$lib/utils/try-catch";
 export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();

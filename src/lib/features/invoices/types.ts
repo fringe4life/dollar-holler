@@ -1,9 +1,9 @@
-import type { CursorId } from "$lib/types";
 import type {
   invoiceInsertSchema,
   invoiceSelectSchema,
   invoiceUpdateSchema,
-} from "$lib/validators";
+} from "$lib/server/schemas";
+import type { CursorId } from "$lib/types";
 import type { invoiceListRowSchema } from "./schemas";
 
 export type InvoiceInsert = typeof invoiceInsertSchema.infer;

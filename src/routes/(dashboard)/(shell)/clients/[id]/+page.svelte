@@ -9,13 +9,13 @@
   import { Button } from "$lib/components/ui/button";
   import BlankState from "$lib/features/clients/components/BlankState.svelte";
   import ClientForm, {
-    type Props,
+    type ClientFormProps,
   } from "$lib/features/clients/components/ClientForm.svelte";
   import InvoiceRow from "$lib/features/invoices/components/InvoiceRow.svelte";
   import InvoiceRowHeader from "$lib/features/invoices/components/InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "$lib/features/invoices/components/InvoiceRowSkeleton.svelte";
   import { ClientInvoicesStore } from "$lib/features/invoices/stores/clientInvoicesStore.svelte";
-  import Pagination from "$lib/features/pagination/components/Pagination.svelte";
+  import PaginatedList from "$lib/features/pagination/components/PaginatedList.svelte";
   import { listUrlKey } from "$lib/features/pagination/utils/url";
   import { Toggle } from "$lib/runes/Toggle.svelte";
   import type { BitsButton } from "$lib/types";
@@ -59,8 +59,6 @@
     clientInvoicesStore.reset();
   });
 
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
-
   const invoiceSummaryTotals = $derived.by(() => {
     const s = clientInvoicesStore.summary;
     if (!s) {
@@ -82,7 +80,7 @@
   });
 
   let isFormShowing = new Toggle();
-  let isEditing = $state<Props["formState"]>("create");
+  let isEditing = $state<ClientFormProps["formState"]>("create");
 
   const handleEdit: BitsButton = () => {
     isEditing = "edit";
@@ -127,47 +125,34 @@
   </div>
 </div>
 
-<div class="flex grow flex-col">
-  {#if clientInvoicesStore.loading}
+<PaginatedList store={clientInvoicesStore}>
+  {#snippet header()}
     <InvoiceRowHeader />
-    <div class="flex flex-col-reverse gap-y-4">
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-    </div>
-  {:else if clientInvoicesStore.error}
-    <div class="grid place-content-center py-8 block-full">
-      <div class="text-lg text-red-500">Error: {clientInvoicesStore.error}</div>
-    </div>
-  {:else if clientInvoicesStore.items.length === 0 && !searchQuery}
+  {/snippet}
+  {#snippet skeleton()}
+    <InvoiceRowSkeleton />
+  {/snippet}
+  {#snippet row(invoice)}
+    <InvoiceRow
+      {invoice}
+      onEdit={(inv) => goto(`/invoices/${inv.id}`)}
+      onDelete={(inv) => goto(`/invoices/${inv.id}`)}
+    />
+  {/snippet}
+  {#snippet blankState()}
     <BlankState />
-  {:else if clientInvoicesStore.items.length === 0 && searchQuery}
+  {/snippet}
+  {#snippet noResults()}
     <NoSearchResults>
       {#snippet header()}
         <InvoiceRowHeader emptyState={true} />
       {/snippet}
     </NoSearchResults>
-  {:else}
-    <div
-      class="grid min-h-full items-start gap-y-4 lg:grid-rows-[min-content_1fr_min-content]"
-    >
-      <InvoiceRowHeader />
-      <div class="flex flex-col-reverse gap-y-4">
-        {#each clientInvoicesStore.items as i (i.invoiceNumber)}
-          <InvoiceRow
-            invoice={i}
-            onEdit={(inv) => goto(`/invoices/${inv.id}`)}
-            onDelete={(inv) => goto(`/invoices/${inv.id}`)}
-          />
-        {/each}
-      </div>
-      <Pagination store={clientInvoicesStore} />
-      <CircledAmount amount={invoiceSummaryTotals.grandTotal} label="Total" />
-    </div>
-  {/if}
-</div>
+  {/snippet}
+  {#snippet footer()}
+    <CircledAmount amount={invoiceSummaryTotals.grandTotal} label="Total" />
+  {/snippet}
+</PaginatedList>
 
 <SlidePanel bind:open={isFormShowing.isOn} buttonText="">
   {#snippet title()}

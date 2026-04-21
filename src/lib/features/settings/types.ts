@@ -2,7 +2,7 @@ import type {
   settingsInsertSchema,
   settingsSelectSchema,
   settingsUpdateSchema,
-} from "$lib/validators";
+} from "$lib/server/schemas";
 
 export type SettingsInsert = typeof settingsInsertSchema.infer;
 export type SettingsSelect = typeof settingsSelectSchema.infer;
@@ -18,7 +18,7 @@ export const SETTINGS_EDITABLE_KEYS = [
   "zip",
 ] as const;
 
-export type SettingsEditableKey = (typeof SETTINGS_EDITABLE_KEYS)[number];
+type SettingsEditableKey = (typeof SETTINGS_EDITABLE_KEYS)[number];
 
 export type SettingsEditableSnapshot = Pick<
   SettingsSelect,

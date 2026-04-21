@@ -1,6 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import AdditionalOptions from "$lib/components/AdditionalOptions.svelte";
+  import AdditionalOptions from "$lib/components/additionaloptions/AdditionalOptions.svelte";
   import AdditionalOptionsButton from "$lib/components/additionaloptions/AdditionalOptionsButton.svelte";
   import type { Option } from "$lib/components/additionaloptions/AdditionalOptionsItem.svelte";
   import AdditionalOptionsList from "$lib/components/additionaloptions/AdditionalOptionsList.svelte";

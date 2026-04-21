@@ -1,10 +1,10 @@
-import type { BitsButton, CursorId, List } from "$lib/types";
 import type {
   lineItemEditRowSchema,
   lineItemInsertSchema,
   lineItemSelectSchema,
   lineItemUpdateSchema,
-} from "$lib/validators";
+} from "$lib/server/schemas";
+import type { BitsButton, CursorId, List } from "$lib/types";
 import type { InvoiceSelect } from "../invoices/types";
 
 export type LineItemInsert = typeof lineItemInsertSchema.infer;
@@ -27,12 +27,12 @@ type InvoiceFormPanel = {
   closePanel: () => void;
 };
 
-export type InvoiceFormEditProps = InvoiceFormPanel & {
+type InvoiceFormEditProps = InvoiceFormPanel & {
   mode: "edit";
   invoiceEdit: InvoiceSelect;
 };
 
-export type InvoiceFormCreateProps = InvoiceFormPanel & {
+type InvoiceFormCreateProps = InvoiceFormPanel & {
   mode: "create";
   invoiceEdit?: undefined;
 };
@@ -40,13 +40,13 @@ export type InvoiceFormCreateProps = InvoiceFormPanel & {
 export type InvoiceFormProps = InvoiceFormEditProps | InvoiceFormCreateProps;
 
 /** Line-item table: view mode has no mutation callbacks. */
-export type LineItemRowsViewProps = {
+type LineItemRowsViewProps = {
   mode: "view";
   lineItems: List<LineItemEditRow>;
   discount: number;
 };
 
-export type LineItemRowsEditProps = {
+type LineItemRowsEditProps = {
   mode: "edit" | "create";
   lineItems: List<LineItemEditRow | NewLineItemWithId>;
   discount: number;
@@ -64,11 +64,11 @@ type LineItemRowBase = {
   isRequired: boolean;
 };
 
-export type LineItemRowViewProps = {
+type LineItemRowViewProps = {
   mode: "view";
 };
 
-export type LineItemRowEditProps = {
+type LineItemRowEditProps = {
   mode: "edit" | "create";
   updateLineItem: (id: Key, patch: LineItemUpdate) => void;
   removeLineItem: (id: Key) => void;

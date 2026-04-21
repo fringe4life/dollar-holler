@@ -1,5 +1,5 @@
 import { resolve } from "$app/paths";
-import { auth } from "$lib/auth";
+import { auth } from "$lib/auth.server";
 import { changePasswordSchema } from "$lib/features/auth/schemas";
 import { tryCatch } from "$lib/utils/try-catch";
 import { fail, redirect } from "@sveltejs/kit";

@@ -18,7 +18,7 @@
     InvoiceListResponse,
     InvoiceSelect,
   } from "$lib/features/invoices/types";
-  import Pagination from "$lib/features/pagination/components/Pagination.svelte";
+  import PaginatedList from "$lib/features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$lib/features/pagination/types";
   import { listUrlKey } from "$lib/features/pagination/utils/url";
   import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
@@ -40,8 +40,6 @@
     invoicesStore.hydrateFromLoad(currentData, listUrlKey(page.url));
   });
 
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
-
   const createForm = new Toggle();
   const editPanel = new ItemPanel<InvoiceSelect>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
@@ -57,46 +55,27 @@
   {/snippet}
 </ItemsHeader>
 
-<div class="flex grow flex-col">
-  {#if invoicesStore.loading}
+<PaginatedList store={invoicesStore}>
+  {#snippet header()}
     <InvoiceRowHeader />
-    <div class="flex flex-col-reverse gap-4">
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-      <InvoiceRowSkeleton />
-    </div>
-  {:else if invoicesStore.error}
-    <div class="grid place-content-center py-8 block-full">
-      <div class="text-lg text-red-500">Error: {invoicesStore.error}</div>
-    </div>
-  {:else if invoicesStore.items.length === 0 && !searchQuery && !invoicesStore.loading}
+  {/snippet}
+  {#snippet skeleton()}
+    <InvoiceRowSkeleton />
+  {/snippet}
+  {#snippet row(invoice)}
+    <InvoiceRow {invoice} onEdit={editPanel.open} onDelete={deleteModal.open} />
+  {/snippet}
+  {#snippet blankState()}
     <BlankState />
-  {:else if invoicesStore.items.length === 0 && searchQuery && !invoicesStore.loading}
+  {/snippet}
+  {#snippet noResults()}
     <NoSearchResults>
       {#snippet header()}
         <InvoiceRowHeader emptyState={true} />
       {/snippet}
     </NoSearchResults>
-  {:else}
-    <div
-      class="grid min-h-full items-start gap-y-4 lg:grid-rows-[min-content_1fr_min-content]"
-    >
-      <InvoiceRowHeader />
-      <div class="flex h-full flex-col-reverse justify-end gap-4">
-        {#each invoicesStore.items as invoice (invoice.id)}
-          <InvoiceRow
-            {invoice}
-            onEdit={editPanel.open}
-            onDelete={deleteModal.open}
-          />
-        {/each}
-      </div>
-      <Pagination store={invoicesStore} />
-    </div>
-  {/if}
-</div>
+  {/snippet}
+</PaginatedList>
 
 <SlidePanel bind:open={createForm.isOn} buttonText="">
   {#snippet title()}

@@ -1,4 +1,4 @@
-import { auth } from "$lib/auth";
+import { auth } from "$lib/auth.server";
 
 type OpenApiDoc = Awaited<ReturnType<typeof auth.api.generateOpenAPISchema>>;
 

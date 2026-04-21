@@ -1,3 +1,2 @@
 import { createAuthClient } from "better-auth/svelte";
-import { ENV } from "varlock/env";
-export const authClient = createAuthClient({ baseURL: ENV.PUBLIC_BASE_URL });
+export const authClient = createAuthClient();

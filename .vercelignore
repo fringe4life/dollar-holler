@@ -6,6 +6,7 @@ components.json
 prettier.config.mjs
 stylelint.config.mjs
 AGENTS.md
+stats.html
 
 .cursor
 .qodo
@@ -15,3 +16,5 @@ docs
 
 .svelte-kit
 .vercel
+.fallow
+.fallowrc.json

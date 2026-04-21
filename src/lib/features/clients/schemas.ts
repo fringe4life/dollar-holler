@@ -2,7 +2,7 @@ import {
   cursorSchema,
   paginationSchema,
 } from "$lib/features/pagination/schemas";
-import { clientSelectSchema } from "$lib/validators";
+import { clientSelectSchema } from "$lib/server/schemas";
 import { type } from "arktype";
 
 export const clientStatusSchema = type({

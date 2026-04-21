@@ -1,23 +1,24 @@
-import { db } from "$lib/db";
-import { invoices as invoicesTable } from "$lib/db/schema";
-import {
-  aggregateClientInvoiceBuckets,
-  type ClientInvoiceSummaryCents,
-} from "$lib/features/invoices/client-invoice-summary";
 import {
   lineItemsSubtotalSqlForInvoiceId,
   mapRowsWithTotal,
   type RowWithSubtotal,
 } from "$lib/features/invoices/queries/invoiceListHelpers";
 import type { InvoiceListResponse } from "$lib/features/invoices/types";
+import {
+  aggregateClientInvoiceBuckets,
+  type ClientInvoiceSummaryCents,
+} from "$lib/features/invoices/utils/client-invoice-summary";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
 } from "$lib/features/pagination/types";
+import { withUserAndSearch } from "$lib/features/pagination/utils/base-filter";
 import {
   fetchCursorPaginatedList,
   type FetchPageArgs,
 } from "$lib/features/pagination/utils/cursor-paginated-fetch.server";
+import { db } from "$lib/server/db";
+import { invoices as invoicesTable } from "$lib/server/db/schema";
 import type { CursorId, Maybe } from "$lib/types";
 import { sql } from "drizzle-orm";
 
@@ -35,12 +36,6 @@ const searchWhere = (q: Maybe<string>) => {
       { client: { name: { ilike: pattern } } },
     ],
   };
-};
-
-const baseFilter = (userId: string, q: Maybe<string>) => {
-  const base = { userId: { eq: userId } };
-  const sw = searchWhere(q);
-  return sw ? { AND: [base, sw] } : base;
 };
 
 /** User + client + optional search (same `q` semantics as global invoice list). */
@@ -98,7 +93,7 @@ export const fetchPaginatedInvoices = async (
   userId: string,
   input: PaginationSearchParams
 ): Promise<CursorPaginatedList<InvoiceListResponse>> => {
-  const ws = baseFilter(userId, input.q);
+  const ws = withUserAndSearch(userId, searchWhere(input.q));
   return fetchCursorPaginatedList({
     input,
     baseWhere: ws,

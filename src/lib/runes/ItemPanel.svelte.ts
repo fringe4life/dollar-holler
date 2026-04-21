@@ -17,7 +17,7 @@ import { Toggle } from "./Toggle.svelte";
  */
 export class ItemPanel<T> {
   toggle = new Toggle();
-  item = $state<Maybe<T>>(undefined);
+  item = $state<Maybe<T>>(null);
 
   open = (item: T) => {
     this.item = item;

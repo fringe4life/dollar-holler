@@ -1,12 +1,13 @@
-import { db } from "$lib/db";
-import { clients as clientsTable } from "$lib/db/schema";
 import { clientReceivedBalanceExtras } from "$lib/features/clients/queries/clientListHelpers";
 import type { ClientListResponse } from "$lib/features/clients/types";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
 } from "$lib/features/pagination/types";
+import { withUserAndSearch } from "$lib/features/pagination/utils/base-filter";
 import { fetchCursorPaginatedList } from "$lib/features/pagination/utils/cursor-paginated-fetch.server";
+import { db } from "$lib/server/db";
+import { clients as clientsTable } from "$lib/server/db/schema";
 import type { Maybe } from "$lib/types";
 
 const searchWhere = (q: Maybe<string>) => {
@@ -28,12 +29,6 @@ const searchWhere = (q: Maybe<string>) => {
   };
 };
 
-const baseFilter = (userId: string, q: Maybe<string>) => {
-  const base = { userId: { eq: userId } };
-  const sw = searchWhere(q);
-  return sw ? { AND: [base, sw] } : base;
-};
-
 const mapRows = (rows: Array<ClientListResponse>): ClientListResponse[] => {
   return rows.map(
     (row): ClientListResponse => ({
@@ -52,7 +47,7 @@ export const fetchPaginatedClients = async (
   userId: string,
   input: PaginationSearchParams
 ): Promise<CursorPaginatedList<ClientListResponse>> => {
-  const ws = baseFilter(userId, input.q);
+  const ws = withUserAndSearch(userId, searchWhere(input.q));
   return fetchCursorPaginatedList({
     input,
     baseWhere: ws,

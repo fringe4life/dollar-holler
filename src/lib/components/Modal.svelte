@@ -59,12 +59,3 @@
     </Dialog.Content>
   </Dialog.Portal>
 </Dialog.Root>
-
-<!-- <Dialog.Trigger
-        onclick={() => (open = !open)}
-        class="bg-dark text-pastelPurple hover:text-blueGem shadow-mini hover:bg-dark/95
-      focus-visible:ring-foreground focus-visible:ring-offset-background inline-flex h-12 cursor-pointer
-      items-center justify-center rounded-md px-[21px] text-[15px] font-semibold whitespace-nowrap transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-hidden active:scale-95"
-      >
-        {buttonText}
-      </Dialog.Trigger> -->

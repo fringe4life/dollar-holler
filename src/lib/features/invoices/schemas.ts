@@ -1,5 +1,5 @@
 import { paginationSchema } from "$lib/features/pagination/schemas";
-import { invoiceSelectSchema } from "$lib/validators";
+import { invoiceSelectSchema } from "$lib/server/schemas";
 import { type } from "arktype";
 
 /** Cursor list row: invoice + client name + line total. */

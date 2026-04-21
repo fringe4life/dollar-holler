@@ -8,6 +8,7 @@ node_modules
 /.svelte-kit
 /build
 .cursor/*.log
+.fallow
 
 # OS
 .DS_Store

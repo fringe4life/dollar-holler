@@ -1,13 +1,13 @@
 import { getRequestEvent } from "$app/server";
-import { db } from "$lib/db/index";
-import { schemaTables } from "$lib/db/schema";
-import { createId } from "$lib/features/pagination/utils/create-uuidv7";
+import { BETTER_AUTH_SECRET } from "$env/static/private";
+import { PUBLIC_BASE_URL } from "$env/static/public";
+import { createId } from "$lib/features/pagination/utils/create-uuidv7.server";
+import { db } from "$lib/server/db/index";
+import { schemaTables } from "$lib/server/db/schema";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth } from "better-auth/minimal";
 import { bearer, openAPI } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
-import { BETTER_AUTH_SECRET } from "$env/static/private";
-import { PUBLIC_BASE_URL } from "$env/static/public";
 export const auth = betterAuth({
   appName: "Dollar Holler",
   baseURL: PUBLIC_BASE_URL,

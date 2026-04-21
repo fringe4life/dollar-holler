@@ -14,7 +14,7 @@
     ClientListResponse,
     ClientSelect,
   } from "$lib/features/clients/types";
-  import Pagination from "$lib/features/pagination/components/Pagination.svelte";
+  import PaginatedList from "$lib/features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$lib/features/pagination/types";
   import { listUrlKey } from "$lib/features/pagination/utils/url";
   import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
@@ -24,8 +24,6 @@
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
-
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
 
   const createForm = new Toggle();
   const editPanel = new ItemPanel<ClientSelect>();
@@ -60,48 +58,33 @@
   {/snippet}
 </ItemsHeader>
 
-<div class="flex grow flex-col">
-  {#if clientsStore.loading}
+<PaginatedList store={clientsStore} class="grid-rows-[1fr_min-content]">
+  {#snippet header()}
     <ClientRowHeader />
-    <div class="flex flex-col-reverse gap-4">
-      <ClientRowSkeleton />
-      <ClientRowSkeleton />
-      <ClientRowSkeleton />
-      <ClientRowSkeleton />
-      <ClientRowSkeleton />
-    </div>
-  {:else if clientsStore.error}
-    <div class="grid place-content-center py-8 block-full">
-      <div class="text-lg text-red-500">Error: {clientsStore.error}</div>
-    </div>
-  {:else if clientsStore.items.length === 0 && !searchQuery}
+  {/snippet}
+  {#snippet skeleton()}
+    <ClientRowSkeleton />
+  {/snippet}
+  {#snippet row(client)}
+    <ClientRow
+      {client}
+      onEdit={editPanel.open}
+      onDelete={deleteModal.open}
+      onActivate={handleActivate}
+      onArchive={handleArchive}
+    />
+  {/snippet}
+  {#snippet blankState()}
     <BlankState />
-  {:else if clientsStore.items.length === 0 && searchQuery}
+  {/snippet}
+  {#snippet noResults()}
     <NoSearchResults>
       {#snippet header()}
         <ClientRowHeader emptyState={true} />
       {/snippet}
     </NoSearchResults>
-  {:else}
-    <div
-      class="grid min-h-full grid-rows-[1fr_min-content] items-start gap-y-4 lg:grid-rows-[min-content_1fr_min-content]"
-    >
-      <ClientRowHeader />
-      <div class="flex h-full flex-col-reverse justify-end gap-4">
-        {#each clientsStore.items as client (client.id)}
-          <ClientRow
-            {client}
-            onEdit={editPanel.open}
-            onDelete={deleteModal.open}
-            onActivate={handleActivate}
-            onArchive={handleArchive}
-          />
-        {/each}
-      </div>
-      <Pagination store={clientsStore} />
-    </div>
-  {/if}
-</div>
+  {/snippet}
+</PaginatedList>
 
 <SlidePanel bind:open={createForm.isOn} buttonText="">
   {#snippet title()}

@@ -9,13 +9,13 @@ export interface ClientInvoiceSummaryCents {
 }
 
 /** Rows must include computed `total` (cents), status, and due date for overdue vs outstanding. */
-export function aggregateClientInvoiceBuckets(
+export const aggregateClientInvoiceBuckets = (
   rows: readonly {
     total: number;
     invoiceStatus: string | null;
     dueDate: Date;
   }[]
-): ClientInvoiceSummaryCents {
+): ClientInvoiceSummaryCents => {
   let overdue = 0;
   let outstanding = 0;
   let draft = 0;
@@ -38,4 +38,4 @@ export function aggregateClientInvoiceBuckets(
 
   const grandTotal = overdue + outstanding + draft + paid;
   return { overdue, outstanding, draft, paid, grandTotal };
-}
+};

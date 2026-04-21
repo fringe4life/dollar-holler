@@ -1,12 +1,12 @@
 import { building } from "$app/environment";
-import { auth } from "$lib/auth";
+import { auth } from "$lib/auth.server";
 import { tryCatch } from "$lib/utils/try-catch";
 import { type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 
 // get session from better auth and populate locals
-export const localsHandler: Handle = async ({ event, resolve }) => {
+const localsHandler: Handle = async ({ event, resolve }) => {
   const { data: result } = await tryCatch(() =>
     auth.api.getSession({
       headers: event.request.headers,
@@ -20,7 +20,7 @@ export const localsHandler: Handle = async ({ event, resolve }) => {
 };
 
 // auth handler for better auth routes
-export const authHandler: Handle = async ({ event, resolve }) =>
+const authHandler: Handle = async ({ event, resolve }) =>
   svelteKitHandler({
     event,
     resolve,
@@ -33,7 +33,7 @@ const PROTECTED_ROUTES = ["/invoices", "/clients", "/settings"];
 const UNPROTECTED_ROUTES = ["/login", "/signup"];
 
 // Auth guard for protected routes
-export const authGuard: Handle = async ({ event, resolve }) => {
+const authGuard: Handle = async ({ event, resolve }) => {
   const path = event.url.pathname;
   // if not logged in and attempting to access protected routes, redirect to login
   if (!event.locals.session) {
@@ -54,7 +54,7 @@ export const authGuard: Handle = async ({ event, resolve }) => {
 };
 
 /** Preload self-hosted fonts from bundled CSS (not invoked in vite dev). */
-export const fontPreloadHandler: Handle = async ({ event, resolve }) =>
+const fontPreloadHandler: Handle = async ({ event, resolve }) =>
   resolve(event, {
     preload: ({ type }) => type === "js" || type === "css" || type === "font",
   });

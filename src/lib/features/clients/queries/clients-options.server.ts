@@ -1,5 +1,5 @@
-import { db } from "$lib/db";
 import type { ClientPickerOption } from "$lib/features/clients/types";
+import { db } from "$lib/server/db";
 import { tryCatch } from "$lib/utils/try-catch";
 
 /**

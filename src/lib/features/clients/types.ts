@@ -2,7 +2,7 @@ import type {
   clientInsertSchema,
   clientSelectSchema,
   clientUpdateSchema,
-} from "$lib/validators";
+} from "$lib/server/schemas";
 import type {
   clientListRowSchema,
   clientPickerOptionSchema,

@@ -1,12 +1,12 @@
 /* eslint-disable new-cap */
-import { db } from "$lib/db";
-import { settings as settingsTable } from "$lib/db/schema";
-import { apiErrorBodySchema } from "$lib/server/schemas";
+import { db } from "$lib/server/db";
+import { settings as settingsTable } from "$lib/server/db/schema";
 import {
+  apiErrorBodySchema,
   settingsInsertSchema,
   settingsSelectSchema,
   settingsUpdateSchema,
-} from "$lib/validators";
+} from "$lib/server/schemas";
 import { eq } from "drizzle-orm";
 import { Elysia } from "elysia";
 import { protectedApiPlugin } from "../plugins/auth-plugin";

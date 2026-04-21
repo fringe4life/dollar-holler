@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0%20beta.22-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.0.2-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0%20beta.22-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
 
@@ -31,9 +31,9 @@ A modern invoice management application built with SvelteKit 5, featuring Better
    - **Without Bitwarden (e.g. quick local setup):** Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, and `PUBLIC_BASE_URL` in `.env` or `.env.local`. Host and CI variables still override resolved values when set.
    - **Types:** After changing `.env.schema`, run `bun run env:typegen` to refresh [`src/env-varlock.d.ts`](./src/env-varlock.d.ts).
 
-   The app resolves configuration from Varlock (`varlock/env`) for the database pool ([`src/lib/db/index.ts`](./src/lib/db/index.ts)), Drizzle Kit ([`drizzle.config.ts`](./drizzle.config.ts)), auth ([`src/lib/auth.ts`](./src/lib/auth.ts)), and the Eden client ([`src/lib/api.ts`](./src/lib/api.ts)). SvelteKit `$env/static/*` remains available where used.
+   The app resolves configuration from Varlock (`varlock/env`) for Drizzle Kit ([`drizzle.config.ts`](./drizzle.config.ts)), auth ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts)), and the Eden client ([`src/lib/api.ts`](./src/lib/api.ts)). The database pool ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)) reads `DATABASE_URL` from SvelteKit `$env/static/private` (populated by the Varlock Vite integration in dev/build). SvelteKit `$env/static/*` remains available where used.
 
-3. **Set up the database:** The `bun run db:*` scripts wrap Drizzle Kit with `varlock run` so `DATABASE_URL` is resolved the same way as the app (see `.env.schema`). `drizzle.config.ts` points at `./src/lib/db/schema.ts` and writes migrations under `./src/lib/db/migrations`.
+3. **Set up the database:** The `bun run db:*` scripts wrap Drizzle Kit with `varlock run` so `DATABASE_URL` is resolved the same way as the app (see `.env.schema`). `drizzle.config.ts` points at `./src/lib/server/db/schema.ts` and writes migrations under `./src/lib/server/db/migrations`.
 
    ```bash
    # Generate migrations
@@ -63,7 +63,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run build` - Build for production
 - `bun run preview` - Preview production build
 - `bun run check` - Run Ultracite checks
-- `bun run check:watch` - Run Svelte check in watch mode
+- `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations
 - `bun run db:migrate` - Run database migrations
@@ -76,6 +76,10 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run lint:fix` - Auto-fix lint and formatting issues
 - `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
 - `bun run fix` - Run Ultracite fix (`ultracite fix`)
+- `bun run fallow` - Run [Fallow](https://github.com/benefacto/fallow) (project graph and analysis)
+- `bun run fallow:dead-code` - Fallow dead-code pass
+- `bun run fallow:boundaries` - List configured boundaries
+- `bun run fallow:boundary-violations` - Dead-code with boundary violations
 
 ## Tech Stack
 
@@ -83,8 +87,8 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`)
 - **Database:** PostgreSQL with Neon serverless
 - **ORM:** Drizzle ORM (beta) with Neon serverless driver (WebSocket `Pool`)
-- **Authentication:** Better Auth with email/password (`src/lib/auth.ts`, Drizzle adapter)
-- **ID generation:** `Bun.randomUUIDv7()` via `src/lib/features/pagination/utils/create-uuidv7.ts` (cursor-friendly IDs)
+- **Authentication:** Better Auth with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter, bearer + OpenAPI plugins)
+- **ID generation:** `Bun.randomUUIDv7()` via [`create-uuidv7.server.ts`](./src/lib/features/pagination/utils/create-uuidv7.server.ts) (cursor-friendly IDs)
 - **Deployment:** Vercel adapter
 - **Package manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
@@ -98,18 +102,18 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ```
 src/
 ├── lib/
-│   ├── auth.ts              # Better Auth configuration (Drizzle adapter, UUIDv7 user IDs)
+│   ├── auth.server.ts       # Better Auth configuration (Drizzle adapter, UUIDv7 IDs)
 │   ├── auth-client.ts       # Client-side auth helpers
 │   ├── api.ts               # Eden Treaty client (`apiClient`)
-│   ├── db/
-│   │   ├── index.ts         # Database connection (Neon serverless WebSocket pool)
-│   │   ├── schema.ts        # Drizzle tables and enums
-│   │   ├── types.ts         # Enum-derived types (e.g. client/invoice status)
-│   │   ├── relations.ts     # Drizzle relations v2 (`defineRelations`)
-│   │   ├── seed.ts          # Database seeding
-│   │   ├── clear-app-data.ts
-│   │   └── migrate.ts
 │   ├── server/
+│   │   ├── db/
+│   │   │   ├── index.ts     # Database connection (Neon serverless WebSocket pool)
+│   │   │   ├── schema.ts    # Drizzle tables and enums
+│   │   │   ├── types.ts     # Enum-derived types (e.g. client/invoice status)
+│   │   │   ├── relations.ts # Drizzle relations v2 (`defineRelations`)
+│   │   │   ├── seed.ts      # Database seeding
+│   │   │   ├── clear-app-data.ts
+│   │   │   └── migrate.ts
 │   │   ├── app.ts           # Elysia app: OpenAPI plugin, auth mount, API routes, error mapping
 │   │   ├── plugins/         # OpenAPI (dev), auth, list-query
 │   │   ├── schemas.ts       # Shared API response shapes
@@ -120,14 +124,13 @@ src/
 │   │   ├── clients/       # includes server queries (list, options, verify)
 │   │   ├── invoices/      # includes server queries (list, verify)
 │   │   ├── line-items/
-│   │   ├── pagination/    # Cursor list-query helpers, cursor-paginated-fetch, parse-cursor-id, UUIDv7
+│   │   ├── pagination/    # PaginatedList, base filters, UUIDv7 `createId` (server module)
 │   │   └── settings/
 │   ├── components/        # Shared UI (icons under components/icons/)
 │   ├── attachments/       # Svelte 5 @attach helpers (e.g. swipe, clickOutside)
 │   ├── runes/             # Shared rune modules (ItemPanel, etc.)
 │   ├── stores/            # Shared list-store bases, dashboard context
-│   ├── utils/
-│   └── validators.ts
+│   └── utils/
 ├── routes/
 │   ├── (auth)/            # Login, signup, password reset, logout
 │   ├── (dashboard)/
@@ -152,7 +155,7 @@ The application uses the following main tables:
 - `line_items` - Invoice line items
 - `settings` - User settings
 
-Primary keys use PostgreSQL `uuid` columns; IDs are Bun UUIDv7 strings from `createId` (including Better Auth `generateId` in [`src/lib/auth.ts`](./src/lib/auth.ts)). Foreign keys use cascade deletes where appropriate.
+Primary keys use PostgreSQL `uuid` columns; IDs are Bun UUIDv7 strings from `createId` (including Better Auth `generateId` in [`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Foreign keys use cascade deletes where appropriate.
 
 The application uses Drizzle's relations v2 (`defineRelations`) to simplify nested queries (e.g., `db.query.invoices.findMany({ with: { client: true, lineItems: true } })`) and avoid manual joins in API routes.
 
@@ -181,7 +184,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 - Uses Vite 8 (`vite` in `package.json`). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
 - ESLint configuration is in `eslint.config.mjs` and uses Svelte 5 rules and Prettier integration. Prettier is configured in `prettier.config.mjs`. Use `bun run format` before `bun run lint`.
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
-- Better Auth is configured to use Bun UUIDv7 for user ID generation and includes session caching for performance.
+- Better Auth is configured in `auth.server.ts` to use Bun UUIDv7 for user ID generation and includes session caching for performance.
 - App configuration lives in `svelte.config.ts` (Vercel adapter, preprocess, Svelte 5 async compiler option).
 
 ## License

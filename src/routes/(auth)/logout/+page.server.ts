@@ -1,5 +1,5 @@
+import { auth } from "$lib/auth.server";
 import { redirect } from "@sveltejs/kit";
-import { auth } from "$lib/auth";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ request }) => {

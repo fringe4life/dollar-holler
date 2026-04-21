@@ -1,6 +1,6 @@
 import { apiClient } from "$lib/api";
-import type { ClientStatus } from "$lib/db/types";
 import type { CursorPaginatedList } from "$lib/features/pagination/types";
+import type { ClientStatus } from "$lib/server/db/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
 import {

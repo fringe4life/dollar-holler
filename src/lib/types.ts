@@ -5,7 +5,7 @@ export type BitsButton = MouseEventHandler<HTMLButtonElement> &
   MouseEventHandler<HTMLAnchorElement>;
 
 declare const __brand: unique symbol;
-export type Brand<T, U extends string> = T & { [__brand]: U };
+type Brand<T, U extends string> = T & { [__brand]: U };
 
 export type SanitizedHTML = Brand<string, "SanitizedHTML">;
 export type CursorId = Brand<string, "CursorId">;

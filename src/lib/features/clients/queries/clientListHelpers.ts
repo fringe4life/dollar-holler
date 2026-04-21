@@ -10,7 +10,7 @@
  *
  * @see ../../invoices/queries/invoiceListHelpers.ts for `lineItemsSubtotalSqlForInvoiceId`.
  */
-import { clients as clientsTable } from "$lib/db/schema";
+import { clients as clientsTable } from "$lib/server/db/schema";
 import { sql } from "drizzle-orm";
 
 /**

@@ -1,9 +1,26 @@
 import {
   cursorSchema,
   paginationSchema,
-} from "$lib/features/pagination/schemas";
-import { clientSelectSchema } from "$lib/server/schemas";
+} from "$features/pagination/schemas.server";
+import { clients } from "$lib/server/db/schema";
 import { type } from "arktype";
+import {
+  createInsertSchema,
+  createSelectSchema,
+  createUpdateSchema,
+} from "drizzle-orm/arktype";
+
+export const clientInsertSchema = createInsertSchema(clients).omit(
+  "createdAt",
+  "updatedAt",
+  "userId"
+);
+export const clientSelectSchema = createSelectSchema(clients).omit("userId");
+export const clientUpdateSchema = createUpdateSchema(clients).omit(
+  "createdAt",
+  "updatedAt",
+  "userId"
+);
 
 export const clientStatusSchema = type({
   clientStatus: "'active' | 'archive'",

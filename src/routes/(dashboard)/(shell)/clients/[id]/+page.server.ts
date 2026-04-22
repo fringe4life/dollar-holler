@@ -1,9 +1,9 @@
 import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
-} from "$lib/features/invoices/queries/invoices-list.server";
-import { cursorSchema } from "$lib/features/pagination/schemas";
-import { normalizeListQueryFromUrl } from "$lib/features/pagination/utils/list-query";
+} from "$features/invoices/queries/invoices-list.server";
+import { cursorSchema } from "$features/pagination/schemas.server";
+import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
 import { db } from "$lib/server/db";
 import { tryCatch } from "$lib/utils/try-catch";
 import { error, redirect } from "@sveltejs/kit";

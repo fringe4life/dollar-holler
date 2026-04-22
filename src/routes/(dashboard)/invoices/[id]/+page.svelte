@@ -1,9 +1,9 @@
 <script lang="ts">
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
+  import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
   import HtmlContent from "$lib/components/HtmlContent.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import LineItemRows from "$lib/features/line-items/components/LineItemRows.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";

@@ -1,7 +1,7 @@
 import type {
   CursorPaginatedList,
   CursorRow,
-} from "$lib/features/pagination/types";
+} from "$features/pagination/types";
 import type { CursorId } from "$lib/types";
 import { DEFAULT_PAGINATION_METADATA } from "../constants";
 import type { ListDirection } from "../types";

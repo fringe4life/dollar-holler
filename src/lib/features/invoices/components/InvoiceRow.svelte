@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { getLabel } from "$features/invoices/utils/labelHelpers";
   import AdditionalOptions from "$lib/components/additionaloptions/AdditionalOptions.svelte";
   import AdditionalOptionsButton from "$lib/components/additionaloptions/AdditionalOptionsButton.svelte";
   import type { Option } from "$lib/components/additionaloptions/AdditionalOptionsItem.svelte";
@@ -10,7 +11,6 @@
   import View from "$lib/components/icons/View.svelte";
   import Swipeable from "$lib/components/Swipeable.svelte";
   import Badge from "$lib/components/ui/badge/badge.svelte";
-  import { getLabel } from "$lib/features/invoices/utils/labelHelpers";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { MouseEventHandler } from "svelte/elements";

@@ -4,8 +4,15 @@
   "rules": {
     "boundary-violation": "warn"
   },
+  "duplicates": {
+    "ignore": ["src/lib/server/db/schema.ts"]
+  },
   "boundaries": {
     "zones": [
+      {
+        "name": "features-server",
+        "patterns": ["src/lib/features/**/*.server.ts"]
+      },
       { "name": "features", "patterns": ["src/lib/features/**"] },
       {
         "name": "server-db",
@@ -27,15 +34,39 @@
     "rules": [
       {
         "from": "routes",
-        "allow": ["features", "components", "shared", "server", "server-db"]
+        "allow": [
+          "features",
+          "features-server",
+          "components",
+          "shared",
+          "server",
+          "server-db"
+        ]
+      },
+      {
+        "from": "features-server",
+        "allow": [
+          "features",
+          "components",
+          "shared",
+          "attachments",
+          "server-db",
+          "server"
+        ]
       },
       {
         "from": "features",
-        "allow": ["components", "shared", "attachments", "server-db"]
+        "allow": [
+          "components",
+          "shared",
+          "attachments",
+          "server-db",
+          "features-server"
+        ]
       },
       {
         "from": "server",
-        "allow": ["features", "shared", "server-db"]
+        "allow": ["features", "features-server", "shared", "server-db"]
       },
       {
         "from": "components",

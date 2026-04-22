@@ -5,12 +5,12 @@
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
   import Search from "$lib/components/icons/Search.svelte";
-  import type { SearchableListStore } from "$lib/features/pagination/types";
+  import type { SearchableListStore } from "$features/pagination/types";
   import {
     parseLimitParam,
     toNormalizedListQuery,
-  } from "$lib/features/pagination/utils/list-query";
-  import { buildListSearchString } from "$lib/features/pagination/utils/url";
+  } from "$features/pagination/utils/list-query";
+  import { buildListSearchString } from "$features/pagination/utils/url";
   import { Toggle } from "$lib/runes/Toggle.svelte";
   import type { KeyboardEventHandler } from "svelte/elements";
 

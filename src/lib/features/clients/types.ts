@@ -1,14 +1,12 @@
 import type {
   clientInsertSchema,
-  clientSelectSchema,
-  clientUpdateSchema,
-} from "$lib/server/schemas";
-import type {
   clientListRowSchema,
   clientPickerOptionSchema,
   clientPickerOptionsResponseSchema,
   clientReceivedBalanceSchema,
-} from "./schemas";
+  clientSelectSchema,
+  clientUpdateSchema,
+} from "./schemas.server";
 export type ClientInsert = typeof clientInsertSchema.infer;
 export type ClientSelect = typeof clientSelectSchema.infer;
 export type ClientUpdate = typeof clientUpdateSchema.infer;

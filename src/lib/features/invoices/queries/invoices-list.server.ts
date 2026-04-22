@@ -2,21 +2,21 @@ import {
   lineItemsSubtotalSqlForInvoiceId,
   mapRowsWithTotal,
   type RowWithSubtotal,
-} from "$lib/features/invoices/queries/invoiceListHelpers";
-import type { InvoiceListResponse } from "$lib/features/invoices/types";
+} from "$features/invoices/queries/invoiceListHelpers";
+import type { InvoiceListResponse } from "$features/invoices/types";
 import {
   aggregateClientInvoiceBuckets,
   type ClientInvoiceSummaryCents,
-} from "$lib/features/invoices/utils/client-invoice-summary";
+} from "$features/invoices/utils/client-invoice-summary";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
-} from "$lib/features/pagination/types";
-import { withUserAndSearch } from "$lib/features/pagination/utils/base-filter";
+} from "$features/pagination/types";
+import { withUserAndSearch } from "$features/pagination/utils/base-filter";
 import {
   fetchCursorPaginatedList,
   type FetchPageArgs,
-} from "$lib/features/pagination/utils/cursor-paginated-fetch.server";
+} from "$features/pagination/utils/cursor-paginated-fetch.server";
 import { db } from "$lib/server/db";
 import { invoices as invoicesTable } from "$lib/server/db/schema";
 import type { CursorId, Maybe } from "$lib/types";

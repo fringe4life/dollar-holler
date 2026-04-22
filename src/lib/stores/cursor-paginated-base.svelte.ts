@@ -1,15 +1,15 @@
-import { DEFAULT_PAGINATION_METADATA } from "$lib/features/pagination/constants";
+import { DEFAULT_PAGINATION_METADATA } from "$features/pagination/constants";
 import type {
   CursorPaginatedList,
   CursorRow,
   PaginatableItems,
   PaginationMetadata,
   PaginationSearchParams,
-} from "$lib/features/pagination/types";
+} from "$features/pagination/types";
 import {
   normalizedToQueryRecord,
   serializeNormalizedForKey,
-} from "$lib/features/pagination/utils/url";
+} from "$features/pagination/utils/url";
 import type { Maybe } from "$lib/types";
 import {
   StoreOperation,

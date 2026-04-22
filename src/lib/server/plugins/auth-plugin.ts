@@ -1,6 +1,6 @@
+import { verifyClient } from "$features/clients/queries/verify-client";
+import { verifyInvoice } from "$features/invoices/queries/verify-invoice";
 import { auth } from "$lib/auth.server";
-import { verifyClient } from "$lib/features/clients/queries/verify-client";
-import { verifyInvoice } from "$lib/features/invoices/queries/verify-invoice";
 import { Elysia } from "elysia";
 import { idResponseSchema } from "../schemas";
 import { NotFoundError, UnauthorizedError } from "../utils/errors";

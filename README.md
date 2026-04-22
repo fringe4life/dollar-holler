@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0%20beta.22-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 
 </div>
 
@@ -102,8 +102,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ```
 src/
 ├── lib/
-│   ├── auth.server.ts       # Better Auth configuration (Drizzle adapter, UUIDv7 IDs)
-│   ├── auth-client.ts       # Client-side auth helpers
+│   ├── auth.server.ts       # Centralized Better Auth configuration (Drizzle adapter, UUIDv7 IDs)
 │   ├── api.ts               # Eden Treaty client (`apiClient`)
 │   ├── server/
 │   │   ├── db/
@@ -112,8 +111,7 @@ src/
 │   │   │   ├── types.ts     # Enum-derived types (e.g. client/invoice status)
 │   │   │   ├── relations.ts # Drizzle relations v2 (`defineRelations`)
 │   │   │   ├── seed.ts      # Database seeding
-│   │   │   ├── clear-app-data.ts
-│   │   │   └── migrate.ts
+│   │   │   └── clear-app-data.ts
 │   │   ├── app.ts           # Elysia app: OpenAPI plugin, auth mount, API routes, error mapping
 │   │   ├── plugins/         # OpenAPI (dev), auth, list-query
 │   │   ├── schemas.ts       # Shared API response shapes

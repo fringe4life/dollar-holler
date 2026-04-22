@@ -1,3 +1,4 @@
+import { createId } from "$features/pagination/utils/create-uuidv7.server";
 import type { CursorId } from "$lib/types";
 import {
   boolean,
@@ -11,7 +12,6 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createId } from "../../features/pagination/utils/create-uuidv7.server";
 
 export const clientStatusEnum = pgEnum("client_status", ["active", "archive"]);
 

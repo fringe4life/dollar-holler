@@ -1,5 +1,5 @@
-import { fetchPaginatedClients } from "$lib/features/clients/queries/clients-list.server";
-import { normalizeListQueryFromUrl } from "$lib/features/pagination/utils/list-query";
+import { fetchPaginatedClients } from "$features/clients/queries/clients-list.server";
+import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
 import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 

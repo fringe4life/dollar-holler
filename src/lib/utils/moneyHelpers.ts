@@ -1,8 +1,8 @@
-import type { InvoiceSelect } from "$lib/features/invoices/types";
+import type { InvoiceSelect } from "$features/invoices/types";
 import type {
   LineItemEditRow,
   NewLineItemWithId,
-} from "$lib/features/line-items/types";
+} from "$features/line-items/types";
 import type { List, Maybe } from "$lib/types";
 
 /**

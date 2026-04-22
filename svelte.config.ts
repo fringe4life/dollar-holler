@@ -5,7 +5,10 @@ const config: Config = {
   preprocess: [vitePreprocess()],
   kit: {
     adapter: adapter(),
-    alias: { $utils: "./src/utils" },
+    alias: {
+      $features: "./src/lib/features",
+      $lib: "./src/lib",
+    },
     typescript: {
       config: (config) => ({
         ...config,

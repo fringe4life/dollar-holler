@@ -1,28 +1,27 @@
-/* eslint-disable new-cap */
-import { fetchPaginatedClients } from "$lib/features/clients/queries/clients-list.server";
-import { fetchClientPickerOptions } from "$lib/features/clients/queries/clients-options.server";
+import { fetchPaginatedClients } from "$features/clients/queries/clients-list.server";
+import { fetchClientPickerOptions } from "$features/clients/queries/clients-options.server";
 import {
+  clientInsertSchema,
   clientPaginatedListSchema,
   clientPickerOptionsResponseSchema,
+  clientSelectSchema,
   clientStatusPatchResponseSchema,
   clientStatusSchema,
-} from "$lib/features/clients/schemas";
+  clientUpdateSchema,
+} from "$features/clients/schemas.server";
 import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
-} from "$lib/features/invoices/queries/invoices-list.server";
+} from "$features/invoices/queries/invoices-list.server";
 import {
   clientInvoiceSummarySchema,
   invoicePaginatedListSchema,
-} from "$lib/features/invoices/schemas";
-import { querySchema } from "$lib/features/pagination/schemas";
+} from "$features/invoices/schemas.server";
+import { querySchema } from "$features/pagination/schemas.server";
 import { db } from "$lib/server/db";
 import { clients as clientsTable } from "$lib/server/db/schema";
 import {
   apiErrorBodySchema,
-  clientInsertSchema,
-  clientSelectSchema,
-  clientUpdateSchema,
   deleteSuccessSchema,
   idResponseSchema,
 } from "$lib/server/schemas";

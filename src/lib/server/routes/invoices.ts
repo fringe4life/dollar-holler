@@ -1,6 +1,15 @@
-/* eslint-disable new-cap */
-import { fetchPaginatedInvoices } from "$lib/features/invoices/queries/invoices-list.server";
-import { invoicePaginatedListSchema } from "$lib/features/invoices/schemas";
+import { fetchPaginatedInvoices } from "$features/invoices/queries/invoices-list.server";
+import {
+  invoiceInsertSchema,
+  invoicePaginatedListSchema,
+  invoiceSelectSchema,
+  invoiceUpdateSchema,
+} from "$features/invoices/schemas.server";
+import {
+  lineItemEditRowSchema,
+  lineItemInsertSchema,
+  lineItemSelectSchema,
+} from "$features/line-items/schemas.server";
 import { db } from "$lib/server/db";
 import {
   invoices as invoicesTable,
@@ -10,12 +19,6 @@ import {
   apiErrorBodySchema,
   deleteSuccessSchema,
   idResponseSchema,
-  invoiceInsertSchema,
-  invoiceSelectSchema,
-  invoiceUpdateSchema,
-  lineItemEditRowSchema,
-  lineItemInsertSchema,
-  lineItemSelectSchema,
 } from "$lib/server/schemas";
 import { type } from "arktype";
 import { and, eq } from "drizzle-orm";

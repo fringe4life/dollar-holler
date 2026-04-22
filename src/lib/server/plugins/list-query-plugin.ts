@@ -1,5 +1,5 @@
-import { listQueryWireSchema } from "$lib/features/pagination/schemas";
-import { normalizeListQuery } from "$lib/features/pagination/utils/list-query";
+import { listQueryWireSchema } from "$features/pagination/schemas.server";
+import { normalizeListQuery } from "$features/pagination/utils/list-query";
 import { Elysia } from "elysia";
 
 /**

@@ -1,6 +1,6 @@
 import { resolve } from "$app/paths";
+import { loginSchema } from "$features/auth/schemas.server";
 import { auth } from "$lib/auth.server";
-import { loginSchema } from "$lib/features/auth/schemas";
 import { tryCatch } from "$lib/utils/try-catch";
 import { fail, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";

@@ -3,7 +3,7 @@ import type {
   listDirectionSchema,
   listQueryWireSchema,
   paginationMetadataSchema,
-} from "./schemas";
+} from "./schemas.server";
 
 export interface NormalizeListQueryResult {
   normalized: PaginationSearchParams;

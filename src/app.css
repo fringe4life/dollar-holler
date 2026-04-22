@@ -48,6 +48,62 @@
   navigation: auto;
 }
 
+@keyframes --slide-in {
+  from {
+    translate: var(--slide-distance) 0;
+  }
+}
+
+@keyframes --slide-out {
+  to {
+    translate: var(--slide-distance) 0;
+  }
+}
+
+@keyframes --fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes --fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+:active-view-transition-type(forwards) {
+  &::view-transition-old(paginated-list-rows) {
+    --slide-distance: -60px;
+    animation:
+      --fade-out 250ms ease both,
+      --slide-out 250ms ease both;
+  }
+
+  &::view-transition-new(paginated-list-rows) {
+    --slide-distance: calc(100vw + 60px);
+    animation:
+      --fade-in 250ms ease both,
+      --slide-in 250ms ease both;
+  }
+}
+
+:active-view-transition-type(backwards) {
+  &::view-transition-old(paginated-list-rows) {
+    --slide-distance: calc(100vw + 60px);
+    animation:
+      --fade-out 250ms ease both,
+      --slide-out 250ms ease both;
+  }
+
+  &::view-transition-new(paginated-list-rows) {
+    --slide-distance: -60px;
+    animation:
+      --fade-in 250ms ease both,
+      --slide-in 250ms ease both;
+  }
+}
+
 @theme {
   --color-*: initial;
   --font-sansserif: "Source Sans 3", sans-serif;

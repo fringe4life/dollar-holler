@@ -6,11 +6,11 @@
   import {
     computeSettingsEditableDelta,
     pickSettingsEditableSnapshot,
-  } from "$lib/features/settings/settings-diff";
+  } from "$features/settings/settings-diff";
   import type {
     SettingsEditableSnapshot,
     SettingsSelect,
-  } from "$lib/features/settings/types";
+  } from "$features/settings/types";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import { onMount } from "svelte";
   import { toast } from "svelte-sonner";

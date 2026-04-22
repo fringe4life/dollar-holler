@@ -1,8 +1,8 @@
-import type { ClientInsert, ClientSelect } from "$lib/features/clients/types";
-import type { InvoiceInsert } from "$lib/features/invoices/types";
-import type { LineItemInsert } from "$lib/features/line-items/types";
-import { createId } from "$lib/features/pagination/utils/create-uuidv7.server";
-import type { SettingsInsert } from "$lib/features/settings/types";
+import type { ClientInsert, ClientSelect } from "$features/clients/types";
+import type { InvoiceInsert } from "$features/invoices/types";
+import type { LineItemInsert } from "$features/line-items/types";
+import { createId } from "$features/pagination/utils/create-uuidv7.server";
+import type { SettingsInsert } from "$features/settings/types";
 import type { CursorId } from "$lib/types";
 import { neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";

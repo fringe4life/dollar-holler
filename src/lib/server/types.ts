@@ -1,4 +1,4 @@
-import { apiErrorBodySchema, idResponseSchema } from "./schemas";
+import type { apiErrorBodySchema, idResponseSchema } from "./schemas";
 
 export type ApiErrorBody = typeof apiErrorBodySchema.infer;
 

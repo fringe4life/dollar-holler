@@ -5,18 +5,18 @@
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import ItemsHeader from "$lib/components/ItemsHeader.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
-  import BlankState from "$lib/features/clients/components/BlankState.svelte";
-  import ClientForm from "$lib/features/clients/components/ClientForm.svelte";
-  import ClientRow from "$lib/features/clients/components/ClientRow.svelte";
-  import ClientRowHeader from "$lib/features/clients/components/ClientRowHeader.svelte";
-  import ClientRowSkeleton from "$lib/features/clients/components/ClientRowSkeleton.svelte";
+  import BlankState from "$features/clients/components/BlankState.svelte";
+  import ClientForm from "$features/clients/components/ClientForm.svelte";
+  import ClientRow from "$features/clients/components/ClientRow.svelte";
+  import ClientRowHeader from "$features/clients/components/ClientRowHeader.svelte";
+  import ClientRowSkeleton from "$features/clients/components/ClientRowSkeleton.svelte";
   import type {
     ClientListResponse,
     ClientSelect,
-  } from "$lib/features/clients/types";
-  import PaginatedList from "$lib/features/pagination/components/PaginatedList.svelte";
-  import type { CursorPaginatedList } from "$lib/features/pagination/types";
-  import { listUrlKey } from "$lib/features/pagination/utils/url";
+  } from "$features/clients/types";
+  import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
+  import type { CursorPaginatedList } from "$features/pagination/types";
+  import { listUrlKey } from "$features/pagination/utils/url";
   import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";

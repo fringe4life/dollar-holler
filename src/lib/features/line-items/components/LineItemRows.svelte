@@ -1,7 +1,7 @@
 <script lang="ts">
+  import type { LineItemRowsProps } from "$features/line-items/types";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import type { LineItemRowsProps } from "$lib/features/line-items/types";
   import { centsToDollars, sumLineItems } from "$lib/utils/moneyHelpers";
   import type { FormEventHandler } from "svelte/elements";
   import LineItemRow from "./LineItemRow.svelte";

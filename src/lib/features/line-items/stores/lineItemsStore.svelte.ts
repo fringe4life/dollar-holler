@@ -1,9 +1,9 @@
-import { apiClient } from "$lib/api";
 import type {
   Key,
   LineItemInsert,
   NewLineItemWithId,
-} from "$lib/features/line-items/types";
+} from "$features/line-items/types";
+import { apiClient } from "$lib/api";
 import { StoreResourceErrorBase } from "$lib/stores/store-resource-error-base.svelte";
 import type { CursorId, List } from "$lib/types";
 import {
@@ -13,19 +13,14 @@ import {
 } from "$lib/utils/error-message";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import { toast } from "svelte-sonner";
-import type { LineItemEditRow } from "../types";
+import type { LineItemEditRow, UIKey } from "../types";
 
 export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
   protected readonly resourceSingular = "line item";
   protected readonly resourcePlural = "line items";
 
-  /** Line amount from quantity × unit price. */
-  amountFromUnitPrice(quantity: number, unitPrice: number): number {
-    return quantity * unitPrice;
-  }
-
   /** Returns a blank LineItem for form rows (new id and timestamps each call). */
-  newLineItem({ id }: { id: number }): NewLineItemWithId {
+  newLineItem(id: UIKey): NewLineItemWithId {
     return {
       id,
       description: "",
@@ -129,6 +124,9 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
 
   // Delete a line item
   async deleteLineItem(lineItemId: Key) {
+    if (typeof lineItemId === "number") {
+      return;
+    }
     const fallback = this.fallbackFor(StoreOperation.deleteOne);
     try {
       unwrapTreatyResult(

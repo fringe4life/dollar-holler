@@ -3,7 +3,7 @@ import type {
   lineItemInsertSchema,
   lineItemSelectSchema,
   lineItemUpdateSchema,
-} from "$lib/server/schemas";
+} from "./schemas.server";
 import type { BitsButton, CursorId, List } from "$lib/types";
 import type { InvoiceSelect } from "../invoices/types";
 

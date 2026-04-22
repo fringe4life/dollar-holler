@@ -50,11 +50,14 @@
     {@render noResults?.()}
   {:else}
     <div
-      class="grid min-h-full items-start gap-y-4 lg:grid-rows-[min-content_1fr_min-content] {extraClass ??
+      class="grid grid-rows-[1fr_min-content] items-start gap-y-4 min-block-full lg:grid-rows-[min-content_1fr_min-content] {extraClass ??
         ''}"
     >
       {@render header()}
-      <div class="flex h-full flex-col-reverse justify-end gap-4">
+      <div
+        class="flex flex-col-reverse justify-end gap-4 block-full"
+        style:view-transition-name="paginated-list-rows"
+      >
         {#if store.loading}
           {#each { length: skeletonCount } as _, i (i)}
             {@render skeleton()}

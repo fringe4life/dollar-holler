@@ -2,7 +2,7 @@ import type {
   settingsInsertSchema,
   settingsSelectSchema,
   settingsUpdateSchema,
-} from "$lib/server/schemas";
+} from "./schemas.server";
 
 export type SettingsInsert = typeof settingsInsertSchema.infer;
 export type SettingsSelect = typeof settingsSelectSchema.infer;

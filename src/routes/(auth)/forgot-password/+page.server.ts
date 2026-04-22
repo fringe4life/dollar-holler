@@ -1,5 +1,5 @@
+import { forgotPassword } from "$features/auth/schemas.server";
 import { auth } from "$lib/auth.server";
-import { forgotPassword } from "$lib/features/auth/schemas";
 import { tryCatch } from "$lib/utils/try-catch";
 import { fail } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";

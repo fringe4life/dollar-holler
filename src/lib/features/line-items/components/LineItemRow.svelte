@@ -4,7 +4,7 @@
   import type {
     LineItemRowProps,
     LineItemUpdate,
-  } from "$lib/features/line-items/types";
+  } from "$features/line-items/types";
   import type { FocusEventHandler, FormEventHandler } from "svelte/elements";
 
   let props: LineItemRowProps = $props();

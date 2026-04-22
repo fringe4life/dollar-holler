@@ -1,11 +1,11 @@
-import { clientReceivedBalanceExtras } from "$lib/features/clients/queries/clientListHelpers";
-import type { ClientListResponse } from "$lib/features/clients/types";
+import { clientReceivedBalanceExtras } from "$features/clients/queries/clientListHelpers";
+import type { ClientListResponse } from "$features/clients/types";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
-} from "$lib/features/pagination/types";
-import { withUserAndSearch } from "$lib/features/pagination/utils/base-filter";
-import { fetchCursorPaginatedList } from "$lib/features/pagination/utils/cursor-paginated-fetch.server";
+} from "$features/pagination/types";
+import { withUserAndSearch } from "$features/pagination/utils/base-filter";
+import { fetchCursorPaginatedList } from "$features/pagination/utils/cursor-paginated-fetch.server";
 import { db } from "$lib/server/db";
 import { clients as clientsTable } from "$lib/server/db/schema";
 import type { Maybe } from "$lib/types";

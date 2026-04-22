@@ -1,4 +1,4 @@
-import { cursorSchema } from "$lib/features/pagination/schemas";
+import { cursorSchema } from "$features/pagination/schemas.server";
 import { db } from "$lib/server/db";
 import { markdownToHtml } from "$lib/utils/markdown.server";
 import { tryCatch } from "$lib/utils/try-catch";

@@ -4,20 +4,21 @@
    */
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
-  import { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import type {
     CursorRow,
     PaginatableItems,
     PaginationSearchParams,
-  } from "$lib/features/pagination/types";
+  } from "$features/pagination/types";
   import {
     parseLimitParam,
     toNormalizedListQuery,
-  } from "$lib/features/pagination/utils/list-query";
-  import { buildListSearchString } from "$lib/features/pagination/utils/url";
+  } from "$features/pagination/utils/list-query";
+  import { buildListSearchString } from "$features/pagination/utils/url";
+  import { buttonVariants } from "$lib/components/ui/button/button.svelte";
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { LIMITS } from "../constants";
+  import type { ListDirection } from "../types";
 
   type Props = {
     store: PaginatableItems<T>;
@@ -42,19 +43,37 @@
     pushState(`${page.url.pathname}${buildListSearchString(next)}`, {});
     await store.loadItems(next);
   };
+
+  const navigateWithTransition = async (
+    next: PaginationSearchParams,
+    direction: ListDirection
+  ) => {
+    if (typeof document?.startViewTransition !== "function") {
+      await navigateWithQuery(next);
+      return;
+    }
+
+    try {
+      await document.startViewTransition({
+        types: [direction],
+        update: () => navigateWithQuery(next),
+      }).finished;
+    } catch {
+      await navigateWithQuery(next);
+    }
+  };
   const handleForward = async () => {
     const last = rowItems.at(-1);
     if (!last) {
       return;
     }
     const q = searchQuery || undefined;
-    await navigateWithQuery(
-      toNormalizedListQuery(q, {
-        cursor: last.id,
-        direction: "forward",
-        limit: limitFromUrl,
-      })
-    );
+    const next = toNormalizedListQuery(q, {
+      cursor: last.id,
+      direction: "forward",
+      limit: limitFromUrl,
+    });
+    await navigateWithTransition(next, "forward");
   };
 
   const handleBackward = async () => {
@@ -63,13 +82,12 @@
       return;
     }
     const q = searchQuery || undefined;
-    await navigateWithQuery(
-      toNormalizedListQuery(q, {
-        cursor: first.id,
-        direction: "backward",
-        limit: limitFromUrl,
-      })
-    );
+    const next = toNormalizedListQuery(q, {
+      cursor: first.id,
+      direction: "backward",
+      limit: limitFromUrl,
+    });
+    await navigateWithTransition(next, "backward");
   };
 
   const handleLimitChange = async (newLimit: number) => {

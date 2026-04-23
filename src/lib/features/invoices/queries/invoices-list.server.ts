@@ -1,3 +1,4 @@
+import type { sql } from "drizzle-orm";
 import {
   lineItemsSubtotalSqlForInvoiceId,
   mapRowsWithTotal,
@@ -14,18 +15,17 @@ import type {
 } from "$features/pagination/types";
 import { withUserAndSearch } from "$features/pagination/utils/base-filter";
 import {
-  fetchCursorPaginatedList,
   type FetchPageArgs,
+  fetchCursorPaginatedList,
 } from "$features/pagination/utils/cursor-paginated-fetch.server";
 import { db } from "$lib/server/db";
 import { invoices as invoicesTable } from "$lib/server/db/schema";
 import type { CursorId, Maybe } from "$lib/types";
-import { sql } from "drizzle-orm";
 
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();
   if (!trimmed) {
-    return undefined;
+    return;
   }
   const pattern = `%${trimmed}%`;
   return {
@@ -39,7 +39,7 @@ const searchWhere = (q: Maybe<string>) => {
 };
 
 /** User + client + optional search (same `q` semantics as global invoice list). */
-export const clientInvoiceListWhere = (
+const clientInvoiceListWhere = (
   userId: string,
   clientId: CursorId,
   q: Maybe<string>
@@ -66,8 +66,8 @@ const mapRows = (
         client?: { name: string | null } | null;
       }
   >
-): InvoiceListResponse[] => {
-  return mapRowsWithTotal(
+): InvoiceListResponse[] =>
+  mapRowsWithTotal(
     rows.map((row) => {
       const { client, ...rest } = row;
       return {
@@ -76,7 +76,6 @@ const mapRows = (
       };
     })
   );
-};
 
 const fetchInvoiceListPage = ({ where, orderBy, limit }: FetchPageArgs) =>
   db.query.invoices.findMany({
@@ -89,6 +88,7 @@ const fetchInvoiceListPage = ({ where, orderBy, limit }: FetchPageArgs) =>
     limit,
   });
 
+// biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
 export const fetchPaginatedInvoices = async (
   userId: string,
   input: PaginationSearchParams
@@ -103,6 +103,7 @@ export const fetchPaginatedInvoices = async (
   });
 };
 
+// biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
 export const fetchPaginatedInvoicesForClient = async (
   userId: string,
   clientId: CursorId,

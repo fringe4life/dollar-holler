@@ -1,8 +1,8 @@
+import { fail } from "@sveltejs/kit";
+import { ArkErrors } from "arktype";
 import { forgotPassword } from "$features/auth/schemas.server";
 import { auth } from "$lib/auth.server";
 import { tryCatch } from "$lib/utils/try-catch";
-import { fail } from "@sveltejs/kit";
-import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";
 export const actions: Actions = {
   default: async ({ request }) => {

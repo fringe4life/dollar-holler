@@ -12,11 +12,11 @@
   {#snippet children()}
     <div class="field">
       <label for="newPassword">New Password</label>
-      <input type="password" name="newPassword" id="newPassword" />
+      <input type="password" name="newPassword" id="newPassword">
     </div>
     <div class="field">
       <label for="confirmPassword">Confirm Password</label>
-      <input type="password" name="confirmPassword" id="confirmPassword" />
+      <input type="password" name="confirmPassword" id="confirmPassword">
     </div>
   {/snippet}
   {#snippet submit()}

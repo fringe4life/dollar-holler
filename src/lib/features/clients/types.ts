@@ -3,7 +3,6 @@ import type {
   clientListRowSchema,
   clientPickerOptionSchema,
   clientPickerOptionsResponseSchema,
-  clientReceivedBalanceSchema,
   clientSelectSchema,
   clientUpdateSchema,
 } from "./schemas.server";
@@ -19,5 +18,3 @@ export type ClientPickerOptionsResponse =
 
 /** Invoice client `<select>`: id + name only (GET /api/clients/options). */
 export type ClientPickerOption = typeof clientPickerOptionSchema.infer;
-
-export type ClientReceivedBalance = typeof clientReceivedBalanceSchema.infer;

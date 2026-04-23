@@ -1,6 +1,7 @@
 import adapter from "@sveltejs/adapter-vercel";
 import type { Config } from "@sveltejs/kit";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
+
 const config: Config = {
   preprocess: [vitePreprocess()],
   kit: {
@@ -21,6 +22,7 @@ const config: Config = {
       async: true,
     },
     runes: ({ filename }) =>
+      // biome-ignore lint/performance/useTopLevelRegex: we need to split the filename by / or \
       filename.split(/[/\\]/).includes("node_modules") ? undefined : true,
   },
 };

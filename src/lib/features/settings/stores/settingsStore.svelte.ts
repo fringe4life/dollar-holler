@@ -1,9 +1,9 @@
+import { toast } from "svelte-sonner";
 import { apiClient } from "$lib/api";
 import { LoadableListStoreBase } from "$lib/stores/loadable-list-store-base.svelte";
 import type { Maybe } from "$lib/types";
 import { getErrorMessage } from "$lib/utils/error-message";
 import { unwrapTreaty } from "$lib/utils/unwrap";
-import { toast } from "svelte-sonner";
 import type { SettingsInsert, SettingsSelect, SettingsUpdate } from "../types";
 
 export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {

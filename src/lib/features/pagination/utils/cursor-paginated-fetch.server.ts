@@ -7,21 +7,21 @@ import { resolveCursorListQuery } from "$features/pagination/utils/cursor-list-q
 import { toPagination } from "$features/pagination/utils/to-pagination.server";
 
 export interface FetchPageArgs {
-  where: Record<string, unknown>;
-  orderBy: { id: "asc" | "desc" };
   limit: number;
+  orderBy: { id: "asc" | "desc" };
+  where: Record<string, unknown>;
 }
 
-export interface FetchCursorPaginatedListParams<
+interface FetchCursorPaginatedListParams<
   R,
   T extends CursorRow,
   TBase extends Record<string, unknown> = Record<string, unknown>,
 > {
-  input: PaginationSearchParams;
   baseWhere: TBase | undefined;
-  idColumn?: unknown;
-  map: (rows: R[]) => T[];
   fetchPage: (args: FetchPageArgs) => Promise<R[]>;
+  idColumn?: unknown;
+  input: PaginationSearchParams;
+  map: (rows: R[]) => T[];
 }
 
 /**

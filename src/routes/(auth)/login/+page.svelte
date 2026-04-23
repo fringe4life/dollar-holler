@@ -18,17 +18,18 @@
         name="email"
         placeholder="john@email.com"
         defaultValue={form?.email ?? ""}
-      />
+      >
     </div>
     <div class="field">
       <div class="flex items-center justify-between">
         <label for="password" class="text-goldenFizz">Password</label>
         <a
           class="text-whisper text-sm underline hover:no-underline"
-          href={resolve("/forgot-password")}>Forgot Password</a
+          href={resolve("/forgot-password")}
+          >Forgot Password</a
         >
       </div>
-      <input required minlength="6" type="password" name="password" />
+      <input required minlength="6" type="password" name="password">
     </div>
   {/snippet}
   {#snippet submit()}

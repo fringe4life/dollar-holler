@@ -1,19 +1,17 @@
 <script lang="ts">
-  import Search, {
-    type Props as SearchProps,
-  } from "$lib/components/Search.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
   import type { Snippet } from "svelte";
+  import Search, { type SearchProps } from "$lib/components/Search.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import type { Toggle } from "$lib/runes/Toggle.svelte";
 
   /** Same signature as `new Toggle().toggle`. */
   export type ItemsHeaderToggle = InstanceType<typeof Toggle>["toggle"];
 
-  export type ItemsHeaderProps = {
+  interface ItemsHeaderProps {
+    button: Snippet;
     store: SearchProps["store"];
     toggle: ItemsHeaderToggle;
-    button: Snippet;
-  };
+  }
 
   let { store, toggle, button }: ItemsHeaderProps = $props();
 </script>
@@ -23,8 +21,6 @@
 >
   <Search {store} />
   <div class="z-1">
-    <Button onclick={toggle} size="lg">
-      {@render button()}
-    </Button>
+    <Button onclick={toggle} size="lg">{@render button()}</Button>
   </div>
 </div>

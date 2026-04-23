@@ -4,9 +4,10 @@
  */
 import { neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
+import { ENV } from "varlock/env";
 import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
-import { ENV } from "varlock/env";
+
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 const pool = new Pool({ connectionString: ENV.DATABASE_URL });
 

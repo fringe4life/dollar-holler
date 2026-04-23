@@ -1,5 +1,6 @@
 <script lang="ts">
   import { asset } from "$app/paths";
+
   let { children } = $props();
 </script>
 
@@ -16,7 +17,7 @@
         src={asset("/images/logo.svg")}
         alt="The Doller Holla"
         class="mx-auto"
-      />
+      >
     </div>
     <div
       class="col-span-full md:col-span-6 md:my-auto lg:col-span-4 xl:col-span-3"

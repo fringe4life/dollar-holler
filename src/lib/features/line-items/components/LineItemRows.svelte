@@ -1,9 +1,9 @@
 <script lang="ts">
+  import type { FormEventHandler } from "svelte/elements";
   import type { LineItemRowsProps } from "$features/line-items/types";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { centsToDollars, sumLineItems } from "$lib/utils/moneyHelpers";
-  import type { FormEventHandler } from "svelte/elements";
   import LineItemRow from "./LineItemRow.svelte";
 
   let props: LineItemRowsProps = $props();
@@ -22,7 +22,9 @@
   });
 
   const onDiscountInput: FormEventHandler<HTMLInputElement> = (e) => {
-    if (props.mode === "view") return;
+    if (props.mode === "view") {
+      return;
+    }
     props.setDiscount(Number(e.currentTarget.value));
   };
 </script>
@@ -73,7 +75,8 @@
 <div class="invoice-line-item">
   <div class="col-span-1 sm:col-span-2">
     {#if isEditable && props.mode === "edit"}
-      <Button variant="textOnly" onclick={props.addLineItem}>+ Line Item</Button
+      <Button variant="textOnly" onclick={props.addLineItem}
+        >+ Line Item</Button
       >
     {/if}
   </div>
@@ -99,7 +102,7 @@
       max="100"
       value={props.discount}
       oninput={isEditable ? onDiscountInput : undefined}
-    />
+    >
     <span class="absolute inset-e-0 inset-bs-2 font-mono">%</span>
   </div>
   <div class="py-5 text-right font-mono">{centsToDollars(discountAmount)}</div>

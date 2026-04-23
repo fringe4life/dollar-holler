@@ -1,6 +1,6 @@
+import { error } from "@sveltejs/kit";
 import { fetchPaginatedInvoices } from "$features/invoices/queries/invoices-list.server";
 import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
-import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url, locals }) => {

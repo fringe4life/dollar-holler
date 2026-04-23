@@ -14,10 +14,11 @@
  *
  * @see ../clients/queries/clientListHelpers.ts for per-client received/balance.
  */
-import { lineItems as lineItemsTable } from "$lib/server/db/schema";
-import type { Maybe, Total } from "$lib/types";
+
 import type { AnyColumn } from "drizzle-orm";
 import { sql } from "drizzle-orm";
+import { lineItems as lineItemsTable } from "$lib/server/db/schema";
+import type { Maybe, Total } from "$lib/types";
 
 /**
  * Scalar subquery: sum of line item amounts for one invoice (for RQB `extras`).
@@ -33,12 +34,11 @@ export type RowWithSubtotal = {
 
 export const mapRowsWithTotal = <T extends RowWithSubtotal>(
   rows: T[]
-): (Omit<T, "subtotal"> & Total)[] => {
-  return rows.map((row) => {
+): (Omit<T, "subtotal"> & Total)[] =>
+  rows.map((row) => {
     const subtotal = Number(row.subtotal ?? 0);
     const discountPercent = Number(row.discount ?? 0);
     const total = Math.round(subtotal - subtotal * (discountPercent / 100));
     const { subtotal: _s, ...rest } = row;
     return { ...rest, total } satisfies Omit<T, "subtotal"> & Total;
   });
-};

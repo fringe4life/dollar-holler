@@ -1,3 +1,5 @@
+import { and, eq } from "drizzle-orm";
+import { Elysia } from "elysia";
 import { fetchPaginatedClients } from "$features/clients/queries/clients-list.server";
 import { fetchClientPickerOptions } from "$features/clients/queries/clients-options.server";
 import {
@@ -25,8 +27,6 @@ import {
   deleteSuccessSchema,
   idResponseSchema,
 } from "$lib/server/schemas";
-import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
 import { protectedApiPlugin } from "../plugins/auth-plugin";
 import { listQueryPlugin } from "../plugins/list-query-plugin";
 import { InternalServerError, NotFoundError } from "../utils/errors";
@@ -141,7 +141,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         }
         return client;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error loading client:", error);
         throw new InternalServerError("Failed to load client");
       }
@@ -179,7 +181,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         }
         return updated;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error updating client:", error);
         throw new InternalServerError("Failed to update client");
       }
@@ -226,7 +230,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
 
         return updated;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error updating client status:", error);
         throw new InternalServerError("Failed to update client status");
       }
@@ -264,7 +270,9 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
         }
         return { success: true as const };
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error deleting client:", error);
         throw new InternalServerError("Failed to delete client");
       }

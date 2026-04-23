@@ -22,7 +22,7 @@
         name="email"
         id="email"
         placeholder="john@email.com"
-      />
+      >
     </div>
 
     <Button variant="auth" type="submit">Send me a reset email!</Button>

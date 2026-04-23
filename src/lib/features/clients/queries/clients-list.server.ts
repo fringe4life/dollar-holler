@@ -13,7 +13,7 @@ import type { Maybe } from "$lib/types";
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();
   if (!trimmed) {
-    return undefined;
+    return;
   }
   const pattern = `%${trimmed}%`;
   return {
@@ -29,8 +29,8 @@ const searchWhere = (q: Maybe<string>) => {
   };
 };
 
-const mapRows = (rows: Array<ClientListResponse>): ClientListResponse[] => {
-  return rows.map(
+const mapRows = (rows: ClientListResponse[]): ClientListResponse[] =>
+  rows.map(
     (row): ClientListResponse => ({
       ...row,
       clientStatus: row.clientStatus,
@@ -38,11 +38,12 @@ const mapRows = (rows: Array<ClientListResponse>): ClientListResponse[] => {
       balance: Math.round(Number(row.balance ?? 0)),
     })
   );
-};
 
 /**
  * Paginated clients list (one row per client). Used by Elysia GET and +page.server.ts load.
  */
+
+// biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
 export const fetchPaginatedClients = async (
   userId: string,
   input: PaginationSearchParams

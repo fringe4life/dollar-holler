@@ -3,12 +3,12 @@
 
   export type EmptyStateHeaderSnippet = Snippet<[string, boolean]>;
 
-  type TableHeaderProps = {
-    headers: readonly string[];
+  interface TableHeaderProps {
     className?: string;
     emptyState?: boolean;
     headerSnippet: EmptyStateHeaderSnippet;
-  };
+    headers: readonly string[];
+  }
 
   export type HeaderProps = Pick<TableHeaderProps, "className" | "emptyState">;
 

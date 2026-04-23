@@ -11,9 +11,7 @@
 import type { Maybe } from "$lib/types";
 
 // Utility function to convert undefined to null for consistent null handling
-export const normalizeToNull = <T>(value: Maybe<T>): T | null => {
-  return value ?? null;
-};
+const normalizeToNull = <T>(value: Maybe<T>): T | null => value ?? null;
 
 // Type helper to transform null to undefined in object types
 // Converts properties like `string | null` to `string | undefined`

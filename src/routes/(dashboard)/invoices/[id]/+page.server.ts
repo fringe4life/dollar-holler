@@ -1,9 +1,9 @@
+import { error, redirect } from "@sveltejs/kit";
+import { ArkErrors } from "arktype";
 import { cursorSchema } from "$features/pagination/schemas.server";
 import { db } from "$lib/server/db";
 import { markdownToHtml } from "$lib/utils/markdown.server";
 import { tryCatch } from "$lib/utils/try-catch";
-import { error, redirect } from "@sveltejs/kit";
-import { ArkErrors } from "arktype";
 import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async ({ params, locals }) => {
   const { id } = params;

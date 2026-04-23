@@ -1,15 +1,16 @@
+import { neonConfig, Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { ENV } from "varlock/env";
 import type { ClientInsert, ClientSelect } from "$features/clients/types";
 import type { InvoiceInsert } from "$features/invoices/types";
 import type { LineItemInsert } from "$features/line-items/types";
 import { createId } from "$features/pagination/utils/create-uuidv7.server";
 import type { SettingsInsert } from "$features/settings/types";
 import type { CursorId } from "$lib/types";
-import { neonConfig, Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { ENV } from "varlock/env";
 import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
+
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 // Create the Pool client (WebSocket-based for transaction support)
 const pool = new Pool({ connectionString: ENV.DATABASE_URL });
@@ -77,7 +78,7 @@ async function main() {
         Math.floor(Math.random() * 4)
       ],
       state: ["TN", "CA", "NY", "TX"][Math.floor(Math.random() * 4)],
-      zip: `${Math.floor(Math.random() * 90000) + 10000}`,
+      zip: `${Math.floor(Math.random() * 90_000) + 10_000}`,
     })
   );
 
@@ -89,7 +90,9 @@ async function main() {
   for (let i = 0; i < users.length; i++) {
     const u = users[i];
     for (let j = 0; j < users.length; j++) {
-      if (j === i) continue;
+      if (j === i) {
+        continue;
+      }
       const peer = settingsData[j];
       clientsData.push({
         id: createId(),
@@ -159,7 +162,9 @@ async function main() {
 
   for (const u of users) {
     const ownedClients = clientsByUserId.get(u.id) ?? [];
-    if (ownedClients.length === 0) continue;
+    if (ownedClients.length === 0) {
+      continue;
+    }
 
     let invoiceSeq = 0;
     for (let n = 0; n < invoicesPerUser; n++) {
@@ -209,7 +214,7 @@ async function main() {
   console.log(`✅ Created ${lineItemsData.length} line items`);
 
   console.log("🎉 Seeding complete!");
-  console.log(`📊 Summary:`);
+  console.log("📊 Summary:");
   console.log(`   - ${users.length} users`);
   console.log(`   - ${settingsData.length} settings records`);
   console.log(`   - ${insertedClients.length} clients`);

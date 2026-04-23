@@ -2,7 +2,7 @@
   import { tv, type VariantProps } from "tailwind-variants";
 
   export const badgeVariants = tv({
-    base: "text-md rounded-full border text-center font-bold whitespace-nowrap capitalize inline-20 outline-transparent transition-colors duration-200 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-ring/50",
+    base: "inline-20 whitespace-nowrap rounded-full border text-center font-bold text-md capitalize outline-transparent transition-colors duration-200 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-ring/50",
     variants: {
       variant: {
         sent: "border-robinEggBlue bg-robinEggBlue text-blueGem",
@@ -33,8 +33,8 @@
 </script>
 
 <script lang="ts">
-  import { cn, type WithElementRef } from "$lib/utils.js";
   import type { HTMLAnchorAttributes } from "svelte/elements";
+  import { cn, type WithElementRef } from "$lib/utils.js";
 
   let {
     ref = $bindable(null),

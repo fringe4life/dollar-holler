@@ -1,10 +1,6 @@
 <script lang="ts">
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
-  import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
-  import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
-  import SlidePanel from "$lib/components/SlidePanel.svelte";
   import BlankState from "$features/clients/components/BlankState.svelte";
   import ClientForm from "$features/clients/components/ClientForm.svelte";
   import ClientRow from "$features/clients/components/ClientRow.svelte";
@@ -17,6 +13,10 @@
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$features/pagination/types";
   import { listUrlKey } from "$features/pagination/utils/url";
+  import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
+  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
+  import NoSearchResults from "$lib/components/NoSearchResults.svelte";
+  import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
@@ -48,9 +48,7 @@
     await clientsStore.updateClientStatus(clientId, "archive");
 </script>
 
-<svelte:head>
-  <title>Clients | Dollar Holler</title>
-</svelte:head>
+<svelte:head> <title>Clients | Dollar Holler</title> </svelte:head>
 
 <ItemsHeader store={clientsStore} toggle={createForm.toggle}>
   {#snippet button()}

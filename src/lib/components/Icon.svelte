@@ -4,9 +4,9 @@
 
   export type IconProps = SVGAttributes<SVGSVGElement>;
 
-  type Props = {
+  interface Props extends IconProps {
     children: Snippet;
-  } & IconProps;
+  }
   let { width = 24, height = 24, children, ...rest }: Props = $props();
 </script>
 

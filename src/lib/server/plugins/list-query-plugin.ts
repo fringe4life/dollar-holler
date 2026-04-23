@@ -1,6 +1,6 @@
+import { Elysia } from "elysia";
 import { listQueryWireSchema } from "$features/pagination/schemas.server";
 import { normalizeListQuery } from "$features/pagination/utils/list-query";
-import { Elysia } from "elysia";
 
 /**
  * Pagination query macro for Elysia: `listQuery: true` validates list query params and injects

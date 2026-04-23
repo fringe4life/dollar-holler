@@ -1,4 +1,7 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
+  import type { FormEventHandler } from "svelte/elements";
+  import { slide } from "svelte/transition";
   import type { ClientInsert } from "$features/clients/types";
   import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
   import LineItemSkeleton from "$features/line-items/components/LineItemSkeleton.svelte";
@@ -12,9 +15,6 @@
   import Button from "$lib/components/ui/button/button.svelte";
   import type { BitsButton } from "$lib/types";
   import { today } from "$lib/utils/dateHelpers";
-  import type { Snippet } from "svelte";
-  import type { FormEventHandler } from "svelte/elements";
-  import { slide } from "svelte/transition";
   import type { NewInvoice } from "../types";
   import ClientField from "./ClientField.svelte";
 
@@ -44,12 +44,16 @@
 
   const removeLineItem = (id: Key) => {
     const index = lineItems.findIndex((item) => item.id === id);
-    if (index !== -1) lineItems.splice(index, 1);
+    if (index !== -1) {
+      lineItems.splice(index, 1);
+    }
   };
 
   const updateLineItem = (id: Key, patch: LineItemUpdate) => {
     const index = lineItems.findIndex((item) => item.id === id);
-    if (index !== -1) lineItems[index] = { ...lineItems[index], ...patch };
+    if (index !== -1) {
+      lineItems[index] = { ...lineItems[index], ...patch };
+    }
   };
 
   const setDiscount = (value: number) => {
@@ -69,7 +73,7 @@
       name="invoiceNumber"
       required
       bind:value={invoice.invoiceNumber}
-    />
+    >
   </div>
 
   <!-- new client extended fields -->
@@ -83,7 +87,7 @@
           type="email"
           name="email"
           id="email"
-        />
+        >
       </div>
 
       <div class="field col-span-6">
@@ -93,12 +97,12 @@
           type="text"
           name="street"
           id="street"
-        />
+        >
       </div>
 
       <div class="field col-span-2">
         <label for="city">City</label>
-        <input bind:value={newClient.city} type="text" name="city" id="city" />
+        <input bind:value={newClient.city} type="text" name="city" id="city">
       </div>
 
       <div class="field col-span-2">
@@ -113,7 +117,7 @@
           type="text"
           name="zipCode"
           id="zipCode"
-        />
+        >
       </div>
     </div>
   {/if}
@@ -127,7 +131,7 @@
       name="dueDate"
       min={today}
       bind:value={invoice.dueDate}
-    />
+    >
   </div>
 
   <!-- issue date -->
@@ -138,13 +142,13 @@
       name="issueDate"
       min={today}
       bind:value={invoice.issueDate}
-    />
+    >
   </div>
 
   <!-- subject -->
   <div class="field col-span-6">
     <label for="subject">Subject</label>
-    <input type="text" name="subject" bind:value={invoice.subject} />
+    <input type="text" name="subject" bind:value={invoice.subject}>
   </div>
 
   <!-- line items -->
@@ -167,8 +171,8 @@
   <!-- notes -->
   <div class="field col-span-6">
     <label for="notes"
-      >Notes <span class="font-normal">(optional, displayed on invoice)</span
-      ></label
+      >Notes
+      <span class="font-normal">(optional, displayed on invoice)</span></label
     >
     <textarea bind:value={invoice.notes} name="notes" id="notes"></textarea>
   </div>
@@ -176,8 +180,8 @@
   <!-- terms -->
   <div class="field col-span-6">
     <label for="terms"
-      >Terms <span class="font-normal">(optional, displayed on invoice)</span
-      ></label
+      >Terms
+      <span class="font-normal">(optional, displayed on invoice)</span></label
     >
     <textarea bind:value={invoice.terms} name="terms" id="terms"></textarea>
     <p class="text-xs text-gray-400">
@@ -186,9 +190,7 @@
   </div>
 
   <!-- buttons -->
-  <div class="field col-span-2">
-    {@render buttons?.()}
-  </div>
+  <div class="field col-span-2">{@render buttons?.()}</div>
   <div class="field col-span-4 flex justify-end gap-x-5">
     <Button variant="secondary" onclick={() => closePanel()}>Cancel</Button>
     <Button variant="default" type="submit">Save</Button>

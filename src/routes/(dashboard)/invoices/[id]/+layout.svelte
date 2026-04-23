@@ -1,9 +1,10 @@
 <script lang="ts">
+  import { fly } from "svelte/transition";
   import { afterNavigate, goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import Arrow from "$lib/components/icons/Arrow.svelte";
   import type { Maybe } from "$lib/types";
-  import { fly } from "svelte/transition";
+
   let { children } = $props();
 
   let previousPageLink: Maybe<string> = $state(undefined);

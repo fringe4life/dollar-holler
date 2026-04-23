@@ -12,18 +12,15 @@ import { tryParseCursorId } from "./parse-cursor-id";
  * @param raw - The raw limit parameter.
  * @returns The parsed limit parameter.
  */
-const parseLimit = (raw: Maybe<string>): number => {
-  return parseLimitParam(raw);
-};
+const parseLimit = (raw: Maybe<string>): number => parseLimitParam(raw);
 
 /**
  * @description Parses a direction parameter from a string.
  * @param raw - The raw direction parameter.
  * @returns The parsed direction parameter.
  */
-const parseDirection = (raw: Maybe<string>): ListDirection => {
-  return raw === "backward" ? "backward" : "forward";
-};
+const parseDirection = (raw: Maybe<string>): ListDirection =>
+  raw === "backward" ? "backward" : "forward";
 
 /**
  * Shared list-query normalization for SSR, Elysia GET handlers, and client.
@@ -75,11 +72,8 @@ export const normalizeListQuery = (raw: {
   };
 };
 
-export const normalizeListQueryFromUrl = (
-  url: URL
-): NormalizeListQueryResult => {
-  return normalizeListQuery(parseSearchParamsToRaw(url.searchParams));
-};
+export const normalizeListQueryFromUrl = (url: URL): NormalizeListQueryResult =>
+  normalizeListQuery(parseSearchParamsToRaw(url.searchParams));
 
 const firstParam = (
   searchParams: URLSearchParams,
@@ -90,21 +84,19 @@ const firstParam = (
 };
 
 /** First `cursor` wins (matches `URLSearchParams.get`). */
-export const parseSearchParamsToRaw = (
+const parseSearchParamsToRaw = (
   searchParams: URLSearchParams
 ): {
   q?: string;
   cursor?: string;
   direction?: string;
   limit?: string;
-} => {
-  return {
-    q: firstParam(searchParams, "q"),
-    cursor: firstParam(searchParams, "cursor"),
-    direction: firstParam(searchParams, "direction"),
-    limit: firstParam(searchParams, "limit"),
-  };
-};
+} => ({
+  q: firstParam(searchParams, "q"),
+  cursor: firstParam(searchParams, "cursor"),
+  direction: firstParam(searchParams, "direction"),
+  limit: firstParam(searchParams, "limit"),
+});
 
 /**
  * @description Parses a limit parameter from a string.

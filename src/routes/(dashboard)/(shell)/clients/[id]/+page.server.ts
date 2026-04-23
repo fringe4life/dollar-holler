@@ -1,3 +1,5 @@
+import { error, redirect } from "@sveltejs/kit";
+import { ArkErrors } from "arktype";
 import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
@@ -6,8 +8,6 @@ import { cursorSchema } from "$features/pagination/schemas.server";
 import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
 import { db } from "$lib/server/db";
 import { tryCatch } from "$lib/utils/try-catch";
-import { error, redirect } from "@sveltejs/kit";
-import { ArkErrors } from "arktype";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, locals, url }) => {

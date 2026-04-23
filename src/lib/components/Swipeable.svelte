@@ -1,16 +1,16 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { swipe } from "$lib/attachments/swipe.svelte";
   import Cancel from "$lib/components/icons/Cancel.svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
-  import type { Snippet } from "svelte";
 
-  type Props = {
+  interface Props {
     content: Snippet;
-    revealed: Snippet;
     contentClass: string;
     /** Stable name for View Transitions API (e.g. `client-${id}`) so rows morph instead of cross-fading. */
     contentViewTransitionName: string;
-  };
+    revealed: Snippet;
+  }
 
   let { content, revealed, contentClass, contentViewTransitionName }: Props =
     $props();
@@ -35,7 +35,7 @@
   <div
     class="absolute inset-0 z-1 flex items-center justify-around block-full inline-full"
   >
-    <button onclick={swipeReset.toggle} class="action-button">
+    <button type="button" onclick={swipeReset.toggle} class="action-button">
       <Cancel width={32} height={32} />
       Cancel
     </button>

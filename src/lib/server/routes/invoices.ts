@@ -1,3 +1,6 @@
+import { type } from "arktype";
+import { and, eq } from "drizzle-orm";
+import { Elysia } from "elysia";
 import { fetchPaginatedInvoices } from "$features/invoices/queries/invoices-list.server";
 import {
   invoiceInsertSchema,
@@ -20,9 +23,6 @@ import {
   deleteSuccessSchema,
   idResponseSchema,
 } from "$lib/server/schemas";
-import { type } from "arktype";
-import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
 import { protectedApiPlugin } from "../plugins/auth-plugin";
 import { listQueryPlugin } from "../plugins/list-query-plugin";
 import { InternalServerError, NotFoundError } from "../utils/errors";
@@ -110,7 +110,9 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         }
         return invoice;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error loading invoice:", error);
         throw new InternalServerError("Failed to load invoice");
       }
@@ -153,7 +155,9 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         }
         return updated;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error updating invoice:", error);
         throw new InternalServerError("Failed to update invoice");
       }
@@ -193,7 +197,9 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         }
         return { success: true as const };
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error deleting invoice:", error);
         throw new InternalServerError("Failed to delete invoice");
       }
@@ -432,7 +438,9 @@ export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
         }
         return { success: true as const };
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error deleting line item:", error);
         throw new InternalServerError("Failed to delete line item");
       }

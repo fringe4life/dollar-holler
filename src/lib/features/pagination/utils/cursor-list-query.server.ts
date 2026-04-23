@@ -1,7 +1,7 @@
 import type { CursorId } from "$lib/types";
 import type { ListDirection } from "../types";
 
-export type CursorListQueryResolved =
+type CursorListQueryResolved =
   | { kind: "first-page" }
   | {
       kind: "query";
@@ -28,7 +28,7 @@ const mergeBaseAndCursor = (
     return {};
   }
   if (parts.length === 1) {
-    return parts[0]!;
+    return parts[0];
   }
   return { AND: parts };
 };

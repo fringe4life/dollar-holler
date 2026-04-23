@@ -1,16 +1,16 @@
 <script lang="ts" generics="T">
+  import type { Snippet } from "svelte";
   import Modal from "$lib/components/Modal.svelte";
   import { Button } from "$lib/components/ui/button";
-  import type { Snippet } from "svelte";
 
-  type Props<T> = {
+  interface Props<T> {
+    descriptionSnippet?: Snippet<[item: T]>;
     item: T;
-    titleText?: string;
     onCancel?: () => void;
     onDelete: () => Promise<void> | void;
-    descriptionSnippet?: Snippet<[item: T]>;
     open?: boolean;
-  };
+    titleText?: string;
+  }
 
   let {
     item,
@@ -41,7 +41,8 @@
 
   <div class="flex justify-center gap-4">
     <Button variant="secondary" onclick={() => onCancel?.()}>Cancel</Button>
-    <Button variant="destructive" onclick={handleDelete}>Yes, Delete It.</Button
+    <Button variant="destructive" onclick={handleDelete}
+      >Yes, Delete It.</Button
     >
   </div>
 </Modal>

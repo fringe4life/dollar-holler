@@ -2,9 +2,7 @@
   import { asset } from "$app/paths";
 </script>
 
-<svelte:head>
-  <title>Thank You! | Doller Holla</title>
-</svelte:head>
+<svelte:head> <title>Thank You! | Doller Holla</title> </svelte:head>
 
 <div
   class="flex items-center justify-center bg-center bg-no-repeat inline-full min-block-dvh"

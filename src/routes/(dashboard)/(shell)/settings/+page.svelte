@@ -1,8 +1,6 @@
 <script lang="ts">
-  import Form from "$lib/components/Form.svelte";
-  import Check from "$lib/components/icons/Check.svelte";
-  import States from "$lib/components/States.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import { onMount } from "svelte";
+  import { toast } from "svelte-sonner";
   import {
     computeSettingsEditableDelta,
     pickSettingsEditableSnapshot,
@@ -11,9 +9,12 @@
     SettingsEditableSnapshot,
     SettingsSelect,
   } from "$features/settings/types";
+  import Form from "$lib/components/Form.svelte";
+  import Check from "$lib/components/icons/Check.svelte";
+  import States from "$lib/components/States.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import { onMount } from "svelte";
-  import { toast } from "svelte-sonner";
+
   const { form } = $props();
 
   const { settings: settingsStore } = getDashboardStores();
@@ -91,7 +92,7 @@
         name="myName"
         id="myName"
         bind:value={mySettings.myName}
-      />
+      >
     </div>
     <div class="field col-span-6 md:col-span-3">
       <label for="invoiceEmail">Email (shown on invoices)</label>
@@ -100,7 +101,7 @@
         name="invoiceEmail"
         id="invoiceEmail"
         bind:value={mySettings.email}
-      />
+      >
     </div>
     <div class="field col-span-6">
       <label for="address">Address</label>
@@ -109,11 +110,11 @@
         name="address"
         id="address"
         bind:value={mySettings.street}
-      />
+      >
     </div>
     <div class="field col-span-6 md:col-span-2">
       <label for="city">City</label>
-      <input type="text" name="city" id="city" bind:value={mySettings.city} />
+      <input type="text" name="city" id="city" bind:value={mySettings.city}>
     </div>
     <div class="field col-span-6 md:col-span-2">
       <label for="state">State</label>
@@ -121,7 +122,7 @@
     </div>
     <div class="field col-span-6 md:col-span-2">
       <label for="zip">Zip</label>
-      <input type="text" name="zip" id="zip" bind:value={mySettings.zip} />
+      <input type="text" name="zip" id="zip" bind:value={mySettings.zip}>
     </div>
     <div class="field col-span-6 justify-self-end md:col-span-2 md:col-start-5">
       <Button onclick={saveSettings}><Check /> Save</Button>
@@ -143,27 +144,28 @@
             name="email"
             id="email"
             defaultValue={form?.email ?? ""}
-          />
+          >
         </div>
 
         <div class="field col-span-6 md:col-span-3">
           <label for="currentPassword">Current Password</label>
-          <input type="password" name="currentPassword" id="currentPassword" />
+          <input type="password" name="currentPassword" id="currentPassword">
         </div>
 
         <div class="field col-span-6 md:col-span-3">
           <label for="newPassword">New Password</label>
-          <input type="password" name="newPassword" id="newPassword" />
+          <input type="password" name="newPassword" id="newPassword">
         </div>
 
         <div class="field col-span-6 md:col-span-3">
           <label for="confirmPassword">Confirm Password</label>
-          <input type="password" name="confirmPassword" id="confirmPassword" />
+          <input type="password" name="confirmPassword" id="confirmPassword">
         </div>
       </div>
     {/snippet}
     {#snippet submit()}
-      <Check /> Save
+      <Check />
+      Save
     {/snippet}
   </Form>
 </section>

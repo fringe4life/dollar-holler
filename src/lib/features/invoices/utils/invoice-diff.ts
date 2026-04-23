@@ -38,19 +38,17 @@ const datesEqual = (a: Date, b: Date): boolean => a.getTime() === b.getTime();
 
 export const pickInvoicePatchSnapshot = (
   invoice: InvoiceInsert | InvoiceSelect
-): InvoicePatchSnapshot => {
-  return {
-    clientId: invoice.clientId,
-    invoiceNumber: invoice.invoiceNumber,
-    subject: invoice.subject,
-    issueDate: invoice.issueDate,
-    dueDate: invoice.dueDate,
-    discount: invoice.discount,
-    notes: invoice.notes ?? null,
-    terms: invoice.terms ?? null,
-    invoiceStatus: invoice.invoiceStatus ?? "draft",
-  };
-};
+): InvoicePatchSnapshot => ({
+  clientId: invoice.clientId,
+  invoiceNumber: invoice.invoiceNumber,
+  subject: invoice.subject,
+  issueDate: invoice.issueDate,
+  dueDate: invoice.dueDate,
+  discount: invoice.discount,
+  notes: invoice.notes ?? null,
+  terms: invoice.terms ?? null,
+  invoiceStatus: invoice.invoiceStatus ?? "draft",
+});
 
 export const computeInvoicePatchDelta = (
   baseline: InvoicePatchSnapshot,

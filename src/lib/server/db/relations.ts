@@ -1,5 +1,5 @@
-import { schemaTables } from "./schema";
 import { defineRelations } from "drizzle-orm";
+import { schemaTables } from "./schema";
 export const tableRelations = defineRelations(schemaTables, (relations) => ({
   user: {
     settings: relations.one.settings({

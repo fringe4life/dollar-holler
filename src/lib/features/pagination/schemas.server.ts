@@ -1,5 +1,5 @@
-import type { CursorId } from "$lib/types";
 import { type } from "arktype";
+import type { CursorId } from "$lib/types";
 import { LIMITS } from "./constants";
 import type { CursorRow } from "./types";
 /** Pagination metadata for cursor-paginated lists. */

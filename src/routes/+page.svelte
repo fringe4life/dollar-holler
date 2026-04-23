@@ -1,7 +1,4 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
-  import LandingNav from "$lib/components/LandingNav.svelte";
-  import { Button } from "$lib/components/ui/button";
   import {
     FileTextIcon,
     ShieldCheckIcon,
@@ -9,6 +6,9 @@
     UsersIcon,
     ZapIcon,
   } from "@lucide/svelte";
+  import { resolve } from "$app/paths";
+  import LandingNav from "$lib/components/LandingNav.svelte";
+  import { Button } from "$lib/components/ui/button";
 
   let { data } = $props();
 
@@ -314,7 +314,8 @@
         <h2
           class="font-sansserif text-daisyBush text-4xl font-black sm:text-5xl"
         >
-          Everything you need<br class="hidden sm:block" /> to get paid on time
+          Everything you need<br class="hidden sm:block" />
+          to get paid on time
         </h2>
       </div>
 

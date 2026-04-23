@@ -1,11 +1,11 @@
 <script lang="ts">
-  import Trash from "$lib/components/icons/Trash.svelte";
-  import { Button } from "$lib/components/ui/button";
+  import type { FocusEventHandler, FormEventHandler } from "svelte/elements";
   import type {
     LineItemRowProps,
     LineItemUpdate,
   } from "$features/line-items/types";
-  import type { FocusEventHandler, FormEventHandler } from "svelte/elements";
+  import Trash from "$lib/components/icons/Trash.svelte";
+  import { Button } from "$lib/components/ui/button";
 
   let props: LineItemRowProps = $props();
 
@@ -23,7 +23,9 @@
   const amount = $derived((quantity * Number(unitPrice)).toFixed(2));
 
   function patch(update: LineItemUpdate) {
-    if (props.mode === "view") return;
+    if (props.mode === "view") {
+      return;
+    }
     props.updateLineItem(props.lineItem.id, update);
   }
 
@@ -68,7 +70,7 @@
       id="description-{props.lineItem.id}"
       required={props.isRequired}
       disabled={!isEditable}
-    />
+    >
     <span
       aria-hidden="true"
       class="border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200"
@@ -78,7 +80,8 @@
   <div class="unitPrice relative">
     <label
       for="unitPrice-{props.lineItem.id}"
-      class="line-item-label text-right">Unit Price</label
+      class="line-item-label text-right"
+      >Unit Price</label
     >
     <input
       class="line-item text-right"
@@ -92,7 +95,7 @@
       min={isEditable ? "0" : undefined}
       required={props.isRequired}
       disabled={!isEditable}
-    />
+    >
     <span
       aria-hidden="true"
       class="border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200"
@@ -101,7 +104,8 @@
   <div class="quantity relative">
     <label
       for="quantity-{props.lineItem.id}"
-      class="line-item-label text-center">Qty</label
+      class="line-item-label text-center"
+      >Qty</label
     >
     <input
       value={props.lineItem.quantity}
@@ -113,7 +117,7 @@
       min="0"
       required={props.isRequired}
       disabled={!isEditable}
-    />
+    >
     <span
       aria-hidden="true"
       class="border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200"
@@ -130,16 +134,19 @@
       name="amount"
       id="amount-{props.lineItem.id}"
       disabled
-    />
+    >
   </div>
   <div class="trash place-self-center">
     {#if props.canDelete && isEditable}
       <Button
         onclick={() => {
-          if (props.mode !== "view") props.removeLineItem(props.lineItem.id);
+          if (props.mode !== "view") {
+            props.removeLineItem(props.lineItem.id);
+          }
         }}
         variant="ghost"
-        class="text-center block-10 inline-full"><Trash /></Button
+        class="text-center block-10 inline-full"
+        ><Trash /></Button
       >
     {/if}
   </div>
@@ -173,10 +180,10 @@
 
   :global {
     .invoice-line-item {
-      @apply relative grid gap-x-2 sm:grid-cols-[1fr_100px_100px_100px_65px] md:gap-x-5;
       grid-template-areas:
         "description description description"
         "unitPrice   quantity    amount";
+      @apply relative grid gap-x-2 sm:grid-cols-[1fr_100px_100px_100px_65px] md:gap-x-5;
 
       @media screen and (width > 640px) {
         grid-template-areas: "description unitPrice quantity amount trash";

@@ -45,9 +45,7 @@
   const deleteModal = new ItemPanel<InvoiceListResponse>();
 </script>
 
-<svelte:head>
-  <title>Invoices | Dollar Holler</title>
-</svelte:head>
+<svelte:head> <title>Invoices | Dollar Holler</title> </svelte:head>
 
 <ItemsHeader store={invoicesStore} toggle={createForm.toggle}>
   {#snippet button()}
@@ -128,9 +126,8 @@
     }}
   >
     {#snippet descriptionSnippet(invoice)}
-      This will delete the invoice to <span class="text-scarlet"
-        >{invoice.name}</span
-      >
+      This will delete the invoice to
+      <span class="text-scarlet">{invoice.name}</span>
       for
       <span class="text-scarlet">{formatTotal(invoice.total)}</span>
     {/snippet}

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import { getLabel } from "$features/invoices/utils/labelHelpers";
   import AdditionalOptions from "$lib/components/additionaloptions/AdditionalOptions.svelte";
@@ -13,7 +14,6 @@
   import Badge from "$lib/components/ui/badge/badge.svelte";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { formatTotal } from "$lib/utils/moneyHelpers";
-  import type { MouseEventHandler } from "svelte/elements";
   import type { InvoiceListResponse } from "../types";
 
   type Props = {
@@ -76,7 +76,8 @@
 >
   {#snippet content()}
     <div class="status justify-self-end">
-      <Badge class="ms-auto md:ms-0" variant={label} size="small">{label}</Badge
+      <Badge class="ms-auto md:ms-0" variant={label} size="small"
+        >{label}</Badge
       >
     </div>
     <div class="duedate truncate text-sm lg:text-lg">

@@ -41,7 +41,9 @@ export const resetPasswordSchema = type({
 })
   .merge(updatePasswordSchema)
   .narrow((data, context) => {
-    if (data.newPassword === data.confirmPassword) return true;
+    if (data.newPassword === data.confirmPassword) {
+      return true;
+    }
     return context.reject({
       expected: "New Password and Confirm Password must be identical",
       actual: "New Password and Confirm Password are not identical",
@@ -55,7 +57,9 @@ export const changePasswordSchema = type({
 })
   .merge(updatePasswordSchema)
   .narrow((data, context) => {
-    if (data.newPassword === data.confirmPassword) return true;
+    if (data.newPassword === data.confirmPassword) {
+      return true;
+    }
     return context.reject({
       expected: "New Password and Confirm Password must be identical",
       actual: "New Password and Confirm Password are not identical",

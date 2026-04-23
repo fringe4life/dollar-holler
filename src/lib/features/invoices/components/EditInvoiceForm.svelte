@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { onDestroy, onMount } from "svelte";
+  import type { FormEventHandler } from "svelte/elements";
+  import { toast } from "svelte-sonner";
   import type { ClientInsert } from "$features/clients/types";
   import type {
     LineItemEditRow,
@@ -15,9 +18,6 @@
   import { toDateInputValue } from "$lib/utils/dateHelpers";
   import { isAbortError } from "$lib/utils/error-message";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
-  import { onDestroy, onMount } from "svelte";
-  import { toast } from "svelte-sonner";
-  import type { FormEventHandler } from "svelte/elements";
   import type {
     InvoiceDeleteConfirmItem,
     InvoiceSelect,
@@ -25,9 +25,9 @@
   } from "../types";
   import {
     computeInvoicePatchDelta,
+    type InvoicePatchSnapshot,
     pickInvoicePatchSnapshot,
     serializedNormalizedLineItemsForCompare,
-    type InvoicePatchSnapshot,
   } from "../utils/invoice-diff";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
@@ -80,8 +80,12 @@
         lineItemsStore.loadLineItemsByInvoiceId(invoiceEdit.id, { signal }),
       ]);
 
-      if (!isMounted) return;
-      if (items == null) return;
+      if (!isMounted) {
+        return;
+      }
+      if (items == null) {
+        return;
+      }
 
       lineItems =
         items.length > 0
@@ -199,7 +203,9 @@
         effectiveInvoiceId,
         normalizedLineItemsNow
       );
-      if (lineResult === null) return;
+      if (lineResult === null) {
+        return;
+      }
     }
 
     await invoicesStore.loadItems(toNormalizedListQuery(undefined, {}));
@@ -222,13 +228,16 @@
     <Button
       variant="textOnlyDestructive"
       onclick={() => {
-        if (!invoice.id) return;
+        if (!invoice.id) {
+          return;
+        }
         deleteModal.open({
           id: invoice.id,
           name: clientName,
           total: sumLineItems(lineItems),
         });
-      }}><Trash />Delete</Button
+      }}
+      ><Trash />Delete</Button
     >
   {/snippet}
 </InvoiceFormLayout>
@@ -240,16 +249,17 @@
     titleText="Are you sure you want to delete this invoice?"
     onCancel={deleteModal.close}
     onDelete={async () => {
-      if (!deleteModal.item?.id) return;
+      if (!deleteModal.item?.id) {
+        return;
+      }
       await invoicesStore.deleteInvoice(deleteModal.item.id);
       deleteModal.close();
       closePanel();
     }}
   >
     {#snippet descriptionSnippet(inv)}
-      This will delete the invoice to <span class="text-scarlet"
-        >{inv.name}</span
-      >
+      This will delete the invoice to
+      <span class="text-scarlet">{inv.name}</span>
       for
       <span class="text-scarlet">{totalDisplay}</span>
     {/snippet}

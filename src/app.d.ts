@@ -1,6 +1,8 @@
-import type { Maybe } from "$lib/types";
 import type { Session, User } from "better-auth";
+import type { Maybe } from "$lib/types";
+
 declare global {
+  // biome-ignore lint/style/noNamespace: svelte-kit
   namespace App {
     // interface Error {}
     interface Locals {

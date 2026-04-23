@@ -1,0 +1,17 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite/biome/core", "ultracite/biome/svelte"],
+  "linter": {
+    "rules": {
+      "style": {
+        "useFilenamingConvention": "off"
+      },
+      "suspicious": {
+        "noAssignInExpressions": "info"
+      }
+    }
+  },
+  "files": {
+    "includes": ["**", "!src/env-varlock.d.ts"]
+  }
+}

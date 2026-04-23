@@ -1,10 +1,10 @@
+import { Elysia, status } from "elysia";
 import { auth } from "$lib/auth.server";
 import { openApiPlugin } from "$lib/server/plugins/openapi-plugin";
 import { clientsRoutes } from "$lib/server/routes/clients";
 import { invoicesRoutes, lineItemsRoutes } from "$lib/server/routes/invoices";
 import { settingsRoutes } from "$lib/server/routes/settings";
 import { apiErrorBody } from "$lib/server/utils/api-error-body";
-import { Elysia, status } from "elysia";
 import { UnauthorizedError } from "./utils/errors";
 
 // Create Elysia app with all routes

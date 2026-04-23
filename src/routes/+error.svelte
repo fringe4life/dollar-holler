@@ -3,9 +3,7 @@
   import { page } from "$app/state";
 </script>
 
-<svelte:head>
-  <title>Not Found! | Doller Holla</title>
-</svelte:head>
+<svelte:head> <title>Not Found! | Doller Holla</title> </svelte:head>
 
 <div
   class="flex items-center justify-center bg-center bg-no-repeat inline-full min-block-dvh"

@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends CursorRow">
+  import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
@@ -15,14 +17,12 @@
   } from "$features/pagination/utils/list-query";
   import { buildListSearchString } from "$features/pagination/utils/url";
   import { buttonVariants } from "$lib/components/ui/button/button.svelte";
-  import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
-  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { LIMITS } from "../constants";
   import type { ListDirection } from "../types";
 
-  type Props = {
+  interface Props {
     store: PaginatableItems<T>;
-  };
+  }
 
   let { store }: Props = $props();
 
@@ -113,8 +113,10 @@
       {#each LIMITS as limitOption (limitOption)}
         <option
           selected={limitOption === limitFromUrl}
-          value={String(limitOption)}>{limitOption}</option
+          value={String(limitOption)}
         >
+          {limitOption}
+        </option>
       {/each}
     </select>
     <div class="flex items-center gap-2">

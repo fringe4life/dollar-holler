@@ -1,7 +1,7 @@
 <script lang="ts">
-  import Arrow from "$lib/components/icons/Arrow.svelte";
   import { Dialog, type WithoutChild } from "bits-ui";
   import type { Snippet } from "svelte";
+  import Arrow from "$lib/components/icons/Arrow.svelte";
   import Button from "./ui/button/button.svelte";
 
   type Props = Dialog.RootProps & {
@@ -42,9 +42,7 @@
       class="shadow-addInvoice data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed inset-e-0 inset-bs-0  z-80  overflow-y-scroll bg-white p-2 block-dvh inline-full lg:px-15 lg:py-12 lg:inline-3/4"
       {...contentProps}
     >
-      <Dialog.Title>
-        {@render title()}
-      </Dialog.Title>
+      <Dialog.Title> {@render title()} </Dialog.Title>
       <Dialog.Description class="text-foreground-alt text-sm">
         {@render description()}
       </Dialog.Description>

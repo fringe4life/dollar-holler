@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { asset } from "$app/paths";
   import type { Snippet } from "svelte";
+  import { asset } from "$app/paths";
   import BlankRow from "./BlankRow.svelte";
 
   let {
@@ -20,9 +20,7 @@
     <h2 class="font-handwriting text-caribbeanGreen text-4xl font-bold">
       Bummer
     </h2>
-    <p class="text-caribbeanGreen text-xl font-bold">
-      {message}
-    </p>
+    <p class="text-caribbeanGreen text-xl font-bold">{message}</p>
   </div>
 
   {@render header()}

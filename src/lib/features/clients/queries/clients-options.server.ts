@@ -1,4 +1,4 @@
-import type { ClientPickerOption } from "$features/clients/types";
+import type { ClientPickerOptionsResponse } from "$features/clients/types";
 import { db } from "$lib/server/db";
 import { tryCatch } from "$lib/utils/try-catch";
 
@@ -8,7 +8,7 @@ import { tryCatch } from "$lib/utils/try-catch";
  */
 const fetchClientPickerOptions = async (
   userId: string
-): Promise<Array<ClientPickerOption>> => {
+): Promise<ClientPickerOptionsResponse["options"]> => {
   const { data: clients } = await tryCatch(() =>
     db.query.clients.findMany({
       where: { userId: { eq: userId } },
@@ -18,4 +18,5 @@ const fetchClientPickerOptions = async (
   );
   return clients ?? [];
 };
+
 export { fetchClientPickerOptions };

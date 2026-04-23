@@ -95,7 +95,8 @@
     <div class="view relative hidden place-self-center lg:block">
       <a
         class="text-pastelPurple hover:text-daisyBush group-hover/row:text-daisyBush/50 transition-colors duration-200"
-        href={resolved}><View /></a
+        href={resolved}
+        ><View /></a
       >
     </div>
     <AdditionalOptions classes="threeDots">

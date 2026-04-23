@@ -1,13 +1,15 @@
 <script lang="ts">
-  import { asset, resolve } from "$app/paths";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
-  import { Button } from "$lib/components/ui/button";
-  import type { Maybe } from "$lib/types";
   import MenuIcon from "@lucide/svelte/icons/menu";
   import XIcon from "@lucide/svelte/icons/x";
   import type { User } from "better-auth";
+  import { asset, resolve } from "$app/paths";
+  import { Button } from "$lib/components/ui/button";
+  import { Toggle } from "$lib/runes/Toggle.svelte";
+  import type { Maybe } from "$lib/types";
 
-  type Props = { user: Maybe<User> };
+  interface Props {
+    user: Maybe<User>;
+  }
   let { user = null }: Props = $props();
 
   let mobileOpen = new Toggle();
@@ -17,7 +19,6 @@
   class="
     landing-nav not-supports-scroll-timeline:bg-whisper/95 fixed inset-x-0
     inset-bs-0 z-50 not-supports-scroll-timeline:shadow-xs
-    
     not-supports-scroll-timeline:backdrop-blur-xs
   "
 >
@@ -34,7 +35,7 @@
         src={asset("/images/logo.svg")}
         alt="Dollar Holler"
         class="aspect-square inline-8"
-      />
+      >
       <span
         class="font-sansserif text-daisyBush text-xl font-black tracking-tight"
       >
@@ -63,6 +64,7 @@
       class="text-daisyBush flex cursor-pointer items-center md:hidden"
       onclick={mobileOpen.toggle}
       aria-label="Toggle navigation"
+      type="button"
     >
       {#if mobileOpen.isOn}
         <XIcon size={26} />

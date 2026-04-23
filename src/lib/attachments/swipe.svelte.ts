@@ -4,11 +4,11 @@ import { Spring, type SpringOptions } from "svelte/motion";
 import { MediaQuery } from "svelte/reactivity";
 
 interface SwipeConfig {
-  triggerReset?: boolean;
   onResetComplete?: () => void;
   onSwipeLeft?: () => void;
   onSwipeRight?: () => void;
   threshold?: number;
+  triggerReset?: boolean;
 }
 
 const MOBILE_MEDIA_QUERY = new MediaQuery("(max-width: 1024px)");
@@ -82,7 +82,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Handle swipe completion
     function handleSwipeEnd() {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       const movement = startX - currentX;
       const leftSnapX = elementWidth * -0.95;
@@ -102,9 +104,13 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Mouse event handlers
     function handleMouseDown(event: MouseEvent) {
-      if (!isMobile) return;
+      if (!isMobile) {
+        return;
+      }
 
-      documentCleanups.forEach((off) => off());
+      for (const off of documentCleanups) {
+        off();
+      }
       documentCleanups = [];
 
       event.preventDefault();
@@ -115,7 +121,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
       const offMove = on(document, "mousemove", handleMouseMove);
       const offUp = on(document, "mouseup", () => {
-        if (!isDragging) return;
+        if (!isDragging) {
+          return;
+        }
         handleSwipeEnd();
         offMove();
         offUp();
@@ -125,7 +133,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     }
 
     function handleMouseMove(event: MouseEvent) {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       const dx = event.clientX - currentX;
       currentX = event.clientX;
@@ -135,9 +145,13 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
     // Touch event handlers
     function handleTouchStart(event: TouchEvent) {
-      if (!isMobile) return;
+      if (!isMobile) {
+        return;
+      }
 
-      documentCleanups.forEach((off) => off());
+      for (const off of documentCleanups) {
+        off();
+      }
       documentCleanups = [];
 
       event.preventDefault();
@@ -150,7 +164,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
         passive: false,
       });
       const offEnd = on(document, "touchend", () => {
-        if (!isDragging) return;
+        if (!isDragging) {
+          return;
+        }
         handleSwipeEnd();
         offMove();
         offEnd();
@@ -160,7 +176,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     }
 
     function handleTouchMove(event: TouchEvent) {
-      if (!isDragging) return;
+      if (!isDragging) {
+        return;
+      }
 
       event.preventDefault();
       const dx = event.touches[0].clientX - currentX;
@@ -194,7 +212,9 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     // Cleanup: remove any active document listeners (e.g. drag in progress) when attachment is detached
     return () => {
       isDragging = false;
-      documentCleanups.forEach((off) => off());
+      for (const off of documentCleanups) {
+        off();
+      }
       documentCleanups = [];
     };
   };

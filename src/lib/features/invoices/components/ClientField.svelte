@@ -39,7 +39,8 @@
           isNewClient = true;
           newClient.name = "";
           newClient.email = "";
-        }}>+ Client</Button
+        }}
+        >+ Client</Button
       >
     </div>
   {:else}
@@ -51,14 +52,15 @@
         type="text"
         name="newClient"
         required={isNewClient}
-      />
+      >
       <Button
         variant="outline"
         size="sm"
         onclick={() => {
           isNewClient = false;
           newClient = clientsStore.newClient();
-        }}>Existing Client</Button
+        }}
+        >Existing Client</Button
       >
     </div>
   {/if}

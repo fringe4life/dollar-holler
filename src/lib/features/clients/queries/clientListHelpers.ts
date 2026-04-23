@@ -10,8 +10,9 @@
  *
  * @see ../../invoices/queries/invoiceListHelpers.ts for `lineItemsSubtotalSqlForInvoiceId`.
  */
-import { clients as clientsTable } from "$lib/server/db/schema";
-import { sql } from "drizzle-orm";
+
+import type { sql } from "drizzle-orm";
+import type { clients as clientsTable } from "$lib/server/db/schema";
 
 /**
  * RQB `extras`: received (paid) and balance (unpaid) per client, matching the

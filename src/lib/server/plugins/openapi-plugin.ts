@@ -1,10 +1,10 @@
+import { openapi } from "@elysiajs/openapi";
+import type { OpenAPIV3 } from "openapi-types";
 import { dev } from "$app/environment";
 import {
   getBetterAuthOpenApiComponents,
   getBetterAuthOpenApiPaths,
 } from "$lib/server/utils/better-auth-openapi";
-import { openapi } from "@elysiajs/openapi";
-import type { OpenAPIV3 } from "openapi-types";
 
 const enabled = dev;
 

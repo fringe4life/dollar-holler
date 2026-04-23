@@ -1,4 +1,3 @@
-import type { InvoiceSelect } from "$features/invoices/types";
 import type {
   LineItemEditRow,
   NewLineItemWithId,
@@ -13,13 +12,15 @@ import type { List, Maybe } from "$lib/types";
 export const sumLineItems = (
   lineItems: List<LineItemEditRow | NewLineItemWithId>
 ): number => {
-  if (!lineItems) return 0;
+  if (!lineItems) {
+    return 0;
+  }
 
   return lineItems.reduce((acc, cur) => {
     if (Number.isNaN(cur.amount)) {
       return acc;
     }
-    return (acc += cur.amount);
+    return acc + cur.amount;
   }, 0);
 };
 const MONEY_FORMATTER = new Intl.NumberFormat("en", {
@@ -52,33 +53,5 @@ export const formatTotal = (
     discountPercent && discountPercent > 0
       ? totalOrSubtotal - totalOrSubtotal * (discountPercent / 100)
       : totalOrSubtotal;
-  return centsToDollars(isNaN(total) ? 0 : total);
-};
-
-/**
- * @abstract turns money amounts expressed in dollars into money expressed in cents
- * @param {number} dollars the amount of dollars to be converted into cents
- * @returns {number} the money in cents
- */
-export const dollarsToCents = (dollars: number): number => {
-  return dollars * 100;
-};
-
-/**
- * @abstract provides the total cost of the invoice (subtotal - discount)
- * @param {Invoice} invoice the invoice to get the total for (may have lineItems)
- * @returns {number} total in cents
- */
-export const getTotal = (
-  invoice: Maybe<InvoiceSelect & { lineItems?: List<LineItemEditRow> }>
-): number => {
-  if (!invoice) {
-    return 0;
-  }
-
-  const sum = sumLineItems(invoice.lineItems);
-  const discount = invoice.discount ? sum * (invoice.discount / 100) : 0;
-  const final = sum - discount;
-  if (isNaN(final)) return 0;
-  return final;
+  return centsToDollars(Number.isNaN(total) ? 0 : total);
 };

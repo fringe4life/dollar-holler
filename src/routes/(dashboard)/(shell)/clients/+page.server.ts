@@ -1,6 +1,6 @@
+import { error } from "@sveltejs/kit";
 import { fetchPaginatedClients } from "$features/clients/queries/clients-list.server";
 import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
-import { error } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url, locals }) => {

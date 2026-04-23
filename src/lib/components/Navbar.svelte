@@ -9,9 +9,9 @@
   import { isActive } from "$lib/utils/is-active";
   import type { User } from "better-auth";
 
-  type Props = {
+  interface Props {
     user: Maybe<User>;
-  };
+  }
 
   let { user = null }: Props = $props();
 
@@ -43,6 +43,7 @@
     "text-daisyBush": !nav.isOn,
   }}
   onclick={nav.toggle}
+  type="button"
 >
   {#if nav.isOn}
     <Close width={32} height={32} />
@@ -63,7 +64,7 @@
         class="mx-auto"
         src={asset("/images/logo.svg")}
         alt="Doller Holla company logo"
-      />
+      >
     </a>
   </div>
   <ul class="list-none text-2xl font-medium lg:font-bold">

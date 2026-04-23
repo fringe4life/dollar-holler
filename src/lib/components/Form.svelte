@@ -1,21 +1,24 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { enhance } from "$app/forms";
   import Alert from "$lib/components/Alert.svelte";
   import Loader from "$lib/components/Loader.svelte";
   import { Button } from "$lib/components/ui/button";
-  import type { Snippet } from "svelte";
 
-  type FormResult = { type: string; data?: unknown };
+  interface FormResult {
+    data?: unknown;
+    type: string;
+  }
 
-  type Props = {
-    form?: { error?: string } | null;
-    children: Snippet;
-    submit: Snippet;
-    footer?: Snippet;
-    method?: "GET" | "POST" | "DIALOG";
+  interface Props {
     action?: string;
+    children: Snippet;
+    footer?: Snippet;
+    form?: { error?: string } | null;
+    method?: "GET" | "POST" | "DIALOG";
     onSuccess?: (result: FormResult) => void;
-  };
+    submit: Snippet;
+  }
 
   let {
     form,

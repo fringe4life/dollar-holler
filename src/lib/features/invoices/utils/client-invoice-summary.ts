@@ -1,11 +1,11 @@
 import { isLate } from "$lib/utils/dateHelpers";
 
 export interface ClientInvoiceSummaryCents {
-  overdue: number;
-  outstanding: number;
   draft: number;
-  paid: number;
   grandTotal: number;
+  outstanding: number;
+  overdue: number;
+  paid: number;
 }
 
 /** Rows must include computed `total` (cents), status, and due date for overdue vs outstanding. */

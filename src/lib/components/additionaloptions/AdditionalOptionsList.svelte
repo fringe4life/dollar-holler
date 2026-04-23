@@ -3,10 +3,10 @@
   import type { Option } from "./AdditionalOptionsItem.svelte";
   import AdditionalOptionsItem from "./AdditionalOptionsItem.svelte";
 
-  type Props = {
+  interface Props {
     additionalMenu: Toggle;
     options: Option[];
-  };
+  }
 
   let { additionalMenu, options }: Props = $props();
 </script>

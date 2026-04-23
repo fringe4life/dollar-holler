@@ -8,16 +8,14 @@ import {
 
 export const pickSettingsEditableSnapshot = (
   settings: SettingsSelect
-): SettingsEditableSnapshot => {
-  return {
-    myName: settings.myName,
-    email: settings.email,
-    street: settings.street,
-    city: settings.city,
-    state: settings.state,
-    zip: settings.zip,
-  };
-};
+): SettingsEditableSnapshot => ({
+  myName: settings.myName,
+  email: settings.email,
+  street: settings.street,
+  city: settings.city,
+  state: settings.state,
+  zip: settings.zip,
+});
 
 /** Keys whose values differ between baseline and current (invoice-details fields only). */
 export const computeSettingsEditableDelta = (

@@ -1,9 +1,10 @@
 <script lang="ts">
   import { asset } from "$app/paths";
-  type Props = {
-    label: string;
+
+  interface Props {
     amount: string;
-  };
+    label: string;
+  }
   let { label, amount }: Props = $props();
 </script>
 

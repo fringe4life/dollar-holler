@@ -1,10 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
-  import { type Snippet } from "svelte";
-  type Props = {
+
+  interface Props {
     classes?: string;
     content: Snippet<[Toggle]>;
-  };
+  }
 
   let { classes = "", content }: Props = $props();
 

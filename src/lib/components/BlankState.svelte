@@ -1,11 +1,11 @@
 <script lang="ts">
+  import type { Snippet } from "svelte";
   import { asset } from "$app/paths";
   import BlankRow from "$lib/components/BlankRow.svelte";
-  import type { Snippet } from "svelte";
 
   interface Props {
-    message: string;
     header: Snippet;
+    message: string;
   }
 
   let { message, header }: Props = $props();

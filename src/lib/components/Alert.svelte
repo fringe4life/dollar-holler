@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { Maybe } from "$lib/types";
 
-  type Props = {
+  interface Props {
     message: Maybe<string>;
-  };
+  }
   let { message }: Props = $props();
 </script>
 

@@ -1,15 +1,12 @@
 /** Eden Treaty helpers: map HTTP error bodies to thrown errors. */
 
-export interface UnwrapTreatyOptions {
-  fallbackMessage: string;
+interface UnwrapTreatyOptions {
   emptyDataMessage?: string;
+  fallbackMessage: string;
 }
 
 /** Standard API error body from `status(code, { message })`. */
-export const messageFromEdenValue = (
-  value: unknown,
-  fallback: string
-): string => {
+const messageFromEdenValue = (value: unknown, fallback: string): string => {
   if (typeof value === "string") {
     return value;
   }
@@ -24,7 +21,7 @@ export const messageFromEdenValue = (
   return fallback;
 };
 
-export class ApiError extends Error {
+class ApiError extends Error {
   readonly status: number;
   readonly body: unknown;
 
@@ -36,10 +33,10 @@ export class ApiError extends Error {
   }
 }
 
-export type TreatyResultLike<TData> = {
+interface TreatyResultLike<TData> {
   data: TData | null;
   error: { status: number; value: unknown } | null;
-};
+}
 
 export const unwrapTreatyResult = <TData>(
   result: TreatyResultLike<TData>,
@@ -61,6 +58,4 @@ export const unwrapTreatyResult = <TData>(
 export const unwrapTreaty = async <TData>(
   promise: Promise<TreatyResultLike<TData>>,
   options: UnwrapTreatyOptions
-): Promise<TData> => {
-  return unwrapTreatyResult(await promise, options);
-};
+): Promise<TData> => unwrapTreatyResult(await promise, options);

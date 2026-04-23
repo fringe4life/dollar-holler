@@ -7,7 +7,9 @@ const DATE_FORMATTER = new Intl.DateTimeFormat();
  * @returns {string} unknown if myDate is undefined otherwise a formatted date
  */
 export const convertDate = (myDate: Maybe<string>): string => {
-  if (!myDate) return "Unknown";
+  if (!myDate) {
+    return "Unknown";
+  }
   const date = new Date(myDate);
   return DATE_FORMATTER.format(date);
 };
@@ -18,10 +20,16 @@ export const convertDate = (myDate: Maybe<string>): string => {
  * @returns {boolean} it is either late or not
  */
 export const isLate = (myDate: Maybe<string>): boolean => {
-  if (!myDate) return false;
+  if (!myDate) {
+    return false;
+  }
 
   const [year, month, date] = splitDate(myDate);
-  const dueDate = new Date(parseInt(year), parseInt(month), parseInt(date));
+  const dueDate = new Date(
+    Number.parseInt(year, 10),
+    Number.parseInt(month, 10),
+    Number.parseInt(date, 10)
+  );
   return dueDate.getTime() < Date.now();
 };
 
@@ -30,9 +38,7 @@ export const isLate = (myDate: Maybe<string>): boolean => {
  * @param myDate a string to be split based on the encoding being 12-05-2024
  * @returns {string[]} an array of strings
  */
-export const splitDate = (myDate: string): string[] => {
-  return myDate.split("-");
-};
+const splitDate = (myDate: string): string[] => myDate.split("-");
 
 export const today = new Date().toISOString().split("T")[0];
 
@@ -42,8 +48,12 @@ export const today = new Date().toISOString().split("T")[0];
  * @returns "yyyy-MM-dd" string, or today if invalid
  */
 export const toDateInputValue = (date: Maybe<Date | string>): string => {
-  if (date == null) return today;
+  if (date == null) {
+    return today;
+  }
   const d = typeof date === "string" ? new Date(date) : date;
-  if (Number.isNaN(d.getTime())) return today;
+  if (Number.isNaN(d.getTime())) {
+    return today;
+  }
   return d.toISOString().split("T")[0];
 };

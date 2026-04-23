@@ -12,9 +12,7 @@
     </div>
 
     <!-- duedate: fits 100px col on desktop -->
-    <div class="duedate">
-      <Skeleton class="bg-prim/40 block-4 inline-20" />
-    </div>
+    <div class="duedate"><Skeleton class="bg-prim/40 block-4 inline-20" /></div>
 
     <!-- invoicenumber: 100px col on desktop -->
     <div class="invoicenumber">

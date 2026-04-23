@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import BlankState from "$features/clients/components/BlankState.svelte";
@@ -12,15 +13,14 @@
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import { listUrlKey } from "$features/pagination/utils/url";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
-  import Edit from "$lib/components/icons/Edit.svelte";
   import ItemsHeader from "$lib/components/ItemsHeader.svelte";
+  import Edit from "$lib/components/icons/Edit.svelte";
   import NoSearchResults from "$lib/components/NoSearchResults.svelte";
   import SlidePanel from "$lib/components/SlidePanel.svelte";
   import { Button } from "$lib/components/ui/button";
   import { Toggle } from "$lib/runes/Toggle.svelte";
   import type { BitsButton } from "$lib/types";
   import { centsToDollars } from "$lib/utils/moneyHelpers";
-  import { onDestroy } from "svelte";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
@@ -88,9 +88,7 @@
   };
 </script>
 
-<svelte:head>
-  <title>{client.name} | Doller Holla</title>
-</svelte:head>
+<svelte:head> <title>{client.name} | Doller Holla</title> </svelte:head>
 <ItemsHeader store={clientInvoicesStore} toggle={isFormShowing.toggle}>
   {#snippet button()}
     + Client

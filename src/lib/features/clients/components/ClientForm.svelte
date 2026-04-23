@@ -1,25 +1,25 @@
 <script lang="ts">
+  import type { FormEventHandler } from "svelte/elements";
   import Check from "$lib/components/icons/Check.svelte";
   import Trash from "$lib/components/icons/Trash.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { FormEventHandler } from "svelte/elements";
   import type { ClientInsert, ClientSelect } from "../types";
 
-  type Panel = {
+  interface Panel {
     closePanel: () => void;
-  };
+  }
 
-  type EditProps = {
+  interface EditProps extends Panel {
     edit: ClientSelect;
     formState: "edit";
-  } & Panel;
+  }
 
-  type CreateProps = {
-    formState: "create";
+  interface CreateProps extends Panel {
     edit?: undefined;
-  } & Panel;
+    formState: "create";
+  }
 
   export type ClientFormProps = CreateProps | EditProps;
 
@@ -54,13 +54,7 @@
 <form class="grid grid-cols-6 gap-x-5" onsubmit={handleSubmit}>
   <div class="field col-span-full">
     <label for="name">Client Name</label>
-    <input
-      type="text"
-      name="name"
-      id="name"
-      bind:value={client.name}
-      required
-    />
+    <input type="text" name="name" id="name" bind:value={client.name} required>
   </div>
 
   <div class="field col-span-full">
@@ -71,17 +65,17 @@
       id="email"
       bind:value={client.email}
       required
-    />
+    >
   </div>
 
   <div class="field col-span-full">
     <label for="street">Address</label>
-    <input type="text" name="street" id="street" bind:value={client.street} />
+    <input type="text" name="street" id="street" bind:value={client.street}>
   </div>
 
   <div class="field col-span-2">
     <label for="city">City</label>
-    <input type="text" name="city" id="city" bind:value={client.city} />
+    <input type="text" name="city" id="city" bind:value={client.city}>
   </div>
 
   <div class="field col-span-2">
@@ -97,12 +91,13 @@
       id="zip"
       minlength="4"
       bind:value={client.zip}
-    />
+    >
   </div>
 
   <div class="field col-span-3">
     <Button variant="textOnlyDestructive" onclick={() => {}}
-      ><Trash /> Delete</Button
+      ><Trash />
+      Delete</Button
     >
   </div>
 

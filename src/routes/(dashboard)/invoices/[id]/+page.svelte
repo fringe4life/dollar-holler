@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { toast } from "svelte-sonner";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
@@ -8,8 +9,8 @@
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { tryCatch } from "$lib/utils/try-catch";
-  import { toast } from "svelte-sonner";
   import type { PageProps } from "./$types";
+
   let { data }: PageProps = $props();
 
   const { settings: settingsStore } = getDashboardStores();
@@ -63,20 +64,20 @@
       src={asset("/images/logo.png")}
       srcset={`${asset("/images/logo@2x.png")} 2x, ${asset("/images/logo.png")} 1x`}
       alt="Compressed fm"
-    />
+    >
   </div>
 
   <div
     class="col-span-full pbs-4 sm:col-span-2 sm:col-start-5 print:col-span-3"
   >
     <div class="label">From</div>
-    {#if settingsStore.settings && settingsStore.settings.myName}
+    {#if settingsStore.settings?.myName}
       <p>
         {#if settingsStore.settings.myName}
-          {settingsStore.settings.myName}<br />
+          {settingsStore.settings.myName}<br>
         {/if}
         {#if settingsStore.settings.city && settingsStore.settings.street && settingsStore.settings.state && settingsStore.settings.zip}
-          {settingsStore.settings.street}<br />
+          {settingsStore.settings.street}<br>
           {settingsStore.settings.city}
           {settingsStore.settings.state}
           {settingsStore.settings.zip}
@@ -99,11 +100,21 @@
     <div class="label">Bill To:</div>
     <p>
       {#if data.client}
-        {#if data.client.name}<strong>{data.client.name}</strong><br />{/if}
-        {#if data.client.email}{data.client.email}<br />{/if}
-        {#if data.client.street}{data.client.street}<br />{/if}
-        {#if data.client.state}{data.client.state}{/if}
-        {#if data.client.zip}{data.client.zip}{/if}
+        {#if data.client.name}
+          <strong>{data.client.name}</strong><br>
+        {/if}
+        {#if data.client.email}
+          {data.client.email}<br>
+        {/if}
+        {#if data.client.street}
+          {data.client.street}<br>
+        {/if}
+        {#if data.client.state}
+          {data.client.state}
+        {/if}
+        {#if data.client.zip}
+          {data.client.zip}
+        {/if}
       {:else}
         No client found
       {/if}
@@ -116,7 +127,7 @@
   <div class="col-span-3">
     <div class="label">Due Date:</div>
     <p>
-      {convertDate(invoice.dueDate != null ? String(invoice.dueDate) : null)}
+      {convertDate(invoice.dueDate === null ? null : String(invoice.dueDate))}
     </p>
   </div>
 
@@ -124,7 +135,7 @@
     <div class="label">Issue Date:</div>
     <p>
       {convertDate(
-        invoice.issueDate != null ? String(invoice.issueDate) : null
+        invoice.issueDate === null ? null : String(invoice.issueDate),
       )}
     </p>
   </div>

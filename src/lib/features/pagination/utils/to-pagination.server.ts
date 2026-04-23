@@ -6,12 +6,12 @@ import type { CursorId } from "$lib/types";
 import { DEFAULT_PAGINATION_METADATA } from "../constants";
 import type { ListDirection } from "../types";
 
-export interface ToPaginationParams<R, T extends CursorRow> {
-  rows: R[];
-  limit: number;
+interface ToPaginationParams<R, T extends CursorRow> {
   cursor: CursorId | undefined;
   direction: ListDirection;
+  limit: number;
   map: (pageRows: R[]) => T[];
+  rows: R[];
 }
 
 /**

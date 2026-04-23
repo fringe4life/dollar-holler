@@ -1,22 +1,22 @@
 <script lang="ts" generics="T extends CursorRow">
-  import { page } from "$app/state";
   import type { Snippet } from "svelte";
+  import { page } from "$app/state";
   import { DEFAULT_LIMIT } from "../constants";
   import type { CursorRow, PaginatableItems } from "../types";
   import Pagination from "./Pagination.svelte";
   import PaginationSkeleton from "./PaginationSkeleton.svelte";
 
-  type Props = {
-    store: PaginatableItems<T>;
-    skeletonCount?: number;
-    class?: string;
-    header: Snippet;
-    skeleton: Snippet;
-    row: Snippet<[T]>;
+  interface Props {
     blankState?: Snippet;
-    noResults?: Snippet;
+    class?: string;
     footer?: Snippet;
-  };
+    header: Snippet;
+    noResults?: Snippet;
+    row: Snippet<[T]>;
+    skeleton: Snippet;
+    skeletonCount?: number;
+    store: PaginatableItems<T>;
+  }
 
   let {
     store,

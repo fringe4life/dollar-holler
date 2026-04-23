@@ -1,9 +1,9 @@
+import { fail, redirect } from "@sveltejs/kit";
+import { ArkErrors } from "arktype";
 import { resolve } from "$app/paths";
 import { changePasswordSchema } from "$features/auth/schemas.server";
 import { auth } from "$lib/auth.server";
 import { tryCatch } from "$lib/utils/try-catch";
-import { fail, redirect } from "@sveltejs/kit";
-import { ArkErrors } from "arktype";
 import type { Actions } from "./$types";
 
 export const actions: Actions = {

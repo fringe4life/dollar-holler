@@ -1,11 +1,11 @@
-import { paginationSchema } from "$features/pagination/schemas.server";
-import { invoices } from "$lib/server/db/schema";
 import { type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
+import { paginationSchema } from "$features/pagination/schemas.server";
+import { invoices } from "$lib/server/db/schema";
 
 /**
  * JSON bodies encode dates as ISO strings; Drizzle arktype expects `Date`.

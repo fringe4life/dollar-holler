@@ -1,24 +1,24 @@
 <script lang="ts">
+  import type { KeyboardEventHandler } from "svelte/elements";
   /**
    * Search input: calls `store.loadItems` then shallow `pushState` (no full navigation).
    */
   import { pushState } from "$app/navigation";
   import { page } from "$app/state";
-  import Search from "$lib/components/icons/Search.svelte";
   import type { SearchableListStore } from "$features/pagination/types";
   import {
     parseLimitParam,
     toNormalizedListQuery,
   } from "$features/pagination/utils/list-query";
   import { buildListSearchString } from "$features/pagination/utils/url";
+  import Search from "$lib/components/icons/Search.svelte";
   import { Toggle } from "$lib/runes/Toggle.svelte";
-  import type { KeyboardEventHandler } from "svelte/elements";
 
-  export type Props = {
+  export interface SearchProps {
     store: SearchableListStore;
-  };
+  }
 
-  let { store }: Props = $props();
+  let { store }: SearchProps = $props();
 
   const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
 
@@ -84,7 +84,7 @@
       id="search"
       bind:value={search}
       onkeydown={handleKeydown}
-    />
+    >
     <span
       aria-hidden="true"
       class="border-b-lavenderIndigo ease-anticipate supports-linear:ease-anticipate pointer-events-none absolute inset-x-0 bottom-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200 block-2 peer-not-placeholder-shown:scale-x-100 peer-not-placeholder-shown:opacity-100 peer-focus:scale-x-100 peer-focus:opacity-100 md:inline-52 lg:inline-72"
@@ -94,8 +94,9 @@
       onclick={handleSearchClick}
       onkeydown={handleKeydown}
       class="font-sansserif text-pastelPurple peer-not-placeholder-shown:text-lavenderIndigo peer-focus:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush supports-linear:ease-anticipate pointer-events-none absolute translate-x-0 transform text-xl font-black transition-transform duration-200 ease-out inline-15.5 not-placeholder-shown:pointer-events-auto"
-      >Search</button
     >
+      Search
+    </button>
   </div>
 </div>
 

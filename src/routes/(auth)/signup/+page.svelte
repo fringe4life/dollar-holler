@@ -15,19 +15,19 @@
   <Form {form}>
     {#snippet children()}
       <!-- client-side debug: minimal -->
-      <input type="hidden" name="__debug_ts" value={Date.now()} />
+      <input type="hidden" name="__debug_ts" value={Date.now()}>
       <div class="field">
         <label for="name" class="text-goldenFizz">Full Name</label>
-        <input type="text" name="name" id="name" />
+        <input type="text" name="name" id="name">
       </div>
 
       <div class="field">
         <label for="email" class="text-goldenFizz">Email</label>
-        <input type="email" name="email" id="email" required />
+        <input type="email" name="email" id="email" required>
       </div>
       <div class="field">
         <label for="password" class="text-goldenFizz">Password</label>
-        <input type="password" name="password" id="password" required />
+        <input type="password" name="password" id="password" required>
       </div>
       <div class="field">
         <label for="confirmPassword" class="text-goldenFizz"
@@ -38,7 +38,7 @@
           name="confirmPassword"
           id="confirmPassword"
           required
-        />
+        >
       </div>
     {/snippet}
     {#snippet submit()}
@@ -49,7 +49,8 @@
         <a
           href={resolve("/login")}
           class="underline hover:no-underline"
-          data-sveltekit-preload-data="hover">Already have an account?</a
+          data-sveltekit-preload-data="hover"
+          >Already have an account?</a
         >
       </p>
     {/snippet}

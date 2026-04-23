@@ -4,7 +4,7 @@ import type { InvoicesStore } from "../features/invoices/stores/invoicesStore.sv
 import type { LineItemsStore } from "../features/line-items/stores/lineItemsStore.svelte";
 import type { SettingsStore } from "../features/settings/stores/settingsStore.svelte";
 
-export interface DashboardStores {
+interface DashboardStores {
   clients: ClientsStore;
   invoices: InvoicesStore;
   lineItems: LineItemsStore;

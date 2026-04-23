@@ -1,17 +1,17 @@
 <script lang="ts" module>
-  import { cn, type WithElementRef } from "$lib/utils.js";
   import type {
     HTMLAnchorAttributes,
     HTMLButtonAttributes,
   } from "svelte/elements";
   import { tv, type VariantProps } from "tailwind-variants";
+  import { cn, type WithElementRef } from "$lib/utils.js";
 
   export const buttonVariants = tv({
-    base: "inline-flex cursor-pointer items-center justify-center gap-x-2 rounded-lg font-sansserif whitespace-nowrap outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    base: "inline-flex cursor-pointer items-center justify-center gap-x-2 whitespace-nowrap rounded-lg font-sansserif outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg:not([class*='size-'])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0",
     variants: {
       variant: {
         default:
-          "relative translate-y-0 bg-lavenderIndigo text-xl font-black whitespace-nowrap text-white shadow-colored transition-transform duration-200 ease-glide after:absolute after:inset-0 after:rounded-lg after:opacity-0 after:shadow-coloredHover after:transition-opacity after:duration-200 after:ease-glide hover:-translate-1 hover:after:opacity-100",
+          "hover:-translate-1 relative translate-y-0 whitespace-nowrap bg-lavenderIndigo font-black text-white text-xl shadow-colored transition-transform duration-200 ease-glide after:absolute after:inset-0 after:rounded-lg after:opacity-0 after:shadow-coloredHover after:transition-opacity after:duration-200 after:ease-glide hover:after:opacity-100",
         destructive:
           "bg-scarlet text-goldenFizz shadow-xs transition-colors duration-200 hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40",
         ghost:
@@ -25,7 +25,7 @@
         secondary:
           "bg-gallery/80 font-bold text-blueGem/90 shadow-colored transition-colors duration-200 hover:bg-gallery hover:text-blueGem",
         link: "text-primary underline-offset-4 hover:underline",
-        auth: "after:rounded-inherit relative mbs-6 rounded-lg bg-robinEggBlue px-4 py-3 text-xl font-bold text-daisyBush transition-[translate] duration-200 inline-full min-block-14 after:absolute after:inset-0 after:opacity-0 after:shadow-lg after:transition-opacity after:duration-200 after:ease-glide hover:-translate-y-1 hover:after:opacity-100 supports-linear:ease-anticipate",
+        auth: "mbs-6 inline-full min-block-14 relative rounded-lg bg-robinEggBlue px-4 py-3 font-bold text-daisyBush text-xl transition-[translate] duration-200 after:absolute after:inset-0 after:rounded-inherit after:opacity-0 after:shadow-lg after:transition-opacity after:duration-200 after:ease-glide hover:-translate-y-1 hover:after:opacity-100 supports-linear:ease-anticipate",
       },
       size: {
         default: "px-5 py-2 has-[>svg]:px-3",
@@ -57,7 +57,7 @@
     variant = "default",
     size = "default",
     ref = $bindable(null),
-    href = undefined,
+    href,
     type = "button",
     disabled,
     children,

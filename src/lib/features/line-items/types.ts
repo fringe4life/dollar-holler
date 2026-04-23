@@ -1,19 +1,14 @@
+import type { BitsButton, CursorId, List } from "$lib/types";
+import type { InvoiceSelect } from "../invoices/types";
 import type {
   lineItemEditRowSchema,
   lineItemInsertSchema,
-  lineItemSelectSchema,
   lineItemUpdateSchema,
 } from "./schemas.server";
-import type { BitsButton, CursorId, List } from "$lib/types";
-import type { InvoiceSelect } from "../invoices/types";
 
 export type LineItemInsert = typeof lineItemInsertSchema.infer;
 export type LineItemEditRow = typeof lineItemEditRowSchema.infer;
-export type LineItemSelect = typeof lineItemSelectSchema.infer;
 export type LineItemUpdate = Omit<typeof lineItemUpdateSchema.infer, "id">;
-
-/** Used by LineItemRows / LineItemRow (including public invoice view). */
-export type LineItemsSectionMode = "edit" | "create" | "view";
 
 export type UIKey = number;
 
@@ -23,14 +18,14 @@ export type NewLineItemWithId = Omit<LineItemInsert, "id"> & {
   id: Key;
 };
 
-type InvoiceFormPanel = {
+interface InvoiceFormPanel {
   closePanel: () => void;
-};
+}
 
-type InvoiceFormEditProps = InvoiceFormPanel & {
-  mode: "edit";
+interface InvoiceFormEditProps extends InvoiceFormPanel {
   invoiceEdit: InvoiceSelect;
-};
+  mode: "edit";
+}
 
 type InvoiceFormCreateProps = InvoiceFormPanel & {
   mode: "create";
@@ -40,39 +35,39 @@ type InvoiceFormCreateProps = InvoiceFormPanel & {
 export type InvoiceFormProps = InvoiceFormEditProps | InvoiceFormCreateProps;
 
 /** Line-item table: view mode has no mutation callbacks. */
-type LineItemRowsViewProps = {
-  mode: "view";
+interface LineItemRowsViewProps {
+  discount: number;
   lineItems: List<LineItemEditRow>;
-  discount: number;
-};
+  mode: "view";
+}
 
-type LineItemRowsEditProps = {
-  mode: "edit" | "create";
-  lineItems: List<LineItemEditRow | NewLineItemWithId>;
-  discount: number;
-  updateLineItem: (id: Key, patch: LineItemUpdate) => void;
-  setDiscount: (value: number) => void;
+interface LineItemRowsEditProps {
   addLineItem: BitsButton;
+  discount: number;
+  lineItems: List<LineItemEditRow | NewLineItemWithId>;
+  mode: "edit" | "create";
   removeLineItem: (id: Key) => void;
-};
+  setDiscount: (value: number) => void;
+  updateLineItem: (id: Key, patch: LineItemUpdate) => void;
+}
 
 export type LineItemRowsProps = LineItemRowsViewProps | LineItemRowsEditProps;
 
-type LineItemRowBase = {
-  lineItem: LineItemEditRow | NewLineItemWithId;
+interface LineItemRowBase {
   canDelete: boolean;
   isRequired: boolean;
-};
+  lineItem: LineItemEditRow | NewLineItemWithId;
+}
 
-type LineItemRowViewProps = {
+interface LineItemRowViewProps {
   mode: "view";
-};
+}
 
-type LineItemRowEditProps = {
+interface LineItemRowEditProps {
   mode: "edit" | "create";
-  updateLineItem: (id: Key, patch: LineItemUpdate) => void;
   removeLineItem: (id: Key) => void;
-};
+  updateLineItem: (id: Key, patch: LineItemUpdate) => void;
+}
 
 export type LineItemRowProps = LineItemRowBase &
   (LineItemRowViewProps | LineItemRowEditProps);

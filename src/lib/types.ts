@@ -10,6 +10,6 @@ type Brand<T, U extends string> = T & { [__brand]: U };
 export type SanitizedHTML = Brand<string, "SanitizedHTML">;
 export type CursorId = Brand<string, "CursorId">;
 
-export type Total = {
+export interface Total {
   total: number;
-};
+}

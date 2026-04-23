@@ -6,9 +6,9 @@ import type {
 } from "./schemas.server";
 
 export interface NormalizeListQueryResult {
-  normalized: PaginationSearchParams;
   /** True when a `cursor` query param was present but stripped as invalid. */
   listCursorWasNormalized: boolean;
+  normalized: PaginationSearchParams;
 }
 
 export type ListDirection = typeof listDirectionSchema.infer;
@@ -32,21 +32,22 @@ export interface CursorRow {
 }
 /** Contract for list pages that load rows with optional `q` search and expose a loading flag for the Search UI. */
 export interface SearchableListStore {
+  readonly error?: string | null;
   loadItems(
     normalized: PaginationSearchParams,
     options?: { signal?: AbortSignal }
   ): Promise<void>;
+  readonly loading: boolean;
   /**
    * Call immediately before `pushState` when changing list query from the client so
    * URL-sync effects do not refetch using a stale URL while `loadItems` is in flight.
    */
   presetClientListQueryKey?(normalized: PaginationSearchParams): void;
-  readonly loading: boolean;
-  readonly error?: string | null;
 }
 
 /** Cursor-paginated list store: list rows, URL sync key, and pagination flags for UI. */
 export interface PaginatableItems<T extends CursorRow>
-  extends SearchableListStore, CursorPaginatedList<T> {
+  extends SearchableListStore,
+    CursorPaginatedList<T> {
   lastSuccessfulListKey: Maybe<string>;
 }

@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { Maybe, SanitizedHTML } from "$lib/types";
 
-  type HtmlContentProps = {
+  interface HtmlContentProps {
     html: Maybe<SanitizedHTML>;
-  };
+  }
   let { html }: HtmlContentProps = $props();
 </script>
 

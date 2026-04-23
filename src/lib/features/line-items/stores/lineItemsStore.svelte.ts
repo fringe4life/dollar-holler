@@ -1,3 +1,4 @@
+import { toast } from "svelte-sonner";
 import type {
   Key,
   LineItemInsert,
@@ -7,12 +8,11 @@ import { apiClient } from "$lib/api";
 import { StoreResourceErrorBase } from "$lib/stores/store-resource-error-base.svelte";
 import type { CursorId, List } from "$lib/types";
 import {
-  StoreOperation,
   getErrorMessage,
   isAbortError,
+  StoreOperation,
 } from "$lib/utils/error-message";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
-import { toast } from "svelte-sonner";
 import type { LineItemEditRow, UIKey } from "../types";
 
 export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
@@ -41,9 +41,9 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
       return await unwrapTreaty(
         apiClient
           .invoices({ id: invoiceId })
-          [
-            "line-items"
-          ].edit.get(options?.signal ? { fetch: { signal: options.signal } } : undefined),
+          ["line-items"].edit.get(
+            options?.signal ? { fetch: { signal: options.signal } } : undefined
+          ),
         { fallbackMessage: fallback }
       );
     } catch (err) {
@@ -60,10 +60,12 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
   }
 
   normalizeLineItems(
-    items: Array<LineItemEditRow | NewLineItemWithId>
-  ): Array<LineItemInsert> {
-    if (items.length === 0) return [];
-    return items.reduce<Array<LineItemInsert>>((acc, item) => {
+    items: (LineItemEditRow | NewLineItemWithId)[]
+  ): LineItemInsert[] {
+    if (items.length === 0) {
+      return [];
+    }
+    return items.reduce<LineItemInsert[]>((acc, item) => {
       if ((item.description?.trim() ?? "").length > 0) {
         acc.push({
           ...item,
@@ -76,7 +78,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
   // Create line items for an invoice
   async createLineItems(
     invoiceId: CursorId,
-    items: Array<LineItemInsert>
+    items: LineItemInsert[]
   ): Promise<List<LineItemEditRow>> {
     const fallback = this.fallbackFor(StoreOperation.createMany);
 
@@ -101,7 +103,7 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
   // Update line items for an invoice (replace all)
   async updateLineItems(
     invoiceId: CursorId,
-    items: Array<LineItemInsert>
+    items: LineItemInsert[]
   ): Promise<List<LineItemEditRow>> {
     const fallback = this.fallbackFor(StoreOperation.updateMany);
     try {

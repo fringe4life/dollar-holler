@@ -1,16 +1,16 @@
+import { toast } from "svelte-sonner";
 import type { CursorPaginatedList } from "$features/pagination/types";
 import { apiClient } from "$lib/api";
 import type { ClientStatus } from "$lib/server/db/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
 import {
-  StoreOperation,
   getErrorMessage,
   isAbortError,
+  StoreOperation,
 } from "$lib/utils/error-message";
 import { transformNullToUndefined } from "$lib/utils/typeHelpers";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
-import { toast } from "svelte-sonner";
 import type {
   ClientInsert,
   ClientListResponse,
@@ -125,14 +125,13 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
       );
 
       const index = this.items.findIndex((c) => c.id === clientId);
-      if (index !== -1) {
-        this.items[index] = {
-          ...this.items[index],
-          ...rest,
-        };
-      } else {
+      if (index === -1) {
         throw new Error("Client not found");
       }
+      this.items[index] = {
+        ...this.items[index],
+        ...rest,
+      };
 
       toast.success("Client updated successfully");
     } catch (err) {

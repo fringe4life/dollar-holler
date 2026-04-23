@@ -1,4 +1,7 @@
 /* eslint-disable new-cap */
+
+import { eq } from "drizzle-orm";
+import { Elysia } from "elysia";
 import {
   settingsInsertSchema,
   settingsSelectSchema,
@@ -7,8 +10,6 @@ import {
 import { db } from "$lib/server/db";
 import { settings as settingsTable } from "$lib/server/db/schema";
 import { apiErrorBodySchema } from "$lib/server/schemas";
-import { eq } from "drizzle-orm";
-import { Elysia } from "elysia";
 import { protectedApiPlugin } from "../plugins/auth-plugin";
 import { InternalServerError, NotFoundError } from "../utils/errors";
 
@@ -34,7 +35,9 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
 
         return userSettings;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error loading settings:", error);
         throw new InternalServerError("Failed to load settings");
       }
@@ -73,7 +76,9 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
         }
         return updated;
       } catch (error) {
-        if (error instanceof NotFoundError) throw error;
+        if (error instanceof NotFoundError) {
+          throw error;
+        }
         console.error("Error updating settings:", error);
         throw new InternalServerError("Failed to update settings");
       }

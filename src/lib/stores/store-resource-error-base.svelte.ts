@@ -1,6 +1,6 @@
 import {
-  type StoreOperation,
   resourceOperationFallback,
+  type StoreOperation,
 } from "$lib/utils/error-message";
 import { LoadableListStoreBase } from "./loadable-list-store-base.svelte";
 

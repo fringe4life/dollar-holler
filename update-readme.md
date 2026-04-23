@@ -29,7 +29,6 @@ Provide ONLY this file in future sessions to have the AI re-scan and update `REA
   - Drizzle ORM: `drizzle-orm` version
   - Better Auth: `better-auth` version
   - Neon: `@neondatabase/serverless` version
-  - CUID2: `@paralleldrive/cuid2` version
 - Preserve existing README headings and tone, only patch relevant sections.
 - Do not change license wording.
 

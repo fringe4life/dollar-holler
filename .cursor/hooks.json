@@ -4,6 +4,9 @@
     "afterFileEdit": [
       {
         "command": "bun fix"
+      },
+      {
+        "command": "bun fix --skip=correctness/noUnusedImports"
       }
     ]
   }

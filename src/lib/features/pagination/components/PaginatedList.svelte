@@ -1,4 +1,6 @@
 <script lang="ts" generics="T extends CursorRow">
+  import { css, cx } from "styled-system/css";
+  import { flex, grid, gridItem, stack } from "styled-system/patterns";
   import type { Snippet } from "svelte";
   import { page } from "$app/state";
   import { DEFAULT_LIMIT } from "../constants";
@@ -39,10 +41,18 @@
   );
 </script>
 
-<div class="flex grow flex-col">
+<div class={stack({ flexGrow: 1 })}>
   {#if store.error}
-    <div class="grid place-content-center py-8 block-full">
-      <div class="text-lg text-red-500">Error: {store.error}</div>
+    <div
+      class={grid({
+        placeContent: "center",
+        paddingBlock: 8,
+        blockSize: "full",
+      })}
+    >
+      <div class={gridItem({ color: "scarlet", fontSize: "lg" })}>
+        Error: {store.error}
+      </div>
     </div>
   {:else if isBlank}
     {@render blankState?.()}
@@ -50,12 +60,27 @@
     {@render noResults?.()}
   {:else}
     <div
-      class="grid grid-rows-[1fr_min-content] items-start gap-y-4 min-block-full lg:grid-rows-[min-content_1fr_min-content] {extraClass ??
-        ''}"
+      class={cx(
+        grid({
+          gridTemplateRows: {
+            base: "1fr min-content",
+            lg: "min-content 1fr min-content",
+          },
+          alignItems: "start",
+          rowGap: 4,
+          minBlockSize: "full",
+        }),
+        extraClass,
+      )}
     >
       {@render header()}
       <div
-        class="flex flex-col-reverse justify-end gap-4 block-full"
+        class={flex({
+          direction: "column-reverse",
+          justify: "flex-end",
+          gap: 4,
+          blockSize: "full",
+        })}
         style:view-transition-name="paginated-list-rows"
       >
         {#if store.loading}

@@ -1,6 +1,6 @@
-import { toast } from "svelte-sonner";
 import type { CursorPaginatedList } from "$features/pagination/types";
 import { apiClient } from "$lib/api";
+import type { InvoiceStatus } from "$lib/server/db/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
 import { today } from "$lib/utils/dateHelpers";
@@ -9,6 +9,7 @@ import {
   isAbortError,
   StoreOperation,
 } from "$lib/utils/error-message";
+import { toast } from "$lib/utils/toast.svelte";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import type {
   InvoiceInsert,
@@ -63,6 +64,31 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
       console.error("Error loading invoice:", error);
       toast.error(errorMessage);
       return null;
+    }
+  }
+
+  async updateInvoiceStatus(invoiceId: CursorId, invoiceStatus: InvoiceStatus) {
+    const fb = "Failed to update invoice status";
+    try {
+      await unwrapTreaty(
+        apiClient.invoices({ id: invoiceId }).patch({ invoiceStatus }),
+        { fallbackMessage: fb }
+      );
+
+      const index = this.items.findIndex((invoice) => invoice.id === invoiceId);
+      if (index === -1) {
+        throw new Error("Invoice not found");
+      }
+      this.items[index] = {
+        ...this.items[index],
+        invoiceStatus,
+        updatedAt: new Date(),
+      };
+      toast.success("Invoice updated successfully");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err, fb);
+      console.error("Error updating invoice status:", err);
+      toast.error(errorMessage);
     }
   }
 

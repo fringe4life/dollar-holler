@@ -1,6 +1,6 @@
 import { type } from "arktype";
 import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
+import { Elysia, InternalServerError, NotFoundError } from "elysia";
 import { fetchPaginatedInvoices } from "$features/invoices/queries/invoices-list.server";
 import {
   invoiceInsertSchema,
@@ -23,9 +23,9 @@ import {
   deleteSuccessSchema,
   idResponseSchema,
 } from "$lib/server/schemas";
+import { stripNullishEntries } from "$lib/utils/strip-nullish-entries";
 import { protectedApiPlugin } from "../plugins/auth-plugin";
 import { listQueryPlugin } from "../plugins/list-query-plugin";
-import { InternalServerError, NotFoundError } from "../utils/errors";
 
 export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   .use(protectedApiPlugin)
@@ -139,12 +139,12 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     "/:id",
     async ({ params: { id }, body, user }) => {
       try {
+        const setPayload = stripNullishEntries({
+          ...body,
+        });
         const [updated] = await db
           .update(invoicesTable)
-          .set({
-            ...body,
-            invoiceStatus: body.invoiceStatus ?? "draft",
-          })
+          .set(setPayload)
           .where(
             and(eq(invoicesTable.id, id), eq(invoicesTable.userId, user.id))
           )
@@ -165,15 +165,16 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     {
       params: idResponseSchema,
       body: invoiceUpdateSchema,
-      authMutation: true,
+      verifyInvoicePatchMutation: true,
       detail: {
         operationId: "patchInvoice",
         summary: "Update invoice",
         description:
-          "Partial update; `invoiceStatus` defaults to draft when omitted. Returns only `{ id }` on success. Missing or non-owned invoice returns 404.",
+          "Partial update; omitted fields are left unchanged (including `invoiceStatus`). When `invoiceStatus` is set, only draft→sent, sent→paid, or a no-op same value is allowed. Returns only `{ id }` on success. Missing or non-owned invoice returns 404.",
       },
       response: {
         200: idResponseSchema,
+        400: apiErrorBodySchema,
         401: apiErrorBodySchema,
         404: apiErrorBodySchema,
         500: apiErrorBodySchema,

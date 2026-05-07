@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
   /**
    * List UI: SSR uses `data` from +page.server.ts (effects do not run on the server).
    * After hydration, `invoicesStore` matches `listUrlKey(page.url)` and owns the rows.
@@ -14,15 +15,14 @@
     InvoiceListResponse,
     InvoiceSelect,
   } from "$features/invoices/types";
+  import ItemsHeader from "$features/pagination/components/ItemsHeader.svelte";
+  import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$features/pagination/types";
   import { listUrlKey } from "$features/pagination/utils/url";
+  import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
-  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
-  import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import SlidePanel from "$lib/components/SlidePanel.svelte";
-  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
+  import Modal from "$lib/components/Modal.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { PageData } from "./$types";
@@ -40,14 +40,14 @@
     invoicesStore.hydrateFromLoad(currentData, listUrlKey(page.url));
   });
 
-  const createForm = new Toggle();
+  const createForm = new ItemPanel<undefined>();
   const editPanel = new ItemPanel<InvoiceSelect>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
 </script>
 
 <svelte:head> <title>Invoices | Dollar Holler</title> </svelte:head>
 
-<ItemsHeader store={invoicesStore} toggle={createForm.toggle}>
+<ItemsHeader store={invoicesStore} open={createForm.open.bind(null, undefined)}>
   {#snippet button()}
     + Invoice
   {/snippet}
@@ -61,7 +61,14 @@
     <InvoiceRowSkeleton />
   {/snippet}
   {#snippet row(invoice)}
-    <InvoiceRow {invoice} onEdit={editPanel.open} onDelete={deleteModal.open} />
+    <InvoiceRow
+      {invoice}
+      onEdit={editPanel.open}
+      onDelete={deleteModal.open}
+      onSendInvoice={async (inv) => {
+        await invoicesStore.updateInvoiceStatus(inv.id, "sent");
+      }}
+    />
   {/snippet}
   {#snippet blankState()}
     <BlankState />
@@ -75,31 +82,54 @@
   {/snippet}
 </PaginatedList>
 
-<SlidePanel bind:open={createForm.isOn} buttonText="">
+<Modal
+  variant="panel"
+  bind:dialogEl={createForm.dialogEl}
+  onClose={createForm.close}
+>
   {#snippet title()}
     <h2
-      class="font-sansserif text-daisyBush mbs-9 mbe-7 text-3xl font-bold lg:mbs-0"
+      class={css({
+        fontFamily: "sansserif",
+        color: "daisyBush",
+        marginBlockStart: { base: 9, lg: 0 },
+        marginBlockEnd: 7,
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
     >
       Add an Invoice
     </h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="hidden">""</h2>
+    <h2 class={css({ display: "none" })}>""</h2>
   {/snippet}
 
-  <InvoiceForm mode="create" closePanel={createForm.off} />
-</SlidePanel>
+  <InvoiceForm mode="create" closePanel={createForm.close} />
+</Modal>
 
-<SlidePanel bind:open={editPanel.toggle.isOn} buttonText="">
+<Modal
+  variant="panel"
+  bind:dialogEl={editPanel.dialogEl}
+  onClose={editPanel.close}
+>
   {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mbe-7 text-3xl font-bold">
+    <h2
+      class={css({
+      fontFamily: "sansserif",
+      color: "daisyBush",
+      marginBlockEnd: 7,
+      fontSize: "3xl",
+      fontWeight: "bold",
+    })}
+    >
       Edit an Invoice
     </h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="hidden">""</h2>
+    <h2 class={css({ display: "none" })}>Add an invoice</h2>
   {/snippet}
 
   {#if editPanel.item}
@@ -111,25 +141,29 @@
       />
     {/key}
   {/if}
-</SlidePanel>
+</Modal>
 
 {#if deleteModal.item}
   <ConfirmDelete
     item={deleteModal.item}
-    bind:open={deleteModal.toggle.isOn}
+    bind:dialogEl={deleteModal.dialogEl}
     titleText="Are you sure you want to delete this invoice?"
     onCancel={deleteModal.close}
     onDelete={async () => {
-      if (!deleteModal?.item?.id) return;
+      if (!deleteModal?.item?.id) {
+        return;
+      }
       await invoicesStore.deleteInvoice(deleteModal.item.id);
       deleteModal.close();
     }}
   >
     {#snippet descriptionSnippet(invoice)}
       This will delete the invoice to
-      <span class="text-scarlet">{invoice.name}</span>
+      <span class={css({ color: "scarlet" })}>{invoice.name}</span>
       for
-      <span class="text-scarlet">{formatTotal(invoice.total)}</span>
+      <span class={css({ color: "scarlet" })}
+        >{formatTotal(invoice.total)}</span
+      >
     {/snippet}
   </ConfirmDelete>
 {/if}

@@ -1,7 +1,7 @@
 /* eslint-disable new-cap */
 
 import { eq } from "drizzle-orm";
-import { Elysia } from "elysia";
+import { Elysia, InternalServerError, NotFoundError } from "elysia";
 import {
   settingsInsertSchema,
   settingsSelectSchema,
@@ -11,7 +11,6 @@ import { db } from "$lib/server/db";
 import { settings as settingsTable } from "$lib/server/db/schema";
 import { apiErrorBodySchema } from "$lib/server/schemas";
 import { protectedApiPlugin } from "../plugins/auth-plugin";
-import { InternalServerError, NotFoundError } from "../utils/errors";
 
 export const settingsRoutes = new Elysia({ prefix: "/settings" })
   .use(protectedApiPlugin)

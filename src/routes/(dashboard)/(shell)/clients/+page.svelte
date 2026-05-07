@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
   import BlankState from "$features/clients/components/BlankState.svelte";
@@ -10,22 +11,21 @@
     ClientListResponse,
     ClientSelect,
   } from "$features/clients/types";
+  import ItemsHeader from "$features/pagination/components/ItemsHeader.svelte";
+  import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$features/pagination/types";
   import { listUrlKey } from "$features/pagination/utils/url";
+  import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
-  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
-  import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import SlidePanel from "$lib/components/SlidePanel.svelte";
-  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
+  import Modal from "$lib/components/Modal.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { CursorId } from "$lib/types";
   import type { PageData } from "./$types";
 
   let { data }: { data: PageData } = $props();
 
-  const createForm = new Toggle();
+  const createForm = new ItemPanel<undefined>();
   const editPanel = new ItemPanel<ClientSelect>();
   const deleteModal = new ItemPanel<ClientListResponse>();
 
@@ -50,13 +50,16 @@
 
 <svelte:head> <title>Clients | Dollar Holler</title> </svelte:head>
 
-<ItemsHeader store={clientsStore} toggle={createForm.toggle}>
+<ItemsHeader store={clientsStore} open={createForm.open.bind(null, undefined)}>
   {#snippet button()}
     + Client
   {/snippet}
 </ItemsHeader>
 
-<PaginatedList store={clientsStore} class="grid-rows-[1fr_min-content]">
+<PaginatedList
+  store={clientsStore}
+  class={css({ gridTemplateRows: "1fr min-content" })}
+>
   {#snippet header()}
     <ClientRowHeader />
   {/snippet}
@@ -84,60 +87,85 @@
   {/snippet}
 </PaginatedList>
 
-<SlidePanel bind:open={createForm.isOn} buttonText="">
+<Modal
+  variant="panel"
+  bind:dialogEl={createForm.dialogEl}
+  onClose={createForm.close}
+>
   {#snippet title()}
     <h2
-      class="font-sansserif text-daisyBush mbs-9 mbe-7 text-3xl font-bold lg:mbs-0"
+      class={css({
+        fontFamily: "sansserif",
+        color: "daisyBush",
+        marginBlockStart: { base: 9, lg: 0 },
+        marginBlockEnd: 7,
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
     >
       Add a Client
     </h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="hidden">""</h2>
+    <h2 class={css({ srOnly: true })}>Create a new client</h2>
   {/snippet}
 
   <ClientForm
     edit={undefined}
     formState="create"
-    closePanel={() => createForm.off()}
+    closePanel={createForm.close}
   />
-</SlidePanel>
+</Modal>
+{#if editPanel.item}
+  <Modal
+    variant="panel"
+    bind:dialogEl={editPanel.dialogEl}
+    onClose={editPanel.close}
+  >
+    {#snippet title()}
+      <h2
+        class={css({
+      fontFamily: "sansserif",
+      color: "daisyBush",
+      marginBlockEnd: 7,
+      fontSize: "3xl",
+      fontWeight: "bold",
+    })}
+      >
+        Edit a Client
+      </h2>
+    {/snippet}
 
-<SlidePanel bind:open={editPanel.toggle.isOn} buttonText="">
-  {#snippet title()}
-    <h2 class="font-sansserif text-daisyBush mbe-7 text-3xl font-bold">
-      Edit a Client
-    </h2>
-  {/snippet}
+    {#snippet description()}
+      <h2 class={css({ display: "none" })}>Edit a client</h2>
+    {/snippet}
 
-  {#snippet description()}
-    <h2 class="hidden">""</h2>
-  {/snippet}
-
-  {#if editPanel.item}
     <ClientForm
       formState="edit"
       edit={editPanel.item}
-      closePanel={() => editPanel.close()}
+      closePanel={editPanel.close}
     />
-  {/if}
-</SlidePanel>
+  </Modal>
+{/if}
 
 {#if deleteModal.item}
   <ConfirmDelete
     item={deleteModal.item}
-    bind:open={deleteModal.toggle.isOn}
+    bind:dialogEl={deleteModal.dialogEl}
     titleText="Are you sure you want to delete this client?"
     onCancel={deleteModal.close}
     onDelete={async () => {
-      if (!deleteModal?.item?.id) return;
+      if (!deleteModal?.item?.id) {
+        return;
+      }
       await clientsStore.deleteClient(deleteModal.item.id);
       deleteModal.close();
     }}
   >
     {#snippet descriptionSnippet(client)}
-      This will delete Client: <span class="text-scarlet">{client.name}</span>
+      This will delete Client:
+      <span class={css({ color: "scarlet" })}>{client.name}</span>
     {/snippet}
   </ConfirmDelete>
 {/if}

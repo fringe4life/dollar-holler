@@ -1,5 +1,5 @@
 // Auth form validation schemas using ArkType directly
-
+// fallow-ignore-file
 import { type } from "arktype";
 
 const passwordSchema = type("string >= 6");
@@ -35,7 +35,6 @@ export const signupSchema = type({
       path: ["confirmPassword"],
     });
   });
-
 export const resetPasswordSchema = type({
   token: "string >= 1",
 })

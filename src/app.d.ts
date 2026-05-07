@@ -1,4 +1,4 @@
-import type { Session, User } from "better-auth";
+import type { User } from "better-auth";
 import type { Maybe } from "$lib/types";
 
 declare global {
@@ -6,11 +6,9 @@ declare global {
   namespace App {
     // interface Error {}
     interface Locals {
-      session: Maybe<Session>;
       user: Maybe<User>;
     }
     interface PageData {
-      session: Maybe<Session>;
       user: Maybe<User>;
     }
     // interface PageState {}

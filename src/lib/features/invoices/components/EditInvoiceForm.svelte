@@ -1,23 +1,24 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
   import { onDestroy, onMount } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
-  import { toast } from "svelte-sonner";
   import type { ClientInsert } from "$features/clients/types";
   import type {
     LineItemEditRow,
     NewLineItemWithId,
   } from "$features/line-items/types";
   import { toNormalizedListQuery } from "$features/pagination/utils/list-query";
+  import { Counter } from "$lib/client/runes/Counter.svelte";
+  import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import Trash from "$lib/components/icons/Trash.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { Counter } from "$lib/runes/Counter.svelte";
-  import { ItemPanel } from "$lib/runes/ItemPanel.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton, CursorId, Maybe } from "$lib/types";
   import { toDateInputValue } from "$lib/utils/dateHelpers";
   import { isAbortError } from "$lib/utils/error-message";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
+  import { toast } from "$lib/utils/toast.svelte";
   import type {
     InvoiceDeleteConfirmItem,
     InvoiceSelect,
@@ -31,13 +32,12 @@
   } from "../utils/invoice-diff";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
-  let {
-    closePanel,
-    invoiceEdit,
-  }: {
+  interface EditInvoiceFormProps {
     closePanel: () => void;
     invoiceEdit: InvoiceSelect;
-  } = $props();
+  }
+
+  let { closePanel, invoiceEdit }: EditInvoiceFormProps = $props();
 
   const {
     clients: clientsStore,
@@ -46,7 +46,7 @@
   } = getDashboardStores();
 
   type EditableInvoice = NewInvoice & Pick<InvoiceSelect, "id">;
-
+  // svelte-ignore state_referenced_locally
   let invoice: EditableInvoice = $state({
     ...invoiceEdit,
     issueDate: toDateInputValue(invoiceEdit.issueDate),
@@ -245,7 +245,7 @@
 {#if deleteModal.item}
   <ConfirmDelete
     item={deleteModal.item}
-    bind:open={deleteModal.toggle.isOn}
+    dialogEl={deleteModal?.dialogEl}
     titleText="Are you sure you want to delete this invoice?"
     onCancel={deleteModal.close}
     onDelete={async () => {
@@ -259,9 +259,9 @@
   >
     {#snippet descriptionSnippet(inv)}
       This will delete the invoice to
-      <span class="text-scarlet">{inv.name}</span>
+      <span class={css({color: "scarlet"})}>{inv.name}</span>
       for
-      <span class="text-scarlet">{totalDisplay}</span>
+      <span class={css({color: "scarlet"})}>{totalDisplay}</span>
     {/snippet}
   </ConfirmDelete>
 {/if}

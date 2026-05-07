@@ -9,11 +9,16 @@ const config: Config = {
     alias: {
       $features: "./src/lib/features",
       $lib: "./src/lib",
+      "styled-system": "./styled-system/*",
     },
     typescript: {
       config: (config) => ({
         ...config,
-        include: [...config.include, "./drizzle.config.ts"],
+        include: [
+          ...config.include,
+          "./drizzle.config.ts",
+          "../styled-system/*",
+        ],
       }),
     },
   },

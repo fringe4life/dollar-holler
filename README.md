@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.57.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-beta-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![TailwindCSS](https://img.shields.io/badge/TailwindCSS-4.2.2-06B6D4?logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.59.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.5-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.1-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.9-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-1.11.0-16A34A?logo=css3&logoColor=white)](https://panda-css.com/)
 
 </div>
 
@@ -62,7 +62,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run dev` - Start development server (Vite 8)
 - `bun run build` - Build for production
 - `bun run preview` - Preview production build
-- `bun run check` - Run Ultracite checks
+- `bun run check` - Run Ultracite (Biome) checks
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations
@@ -71,31 +71,30 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run db:clear` - Clear application data from the database
 - `bun run db:studio` - Open Drizzle Studio
 - `bun run db:push` - Push schema directly to the database
-- `bun run format` - Format source with Prettier
-- `bun run lint` - Run Prettier check and ESLint
-- `bun run lint:fix` - Auto-fix lint and formatting issues
 - `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
 - `bun run fix` - Run Ultracite fix (`ultracite fix`)
 - `bun run fallow` - Run [Fallow](https://github.com/benefacto/fallow) (project graph and analysis)
 - `bun run fallow:dead-code` - Fallow dead-code pass
 - `bun run fallow:boundaries` - List configured boundaries
 - `bun run fallow:boundary-violations` - Dead-code with boundary violations
+- `bun run fallow:dupes` - Fallow duplicate detection
+- `bun run prepare` (auto) - `panda codegen` and `svelte-kit sync` after install
 
 ## Tech Stack
 
 - **Framework:** SvelteKit 5 with Svelte 5 runes
 - **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`)
 - **Database:** PostgreSQL with Neon serverless
-- **ORM:** Drizzle ORM (beta) with Neon serverless driver (WebSocket `Pool`)
+- **ORM:** Drizzle ORM 1.0 (rc) with Neon serverless driver (WebSocket `Pool`)
 - **Authentication:** Better Auth with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter, bearer + OpenAPI plugins)
 - **ID generation:** `Bun.randomUUIDv7()` via [`create-uuidv7.server.ts`](./src/lib/features/pagination/utils/create-uuidv7.server.ts) (cursor-friendly IDs)
 - **Deployment:** Vercel adapter
 - **Package manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
 - **Bundler:** Vite 8 for dev and production builds
-- **UI components:** Bits UI with Tailwind CSS
-- **Styling:** Tailwind CSS 4 with Tailwind Variants
-- **Lint/format:** Ultracite (ESLint, Prettier, Stylelint)
+- **UI components:** [Ark UI for Svelte](https://ark-ui.com/) (`@ark-ui/svelte`)
+- **Styling:** [Panda CSS](https://panda-css.com/) with generated `styled-system` (see `panda.config.ts`, PostCSS, `prepare` script)
+- **Lint/format:** [Ultracite](https://ultracite.dev/) on top of [Biome](https://biomejs.dev/) (`biome.jsonc`)
 
 ## Project Structure
 
@@ -117,23 +116,24 @@ src/
 │   │   ├── schemas.ts       # Shared API response shapes
 │   │   ├── utils/           # better-auth-openapi, api-error-body, errors
 │   │   └── routes/          # API modules (clients, invoices, settings)
+│   ├── client/            # Client-only: @attach helpers, shared runes (ItemPanel, etc.)
 │   ├── features/          # Domain features: components, stores, schemas, list helpers
 │   │   ├── auth/
 │   │   ├── clients/       # includes server queries (list, options, verify)
 │   │   ├── invoices/      # includes server queries (list, verify)
+│   │   ├── landing-page/  # Marketing sections, nav, copy constants
 │   │   ├── line-items/
-│   │   ├── pagination/    # PaginatedList, base filters, UUIDv7 `createId` (server module)
+│   │   ├── pagination/    # PaginatedList, search, blank states, UUIDv7 `createId` (server module)
 │   │   └── settings/
-│   ├── components/        # Shared UI (icons under components/icons/)
-│   ├── attachments/       # Svelte 5 @attach helpers (e.g. swipe, clickOutside)
-│   ├── runes/             # Shared rune modules (ItemPanel, etc.)
+│   ├── components/        # Shared UI (navbar/, icons under components/icons/, ui/)
 │   ├── stores/            # Shared list-store bases, dashboard context
+│   ├── styles.ts          # Shared class names / style recipes
 │   └── utils/
 ├── routes/
 │   ├── (auth)/            # Login, signup, password reset, logout
 │   ├── (dashboard)/
-│   │   ├── (shell)/       # App shell: clients, invoice list, settings
-│   │   └── invoices/      # Invoice detail, line items, thanks
+│   │   ├── (shell)/       # App shell: clients, invoice list, settings, thanks
+│   │   └── invoices/      # Invoice detail, line items
 │   ├── api/               # Elysia catch-all API handler
 │   ├── +layout.svelte
 │   └── +page.svelte       # Landing page
@@ -166,7 +166,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Reset password supported; token is read from URL and validated
-- **Modern UI:** Bits UI components with Tailwind CSS 4
+- **Modern UI:** Ark UI components with Panda CSS
 - **Svelte 5 Runes:** Uses @attach directives and reactive patterns
 - **Responsive Design:** Mobile-first with swipe gestures
 
@@ -180,7 +180,8 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 ## Notes
 
 - Uses Vite 8 (`vite` in `package.json`). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
-- ESLint configuration is in `eslint.config.mjs` and uses Svelte 5 rules and Prettier integration. Prettier is configured in `prettier.config.mjs`. Use `bun run format` before `bun run lint`.
+- Lint and format run through Ultracite (`bun run check`, `bun run fix`) with Biome rules extended from `ultracite/biome` for core and Svelte.
+- Panda CSS generates `styled-system/`; `svelte.config.ts` aliases `styled-system` and includes it in TypeScript. After dependency install, `prepare` runs codegen for Panda.
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` to use Bun UUIDv7 for user ID generation and includes session caching for performance.
 - App configuration lives in `svelte.config.ts` (Vercel adapter, preprocess, Svelte 5 async compiler option).

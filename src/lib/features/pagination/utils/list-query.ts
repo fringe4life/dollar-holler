@@ -50,11 +50,7 @@ export const normalizeListQuery = (raw: {
     raw.direction === undefined ? undefined : String(raw.direction)
   );
   const limitWire =
-    raw.limit === undefined || raw.limit === ""
-      ? undefined
-      : typeof raw.limit === "number"
-        ? String(raw.limit)
-        : raw.limit;
+    raw.limit === undefined || raw.limit === "" ? undefined : String(raw.limit);
   const limit = parseLimit(limitWire);
 
   /** Backward without cursor: first page (same as forward, no cursor). */

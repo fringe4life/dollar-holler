@@ -1,25 +1,12 @@
-import { neonConfig, Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
-import { ENV } from "varlock/env";
 import type { ClientInsert, ClientSelect } from "$features/clients/types";
 import type { InvoiceInsert } from "$features/invoices/types";
 import type { LineItemInsert } from "$features/line-items/types";
 import { createId } from "$features/pagination/utils/create-uuidv7.server";
 import type { SettingsInsert } from "$features/settings/types";
 import type { CursorId } from "$lib/types";
-import { tableRelations } from "./relations";
-import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
+import { db } from ".";
+import { clients, invoices, lineItems, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
-
-neonConfig.webSocketConstructor = globalThis.WebSocket;
-// Create the Pool client (WebSocket-based for transaction support)
-const pool = new Pool({ connectionString: ENV.DATABASE_URL });
-
-const db = drizzle({
-  client: pool,
-  relations: tableRelations,
-  schema: { ...schemaTables, ...tableRelations },
-});
 
 // Helper function to generate random date within last 6 months
 function randomDateWithinLast6Months(): Date {
@@ -41,6 +28,7 @@ function randomDateWithinLast3Months(): Date {
   return new Date(randomTime);
 }
 
+// biome-ignore lint/complexity/noExcessiveCognitiveComplexity: seed file
 async function main() {
   // 1) Load existing users from Better Auth tables
   const users = await db.query.user.findMany();

@@ -1,14 +1,16 @@
 <script lang="ts" generics="T">
+  import { css } from "styled-system/css";
+  import { flex } from "styled-system/patterns";
   import type { Snippet } from "svelte";
   import Modal from "$lib/components/Modal.svelte";
-  import { Button } from "$lib/components/ui/button";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   interface Props<T> {
     descriptionSnippet?: Snippet<[item: T]>;
+    dialogEl?: HTMLDialogElement | undefined;
     item: T;
     onCancel?: () => void;
     onDelete: () => Promise<void> | void;
-    open?: boolean;
     titleText?: string;
   }
 
@@ -18,7 +20,7 @@
     onCancel,
     onDelete,
     descriptionSnippet,
-    open = $bindable(),
+    dialogEl = $bindable<HTMLDialogElement | undefined>(),
   }: Props<T> = $props();
 
   const handleDelete = async () => {
@@ -26,20 +28,35 @@
   };
 </script>
 
-<Modal bind:open buttonText="" className="z-450">
+<Modal bind:dialogEl onClose={onCancel}>
   {#snippet title()}
-    <h2 class="text-daisyBush text-center text-xl font-bold">{titleText}</h2>
+    <h2
+      class={css({
+        color: "daisyBush",
+        textAlign: "center",
+        fontSize: "xl",
+        fontWeight: "bold",
+      })}
+    >
+      {titleText}
+    </h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="text-daisyBush text-center text-lg font-medium">
+    <h2
+      class={css({
+        color: "daisyBush",
+        textAlign: "center",
+        fontSize: "lg",
+        fontWeight: "medium",
+      })}
+    >
       {#if descriptionSnippet}
         {@render descriptionSnippet?.(item)}
       {/if}
     </h2>
   {/snippet}
-
-  <div class="flex justify-center gap-4">
+  <div class={flex({ justify: "center", gap: 4 })}>
     <Button variant="secondary" onclick={() => onCancel?.()}>Cancel</Button>
     <Button variant="destructive" onclick={handleDelete}
       >Yes, Delete It.</Button

@@ -13,7 +13,6 @@ const localsHandler: Handle = async ({ event, resolve }) => {
     })
   );
   if (result) {
-    event.locals.session = result.session;
     event.locals.user = result.user;
   }
   return resolve(event);
@@ -37,7 +36,7 @@ const authGuard: Handle = ({ event, resolve }) => {
   const path = event.url.pathname;
   // if not logged in and attempting to access protected routes, redirect to login
   if (
-    !event.locals.session &&
+    !event.locals.user &&
     PROTECTED_ROUTES.some((route) => path.startsWith(route))
   ) {
     throw redirect(303, "/login");
@@ -45,7 +44,7 @@ const authGuard: Handle = ({ event, resolve }) => {
 
   // if logged in an attempting to access login or signup, redirect to invoices
   if (
-    event.locals.session &&
+    event.locals.user &&
     UNPROTECTED_ROUTES.some((route) => path.startsWith(route))
   ) {
     throw redirect(303, "/invoices");

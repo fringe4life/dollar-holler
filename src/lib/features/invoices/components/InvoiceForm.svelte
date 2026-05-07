@@ -3,7 +3,11 @@
   import CreateInvoiceForm from "./CreateInvoiceForm.svelte";
   import EditInvoiceForm from "./EditInvoiceForm.svelte";
 
-  let { mode = "create", closePanel, invoiceEdit }: InvoiceFormProps = $props();
+  let {
+    mode = "create",
+    closePanel,
+    invoiceEdit = $bindable(),
+  }: InvoiceFormProps = $props();
 </script>
 
 {#if mode === "edit" && invoiceEdit}

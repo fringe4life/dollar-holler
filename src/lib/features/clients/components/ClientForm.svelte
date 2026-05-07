@@ -1,10 +1,15 @@
 <script lang="ts">
+  import { cx } from "styled-system/css";
+  import { flex, grid, gridItem } from "styled-system/patterns";
   import type { FormEventHandler } from "svelte/elements";
+  import FormField from "$lib/components/FormField.svelte";
   import Check from "$lib/components/icons/Check.svelte";
   import Trash from "$lib/components/icons/Trash.svelte";
   import States from "$lib/components/States.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import Input from "$lib/components/ui/input/Input.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
+  import type { BitsButton } from "$lib/types";
   import type { ClientInsert, ClientSelect } from "../types";
 
   interface Panel {
@@ -49,60 +54,74 @@
     }
     closePanel();
   };
+
+  const handleDelete: BitsButton = async () => {
+    if (formState === "edit" && edit) {
+      await clientsStore.deleteClient(edit.id);
+    }
+  };
 </script>
 
-<form class="grid grid-cols-6 gap-x-5" onsubmit={handleSubmit}>
-  <div class="field col-span-full">
-    <label for="name">Client Name</label>
-    <input type="text" name="name" id="name" bind:value={client.name} required>
-  </div>
+<!-- "grid grid-cols-6 gap-x-5" -->
+<form class={grid({ columns: 6, columnGap: 5 })} onsubmit={handleSubmit}>
+  <!-- "field col-span-full" -->
+  <FormField label="Client Name" forId="name" class={gridItem({ colSpan: 6 })}>
+    <Input
+      type="text"
+      name="name"
+      id="name"
+      bind:value={client.name}
+      required
+    />
+  </FormField>
 
-  <div class="field col-span-full">
-    <label for="email">Client Email</label>
-    <input
+  <FormField
+    label="Client Email"
+    forId="email"
+    class={gridItem({ colSpan: 6 })}
+  >
+    <Input
       type="text"
       name="email"
       id="email"
       bind:value={client.email}
       required
-    >
-  </div>
+    />
+  </FormField>
 
-  <div class="field col-span-full">
-    <label for="street">Address</label>
-    <input type="text" name="street" id="street" bind:value={client.street}>
-  </div>
+  <FormField label="Address" forId="street" class={gridItem({ colSpan: 6 })}>
+    <Input type="text" name="street" id="street" bind:value={client.street} />
+  </FormField>
 
-  <div class="field col-span-2">
-    <label for="city">City</label>
-    <input type="text" name="city" id="city" bind:value={client.city}>
-  </div>
+  <FormField label="City" forId="city" class={gridItem({ colSpan: 2 })}>
+    <Input type="text" name="city" id="city" bind:value={client.city} />
+  </FormField>
 
-  <div class="field col-span-2">
-    <label for="state">State</label>
+  <FormField label="State" forId="state" class={gridItem({ colSpan: 2 })}>
     <States bind:value={client.state} />
-  </div>
+  </FormField>
 
-  <div class="field col-span-2">
-    <label for="zip">Zip</label>
-    <input
+  <FormField label="Zip" forId="zip" class={gridItem({ colSpan: 2 })}>
+    <Input
       type="text"
       name="zip"
       id="zip"
-      minlength="4"
+      minlength={4}
       bind:value={client.zip}
-    >
-  </div>
+    />
+  </FormField>
 
-  <div class="field col-span-3">
-    <Button variant="textOnlyDestructive" onclick={() => {}}
+  <FormField class={gridItem({ colSpan: 3 })}>
+    <Button variant="textOnlyDestructive" onclick={handleDelete}
       ><Trash />
       Delete</Button
     >
-  </div>
-
-  <div class="field col-span-3 flex justify-end gap-x-5">
+  </FormField>
+  <!-- "field col-span-3 flex justify-end gap-x-5" -->
+  <FormField
+    class={cx(gridItem({ colSpan: 3 }), flex({ justify: "end", gap: 5 }))}
+  >
     <Button variant="secondary" onclick={() => closePanel()}>Cancel</Button>
     <Button type="submit"><Check /> Submit</Button>
-  </div>
+  </FormField>
 </form>

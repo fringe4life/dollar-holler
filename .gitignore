@@ -24,3 +24,6 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 seedDb.js
 stats.html
+## Panda
+styled-system
+styled-system-studio

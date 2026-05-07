@@ -1,17 +1,17 @@
 <script lang="ts">
   import { onDestroy, onMount } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
-  import { toast } from "svelte-sonner";
   import type { ClientInsert } from "$features/clients/types";
   import type {
     LineItemEditRow,
     NewLineItemWithId,
   } from "$features/line-items/types";
   import { toNormalizedListQuery } from "$features/pagination/utils/list-query";
-  import { Counter } from "$lib/runes/Counter.svelte";
+  import { Counter } from "$lib/client/runes/Counter.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton, CursorId, Maybe } from "$lib/types";
   import { isAbortError } from "$lib/utils/error-message";
+  import { toast } from "$lib/utils/toast.svelte";
   import type { NewInvoice } from "../types";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 

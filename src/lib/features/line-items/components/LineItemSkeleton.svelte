@@ -1,10 +1,29 @@
-<div class="space-y-4">
-  <div class="flex justify-between border-b-2 pbe-2">
-    <div class="rounded bg-gray-200 block-4 inline-24"></div>
-    <div class="rounded bg-gray-200 block-4 inline-16"></div>
-    <div class="rounded bg-gray-200 block-4 inline-12"></div>
-    <div class="rounded bg-gray-200 block-4 inline-16"></div>
+<script lang="ts">
+  import { css } from "styled-system/css";
+  import { flex } from "styled-system/patterns";
+</script>
+
+<div class={css({ spaceY: 4 })}>
+  <div
+    class={flex({ justify: "space-between", borderBottomWidth: 2, paddingBlockEnd: 2 })}
+  >
+    <div
+      class={css({ animation: "pulse", rounded: "md", bg: "gray.200", blockSize: 4, inlineSize: 24 })}
+    ></div>
+    <div
+      class={css({ animation: "pulse", rounded: "md", bg: "gray.200", blockSize: 4, inlineSize: 16 })}
+    ></div>
+    <div
+      class={css({ animation: "pulse", rounded: "md", bg: "gray.200", blockSize: 4, inlineSize: 12 })}
+    ></div>
+    <div
+      class={css({ animation: "pulse", rounded: "md", bg: "gray.200", blockSize: 4, inlineSize: 16 })}
+    ></div>
   </div>
-  <div class="animate-pulse rounded bg-gray-100 block-10 inline-full"></div>
-  <div class="animate-pulse rounded bg-gray-100 block-10 inline-full"></div>
+  <div
+    class={css({ animation: "pulse", rounded: "md", bg: "gray.100", blockSize: 10, inlineSize: "full" })}
+  ></div>
+  <div
+    class={css({ animation: "pulse", rounded: "md", bg: "gray.100", blockSize: 10, inlineSize: "full" })}
+  ></div>
 </div>

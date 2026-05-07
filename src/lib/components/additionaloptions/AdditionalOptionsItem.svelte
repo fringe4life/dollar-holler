@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
+  import { flex } from "styled-system/patterns";
   import type { Component } from "svelte";
   import type { MouseEventHandler } from "svelte/elements";
   import View from "$lib/components/icons/View.svelte";
@@ -16,13 +18,28 @@
   }
 
   let { option }: Props = $props();
+  const Icon = $derived(option.icon || View);
 </script>
 
 {#if !option.disabled}
-  {@const Icon = option.icon || View}
-  <li class="not-last:border-b-whisper not-last:border-b-2">
+  <li
+    class={css({
+      borderBottomColor: "whisper",
+      borderBottomWidth: 2,
+      borderBottomStyle: "solid",
+      _last: { borderBottomWidth: 0, borderBottomColor: "transparent" },
+    })}
+  >
+    <!-- //"font-sansserif text-pastelPurple hover:text-daisyBush flex cursor-pointer -->
+    <!-- gap-x-2 p-4 font-bold transition-[color] duration-200 inline-full" -->
     <button
-      class="font-sansserif text-pastelPurple hover:text-daisyBush flex cursor-pointer gap-x-2 p-4 font-bold transition-[color] duration-200 inline-full"
+      class={cx(css({
+        inlineSize: "full",
+        padding: 4,
+        fontWeight: "bold",
+        transitionProperty: "colors",
+        transitionDuration: "normal",
+      }), flex({ columnGap: 2 }))}
       type="button"
       onclick={option.onclick}
     >

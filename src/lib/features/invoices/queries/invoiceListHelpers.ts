@@ -27,10 +27,10 @@ import type { Maybe, Total } from "$lib/types";
 export const lineItemsSubtotalSqlForInvoiceId = (invoiceId: AnyColumn) =>
   sql<number>`COALESCE((SELECT SUM(${lineItemsTable.amount}) FROM ${lineItemsTable} WHERE ${lineItemsTable.invoiceId} = ${invoiceId}), 0)`;
 
-export type RowWithSubtotal = {
-  subtotal: Maybe<string | number>;
+export interface RowWithSubtotal {
   discount: Maybe<string | number>;
-};
+  subtotal: Maybe<string | number>;
+}
 
 export const mapRowsWithTotal = <T extends RowWithSubtotal>(
   rows: T[]

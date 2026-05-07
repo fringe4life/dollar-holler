@@ -1,17 +1,19 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
   import type { HTMLAttributes } from "svelte/elements";
-  import { cn, type WithElementRef, type WithoutChildren } from "$lib/utils.js";
 
   let {
-    ref = $bindable(null),
     class: className,
     ...restProps
-  }: WithoutChildren<WithElementRef<HTMLAttributes<HTMLDivElement>>> = $props();
+  }: HTMLAttributes<HTMLDivElement> & { class?: string } = $props();
 </script>
 
 <div
-  bind:this={ref}
   data-slot="skeleton"
-  class={cn("animate-pulse rounded-md bg-accent", className)}
+  aria-hidden="true"
+  class={cx(
+    css({ animation: "pulse", rounded: "md", backgroundColor: "gray.500" }),
+    className,
+  )}
   {...restProps}
 ></div>

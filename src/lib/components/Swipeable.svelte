@@ -1,8 +1,11 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
+  import { flex } from "styled-system/patterns";
   import type { Snippet } from "svelte";
-  import { swipe } from "$lib/attachments/swipe.svelte";
+  import { swipe } from "$lib/client/attachments/swipe.svelte";
+  import { Toggle } from "$lib/client/runes/Toggle.svelte";
   import Cancel from "$lib/components/icons/Cancel.svelte";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
+  import { actionButton } from "$lib/styles";
 
   interface Props {
     content: Snippet;
@@ -18,7 +21,10 @@
 </script>
 
 <div
-  class="relative isolate"
+  class={css({
+    position: "relative",
+    isolation: "isolate",
+  })}
   style:view-transition-name={contentViewTransitionName}
 >
   <!-- CONTENT displayed by default -->
@@ -27,25 +33,26 @@
       triggerReset: swipeReset.isOn,
       onResetComplete: swipeReset.off,
     })}
-    class={contentClass}
+    class={cx(css({ zIndex: 5 }), contentClass)}
   >
     {@render content()}
   </div>
   <!-- REVEALED CONTENT displayed when the user swipes the card -->
   <div
-    class="absolute inset-0 z-1 flex items-center justify-around block-full inline-full"
+    class={flex({
+      align: "center",
+      justify: "space-around",
+      position: "absolute",
+      inset: 0,
+      zIndex: 1,
+      blockSize: "full", 
+      inlineSize: "full",
+    })}
   >
-    <button type="button" onclick={swipeReset.toggle} class="action-button">
+    <button type="button" onclick={swipeReset.toggle} class={actionButton}>
       <Cancel width={32} height={32} />
       Cancel
     </button>
     {@render revealed()}
   </div>
 </div>
-
-<style>
-  @reference "#app.css";
-  :global(.action-button) {
-    @apply text-daisyBush grid justify-items-center font-bold;
-  }
-</style>

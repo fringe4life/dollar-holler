@@ -1,14 +1,20 @@
 <script lang="ts">
-  import { toast } from "svelte-sonner";
+  import { css } from "styled-system/css";
+  import { flex, grid, gridItem } from "styled-system/patterns";
+  import { goto, invalidateAll } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
+  import { apiClient } from "$lib/api";
   import HtmlContent from "$lib/components/HtmlContent.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
   import { convertDate } from "$lib/utils/dateHelpers";
+  import { getErrorMessage } from "$lib/utils/error-message";
+  import { toast } from "$lib/utils/toast.svelte";
   import { tryCatch } from "$lib/utils/try-catch";
+  import { unwrapTreaty } from "$lib/utils/unwrap";
   import type { PageProps } from "./$types";
 
   let { data }: PageProps = $props();
@@ -18,6 +24,9 @@
   const invoice = $derived(data.invoice);
   const lineItems = $derived(data.lineItems ?? []);
   const settingsLink = $derived(resolve("/settings"));
+
+  const canSendInvoice = $derived(invoice.invoiceStatus === "draft");
+  const canPayInvoice = $derived(invoice.invoiceStatus === "sent");
 
   const printInvoice: BitsButton = () => {
     window.print();
@@ -36,41 +45,93 @@
     });
   };
 
-  const payInvoice: BitsButton = () => {
-    console.log("PAY INVOICE");
+  const payInvoice: BitsButton = async () => {
+    const fb = "Failed to record payment";
+    try {
+      await unwrapTreaty(
+        apiClient.invoices({ id: invoice.id }).patch({ invoiceStatus: "paid" }),
+        { fallbackMessage: fb }
+      );
+      await goto(resolve("/invoices/thanks"));
+    } catch (err) {
+      toast.error(getErrorMessage(err, fb));
+    }
   };
 
-  const sendInvoice: BitsButton = () => {
-    console.log("SEND INVOICE");
+  const sendInvoice: BitsButton = async () => {
+    const fb = "Failed to send invoice";
+    try {
+      await unwrapTreaty(
+        apiClient.invoices({ id: invoice.id }).patch({ invoiceStatus: "sent" }),
+        { fallbackMessage: fb }
+      );
+      await invalidateAll();
+      toast.success("Invoice sent");
+    } catch (err) {
+      toast.error(getErrorMessage(err, fb));
+    }
   };
 </script>
 
 <div
-  class=" fixed z-0 mbe-16 grid grid-flow-row justify-between gap-y-5 px-4 inline-full max-inline-5xl md:grid-flow-col lg:px-0 print:hidden"
+  class={grid({ 
+      gridAutoFlow: { base: "row", md: "column" }, 
+      justifyContent: "space-between", 
+      rowGap: 5, 
+      inlineSize: "full", 
+      maxInlineSize: "5xl" ,
+      paddingInline: { base: 4, lg: 0 }, 
+      position: "fixed", 
+      zIndex: 0, 
+      marginBlockEnd: 16, 
+      _print: { display: "none" } 
+    })}
 >
-  <h1 class="text-daisyBush text-3xl font-bold">Invoice</h1>
-  <div class="flex flex-wrap items-center gap-2 sm:flex-nowrap sm:gap-4">
+  <h1
+    class={gridItem({ color: "daisyBush", fontSize: "3xl", fontWeight: "bold" })}
+  >
+    Invoice
+  </h1>
+  <div
+    class={flex({ align: "center", gap: 2, wrap: { base: "wrap", sm: "nowrap" } })}
+  >
     <Button size="short" onclick={printInvoice} variant="outline">Print</Button>
     <Button size="short" onclick={copyLink}>Copy Link</Button>
-    <Button size="short" onclick={payInvoice}>Pay Invoice</Button>
-    <Button size="short" onclick={sendInvoice}>Send Invoice</Button>
+    {#if canPayInvoice}
+      <Button size="short" onclick={payInvoice}>Pay Invoice</Button>
+    {/if}
+    {#if canSendInvoice}
+      <Button size="short" onclick={sendInvoice}>Send Invoice</Button>
+    {/if}
   </div>
 </div>
+
 <section
-  class="not-print:shadow-addInvoice relative inset-bs-36 z-10 grid grid-cols-6 gap-x-5 gap-y-8 bg-white px-5 py-8 md:px-32 md:py-16 print:inset-bs-0"
+  class={grid({ 
+      columns: 6, 
+      columnGap: 5,
+      rowGap: 8,
+      paddingInline: { base: 5, md: 32 }, 
+      paddingBlock: { base: 8, md: 16 }, 
+      position: "relative", 
+      insetBlockStart: {base: 36, _print: 0}, 
+      zIndex: 10, 
+      shadow: {base: "addInvoice", _print: "none"},
+      backgroundColor: "white",
+    })}
 >
-  <div class="col-span-full sm:col-span-3 print:col-span-3">
+  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
     <img
-      src={asset("/images/logo.png")}
-      srcset={`${asset("/images/logo@2x.png")} 2x, ${asset("/images/logo.png")} 1x`}
+      src={asset('/images/logo.png')}
+      srcset={`${asset('/images/logo@2x.png')} 2x, ${asset('/images/logo.png')} 1x`}
       alt="Compressed fm"
     >
   </div>
 
   <div
-    class="col-span-full pbs-4 sm:col-span-2 sm:col-start-5 print:col-span-3"
+    class={gridItem({gridColumnStart: { sm: 5 },  colSpan: { base: 6, sm: 2, _print: 3 }, paddingBlockStart: 4 })}
   >
-    <div class="label">From</div>
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
     {#if settingsStore.settings?.myName}
       <p>
         {#if settingsStore.settings.myName}
@@ -85,19 +146,18 @@
       </p>
     {:else}
       <div
-        class="bg-gallery flex items-center justify-center rounded min-block-17"
+        class={flex({ align: "center", justify: "center", bg: "gallery", borderRadius: "md", minBlockSize: 17 })}
       >
-        <!-- svelte-ignore a11y_invalid_attribute -->
         <a
           href={settingsLink}
-          class="text-stone-600 underline hover:no-underline"
+          class={css({ color: "stone.600", textDecoration: "underline", _hover: { textDecoration: "none" } })}
           >Add your contact information.</a
         >
       </div>
     {/if}
   </div>
-  <div class="col-span-full sm:col-span-3 print:col-span-3">
-    <div class="label">Bill To:</div>
+  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3} })}>
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
     <p>
       {#if data.client}
         {#if data.client.name}
@@ -120,19 +180,23 @@
       {/if}
     </p>
   </div>
-  <div class="col-span-full sm:col-span-2 sm:col-start-5">
-    <div class="label">Invoice Id:</div>
+  <div
+    class={gridItem({ colSpan: { base: 6, sm: 2, _print: 3 }, sm: { gridColumnStart: 5 } })}
+  >
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Invoice Id:</div>
     <p>{invoice.invoiceNumber}</p>
   </div>
-  <div class="col-span-3">
-    <div class="label">Due Date:</div>
+  <div class={gridItem({ colSpan: 3 })}>
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Due Date:</div>
     <p>
       {convertDate(invoice.dueDate === null ? null : String(invoice.dueDate))}
     </p>
   </div>
 
-  <div class="col-span-3 sm:col-span-2 sm:col-start-5">
-    <div class="label">Issue Date:</div>
+  <div
+    class={gridItem({ colSpan: { base: 3, sm: 2, _print: 3 }, sm: { gridColumnStart: 5 } })}
+  >
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Issue Date:</div>
     <p>
       {convertDate(
         invoice.issueDate === null ? null : String(invoice.issueDate),
@@ -140,33 +204,28 @@
     </p>
   </div>
 
-  <div class="col-span-full">
-    <div class="label">Subject:</div>
+  <div class={gridItem({ colSpan: 6 })}>
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Subject:</div>
     <p>{invoice.subject}</p>
   </div>
 
   <!-- line items div wrapper -->
-  <div class="col-span-full">
+  <div class={gridItem({ colSpan: 6 })}>
     <LineItemRows mode="view" {lineItems} discount={invoice.discount || 0} />
   </div>
 
   {#if data.notesHtml}
-    <div class="col-span-full">
-      <div class="label">Notes:</div>
+    <div class={gridItem({ colSpan: 6 })}>
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Notes:</div>
       <HtmlContent html={data.notesHtml} />
     </div>
   {/if}
   {#if data.termsHtml}
-    <div class="col-span-full">
-      <div class="label">Terms and Conditions:</div>
+    <div class={gridItem({ colSpan: 6 })}>
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>
+        Terms and Conditions:
+      </div>
       <HtmlContent html={data.termsHtml} />
     </div>
   {/if}
 </section>
-
-<style>
-  @reference "#app.css";
-  .label {
-    @apply text-monsoon font-black;
-  }
-</style>

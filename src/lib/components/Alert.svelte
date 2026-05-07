@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
   import type { Maybe } from "$lib/types";
 
   interface Props {
@@ -9,7 +10,15 @@
 
 {#if message}
   <div
-    class="bg-lavenderIndigo mbe-8 rounded-md p-4 text-center text-base text-white min-block-14"
+    class={css({
+      backgroundColor: "lavenderIndigo",
+      marginBlockEnd: 8,
+      rounded: "md",
+      p: 4,
+      textAlign: "center",
+      color: "white",
+      minBlockSize: 14,
+    })}
   >
     <p>{message}</p>
   </div>

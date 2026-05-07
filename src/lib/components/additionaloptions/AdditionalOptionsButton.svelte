@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { clickOutside } from "$lib/attachments/clickOutside";
+  import { css } from "styled-system/css";
+  import { clickOutside } from "$lib/client/attachments/clickOutside";
+  import type { Toggle } from "$lib/client/runes/Toggle.svelte";
   import ThreeDots from "$lib/components/icons/ThreeDots.svelte";
-  import type { Toggle } from "$lib/runes/Toggle.svelte";
 
   interface Props {
     additionalMenu: Toggle;
@@ -14,7 +15,11 @@
   type="button"
   {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
   onclick={additionalMenu.toggle}
-  class="text-pastelPurple hover:text-daisyBush group-hover/row:text-daisyBush/50 transition-[color] duration-200"
+  class={css({
+    color: { base:"pastelPurple", _hover: "daisyBush", _groupHover: "daisyBush/50" },
+    transitionProperty: "colors",
+    transitionDuration: "normal",
+  })}
 >
   <ThreeDots />
 </button>

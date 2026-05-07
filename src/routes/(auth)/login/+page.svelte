@@ -1,43 +1,59 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
+  import { flex } from "styled-system/patterns";
   import { resolve } from "$app/paths";
   import Form from "$lib/components/Form.svelte";
+  import FormField from "$lib/components/FormField.svelte";
+  import Input from "$lib/components/ui/input/Input.svelte";
+  import Label from "$lib/components/ui/label/Label.svelte";
+  import { authHeading } from "$lib/styles";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
 </script>
 
-<h1 class="auth-heading">Login</h1>
+<h1 class={authHeading}>Login</h1>
 
 <Form {form}>
   {#snippet children()}
-    <div class="field">
-      <label for="email" class="text-goldenFizz">Email</label>
-      <input
+    <FormField
+      label="Email"
+      forId="email"
+      labelClass={css({ color: "goldenFizz" })}
+    >
+      <Input
         required
         type="email"
         name="email"
         placeholder="john@email.com"
         defaultValue={form?.email ?? ""}
-      >
-    </div>
-    <div class="field">
-      <div class="flex items-center justify-between">
-        <label for="password" class="text-goldenFizz">Password</label>
+      />
+    </FormField>
+    <FormField>
+      <!-- "flex items-center justify-between" -->
+      <div class={flex({ align: "center", justify: "space-between" })}>
+        <Label for="password" class={css({ color: "goldenFizz" })}
+          >Password</Label
+        >
         <a
-          class="text-whisper text-sm underline hover:no-underline"
+          class={css({ color: "whisper", fontSize: "sm", textDecoration: "underline", _hover: { textDecoration: "none" } })}
           href={resolve("/forgot-password")}
           >Forgot Password</a
         >
       </div>
-      <input required minlength="6" type="password" name="password">
-    </div>
+      <Input required minlength={6} type="password" name="password" />
+    </FormField>
   {/snippet}
   {#snippet submit()}
     Let's do this!
   {/snippet}
   {#snippet footer()}
-    <p class="mbs-4 text-center text-sm text-white">
-      <a href={resolve("/signup")} class="underline hover:no-underline"
+    <p
+      class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
+    >
+      <a
+        href={resolve("/signup")}
+        class={css({ textDecoration: "underline", _hover: { textDecoration: "none" } })}
         >Don't have an account yet?</a
       >
     </p>

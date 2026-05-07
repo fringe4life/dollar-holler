@@ -1,15 +1,30 @@
 <script lang="ts">
-  import Navbar from "$lib/components/Navbar.svelte";
+  import { grid, gridItem } from "styled-system/patterns";
+  import Navbar from "$lib/components/navbar/Navbar.svelte";
 
-  let { children, data } = $props();
+  let { children } = $props();
 </script>
 
 <div
-  class="bg-whisper grid grid-cols-12 overflow-x-clip min-block-dvh md:gap-x-16"
+  class={grid({
+    backgroundColor: "whisper",
+    columns: 12,
+    overflowX: "clip",
+    minBlockSize: "100dvh",
+    columnGap: { base: 0, md: 16 },
+    position: "relative"
+  })}
 >
-  <Navbar user={data.user} />
+  <Navbar />
   <main
-    class="relative col-span-12 flex flex-col px-4 pbs-4 min-block-dvh md:col-span-8 md:pbs-10"
+    class={gridItem({
+      display: "flex",
+      flexDirection: "column",
+      paddingInline: 4,
+      minBlockSize: "100dvh",
+      colSpan: { base: 12, md: 8 },
+      paddingBlockStart: { base: 4, md: 10 },
+    })}
   >
     {@render children()}
   </main>

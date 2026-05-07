@@ -1,30 +1,36 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
   import { resolve } from "$app/paths";
   import Form from "$lib/components/Form.svelte";
+  import FormField from "$lib/components/FormField.svelte";
+  import Input from "$lib/components/ui/input/Input.svelte";
+  import { authHeading } from "$lib/styles";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
 </script>
 
-<h1 class="auth-heading">Reset my Password</h1>
+<h1 class={authHeading}>Reset my Password</h1>
 
 <Form {form} method="POST">
   {#snippet children()}
-    <div class="field">
-      <label for="newPassword">New Password</label>
-      <input type="password" name="newPassword" id="newPassword">
-    </div>
-    <div class="field">
-      <label for="confirmPassword">Confirm Password</label>
-      <input type="password" name="confirmPassword" id="confirmPassword">
-    </div>
+    <FormField label="New Password" forId="newPassword">
+      <Input type="password" name="newPassword" id="newPassword" />
+    </FormField>
+    <FormField label="Confirm Password" forId="confirmPassword">
+      <Input type="password" name="confirmPassword" id="confirmPassword" />
+    </FormField>
   {/snippet}
   {#snippet submit()}
     Update my password!
   {/snippet}
   {#snippet footer()}
-    <p class="mbs-4 text-center text-sm text-white">
-      <a href={resolve("/login")} class="underline hover:no-underline"
+    <p
+      class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
+    >
+      <a
+        href={resolve("/login")}
+        class={css({ textDecoration: { base:"underline", _hover: "none" }})}
         >I'm ready to login</a
       >
     </p>

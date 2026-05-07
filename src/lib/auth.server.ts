@@ -32,7 +32,7 @@ export const auth = betterAuth({
   plugins: [openAPI(), bearer(), sveltekitCookies(getRequestEvent)],
   advanced: {
     database: {
-      generateId: () => createId(),
+      generateId: createId,
     },
   },
 });

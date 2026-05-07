@@ -3,7 +3,7 @@
   import { enhance } from "$app/forms";
   import Alert from "$lib/components/Alert.svelte";
   import Loader from "$lib/components/Loader.svelte";
-  import { Button } from "$lib/components/ui/button";
+  import Button from "$lib/components/ui/button/button.svelte";
 
   interface FormResult {
     data?: unknown;

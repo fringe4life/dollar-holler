@@ -1,4 +1,3 @@
-import { toast } from "svelte-sonner";
 import type {
   Key,
   LineItemInsert,
@@ -12,6 +11,7 @@ import {
   isAbortError,
   StoreOperation,
 } from "$lib/utils/error-message";
+import { toast } from "$lib/utils/toast.svelte";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import type { LineItemEditRow, UIKey } from "../types";
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
   import type { Snippet } from "svelte";
 
   export type EmptyStateHeaderSnippet = Snippet<[string, boolean]>;
@@ -19,8 +20,14 @@
     headerSnippet,
   }: TableHeaderProps = $props();
 </script>
-
-<div class={`hidden lg:grid ${className}`}>
+<div
+  class={cx(
+    css({
+      display: { base: "none", lg: "grid" },
+    }),
+    className,
+  )}
+>
   {#each headers as header (header)}
     {@render headerSnippet(header, emptyState)}
   {/each}

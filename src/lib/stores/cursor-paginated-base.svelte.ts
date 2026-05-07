@@ -1,4 +1,3 @@
-import { toast } from "svelte-sonner";
 import { DEFAULT_PAGINATION_METADATA } from "$features/pagination/constants";
 import type {
   CursorPaginatedList,
@@ -17,6 +16,7 @@ import {
   isAbortError,
   StoreOperation,
 } from "$lib/utils/error-message";
+import { toast } from "$lib/utils/toast.svelte";
 import { StoreResourceErrorBase } from "./store-resource-error-base.svelte";
 
 export abstract class CursorPaginatedListStoreBase<T extends CursorRow>

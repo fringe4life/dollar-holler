@@ -1,6 +1,8 @@
 <script lang="ts">
-  import TableHeader from "$lib/components/TableHeader.svelte";
+  import { css, cx } from "styled-system/css";
   import type { HeaderProps } from "$lib/components/TableHeader.svelte";
+  import TableHeader from "$lib/components/TableHeader.svelte";
+  import { clientTable } from "$lib/styles";
 
   const clientHeaders = ["Status", "Client", "Received", "Balanced"];
 
@@ -9,17 +11,19 @@
 
 <TableHeader
   headers={clientHeaders}
-  className={`client-table ${className}`}
+  className={cx(clientTable, className)}
   {emptyState}
 >
-  {#snippet headerSnippet(title: string, emptyState: boolean = false)}
+  {#snippet headerSnippet(title, emptyState)}
     <h3
-      class={{
-        "text-xl leading-snug font-black": true,
-        "text-right": title === "Received" || title === "Balanced",
-        "text-daisyBush": !emptyState,
-        "text-pastelPurple": emptyState,
-      }}
+      class={css({
+        fontSize: "xl",
+        lineHeight: "snug",
+        fontWeight: "bolder",
+        textAlign:
+          title === "Received" || title === "Balanced" ? "right" : undefined,
+        color: emptyState ? "pastelPurple" : "daisyBush",
+      })}
     >
       {title}
     </h3>

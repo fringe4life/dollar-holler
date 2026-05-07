@@ -1,4 +1,3 @@
-import { toast } from "svelte-sonner";
 import type { InvoiceListResponse } from "$features/invoices/types";
 import type { ClientInvoiceSummaryCents } from "$features/invoices/utils/client-invoice-summary";
 import type {
@@ -10,6 +9,7 @@ import {
   serializeNormalizedForKey,
 } from "$features/pagination/utils/url";
 import { apiClient } from "$lib/api";
+import type { InvoiceStatus } from "$lib/server/db/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
 import type { CursorId, Maybe } from "$lib/types";
 import {
@@ -17,7 +17,8 @@ import {
   isAbortError,
   StoreOperation,
 } from "$lib/utils/error-message";
-import { unwrapTreatyResult } from "$lib/utils/unwrap";
+import { toast } from "$lib/utils/toast.svelte";
+import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 
 export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceListResponse> {
   protected readonly resourceSingular = "invoice";
@@ -62,6 +63,37 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
   ) {
     super.hydrateFromLoad(data, urlKey);
     this.summary = summary;
+  }
+
+  async updateInvoiceStatus(
+    invoiceId: CursorId,
+    invoiceStatus: InvoiceStatus,
+    normalized: PaginationSearchParams
+  ) {
+    const fb = "Failed to update invoice status";
+    try {
+      await unwrapTreaty(
+        apiClient.invoices({ id: invoiceId }).patch({ invoiceStatus }),
+        { fallbackMessage: fb }
+      );
+
+      const index = this.items.findIndex((invoice) => invoice.id === invoiceId);
+      if (index !== -1) {
+        this.items[index] = {
+          ...this.items[index],
+          invoiceStatus,
+          updatedAt: new Date(),
+        };
+      }
+
+      const summarySignal = new AbortController().signal;
+      this.summary = await this.fetchSummary(normalized, summarySignal);
+      toast.success("Invoice updated successfully");
+    } catch (err) {
+      const errorMessage = getErrorMessage(err, fb);
+      console.error("Error updating invoice status:", err);
+      toast.error(errorMessage);
+    }
   }
 
   async loadItems(

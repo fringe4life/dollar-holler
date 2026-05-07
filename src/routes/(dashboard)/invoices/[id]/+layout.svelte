@@ -1,49 +1,69 @@
 <script lang="ts">
-  import { fly } from "svelte/transition";
-  import { afterNavigate, goto } from "$app/navigation";
+  import { css, cx } from "styled-system/css";
+  import { afterNavigate, goto, onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
   import Arrow from "$lib/components/icons/Arrow.svelte";
   import type { Maybe } from "$lib/types";
 
   let { children } = $props();
 
-  let previousPageLink: Maybe<string> = $state(undefined);
+  let previousPageLink: Maybe<string> = $derived(undefined);
+  const getBackUrl = $derived(previousPageLink ?? resolve("/invoices"));
+  let isExiting = $state(false);
+  let resolveNavigation: (() => void) | undefined;
 
   afterNavigate((navigation) => {
     previousPageLink = navigation?.from?.url?.pathname;
   });
 
-  // Helper function to get the back navigation URL
-  function getBackUrl(): string {
-    return previousPageLink || resolve("/invoices");
-  }
+  onNavigate(
+    () =>
+      new Promise((resolve) => {
+        resolveNavigation = resolve;
+        isExiting = true;
+      })
+  );
 
-  // Handle escape key navigation
-  function handleEscapeKey() {
-    goto(getBackUrl());
+  function handleAnimationEnd() {
+    resolveNavigation?.();
   }
 </script>
 
 <svelte:window
   onkeydown={(e) => {
     if (e.key === "Escape") {
-      handleEscapeKey();
+      goto(getBackUrl);
     }
   }}
 />
-
+<a
+  href={getBackUrl}
+  class={css({ zIndex: 1000, color: {base: "pastelPurple", _hover: "daisyBush"}, position: "fixed", insetInlineStart: 7, insetBlockStart: 5, transitionProperty: "colors", transitionDuration: "normal", maxInlineSize: "full", _print: { display: "none" } })}
+  ><Arrow /></a
+>
 <div
-  class="bg-whisper pbs-16 block-full inline-full min-block-dvh lg:pbs-12 lg:pbe-32 print:bg-transparent print:py-0"
+  class={css({ backgroundColor: { base:"whisper", _print: "transparent" }, overflowY: "clip", paddingBlockStart: { base:16, lg:12 }, paddingBlockEnd: { lg:32 }, blockSize: "full", inlineSize: "full", minBlockSize: "100dvh", paddingY: { _print: 0 } })}
 >
   <main
-    transition:fly={{ y: 500, duration: 200 }}
-    class="mx-auto max-inline-5xl min-block-dvh"
+    onanimationend={handleAnimationEnd}
+    style="--slide-distance: 100dvh"
+    class={cx(
+      css({
+        marginInline: "auto",
+        maxInlineSize: "5xl",
+        minBlockSize: "100dvh",
+        translate: "0 0",
+        transitionProperty: "translate",
+        transitionDuration: "normal",
+        _starting: { translate: "0 var(--slide-distance)" },
+      }),
+      isExiting && css({
+        animationName: "--slide-down",
+        animationDuration: "normal",
+        animationFillMode: "forwards",
+      })
+    )}
   >
-    <a
-      href={getBackUrl()}
-      class="text-pastelPurple hover:text-daisyBush fixed inset-s-7 inset-bs-5 transition-colors duration-200 max-inline-full print:hidden"
-      ><Arrow /></a
-    >
     {@render children()}
   </main>
 </div>

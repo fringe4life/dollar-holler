@@ -5,13 +5,14 @@ import { clientsRoutes } from "$lib/server/routes/clients";
 import { invoicesRoutes, lineItemsRoutes } from "$lib/server/routes/invoices";
 import { settingsRoutes } from "$lib/server/routes/settings";
 import { apiErrorBody } from "$lib/server/utils/api-error-body";
-import { UnauthorizedError } from "./utils/errors";
+import { BadRequestError, UnauthorizedError } from "./utils/errors";
 
 // Create Elysia app with all routes
 export const app = new Elysia({ prefix: "/api" })
   .use(openApiPlugin)
   .error({
     UNAUTHORIZED: UnauthorizedError,
+    BAD_REQUEST: BadRequestError,
   })
   .mount(auth.handler)
   .use(clientsRoutes)
@@ -22,6 +23,8 @@ export const app = new Elysia({ prefix: "/api" })
     switch (code) {
       case "VALIDATION":
         return status(400, apiErrorBody(error.message));
+      case "BAD_REQUEST":
+        return status(error.status, apiErrorBody(error.message));
       case "UNAUTHORIZED":
         return status(error.status, apiErrorBody(error.message));
       case "NOT_FOUND":

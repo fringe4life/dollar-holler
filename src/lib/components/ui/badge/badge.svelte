@@ -1,43 +1,65 @@
 <script lang="ts" module>
-  import { tv, type VariantProps } from "tailwind-variants";
+  import { cva, cx, type RecipeVariant } from "styled-system/css";
 
-  export const badgeVariants = tv({
-    base: "inline-20 whitespace-nowrap rounded-full border text-center font-bold text-md capitalize outline-transparent transition-colors duration-200 focus-visible:border-ring focus-visible:outline-2 focus-visible:outline-ring/50",
+  export const badgeVariants = cva({
+    base: {
+      inlineSize: 20,
+      blockSize: 20,
+      borderRadius: "full",
+      borderWidth: "1px",
+      fontWeight: "bold",
+      fontSize: "md",
+      textAlign: "center",
+      textTransform: "capitalize",
+    },
     variants: {
       variant: {
-        sent: "border-robinEggBlue bg-robinEggBlue text-blueGem",
-        draft: "border-pastelPurple text-pastelPurple",
-        late: "border-scarlet border-transparent bg-scarlet text-goldenFizz text-white focus-visible:outline-destructive/20 dark:bg-destructive/70 dark:focus-visible:outline-destructive/40",
-        paid: "border-pastelPurple bg-pastelPurple text-white",
+        sent: {
+          borderColor: "robinEggBlue",
+          backgroundColor: "robinEggBlue",
+          color: "blueGem",
+        },
+        draft: {
+          borderColor: "pastelPurple",
+          color: "pastelPurple",
+        },
+        late: {
+          borderColor: "scarlet",
+          backgroundColor: "scarlet",
+          color: "goldenFizz",
+        },
+        paid: {
+          borderColor: "pastelPurple",
+          backgroundColor: "pastelPurple",
+          color: "white",
+        },
       },
       size: {
-        default: "px-3 py-1",
-        small: "px-2",
+        default: { paddingInline: 3, paddingBlock: 1 },
+        small: { paddingInline: 2 },
       },
     },
     defaultVariants: {
       variant: "draft",
-
       size: "small",
     },
   });
 
-  export type BadgeVariant = VariantProps<typeof badgeVariants>["variant"];
-  export type BadgeSize = VariantProps<typeof badgeVariants>["size"];
+  export type BadgeVariant = RecipeVariant<typeof badgeVariants>["variant"];
+  export type BadgeSize = RecipeVariant<typeof badgeVariants>["size"];
 
-  export type BadgeProps = WithElementRef<HTMLAnchorAttributes> &
-    WithElementRef<HTMLAnchorAttributes> & {
+  export type BadgeProps = HTMLAnchorAttributes &
+    HTMLAnchorAttributes & {
       variant?: BadgeVariant;
       size?: BadgeSize;
+      class?: string;
     };
 </script>
 
 <script lang="ts">
   import type { HTMLAnchorAttributes } from "svelte/elements";
-  import { cn, type WithElementRef } from "$lib/utils.js";
 
   let {
-    ref = $bindable(null),
     href,
     class: className,
     variant = "draft",
@@ -50,10 +72,9 @@
 
 <svelte:element
   this={href ? "a" : "span"}
-  bind:this={ref}
   data-slot="badge"
   {href}
-  class={cn(badgeVariants({ variant }), className)}
+  class={cx(badgeVariants({ variant }), className)}
   {...restProps}
 >
   {@render children?.()}

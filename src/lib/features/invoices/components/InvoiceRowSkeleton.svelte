@@ -1,42 +1,87 @@
 <script lang="ts">
-  import { Skeleton } from "$lib/components/ui/skeleton";
+  import { css, cx } from "styled-system/css";
+  import { circle, gridItem } from "styled-system/patterns";
+  import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
+  import { invoiceRow, invoiceTable, tableRowBase } from "$lib/styles";
 </script>
 
-<div class="relative isolate">
+<div class={css({ position: "relative", isolation: "isolate" })}>
   <div
-    class="invoice-table invoice-row shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+    class={cx(
+      invoiceTable,
+      invoiceRow,
+      tableRowBase,
+    )}
   >
     <!-- status: badge-shaped pill ~54px wide -->
-    <div class="status justify-self-end lg:justify-self-start">
-      <Skeleton class="bg-prim/40 rounded-full block-6 inline-[54px]" />
+    <!-- "status justify-self-end lg:justify-self-start" -->
+    <div
+      class={gridItem({
+        justifySelf: { base: "end", lg: "start" },
+        gridArea: "status",
+      })}
+    >
+      <!-- "bg-prim/40 rounded-full block-6 inline-[54px]" -->
+      <Skeleton
+        class={css({
+          bg: "prim/40",
+          rounded: "full",
+          aspectRatio: "9/4",
+          inlineSize: "54px",
+        })}
+      />
     </div>
 
     <!-- duedate: fits 100px col on desktop -->
-    <div class="duedate"><Skeleton class="bg-prim/40 block-4 inline-20" /></div>
+    <!-- "bg-prim/40 block-4 inline-20" -->
+    <div class={gridItem({ gridArea: "duedate" })}>
+      <Skeleton
+        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+      />
+    </div>
 
     <!-- invoicenumber: 100px col on desktop -->
-    <div class="invoicenumber">
-      <Skeleton class="bg-prim/40 block-4 inline-25" />
+    <div class={gridItem({ gridArea: "invoicenumber" })}>
+      <Skeleton class={css({ bg: "prim/40", blockSize: 4, inlineSize: 25 })} />
     </div>
 
     <!-- clientname: 100px col on desktop -->
-    <div class="clientName">
-      <Skeleton class="bg-prim/40 block-5 inline-20" />
+    <div class={gridItem({ gridArea: "clientName" })}>
+      <Skeleton
+        class={css({ bg: "prim/40", aspectRatio: "4/1", inlineSize: 20 })}
+      />
     </div>
 
     <!-- amount: right-aligned, ~80px -->
-    <div class="amount flex justify-end">
-      <Skeleton class="bg-prim/40 block-4 inline-20" />
+    <div class={gridItem({ gridArea: "amount", justifySelf: "end" })}>
+      <Skeleton
+        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+      />
     </div>
 
-    <!-- viewbutton: 32px circle, hidden on mobile -->
-    <div class="viewbutton hidden place-self-center lg:block">
-      <Skeleton class="bg-prim/40 aspect-square rounded-full block-8" />
+    <!-- view: 32px circle, hidden on mobile -->
+    <!-- "viewbutton hidden place-self-center lg:block" -->
+    <div
+      class={gridItem({
+        display: { base: "none", lg: "block" },
+        placeSelf: "center",
+        gridArea: "view",
+      })}
+    >
+      <!-- "bg-prim/40 aspect-square rounded-full block-8" -->
+      <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
     </div>
 
-    <!-- morebutton: 32px circle, hidden on mobile -->
-    <div class="morebutton hidden place-self-center lg:block">
-      <Skeleton class="bg-prim/40 aspect-square rounded-full block-8" />
+    <!-- threeDots: 32px circle, hidden on mobile -->
+    <div
+      class={gridItem({
+        display: { base: "none", lg: "block" },
+        placeSelf: "center",
+        gridArea: "threeDots",
+        
+      })}
+    >
+      <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
     </div>
   </div>
 </div>

@@ -1,12 +1,17 @@
 {
   "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
-  "ignoreDependencies": ["@varlock/bitwarden-plugin", "@sveltejs/mcp"],
+  "ignoreDependencies": [
+    "@varlock/bitwarden-plugin",
+    "@sveltejs/mcp",
+    "@pandacss/plugin-svelte"
+  ],
   "rules": {
     "boundary-violation": "warn"
   },
   "duplicates": {
     "ignore": ["src/lib/server/db/schema.ts"]
   },
+  "ignorePatterns": [],
   "boundaries": {
     "zones": [
       {

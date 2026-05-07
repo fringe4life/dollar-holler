@@ -1,4 +1,3 @@
-import { toast } from "svelte-sonner";
 import type { CursorPaginatedList } from "$features/pagination/types";
 import { apiClient } from "$lib/api";
 import type { ClientStatus } from "$lib/server/db/types";
@@ -9,6 +8,7 @@ import {
   isAbortError,
   StoreOperation,
 } from "$lib/utils/error-message";
+import { toast } from "$lib/utils/toast.svelte";
 import { transformNullToUndefined } from "$lib/utils/typeHelpers";
 import { unwrapTreaty, unwrapTreatyResult } from "$lib/utils/unwrap";
 import type {
@@ -132,7 +132,6 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
         ...this.items[index],
         ...rest,
       };
-
       toast.success("Client updated successfully");
     } catch (err) {
       const fb = "Failed to update client status";

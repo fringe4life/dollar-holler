@@ -1,6 +1,8 @@
 <script lang="ts" generics="T extends CursorRow">
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import { css } from "styled-system/css";
+  import { flex, square } from "styled-system/patterns";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
@@ -16,7 +18,8 @@
     toNormalizedListQuery,
   } from "$features/pagination/utils/list-query";
   import { buildListSearchString } from "$features/pagination/utils/url";
-  import { buttonVariants } from "$lib/components/ui/button/button.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import Select from "$lib/components/ui/select/Select.svelte";
   import { LIMITS } from "../constants";
   import type { ListDirection } from "../types";
 
@@ -97,15 +100,30 @@
 </script>
 
 {#if rowItems.length === 0 && !store.loading}
-  <p class="pe-1 text-right text-sm text-gray-500 italic">No items found</p>
+  <p
+    class={css({
+      paddingInlineEnd: 1,
+      textAlign: "right",
+      fontSize: "sm",
+      color: "gray.500",
+      fontStyle: "italic",
+    })}
+  >
+    No items found
+  </p>
 {:else}
-  <div class="mbe-6 flex items-center justify-between gap-4">
-    <select
+  <!-- "mbe-6 flex items-center justify-between gap-4" -->
+  <div
+    class={flex({
+      marginBlockEnd: 6,
+      align: "center",
+      justify: "space-between",
+      gap: 4,
+    })}
+  >
+    <Select
       name="limit"
-      class={buttonVariants({
-        variant: "outline",
-        class: "h-10 w-20",
-      })}
+      class={css({ blockSize: 10, inlineSize: 20 })}
       disabled={!canNavigate || store.loading}
       onchange={(e) =>
         handleLimitChange(Number((e.currentTarget as HTMLSelectElement).value))}
@@ -118,26 +136,28 @@
           {limitOption}
         </option>
       {/each}
-    </select>
-    <div class="flex items-center gap-2">
-      <button
+    </Select>
+    <div class={flex({ align: "center", gap: 2 })}>
+      <Button
         type="button"
-        class={buttonVariants({ variant: "outline" })}
+        variant="outline"
+        size="default"
         aria-label="Previous page"
         disabled={!pageMeta.hasPreviousPage || store.loading}
         onclick={handleBackward}
       >
-        <ChevronLeftIcon class="aspect-square inline-4" />
-      </button>
-      <button
+        <ChevronLeftIcon class={square({ size: 4 })} />
+      </Button>
+      <Button
         type="button"
-        class={buttonVariants({ variant: "outline" })}
+        variant="outline"
+        size="default"
         aria-label="Next page"
         disabled={!pageMeta.hasNextPage || store.loading}
         onclick={handleForward}
       >
-        <ChevronRightIcon class="aspect-square inline-4" />
-      </button>
+        <ChevronRightIcon class={square({ size: 4 })} />
+      </Button>
     </div>
   </div>
 {/if}

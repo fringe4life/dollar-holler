@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
+  import { gridItem } from "styled-system/patterns";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import { getLabel } from "$features/invoices/utils/labelHelpers";
@@ -12,17 +14,25 @@
   import View from "$lib/components/icons/View.svelte";
   import Swipeable from "$lib/components/Swipeable.svelte";
   import Badge from "$lib/components/ui/badge/badge.svelte";
+  import {
+    actionButton,
+    invoiceRow,
+    invoiceTable,
+    tableRowBase,
+    tableRowHover,
+  } from "$lib/styles";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { InvoiceListResponse } from "../types";
 
-  type Props = {
+  interface Props {
     invoice: InvoiceListResponse;
-    onEdit: (invoice: InvoiceListResponse) => void;
     onDelete: (invoice: InvoiceListResponse) => void;
-  };
+    onEdit: (invoice: InvoiceListResponse) => void;
+    onSendInvoice: (invoice: InvoiceListResponse) => void;
+  }
 
-  let { invoice, onEdit, onDelete }: Props = $props();
+  let { invoice, onEdit, onDelete, onSendInvoice }: Props = $props();
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () =>
     onDelete(invoice);
@@ -30,9 +40,8 @@
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () =>
     onEdit(invoice);
 
-  // TODO: Implement send invoice functionality
-  // even if just using dummy money and a transaction table to keep track of it.
-  const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () => {};
+  const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () =>
+    onSendInvoice(invoice);
 
   const id = $derived(invoice.id);
   const dueDate = $derived(invoice.dueDate);
@@ -70,32 +79,82 @@
   ] satisfies Option[]);
 </script>
 
+<!-- "group/row invoice-table invoice-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6" -->
 <Swipeable
-  contentClass="group/row invoice-table invoice-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentClass={cx(
+    "group",
+    invoiceTable,
+    invoiceRow,
+    tableRowHover,
+    tableRowBase,
+  )}
   contentViewTransitionName={`invoice-${id}`}
 >
   {#snippet content()}
-    <div class="status justify-self-end">
-      <Badge class="ms-auto md:ms-0" variant={label} size="small"
+    <div class={gridItem({ justifySelf: "end", gridArea: "status" })}>
+      <Badge
+        class={css({ marginInlineStart: { base: "auto", md: 0 } })}
+        variant={label}
+        size="small"
         >{label}</Badge
       >
     </div>
-    <div class="duedate truncate text-sm lg:text-lg">
+    <div
+      class={gridItem({
+        gridArea: "duedate",
+        truncate: true,
+        fontSize: { base: "sm", lg: "lg" },
+      })}
+    >
       {convertDate(dueDate.toISOString())}
     </div>
-    <div class="invoicenumber truncate text-sm lg:text-lg">{invoiceNumber}</div>
-    <div class="clientName truncate text-base font-bold lg:text-xl">
+    <div
+      class={gridItem({
+        gridArea: "invoicenumber",
+        truncate: true,
+        fontSize: { base: "sm", lg: "lg" },
+      })}
+    >
+      {invoiceNumber}
+    </div>
+    <div
+      class={gridItem({
+        gridArea: "clientName",
+        truncate: true,
+        fontSize: { lg: "xl" },
+        fontWeight: "bold",
+      })}
+    >
       {client}
     </div>
-    <div class="amount text-right font-mono text-sm font-bold lg:text-lg">
+    <div
+      class={gridItem({
+        gridArea: "amount",
+        justifySelf: "end",
+        fontSize: { base: "sm", lg: "lg" },
+        fontWeight: "bold",
+      })}
+    >
       {totalDisplay}
     </div>
     <div
-      class="group-hover/row:text-daisyBush/50 viewbutton text-pastelPurple hover:text-daisyBush hidden text-sm transition-colors duration-200 md:place-self-center lg:block lg:text-lg"
+      class={gridItem({
+          gridArea: "view",
+          display: { base: "none", lg: "block" },
+          placeSelf: { md: "center" },
+          fontSize: { base: "sm", lg: "lg" },
+          transitionProperty: "colors",
+          transitionDuration: "normal",
+          color: {
+            base: "pastelPurple",
+            _hover: "daisyBush",
+            _groupHover: "daisyBush/50",
+          },
+        })}
     >
       <a href={resolved}><View /></a>
     </div>
-    <AdditionalOptions>
+    <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
       {#snippet content(additionalMenu)}
         <AdditionalOptionsButton {additionalMenu} />
         <AdditionalOptionsList {additionalMenu} options={INVOICE_OPTIONS} />
@@ -103,59 +162,20 @@
     </AdditionalOptions>
   {/snippet}
   {#snippet revealed()}
-    {#if isOptionsDisabled}
-      <button onclick={handleEdit} class="action-button">
+    {#if !isOptionsDisabled}
+      <button onclick={handleEdit} type="button" class={actionButton}>
         <Edit width={32} height={32} />
         Edit
       </button>
-      <button onclick={handleSendInvoice} class="action-button">
+      <button onclick={handleSendInvoice} type="button" class={actionButton}>
         <Send width={32} height={32} />
         Send
       </button>
     {/if}
-    <button onclick={handleDelete} class="action-button">
+    <button onclick={handleDelete} type="button" class={actionButton}>
       <Trash width={32} height={32} />
       Delete
     </button>
-    <a class="action-button" href={resolved}><View height={32} width={32} /></a>
+    <a class={actionButton} href={resolved}><View height={32} width={32} /></a>
   {/snippet}
 </Swipeable>
-
-<style>
-  @reference "#app.css";
-  :global {
-    .invoice-row {
-      grid-template-areas:
-        "invoicenumber invoicenumber"
-        "clientName    amount"
-        "duedate       status";
-      @media screen and (width > 1024px) {
-        grid-template-areas: "status duedate invoicenumber clientName amount viewbutton morebutton";
-      }
-    }
-
-    .status {
-      grid-area: status;
-    }
-    .duedate {
-      grid-area: duedate;
-    }
-    .invoicenumber {
-      grid-area: invoicenumber;
-    }
-    .clientName {
-      grid-area: clientName;
-    }
-
-    .amount {
-      grid-area: amount;
-    }
-
-    .viewbutton {
-      grid-area: viewbutton;
-    }
-    .morebutton {
-      grid-area: morebutton;
-    }
-  }
-</style>

@@ -1,9 +1,14 @@
-import { Elysia } from "elysia";
+import { Elysia, NotFoundError } from "elysia";
 import { verifyClient } from "$features/clients/queries/verify-client";
-import { verifyInvoice } from "$features/invoices/queries/verify-invoice";
+import {
+  verifyInvoice,
+  verifyInvoiceStatus,
+} from "$features/invoices/queries/verify-invoice";
+import { invoiceUpdateSchema } from "$features/invoices/schemas.server";
 import { auth } from "$lib/auth.server";
 import { idResponseSchema } from "../schemas";
-import { NotFoundError, UnauthorizedError } from "../utils/errors";
+import { UnauthorizedError } from "../utils/errors";
+import { assertAllowedInvoiceStatusTransition } from "../utils/invoice-status-transitions";
 
 /**
  * Protected API plugin for ElysiaJS: session macros and resource guards.
@@ -89,5 +94,26 @@ export const protectedApiPlugin = new Elysia({ name: "protected-api" })
       if (!(await verifyInvoice(user.id, id))) {
         throw new NotFoundError("Invoice not found");
       }
+    },
+  })
+  /** PATCH /invoices/:id — verifies invoice ownership and legal `invoiceStatus` transitions when present. */
+  .macro("verifyInvoicePatchMutation", {
+    authMutation: true,
+    params: idResponseSchema,
+    body: invoiceUpdateSchema,
+    async resolve({ user, params: { id }, body }) {
+      const result = await verifyInvoiceStatus(user.id, id);
+      if (!result?.id) {
+        throw new NotFoundError("Invoice not found");
+      }
+      // TODO: This is a workaround to allow the api endpoint to continue without the invoice status
+      if (!body?.invoiceStatus) {
+        return;
+      }
+      const current = result.invoiceStatus;
+      if (!current) {
+        throw new NotFoundError("Invoice not found");
+      }
+      assertAllowedInvoiceStatusTransition(current, body.invoiceStatus);
     },
   });

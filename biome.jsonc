@@ -1,10 +1,12 @@
 {
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "extends": ["ultracite/biome/core", "ultracite/biome/svelte"],
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "linter": {
     "rules": {
       "style": {
-        "useFilenamingConvention": "off"
+        "useFilenamingConvention": "off",
+        "noParameterProperties": "off",
+        "useConsistentMemberAccessibility": "off"
       },
       "suspicious": {
         "noAssignInExpressions": "info"
@@ -12,6 +14,6 @@
     }
   },
   "files": {
-    "includes": ["**", "!src/env-varlock.d.ts"]
+    "includes": ["!src/env-varlock.d.ts", "!styled-system/*"]
   }
 }

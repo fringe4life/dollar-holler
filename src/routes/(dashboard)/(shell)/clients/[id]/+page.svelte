@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { css } from "styled-system/css";
+  import { flex, grid } from "styled-system/patterns";
   import { onDestroy } from "svelte";
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
@@ -10,15 +12,16 @@
   import InvoiceRowHeader from "$features/invoices/components/InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "$features/invoices/components/InvoiceRowSkeleton.svelte";
   import { ClientInvoicesStore } from "$features/invoices/stores/clientInvoicesStore.svelte";
+  import ItemsHeader from "$features/pagination/components/ItemsHeader.svelte";
+  import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
+  import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
   import { listUrlKey } from "$features/pagination/utils/url";
+  import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
-  import ItemsHeader from "$lib/components/ItemsHeader.svelte";
   import Edit from "$lib/components/icons/Edit.svelte";
-  import NoSearchResults from "$lib/components/NoSearchResults.svelte";
-  import SlidePanel from "$lib/components/SlidePanel.svelte";
-  import { Button } from "$lib/components/ui/button";
-  import { Toggle } from "$lib/runes/Toggle.svelte";
+  import Modal from "$lib/components/Modal.svelte";
+  import Button from "$lib/components/ui/button/button.svelte";
   import type { BitsButton } from "$lib/types";
   import { centsToDollars } from "$lib/utils/moneyHelpers";
   import type { PageData } from "./$types";
@@ -38,22 +41,6 @@
     listUrlKey(page.url),
     data.summary
   );
-
-  // $effect(() => {
-  //   const id = data.client.id;
-  //   if (clientInvoicesStore.clientId !== id) {
-  //     clientInvoicesStore.reset();
-  //     clientInvoicesStore = new ClientInvoicesStore(id);
-  //   }
-  //   clientInvoicesStore.hydrateListAndSummaryFromLoad(
-  //     {
-  //       items: data.items,
-  //       paginationMetadata: data.paginationMetadata,
-  //     },
-  //     listUrlKey(page.url),
-  //     data.summary
-  //   );
-  // });
 
   onDestroy(() => {
     clientInvoicesStore.reset();
@@ -79,47 +66,88 @@
     };
   });
 
-  let isFormShowing = new Toggle();
+  const formPanel = new ItemPanel<undefined>();
   let isEditing = $state<ClientFormProps["formState"]>("create");
 
   const handleEdit: BitsButton = () => {
     isEditing = "edit";
-    isFormShowing.toggle();
+    formPanel.open(undefined);
   };
+
+  const listQueryNormalized = $derived(
+    normalizeListQueryFromUrl(page.url).normalized
+  );
 </script>
 
 <svelte:head> <title>{client.name} | Doller Holla</title> </svelte:head>
-<ItemsHeader store={clientInvoicesStore} toggle={isFormShowing.toggle}>
+<ItemsHeader
+  store={clientInvoicesStore}
+  open={formPanel.open.bind(null, undefined)}
+>
   {#snippet button()}
     + Client
   {/snippet}
 </ItemsHeader>
 
-<div class="mbe-7 flex items-center justify-between inline-full">
-  <h1 class="font-sansserif text-daisyBush text-3xl font-bold">
+<div
+  class={flex({ justify: "space-between", align: "center", marginBlockEnd: 7, inlineSize: "full" })}
+>
+  <h1 class={css({ color: "daisyBush", fontSize: "3xl", fontWeight: "bold" })}>
     {client.name}
   </h1>
   <Button variant="textOnly" onclick={handleEdit}><Edit /> Edit</Button>
 </div>
 
 <div
-  class="bg-gallery mbe-10 grid grid-cols-1 gap-4 rounded-lg px-10 py-7 lg:grid-cols-4"
+  class={grid({ columns: { base:1, lg: 4 }, gap: 4, marginBlockEnd: 10, bg: "gallery", borderRadius: "lg", paddingX: 10, paddingY: 7 })}
 >
-  <div class="summary-block">
-    <div class="label">Total Overdue</div>
-    <div class="number">{invoiceSummaryTotals.overdue}</div>
+  <div class={css({ textAlign: "center" })}>
+    <div
+      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black" })}
+    >
+      Total Overdue
+    </div>
+    <div
+      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate:true })}
+    >
+      {invoiceSummaryTotals.overdue}
+    </div>
   </div>
-  <div class="summary-block">
-    <div class="label">Total Outstanding</div>
-    <div class="number">{invoiceSummaryTotals.outstanding}</div>
+  <div class={css({ textAlign: "center" })}>
+    <div
+      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black", truncate: true })}
+    >
+      Total Outstanding
+    </div>
+    <div
+      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate: true })}
+    >
+      {invoiceSummaryTotals.outstanding}
+    </div>
   </div>
-  <div class="summary-block">
-    <div class="label">Total Draft</div>
-    <div class="number">{invoiceSummaryTotals.draft}</div>
+  <div class={css({ textAlign: "center" })}>
+    <div
+      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black" })}
+    >
+      Total Draft
+    </div>
+    <div
+      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate: true })}
+    >
+      {invoiceSummaryTotals.draft}
+    </div>
   </div>
-  <div class="summary-block">
-    <div class="label">Total Paid</div>
-    <div class="number">{invoiceSummaryTotals.paid}</div>
+  <div class={css({ textAlign: "center" })}>
+    <div
+      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black" })}
+    >
+      Total Paid
+    </div>
+    <div
+      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate: true })}
+    >
+      {invoiceSummaryTotals.paid}
+    </div>
   </div>
 </div>
 
@@ -135,6 +163,13 @@
       {invoice}
       onEdit={(inv) => goto(`/invoices/${inv.id}`)}
       onDelete={(inv) => goto(`/invoices/${inv.id}`)}
+      onSendInvoice={async (inv) => {
+        await clientInvoicesStore.updateInvoiceStatus(
+          inv.id,
+          "sent",
+          listQueryNormalized
+        );
+      }}
     />
   {/snippet}
   {#snippet blankState()}
@@ -152,51 +187,37 @@
   {/snippet}
 </PaginatedList>
 
-<SlidePanel bind:open={isFormShowing.isOn} buttonText="">
+<Modal
+  variant="panel"
+  bind:dialogEl={formPanel.dialogEl}
+  onClose={formPanel.close}
+>
   {#snippet title()}
     <h2
-      class="font-sansserif text-daisyBush mbs-9 mbe-7 text-3xl font-bold lg:mbs-0"
+      class={css({
+        fontFamily: "sansserif",
+        color: "daisyBush",
+        marginBlockStart: { base: 9, lg: 0 },
+        marginBlockEnd: 7,
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
     >
       Add a Client
     </h2>
   {/snippet}
 
   {#snippet description()}
-    <h2 class="hidden">""</h2>
+    <h2 class={css({ display: "none" })}>""</h2>
   {/snippet}
 
   {#if isEditing === "edit"}
-    <ClientForm
-      edit={client}
-      formState="edit"
-      closePanel={() => {
-        isFormShowing.off();
-        isEditing = "edit";
-      }}
-    />
+    <ClientForm edit={client} formState="edit" closePanel={formPanel.close} />
   {:else}
     <ClientForm
       edit={undefined}
       formState="create"
-      closePanel={() => {
-        isFormShowing.off();
-        isEditing = "create";
-      }}
+      closePanel={formPanel.close}
     />
   {/if}
-</SlidePanel>
-
-<style>
-  @reference "#app.css";
-  .summary-block {
-    @apply text-center;
-  }
-
-  .label {
-    @apply text-lightGray text-sm font-black;
-  }
-
-  .number {
-    @apply text-purple truncate text-4xl font-black;
-  }
-</style>
+</Modal>

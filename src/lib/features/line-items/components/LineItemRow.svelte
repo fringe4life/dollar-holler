@@ -1,11 +1,15 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
+  import { gridItem } from "styled-system/patterns";
   import type { FocusEventHandler, FormEventHandler } from "svelte/elements";
   import type {
     LineItemRowProps,
     LineItemUpdate,
   } from "$features/line-items/types";
   import Trash from "$lib/components/icons/Trash.svelte";
-  import { Button } from "$lib/components/ui/button";
+  import Button from "$lib/components/ui/button/button.svelte";
+  import { invoiceLineItem } from "$lib/styles";
+  import { lineItemFieldRecipe } from "./LineItemRecipe";
 
   let props: LineItemRowProps = $props();
 
@@ -54,11 +58,31 @@
       amount: quantity * Number(unitPrice),
     });
   };
-</script>
 
-<div class="invoice-line-item border-fog border-b-2 py-4 sm:py-2">
-  <div class="description relative">
-    <label for="description-{props.lineItem.id}" class="line-item-label"
+  const lineItemLabel = css({
+    display: { base: "none", sm: "block" },
+    _print: { display: "none" },
+  });
+
+  const qtyStyles = lineItemFieldRecipe({
+    inputType: "number",
+    align: "center",
+  });
+  const priceStyles = lineItemFieldRecipe({
+    inputType: "number",
+    align: "right",
+  });
+  const amountStyles = lineItemFieldRecipe({
+    inputType: "text",
+    align: "right",
+  });
+</script>
+<!-- "invoice-line-item border-fog border-b-2 py-4 sm:py-2" -->
+<div
+  class={cx(invoiceLineItem, css({ borderColor: "fog", borderBottomWidth: 2, paddingBlock: { base: 4, sm: 2 } }))}
+>
+  <div class={gridItem({ gridArea: "description", position: "relative" })}>
+    <label for="description-{props.lineItem.id}" class={lineItemLabel}
       >Description</label
     >
     <input
@@ -71,20 +95,15 @@
       required={props.isRequired}
       disabled={!isEditable}
     >
-    <span
-      aria-hidden="true"
-      class="border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200"
-    ></span>
+    <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
 
-  <div class="unitPrice relative">
-    <label
-      for="unitPrice-{props.lineItem.id}"
-      class="line-item-label text-right"
+  <div class={gridItem({ position: "relative", gridArea: "unitPrice" })}>
+    <label for="unitPrice-{props.lineItem.id}" class={priceStyles.label}
       >Unit Price</label
     >
     <input
-      class="line-item text-right"
+      class={priceStyles.input}
       type={isEditable ? "number" : "text"}
       name="unitPrice"
       id="unitPrice-{props.lineItem.id}"
@@ -96,21 +115,17 @@
       required={props.isRequired}
       disabled={!isEditable}
     >
-    <span
-      aria-hidden="true"
-      class="border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200"
-    ></span>
+    <!-- "border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200" -->
+    <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
-  <div class="quantity relative">
-    <label
-      for="quantity-{props.lineItem.id}"
-      class="line-item-label text-center"
+  <div class={gridItem({ gridArea: "quantity", position: "relative" })}>
+    <label for="quantity-{props.lineItem.id}" class={qtyStyles.label}
       >Qty</label
     >
     <input
       value={props.lineItem.quantity}
       oninput={isEditable ? onQuantityInput : undefined}
-      class="line-item text-center"
+      class={qtyStyles.input}
       type="number"
       name="quantity"
       id="quantity-{props.lineItem.id}"
@@ -118,25 +133,25 @@
       required={props.isRequired}
       disabled={!isEditable}
     >
-    <span
-      aria-hidden="true"
-      class="border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200"
-    ></span>
+    <span aria-hidden="true" class={qtyStyles.border}></span>
   </div>
-  <div class="amount">
-    <label for="amount-{props.lineItem.id}" class="line-item-label text-right"
+  <div class={gridItem({ gridArea: "amount" })}>
+    <label for="amount-{props.lineItem.id}" class={amountStyles.label}
       >Amount</label
     >
     <input
       value={isEditable ? amount : props.lineItem.amount.toFixed(2)}
-      class="line-item text-right"
+      class={amountStyles.input}
       type="text"
       name="amount"
       id="amount-{props.lineItem.id}"
       disabled
     >
   </div>
-  <div class="trash place-self-center">
+  <!-- absolute inset-e-0 inset-bs-0 sm:static -->
+  <div
+    class={gridItem({ gridArea: "trash", placeSelf: "center", position: {base: "absolute", sm: "static"}, insetInlineEnd: "0", insetBlockStart: "0" })}
+  >
     {#if props.canDelete && isEditable}
       <Button
         onclick={() => {
@@ -145,75 +160,9 @@
           }
         }}
         variant="ghost"
-        class="text-center block-10 inline-full"
+        class={css({ textAlign: "center", blockSize: "10", inlineSize: "full" })}
         ><Trash /></Button
       >
     {/if}
   </div>
 </div>
-
-<style>
-  @reference "#app.css";
-  input:where([type="text"], [type="number"]) {
-    @apply border-b-2 border-dashed border-stone-300 transition-colors duration-200 block-10 inline-full;
-  }
-  input[type="text"] {
-    @apply font-sansserif text-xl font-bold block-10;
-  }
-
-  input[type="number"] {
-    @apply font-mono text-base;
-  }
-
-  input:where([type="number"], [type="text"]):focus {
-    /* @apply border-solid border-lavenderIndigo outline-none; */
-    @apply outline-none;
-  }
-
-  input:where([type="number"], [type="text"]):disabled {
-    @apply border-b-0 bg-transparent px-0;
-  }
-
-  .line-item-label {
-    @apply block sm:hidden print:hidden;
-  }
-
-  :global {
-    .invoice-line-item {
-      grid-template-areas:
-        "description description description"
-        "unitPrice   quantity    amount";
-      @apply relative grid gap-x-2 sm:grid-cols-[1fr_100px_100px_100px_65px] md:gap-x-5;
-
-      @media screen and (width > 640px) {
-        grid-template-areas: "description unitPrice quantity amount trash";
-      }
-
-      .description {
-        grid-area: description;
-      }
-      .quantity {
-        grid-area: quantity;
-      }
-      .unitPrice {
-        grid-area: unitPrice;
-      }
-      .amount {
-        grid-area: amount;
-      }
-
-      .trash {
-        grid-area: trash;
-        @apply absolute inset-e-0 inset-bs-0 sm:static;
-      }
-
-      .field {
-        @apply mbe-6;
-      }
-
-      @media print {
-        grid-template-areas: "description unitPrice quantity amount trash";
-      }
-    }
-  }
-</style>

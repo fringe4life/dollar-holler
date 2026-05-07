@@ -1,3 +1,14 @@
+<script lang="ts">
+  import { circle } from "styled-system/patterns";
+</script>
+
 <div
-  class="aspect-square animate-spin rounded-full border-2 border-current border-b-transparent block-5"
+  class={circle({
+    animation: "spin",
+    borderWidth: 2,
+    borderColor: "currentColor",
+    borderBottomColor: "transparent",
+    size: 5
+  })}
+  aria-hidden="true"
 ></div>

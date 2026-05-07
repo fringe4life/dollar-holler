@@ -1,5 +1,5 @@
 import { and, eq } from "drizzle-orm";
-import { Elysia } from "elysia";
+import { Elysia, InternalServerError, NotFoundError } from "elysia";
 import { fetchPaginatedClients } from "$features/clients/queries/clients-list.server";
 import { fetchClientPickerOptions } from "$features/clients/queries/clients-options.server";
 import {
@@ -29,7 +29,6 @@ import {
 } from "$lib/server/schemas";
 import { protectedApiPlugin } from "../plugins/auth-plugin";
 import { listQueryPlugin } from "../plugins/list-query-plugin";
-import { InternalServerError, NotFoundError } from "../utils/errors";
 
 export const clientsRoutes = new Elysia({ prefix: "/clients" })
   .use(protectedApiPlugin)

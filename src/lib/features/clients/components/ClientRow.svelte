@@ -1,4 +1,7 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
+  import { gridItem } from "styled-system/patterns";
+  import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import AdditionalOptions from "$lib/components/additionaloptions/AdditionalOptions.svelte";
   import AdditionalOptionsButton from "$lib/components/additionaloptions/AdditionalOptionsButton.svelte";
@@ -10,19 +13,25 @@
   import Trash from "$lib/components/icons/Trash.svelte";
   import View from "$lib/components/icons/View.svelte";
   import Swipeable from "$lib/components/Swipeable.svelte";
-  import { Badge } from "$lib/components/ui/badge";
+  import Badge from "$lib/components/ui/badge/badge.svelte";
+  import {
+    actionButton,
+    clientRow,
+    clientTable,
+    tableRowBase,
+    tableRowHover,
+  } from "$lib/styles";
   import type { CursorId } from "$lib/types";
   import { centsToDollars } from "$lib/utils/moneyHelpers";
-  import type { MouseEventHandler } from "svelte/elements";
   import type { ClientListResponse } from "../types";
 
-  type Props = {
+  interface Props {
     client: ClientListResponse;
-    onEdit: (client: ClientListResponse) => void;
-    onDelete: (client: ClientListResponse) => void;
     onActivate: (clientId: CursorId) => void;
     onArchive: (clientId: CursorId) => void;
-  };
+    onDelete: (client: ClientListResponse) => void;
+    onEdit: (client: ClientListResponse) => void;
+  }
 
   let { client, onEdit, onDelete, onActivate, onArchive }: Props = $props();
   // EVENT HANDLERS
@@ -72,34 +81,82 @@
 </script>
 
 <Swipeable
-  contentClass="group/row  client-table client-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  // "group/row  client-table client-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
+  contentClass={cx(
+    "group",
+    clientTable,
+    clientRow,
+    tableRowHover,
+    tableRowBase
+  )}
   contentViewTransitionName={`client-${client.id}`}
 >
   {#snippet content()}
-    <div class="status justify-self-end lg:justify-self-start">
-      {@render tag(client.clientStatus)}
+    <div
+      class={gridItem({
+        justifySelf: { base: "end", lg: "start" },
+        gridArea: "status",
+      })}
+    >
+      <Badge
+        class={css({ marginInlineStart: { base: "auto", md: 0 } })}
+        variant="draft"
+        size="small"
+        >{client.clientStatus}</Badge
+      >
     </div>
     <div
-      class="clientName truncate text-base font-bold whitespace-nowrap lg:text-xl"
+      class={gridItem({
+        gridArea: "clientName",
+        truncate: true,
+        fontSize: { lg: "xl" },
+        fontWeight: "bold",
+      })}
     >
       {client.name}
     </div>
-    <div class="received text-right font-mono text-sm font-bold lg:text-lg">
+    <div
+      class={gridItem({
+            gridArea: "received",
+            _before: { content: "'Received: ' / 'your received money is'"}, 
+            display: { base: "block", lg: "none" } ,
+            textAlign: { base: "left", lg: "right" },
+            fontSize: { base: "sm", lg: "lg" },
+            fontWeight: "bold",
+        })}
+    >
       {receivedDisplay}
     </div>
     <div
-      class="balance text-scarlet justify-self-end text-right font-mono text-sm font-bold lg:justify-self-end lg:text-lg"
+      class={gridItem({
+        gridArea: "balance",
+        justifySelf: "end",
+        _before: { content: "'Balance: ' / 'your balance is'" }, 
+        display: { base: "block", lg: "none" },
+        textAlign: { base: "left", lg: "right" },
+        fontSize: { base: "sm", lg: "lg" },
+        fontWeight: "bold",
+        color: "scarlet",
+      })}
     >
       {balanceDisplay}
     </div>
-    <div class="view relative hidden place-self-center lg:block">
+    <div
+      class={gridItem({
+        display: { base: "none", lg: "block" },
+        gridArea: "view",placeSelf: "center"})}
+    >
       <a
-        class="text-pastelPurple hover:text-daisyBush group-hover/row:text-daisyBush/50 transition-colors duration-200"
+        class={css({
+          color:{ base:"pastelPurple", _hover: "daisyBush", _groupHover: "daisyBush/50"},
+          transitionProperty: "colors",
+          transitionDuration: "normal",
+        })}
         href={resolved}
         ><View /></a
       >
     </div>
-    <AdditionalOptions classes="threeDots">
+    <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
       {#snippet content(additionalMenu)}
         <AdditionalOptionsButton {additionalMenu} />
         <AdditionalOptionsList {additionalMenu} options={CLIENT_OPTIONS} />
@@ -108,67 +165,21 @@
   {/snippet}
   {#snippet revealed()}
     {#if client.clientStatus === "active"}
-      <button onclick={handleArchive} class="action-button">
+      <button onclick={handleArchive} type="button" class={actionButton}>
         <Archive width={32} height={32} />
         Archive
       </button>
     {/if}
     {#if client.clientStatus === "archive"}
-      <button onclick={handleActivation} class="action-button">
+      <button onclick={handleActivation} type="button" class={actionButton}>
         <Activate width={32} height={32} />
         Activate
       </button>
     {/if}
-    <button onclick={handleDelete} class="action-button">
+    <button onclick={handleDelete} type="button" class={actionButton}>
       <Trash width={32} height={32} />
       Delete
     </button>
-    <a class="action-button" href={resolved}><View height={32} width={32} /></a>
+    <a class={actionButton} href={resolved}><View height={32} width={32} /></a>
   {/snippet}
 </Swipeable>
-
-{#snippet tag(title: string | null)}
-  {#if title}
-    <Badge class="ms-auto" variant="draft" size="small">{title}</Badge>
-  {:else}
-    <Badge class="ms-auto" variant="late" size="small">Error</Badge>
-  {/if}
-{/snippet}
-
-<style>
-  @reference "#app.css";
-  :global {
-    .client-row {
-      grid-template-areas:
-        "clientName status"
-        "received balance";
-
-      @media screen and (width > 1024px) {
-        grid-template-areas: "status clientName received balance view threeDots";
-      }
-    }
-    .clientName {
-      grid-area: clientName;
-    }
-    .status {
-      grid-area: status;
-    }
-    .received {
-      grid-area: received;
-      @apply text-left lg:text-right;
-    }
-    .balance {
-      grid-area: balance;
-      @apply text-left lg:text-right;
-    }
-  }
-  /* scoped specifically so the loading skeleton doesn't show these */
-  .balance::before {
-    content: "Balance: " / "Your balance is";
-    @apply block text-xs font-bold lg:hidden;
-  }
-  .received::before {
-    content: "Received: " / "your received money is";
-    @apply block text-xs font-bold lg:hidden;
-  }
-</style>

@@ -1,59 +1,169 @@
 <script lang="ts">
-  import { Dialog, type WithoutChild } from "bits-ui";
+  import { css, cx, sva } from "styled-system/css";
   import type { Snippet } from "svelte";
   import Cancel from "$lib/components/icons/Cancel.svelte";
   import Button from "./ui/button/button.svelte";
 
-  type Props = Dialog.RootProps & {
-    buttonText: string;
-    title: Snippet;
-    description: Snippet;
-    contentProps?: WithoutChild<Dialog.ContentProps>;
-    // ...other component props if you wish to pass them
+  const modalRecipe = sva({
+    slots: ["dialog", "content"],
+    base: {
+      dialog: {
+        border: "none",
+        padding: 0,
+        margin: 0,
+        overflowY: "auto",
+        outlineStyle: "none",
+        transitionProperty: "scale, translate, opacity, overlay, display",
+        transitionDuration: "slow",
+        transitionTimingFunction: {
+          base: "anticipate",
+          _supportsLinear: "glide",
+        },
+        transitionBehavior: "allow-discrete",
+        _backdrop: {
+          background: "blueGem/60",
+          opacity: "0",
+          transitionProperty: "opacity, overlay, display",
+          transitionDuration: "slow",
+          transitionBehavior: "allow-discrete",
+        },
+        _open: {
+          _backdrop: {
+            opacity: "1",
+          },
+        },
+        _starting: {
+          _open: {
+            _backdrop: {
+              opacity: "0",
+            },
+          },
+        },
+      },
+    },
+    variants: {
+      variant: {
+        modal: {
+          dialog: {
+            position: "fixed",
+            insetBlockStart: "50%",
+            insetInlineStart: "50%",
+            inlineSize: "full",
+            maxInlineSize: { base: "calc(100% - 2rem)", sm: "30.625rem" },
+            minBlockSize: 57.5,
+            borderRadius: "lg",
+            backgroundColor: "white",
+            boxShadow: "md",
+            scale: "0.95",
+            translate: "-50% -50%",
+            opacity: "0",
+            _open: {
+              translate: "-50% -50%",
+              scale: "1",
+              opacity: "1",
+              _starting: {
+                scale: "0.95",
+                translate: "-50% -50%",
+                opacity: "0",
+              },
+            },
+          },
+          content: {
+            display: "grid",
+            alignContent: "space-between",
+            blockSize: "full",
+            paddingInline: 10,
+            paddingBlock: 7,
+          },
+        },
+        panel: {
+          dialog: {
+            position: "fixed",
+            insetInlineStart: "auto",
+            insetInlineEnd: 0,
+            insetBlockStart: 0,
+            minBlockSize: "100dvh",
+            inlineSize: { base: "full", lg: "3/4" },
+            overflowY: "scroll",
+            backgroundColor: "white",
+            boxShadow: "addInvoice",
+            translate: "100% 0",
+            _open: {
+              translate: "0 0",
+              _starting: {
+                translate: "100% 0",
+              },
+            },
+          },
+          content: {
+            paddingInline: { base: 2, lg: 15 },
+            paddingBlock: { base: 2, lg: 12 },
+          },
+        },
+      },
+    },
+    defaultVariants: {
+      variant: "modal",
+    },
+  });
+
+  interface Props {
+    children?: Snippet;
     className?: string;
-  };
+    description: Snippet;
+    dialogEl: HTMLDialogElement | undefined;
+    onClose?: () => void;
+    title: Snippet;
+    variant?: "modal" | "panel";
+  }
 
   let {
-    open = $bindable(false),
+    dialogEl = $bindable<HTMLDialogElement | undefined>(),
+    variant = "modal",
     children,
-    buttonText,
-    contentProps,
     title,
     description,
     className = "",
-    ...restProps
+    onClose,
   }: Props = $props();
+
+  const modalStyles = $derived(modalRecipe({ variant }));
+
+  const handleBackdropClick = (e: MouseEvent) => {
+    if (e.target === dialogEl) {
+      // open = false;
+      onClose?.();
+    }
+  };
+
+  const handleDialogClose = () => {
+    onClose?.();
+  };
 </script>
 
-<svelte:head>
-  {#if open}
-    <style>
-      body {
-        overflow: hidden;
-      }
-    </style>
-  {/if}
-</svelte:head>
-
-<Dialog.Root bind:open {...restProps}>
-  <Dialog.Portal>
-    <Dialog.Overlay
-      class={`bg-blueGem/60 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:animate-in data-[state=open]:fade-in-0 fixed inset-0 ${className ? className : "z-50"}`}
-    />
-    <Dialog.Content
-      class="rounded-card-lg bg-background shadow-popover data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 fixed inset-s-1/2 inset-bs-1/2 z-500 grid -translate-1/2 content-between items-center border px-10 py-7 outline-hidden inline-full max-inline-[calc(100%-2rem)] min-block-57.5 sm:max-inline-122.5 md:inline-full"
-      {...contentProps}
-    >
-      <Dialog.Title> {@render title()} </Dialog.Title>
-      <Dialog.Description class="text-foreground-alt text-sm">
-        {@render description()}
-      </Dialog.Description>
-      {@render children?.()}
-      <Dialog.Close
-        class="text-pastelPurple hover:text-blueGem focus-visible:outline-ring/50 absolute rounded-md outline-2 outline-transparent transition-[color,outline-color,scale] duration-200 active:scale-95 pointer-coarse:inset-e-1 pointer-coarse:inset-bs-1 pointer-fine:inset-e-4 pointer-fine:inset-bs-4"
-      >
-        <Button variant="ghost" size="icon"><Cancel /></Button>
-      </Dialog.Close>
-    </Dialog.Content>
-  </Dialog.Portal>
-</Dialog.Root>
+<dialog
+  bind:this={dialogEl}
+  class={cx(modalStyles.dialog, className)}
+  onclick={handleBackdropClick}
+  onclose={handleDialogClose}
+>
+  <div class={modalStyles.content}>
+    {@render title()}
+    {@render description()}
+    {@render children?.()}
+  </div>
+  <Button
+    variant="ghost"
+    size="sm"
+    onclick={onClose}
+    class={css({
+    position: "absolute",
+    insetInlineEnd: 4,
+    insetBlockStart: 4,
+    rounded: "md",
+    _active: { scale: "0.95" },
+  })}
+    aria-label="Close dialog"
+    ><Cancel /></Button
+  >
+</dialog>

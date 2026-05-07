@@ -1,4 +1,5 @@
 // Function to check if a navigation item is active
+// fallow-ignore-file
 const isActive = (href: string, path: string): boolean => {
   // Exact match for root paths
   if (href === "/") {

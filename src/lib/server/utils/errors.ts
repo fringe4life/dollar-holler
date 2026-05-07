@@ -8,5 +8,12 @@ export class UnauthorizedError extends Error {
   }
 }
 
-/** Elysia built-ins: thrown for 404/500; `app.onError` maps to `apiErrorBody`. */
-export { InternalServerError, NotFoundError } from "elysia";
+/** Invalid client input (e.g. illegal invoice status transition); handled as `BAD_REQUEST` → 400. */
+export class BadRequestError extends Error {
+  status = 400;
+
+  constructor(public message = "Bad request") {
+    super(message);
+    this.name = "BadRequestError";
+  }
+}

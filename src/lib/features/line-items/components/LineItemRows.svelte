@@ -1,9 +1,13 @@
 <script lang="ts">
+  import { css, cx } from "styled-system/css";
+  import { gridItem } from "styled-system/patterns";
   import type { FormEventHandler } from "svelte/elements";
   import type { LineItemRowsProps } from "$features/line-items/types";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import { invoiceLineItem } from "$lib/styles";
   import { centsToDollars, sumLineItems } from "$lib/utils/moneyHelpers";
+  import { lineItemFieldRecipe } from "./LineItemRecipe";
   import LineItemRow from "./LineItemRow.svelte";
 
   let props: LineItemRowsProps = $props();
@@ -27,27 +31,25 @@
     }
     props.setDiscount(Number(e.currentTarget.value));
   };
-</script>
 
-<div class="invoice-line-item border-daisyBush border-b-2 pbe-2">
-  <div class="text-daisyBush hidden text-sm font-bold sm:block print:block">
-    Description
-  </div>
-  <div
-    class="text-daisyBush hidden text-right text-sm font-bold sm:block print:block"
-  >
-    Unit price
-  </div>
-  <div
-    class="text-daisyBush hidden text-center text-sm font-bold sm:block print:block"
-  >
-    Qty
-  </div>
-  <div
-    class="text-daisyBush hidden text-right text-sm font-bold sm:block print:block"
-  >
-    Amount
-  </div>
+  const lineItemHeaders = css({
+    color: "daisyBush",
+    display: { base: "none", sm: "block", _print: "block" },
+  });
+
+  const discountStyles = lineItemFieldRecipe({
+    inputType: "number",
+    align: "right",
+  });
+</script>
+<!-- "invoice-line-item border-daisyBush border-b-2 pbe-2" -->
+<div
+  class={cx(invoiceLineItem, css({ borderColor: "daisyBush", borderBottomWidth: 2, paddingBlockEnd: 2 }))}
+>
+  <div class={lineItemHeaders}>Description</div>
+  <div class={cx(lineItemHeaders, css({ textAlign: "right" }))}>Unit price</div>
+  <div class={cx(lineItemHeaders, css({ textAlign: "center" }))}>Qty</div>
+  <div class={cx(lineItemHeaders, css({ textAlign: "right" }))}>Amount</div>
 </div>
 
 {#if props.lineItems}
@@ -72,29 +74,37 @@
   {/each}
 {/if}
 
-<div class="invoice-line-item">
-  <div class="col-span-1 sm:col-span-2">
+<div class={invoiceLineItem}>
+  <!-- "col-span-1 sm:col-span-2" -->
+  <div class={gridItem({ colSpan: { base: 1, sm: 2 } })}>
     {#if isEditable && props.mode === "edit"}
       <Button variant="textOnly" onclick={props.addLineItem}
         >+ Line Item</Button
       >
     {/if}
   </div>
-  <div class="text-monsoon py-5 text-right font-bold print:col-span-3">
+  <!-- "text-monsoon py-5 text-right font-bold print:col-span-3" -->
+  <div
+    class={gridItem({ color: "monsoon", paddingBlock: "5", textAlign: "right", fontWeight: "bold", colSpan: { _print: 3 } })}
+  >
     Subtotal
   </div>
-  <div class="py-5 text-right font-mono">{subTotal}</div>
+  <div
+    class={css({ paddingBlock: "5", textAlign: "right", fontFamily: "mono" })}
+  >
+    {subTotal}
+  </div>
 </div>
 
-<div class="invoice-line-item">
+<div class={invoiceLineItem}>
   <p
-    class="text-monsoon col-span-1 py-5 text-right font-bold sm:col-span-2 print:col-span-3"
+    class={gridItem({ color: "monsoon", paddingBlock: 5, textAlign: "right", fontWeight: "bold", colSpan: { base: 1, sm: 2 , _print: 3 } })}
   >
     Discount
   </p>
-  <div class="relative">
+  <div class={css({ position: "relative" })}>
     <input
-      class="line-item focus:border-lavenderIndigo border-b-2 border-dashed border-b-stone-300 text-right block-10 inline-full not-print:pe-4 focus:border-solid focus:outline-none"
+      class={cx(discountStyles.input, css({ paddingInlineEnd: 3 }))}
       type="number"
       name="discount"
       disabled={!isEditable}
@@ -103,13 +113,20 @@
       value={props.discount}
       oninput={isEditable ? onDiscountInput : undefined}
     >
-    <span class="absolute inset-e-0 inset-bs-2 font-mono">%</span>
+    <span
+      class={css({ position: "absolute", insetInlineEnd: 0, insetBlockStart: 2, fontFamily: "mono" })}
+      >%</span
+    >
   </div>
-  <div class="py-5 text-right font-mono">{centsToDollars(discountAmount)}</div>
+  <div class={css({ paddingBlock: 5, textAlign: "right", fontFamily: "mono" })}>
+    {centsToDollars(discountAmount)}
+  </div>
 </div>
 
-<div class="invoice-line-item">
-  <div class="col-span-3 sm:col-span-full print:col-span-full">
+<div class={invoiceLineItem}>
+  <div
+    class={gridItem({ gridColumn: { base: "span 3", sm: "1 / -1", _print: "1 / -1" } })}
+  >
     <CircledAmount amount={total} label="Total." />
   </div>
 </div>

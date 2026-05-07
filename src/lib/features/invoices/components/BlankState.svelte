@@ -1,5 +1,5 @@
 <script>
-  import BlankState from "$lib/components/BlankState.svelte";
+  import BlankState from "$features/pagination/components/BlankState.svelte";
   import InvoiceRowHeader from "./InvoiceRowHeader.svelte";
 </script>
 

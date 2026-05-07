@@ -2,7 +2,8 @@
   "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
-    "source.fixAll.biome": "explicit"
+    "source.fixAll.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   },
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
@@ -11,14 +12,6 @@
   "css.validate": false,
   "less.validate": false,
   "scss.validate": false,
-  "tailwindCSS.experimental.configFile": "src/app.css",
-  "tailwindCSS.classFunctions": ["tv", "cn", "clsx", "cva"],
-  "tailwindCSS.experimental.classRegex": [
-    ["@theme\\(([^)]*)\\)", "([^)]*)"],
-    ["@apply\\s+([^;]+)", "([^;]+)"],
-    ["classList\\.add\\(([^)]*)\\)", "([^)]*)"],
-    ["className\\s*=\\s*['\"`]([^'\"`]*)['\"`]", "([^'\"`]*)"]
-  ],
   "editor.quickSuggestions": {
     "strings": "on"
   },
@@ -36,14 +29,11 @@
   "[tailwindcss]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "files.associations": {
-    "*.css": "tailwindcss"
-  },
   "editor.formatOnPaste": true,
   "emmet.showExpandedAbbreviation": "never",
   "markdown.validate.enabled": true,
   "[svelte]": {
-    "editor.defaultFormatter": "svelte.svelte-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
   },
   "[css]": {
     "editor.defaultFormatter": "biomejs.biome"

@@ -7,9 +7,6 @@ export const getLabel = (
   label: Maybe<BadgeVariant>,
   dueDate: Maybe<string>
 ): Exclude<BadgeVariant, undefined> => {
-  if (label === "draft") {
-    return "draft";
-  }
   if (label === "sent" && isLate?.(dueDate)) {
     return "late";
   }

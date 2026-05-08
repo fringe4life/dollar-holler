@@ -1,6 +1,6 @@
 /// <reference path="./src/env-varlock.d.ts" />
 import { defineConfig } from "drizzle-kit";
-
+import { ENV } from "varlock/env";
 export default defineConfig({
   dialect: "postgresql",
   schema: "./src/lib/server/db/schema.ts",
@@ -8,6 +8,6 @@ export default defineConfig({
   verbose: true,
   strict: true,
   dbCredentials: {
-    url: process.env.DATABASE_URL,
+    url: ENV.DATABASE_URL,
   },
 });

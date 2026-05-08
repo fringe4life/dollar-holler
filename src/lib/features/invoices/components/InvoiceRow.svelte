@@ -14,15 +14,10 @@
   import View from "$lib/components/icons/View.svelte";
   import Swipeable from "$lib/components/Swipeable.svelte";
   import Badge from "$lib/components/ui/badge/badge.svelte";
-  import {
-    actionButton,
-    invoiceRow,
-    invoiceTable,
-    tableRowBase,
-    tableRowHover,
-  } from "$lib/styles";
+  import { actionButton, tableRowBase, tableRowHover } from "$lib/styles";
   import { convertDate } from "$lib/utils/dateHelpers";
   import { formatTotal } from "$lib/utils/moneyHelpers";
+  import { invoiceRow, invoiceTable } from "../styles";
   import type { InvoiceListResponse } from "../types";
 
   interface Props {
@@ -79,7 +74,6 @@
   ] satisfies Option[]);
 </script>
 
-<!-- "group/row invoice-table invoice-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6" -->
 <Swipeable
   contentClass={cx(
     "group",
@@ -104,6 +98,7 @@
         gridArea: "duedate",
         truncate: true,
         fontSize: { base: "sm", lg: "lg" },
+        textAlign: { base:"left", lg: "center"}
       })}
     >
       {convertDate(dueDate.toISOString())}
@@ -142,17 +137,20 @@
           gridArea: "view",
           display: { base: "none", lg: "block" },
           placeSelf: { md: "center" },
-          fontSize: { base: "sm", lg: "lg" },
+        })}
+    >
+      <a
+        class={css({ fontSize: { base: "sm", lg: "lg" },
           transitionProperty: "colors",
           transitionDuration: "normal",
           color: {
             base: "pastelPurple",
-            _hover: "daisyBush",
             _groupHover: "daisyBush/50",
-          },
-        })}
-    >
-      <a href={resolved}><View /></a>
+            _hover: "daisyBush",
+          },})}
+        href={resolved}
+        ><View /></a
+      >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
       {#snippet content(additionalMenu)}

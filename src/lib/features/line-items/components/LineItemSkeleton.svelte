@@ -1,12 +1,10 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { between } from "styled-system/patterns";
 </script>
 
 <div class={css({ spaceY: 4 })}>
-  <div
-    class={flex({ justify: "space-between", borderBottomWidth: 2, paddingBlockEnd: 2 })}
-  >
+  <div class={between({ borderBottomWidth: 2, paddingBlockEnd: 2 })}>
     <div
       class={css({ animation: "pulse", rounded: "md", bg: "gray.200", blockSize: 4, inlineSize: 24 })}
     ></div>

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { css } from "styled-system/css";
+  import { center } from "styled-system/patterns";
   import { asset } from "$app/paths";
   import { page } from "$app/state";
 </script>
@@ -16,8 +16,8 @@
 </svelte:head>
 
 <div
-  class={cx(flex({ justify: "center", align: "center" }), css({ bgPosition: "center", bgRepeat: "no-repeat", inlineSize: "full", minBlockSize: "calc(100dvh-3rem-1.75rem)" }))}
-  style:background-image="url('{asset('/images/bg-error.svg')}')"
+  class={center({ bgPosition: "center", bgRepeat: "no-repeat", minBlockSize: "calc(100dvh - var(--spacing-16))", backgroundImage: "var(--bg-error)" })}
+  style:--bg-error={`url('${asset('/images/bg-error.svg')}')`}
 >
   <div>
     <h1

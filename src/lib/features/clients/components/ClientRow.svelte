@@ -14,15 +14,10 @@
   import View from "$lib/components/icons/View.svelte";
   import Swipeable from "$lib/components/Swipeable.svelte";
   import Badge from "$lib/components/ui/badge/badge.svelte";
-  import {
-    actionButton,
-    clientRow,
-    clientTable,
-    tableRowBase,
-    tableRowHover,
-  } from "$lib/styles";
+  import { actionButton, tableRowBase, tableRowHover } from "$lib/styles";
   import type { CursorId } from "$lib/types";
   import { centsToDollars } from "$lib/utils/moneyHelpers";
+  import { clientRow, clientTable } from "../styles";
   import type { ClientListResponse } from "../types";
 
   interface Props {
@@ -81,7 +76,6 @@
 </script>
 
 <Swipeable
-  // "group/row  client-table client-row table-row-hover shadow-tableRow relative z-5 items-center rounded-lg bg-white py-3 lg:py-6"
   contentClass={cx(
     "group",
     clientTable,
@@ -118,9 +112,8 @@
     <div
       class={gridItem({
             gridArea: "received",
-            _before: { content: "'Received: ' / 'your received money is'"}, 
-            display: { base: "block", lg: "none" } ,
-            textAlign: { base: "left", lg: "right" },
+            _before: { content: { base: "'Received: ' / 'your received money is'", lg:"''" }},
+            textAlign: {base: "left", lg: "right"},
             fontSize: { base: "sm", lg: "lg" },
             fontWeight: "bold",
         })}
@@ -131,9 +124,8 @@
       class={gridItem({
         gridArea: "balance",
         justifySelf: "end",
-        _before: { content: "'Balance: ' / 'your balance is'" }, 
-        display: { base: "block", lg: "none" },
-        textAlign: { base: "left", lg: "right" },
+        _before: { content: { base: "'Balance: ' / 'your balance is'", lg:"''" }},
+        textAlign: "right",
         fontSize: { base: "sm", lg: "lg" },
         fontWeight: "bold",
         color: "scarlet",

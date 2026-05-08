@@ -1,10 +1,10 @@
 <script lang="ts">
   import { css } from "styled-system/css";
   import { resolve } from "$app/paths";
+  import { authHeading } from "$features/auth/styles";
   import Form from "$lib/components/Form.svelte";
   import FormField from "$lib/components/FormField.svelte";
   import Input from "$lib/components/ui/input/Input.svelte";
-  import { authHeading } from "$lib/styles";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();

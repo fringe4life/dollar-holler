@@ -1,7 +1,7 @@
 <script lang="ts">
   import { StarIcon } from "@lucide/svelte";
   import { css, cx } from "styled-system/css";
-  import { circle, flex, stack } from "styled-system/patterns";
+  import { circle, flex, hstack, stack } from "styled-system/patterns";
   import type { reviews } from "$features/landing-page/constants/reviews.js";
 
   interface Props {
@@ -13,20 +13,20 @@
 
 <div
   class={cx(
-    stack({ gap: 5 }), 
-    css({ 
-      rounded: "2xl", 
-      borderWidth: "1px", 
-      borderStyle: "solid", 
-      borderColor: "white/10", 
-      backgroundColor: "white/8", 
-      padding: 6, 
-      transitionProperty: "scale", 
-      transitionDuration: "normal", 
+    stack({ gap: 5 }),
+    css({
+      rounded: "2xl",
+      borderWidth: "1px",
+      borderStyle: "solid",
+      borderColor: "white/10",
+      backgroundColor: "white/8",
+      padding: 6,
+      transitionProperty: "scale",
+      transitionDuration: "normal",
       backdropFilter: "auto",
       backdropBlur: "sm",
       _hover: { scale: 1.02 }
-    }), 
+    }),
     review.rotate
   )}
 >
@@ -43,7 +43,7 @@
   </p>
 
   <!-- Reviewer -->
-  <div class={flex({ align: "center", gap: 3 })}>
+  <div class={hstack({ gap: 3 })}>
     <img
       src={review.avatar}
       alt={review.name}

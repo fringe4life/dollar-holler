@@ -2,7 +2,8 @@
   import { css, cx } from "styled-system/css";
   import { circle, gridItem } from "styled-system/patterns";
   import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
-  import { clientRow, clientTable, tableRowBase } from "$lib/styles";
+  import { tableRowBase } from "$lib/styles";
+  import { clientRow, clientTable } from "../styles";
 </script>
 
 <div class={css({ position: "relative", isolation: "isolate" })}>

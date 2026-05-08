@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { flex, grid, gridItem } from "styled-system/patterns";
+  import { center, flex, grid, gridItem } from "styled-system/patterns";
   import { goto, invalidateAll } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -74,17 +74,17 @@
 </script>
 
 <div
-  class={grid({ 
-      gridAutoFlow: { base: "row", md: "column" }, 
-      justifyContent: "space-between", 
-      rowGap: 5, 
-      inlineSize: "full", 
+  class={grid({
+      gridAutoFlow: { base: "row", md: "column" },
+      justifyContent: "space-between",
+      rowGap: 5,
+      inlineSize: "full",
       maxInlineSize: "5xl" ,
-      paddingInline: { base: 4, lg: 0 }, 
-      position: "fixed", 
-      zIndex: 0, 
-      marginBlockEnd: 16, 
-      _print: { display: "none" } 
+      paddingInline: { base: 4, lg: 0 },
+      position: "fixed",
+      zIndex: 0,
+      marginBlockEnd: 16,
+      _print: { display: "none" }
     })}
 >
   <h1
@@ -107,16 +107,16 @@
 </div>
 
 <section
-  class={grid({ 
-      columns: 6, 
+  class={grid({
+      columns: 6,
       columnGap: 5,
       rowGap: 8,
-      paddingInline: { base: 5, md: 32 }, 
-      paddingBlock: { base: 8, md: 16 }, 
-      position: "relative", 
-      insetBlockStart: {base: 36, _print: 0}, 
-      zIndex: 10, 
-      shadow: {base: "addInvoice", _print: "none"},
+      paddingInline: { base: 5, md: 32 },
+      paddingBlock: { base: 8, md: 16 },
+      position: "relative",
+      insetBlockStart: { base: 36, _print: 0 },
+      zIndex: 10,
+      shadow: { base: "addInvoice", _print: "none" },
       backgroundColor: "white",
     })}
 >
@@ -146,11 +146,11 @@
       </p>
     {:else}
       <div
-        class={flex({ align: "center", justify: "center", bg: "gallery", borderRadius: "md", minBlockSize: 17 })}
+        class={center({ backgroundColor: "gallery", borderRadius: "md", minBlockSize: 17 })}
       >
         <a
           href={settingsLink}
-          class={css({ color: "stone.600", textDecoration: "underline", _hover: { textDecoration: "none" } })}
+          class={css({ color: "stone.600", textDecoration: { base:"underline", _hover: "none"} })}
           >Add your contact information.</a
         >
       </div>
@@ -181,7 +181,7 @@
     </p>
   </div>
   <div
-    class={gridItem({ colSpan: { base: 6, sm: 2, _print: 3 }, sm: { gridColumnStart: 5 } })}
+    class={gridItem({ colSpan: { base: 6, sm: 2, _print: 3 }, gridColumnStart: { sm: 5 } })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>Invoice Id:</div>
     <p>{invoice.invoiceNumber}</p>
@@ -194,7 +194,7 @@
   </div>
 
   <div
-    class={gridItem({ colSpan: { base: 3, sm: 2, _print: 3 }, sm: { gridColumnStart: 5 } })}
+    class={gridItem({ colSpan: { base: 3, sm: 2, _print: 3 }, gridColumnStart: { sm: 5 } })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>Issue Date:</div>
     <p>

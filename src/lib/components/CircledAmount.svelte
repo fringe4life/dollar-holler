@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { center, flex } from "styled-system/patterns";
   import { asset } from "$app/paths";
 
   interface Props {
@@ -12,8 +12,9 @@
 
 <div
   style:--circle={`url(${asset('/images/circle.svg')})`}
-  class={flex({ 
-    align: "center", justify: "center", columnGap: 4, float: "right",
+  class={center({
+    columnGap: 4,
+    float: "right",
     backgroundImage: "var(--circle)",
     backgroundSize: "cover",
     backgroundPosition: "center",

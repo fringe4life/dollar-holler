@@ -2,7 +2,7 @@
   import { css, cx } from "styled-system/css";
   import type { HeaderProps } from "$lib/components/TableHeader.svelte";
   import TableHeader from "$lib/components/TableHeader.svelte";
-  import { clientTable } from "$lib/styles";
+  import { clientTable } from "../styles";
 
   const clientHeaders = ["Status", "Client", "Received", "Balanced"];
 

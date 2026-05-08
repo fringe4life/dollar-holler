@@ -1,13 +1,13 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { center, flex } from "styled-system/patterns";
   import { asset } from "$app/paths";
 </script>
 
 <svelte:head> <title>Thank You! | Doller Holla</title> </svelte:head>
 
 <div
-  class={flex({ justify: "center", align: "center", backgroundPosition: "center", backgroundRepeat: "no-repeat", inlineSize: "full", backgroundImage: "var(--bg-thankYou)" })}
+  class={center({ backgroundPosition: "center", backgroundRepeat: "no-repeat", inlineSize: "full", backgroundImage: "var(--bg-thankYou)" })}
   style:--bg-thankYou={`url(${asset('/images/bg-thankYou.svg')})`}
 >
   <div>

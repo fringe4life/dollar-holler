@@ -2,7 +2,7 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { css } from "styled-system/css";
-  import { flex, square } from "styled-system/patterns";
+  import { between, flex, hstack, square } from "styled-system/patterns";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
@@ -112,18 +112,15 @@
     No items found
   </p>
 {:else}
-  <!-- "mbe-6 flex items-center justify-between gap-4" -->
   <div
-    class={flex({
+    class={between({
       marginBlockEnd: 6,
-      align: "center",
-      justify: "space-between",
       gap: 4,
     })}
   >
     <Select
       name="limit"
-      class={css({ blockSize: 10, inlineSize: 20 })}
+      class={css({ aspectRatio: "2/1", inlineSize: 20 })}
       disabled={!canNavigate || store.loading}
       onchange={(e) =>
         handleLimitChange(Number((e.currentTarget as HTMLSelectElement).value))}
@@ -137,7 +134,7 @@
         </option>
       {/each}
     </Select>
-    <div class={flex({ align: "center", gap: 2 })}>
+    <div class={hstack({  gap: 2 })}>
       <Button
         type="button"
         variant="outline"

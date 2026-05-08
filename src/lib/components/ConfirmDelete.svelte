@@ -57,7 +57,7 @@
     </h2>
   {/snippet}
   <div class={flex({ justify: "center", gap: 4 })}>
-    <Button variant="secondary" onclick={() => onCancel?.()}>Cancel</Button>
+    <Button variant="secondary" onclick={onCancel}>Cancel</Button>
     <Button variant="destructive" onclick={handleDelete}
       >Yes, Delete It.</Button
     >

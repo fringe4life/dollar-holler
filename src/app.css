@@ -8,6 +8,19 @@
 @import "@fontsource/source-code-pro/latin-700.css";
 @import "@fontsource/kalam/latin-700.css";
 
+@keyframes nav-solidify {
+  from {
+    background-color: transparent;
+    box-shadow: 0 0 0px oklch(from var(--colors-black) l c h / 0);
+    backdrop-filter: blur(0px);
+  }
+  to {
+    background-color: oklch(from var(--colors-whisper) l c h / 0.95);
+    box-shadow: 0 1px 3px oklch(from var(--colors-black) l c h / 0.1);
+    backdrop-filter: blur(4px);
+  }
+}
+
 :active-view-transition-type(forwards) {
   &::view-transition-old(paginated-list-rows) {
     --slide-distance: -60px;

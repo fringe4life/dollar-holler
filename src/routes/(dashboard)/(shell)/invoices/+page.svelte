@@ -143,27 +143,25 @@
   {/if}
 </Modal>
 
-{#if deleteModal.item}
-  <ConfirmDelete
-    item={deleteModal.item}
-    bind:dialogEl={deleteModal.dialogEl}
-    titleText="Are you sure you want to delete this invoice?"
-    onCancel={deleteModal.close}
-    onDelete={async () => {
+<ConfirmDelete
+  item={deleteModal.item}
+  bind:dialogEl={deleteModal.dialogEl}
+  titleText="Are you sure you want to delete this invoice?"
+  onCancel={deleteModal.close}
+  onDelete={async () => {
       if (!deleteModal?.item?.id) {
         return;
       }
       await invoicesStore.deleteInvoice(deleteModal.item.id);
       deleteModal.close();
     }}
-  >
-    {#snippet descriptionSnippet(invoice)}
-      This will delete the invoice to
-      <span class={css({ color: "scarlet" })}>{invoice.name}</span>
-      for
-      <span class={css({ color: "scarlet" })}
-        >{formatTotal(invoice.total)}</span
-      >
-    {/snippet}
-  </ConfirmDelete>
-{/if}
+>
+  {#snippet descriptionSnippet(invoice)}
+    This will delete the invoice to
+    <span class={css({ color: "scarlet" })}>{invoice?.name ?? "Unknown"}</span>
+    for
+    <span class={css({ color: "scarlet" })}
+      >{formatTotal(invoice?.total ?? 0)}</span
+    >
+  {/snippet}
+</ConfirmDelete>

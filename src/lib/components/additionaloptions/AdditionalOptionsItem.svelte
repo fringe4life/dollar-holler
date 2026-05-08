@@ -30,16 +30,17 @@
       _last: { borderBottomWidth: 0, borderBottomColor: "transparent" },
     })}
   >
-    <!-- //"font-sansserif text-pastelPurple hover:text-daisyBush flex cursor-pointer -->
-    <!-- gap-x-2 p-4 font-bold transition-[color] duration-200 inline-full" -->
     <button
-      class={cx(css({
+      class={flex({
+        columnGap: 2,
         inlineSize: "full",
         padding: 4,
         fontWeight: "bold",
         transitionProperty: "colors",
         transitionDuration: "normal",
-      }), flex({ columnGap: 2 }))}
+        color: {base: "pastelPurple", _hover: "daisyBush"},
+        cursor: "pointer",
+         })}
       type="button"
       onclick={option.onclick}
     >

@@ -1,17 +1,22 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { flex, grid } from "styled-system/patterns";
+  import { between, grid } from "styled-system/patterns";
   import { onDestroy } from "svelte";
-  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import BlankState from "$features/clients/components/BlankState.svelte";
   import ClientForm, {
     type ClientFormProps,
   } from "$features/clients/components/ClientForm.svelte";
+  import InvoiceForm from "$features/invoices/components/InvoiceForm.svelte";
   import InvoiceRow from "$features/invoices/components/InvoiceRow.svelte";
   import InvoiceRowHeader from "$features/invoices/components/InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "$features/invoices/components/InvoiceRowSkeleton.svelte";
+  import InvoiceSummaryItem from "$features/invoices/components/InvoiceSummaryItem.svelte";
   import { ClientInvoicesStore } from "$features/invoices/stores/clientInvoicesStore.svelte";
+  import type {
+    InvoiceListResponse,
+    InvoiceSelect,
+  } from "$features/invoices/types";
   import ItemsHeader from "$features/pagination/components/ItemsHeader.svelte";
   import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
@@ -19,14 +24,15 @@
   import { listUrlKey } from "$features/pagination/utils/url";
   import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
+  import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import Edit from "$lib/components/icons/Edit.svelte";
   import Modal from "$lib/components/Modal.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
+  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import type { BitsButton } from "$lib/types";
-  import { centsToDollars } from "$lib/utils/moneyHelpers";
-  import type { PageData } from "./$types";
+  import { centsToDollars, formatTotal } from "$lib/utils/moneyHelpers";
 
-  let { data }: { data: PageData } = $props();
+  let { data } = $props();
 
   const client = $derived(data.client);
 
@@ -67,7 +73,10 @@
   });
 
   const formPanel = new ItemPanel<undefined>();
+  const editPanel = new ItemPanel<InvoiceSelect>();
+  const deleteModal = new ItemPanel<InvoiceListResponse>();
   let isEditing = $state<ClientFormProps["formState"]>("create");
+  const { invoices: invoicesStore } = getDashboardStores();
 
   const handleEdit: BitsButton = () => {
     isEditing = "edit";
@@ -89,9 +98,7 @@
   {/snippet}
 </ItemsHeader>
 
-<div
-  class={flex({ justify: "space-between", align: "center", marginBlockEnd: 7, inlineSize: "full" })}
->
+<div class={between({ marginBlockEnd: 7, inlineSize: "full" })}>
   <h1 class={css({ color: "daisyBush", fontSize: "3xl", fontWeight: "bold" })}>
     {client.name}
   </h1>
@@ -99,56 +106,27 @@
 </div>
 
 <div
-  class={grid({ columns: { base:1, lg: 4 }, gap: 4, marginBlockEnd: 10, bg: "gallery", borderRadius: "lg", paddingX: 10, paddingY: 7 })}
+  class={grid({ 
+    columns: { base: 1, sm: 2, lg: 4 }, 
+    gap: 4, 
+    marginBlockEnd: 10, 
+    backgroundColor: "gallery", 
+    borderRadius: "lg", 
+    paddingInline: { base: 6, md: 8, lg: 10 }, 
+    paddingBlock: { base: 4, md: 6, lg: 8 } 
+    })}
 >
-  <div class={css({ textAlign: "center" })}>
-    <div
-      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black" })}
-    >
-      Total Overdue
-    </div>
-    <div
-      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate:true })}
-    >
-      {invoiceSummaryTotals.overdue}
-    </div>
-  </div>
-  <div class={css({ textAlign: "center" })}>
-    <div
-      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black", truncate: true })}
-    >
-      Total Outstanding
-    </div>
-    <div
-      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate: true })}
-    >
-      {invoiceSummaryTotals.outstanding}
-    </div>
-  </div>
-  <div class={css({ textAlign: "center" })}>
-    <div
-      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black" })}
-    >
-      Total Draft
-    </div>
-    <div
-      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate: true })}
-    >
-      {invoiceSummaryTotals.draft}
-    </div>
-  </div>
-  <div class={css({ textAlign: "center" })}>
-    <div
-      class={css({ color: "lightGray", fontSize: "sm", fontWeight: "black" })}
-    >
-      Total Paid
-    </div>
-    <div
-      class={css({ color: "purple", fontSize: "4xl", fontWeight: "black", truncate: true })}
-    >
-      {invoiceSummaryTotals.paid}
-    </div>
-  </div>
+  <InvoiceSummaryItem
+    title="Total Overdue"
+    amount={invoiceSummaryTotals.overdue}
+  />
+
+  <InvoiceSummaryItem
+    title="Total Outstanding"
+    amount={invoiceSummaryTotals.outstanding}
+  />
+  <InvoiceSummaryItem title="Total Draft" amount={invoiceSummaryTotals.draft} />
+  <InvoiceSummaryItem title="Total Paid" amount={invoiceSummaryTotals.paid} />
 </div>
 
 <PaginatedList store={clientInvoicesStore}>
@@ -158,11 +136,11 @@
   {#snippet skeleton()}
     <InvoiceRowSkeleton />
   {/snippet}
-  {#snippet row(invoice)}
+  {#snippet row(_item)}
     <InvoiceRow
-      {invoice}
-      onEdit={(inv) => goto(`/invoices/${inv.id}`)}
-      onDelete={(inv) => goto(`/invoices/${inv.id}`)}
+      invoice={_item}
+      onEdit={editPanel.open}
+      onDelete={deleteModal.open}
       onSendInvoice={async (inv) => {
         await clientInvoicesStore.updateInvoiceStatus(
           inv.id,
@@ -221,3 +199,60 @@
     />
   {/if}
 </Modal>
+
+<Modal
+  variant="panel"
+  bind:dialogEl={editPanel.dialogEl}
+  onClose={editPanel.close}
+>
+  {#snippet title()}
+    <h2
+      class={css({
+        fontFamily: "sansserif",
+        color: "daisyBush",
+        marginBlockEnd: 7,
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
+    >
+      Edit an Invoice
+    </h2>
+  {/snippet}
+
+  {#snippet description()}
+    <h2 class={css({ display: "none" })}>Edit an invoice</h2>
+  {/snippet}
+
+  {#if editPanel.item}
+    {#key editPanel.item.id}
+      <InvoiceForm
+        mode="edit"
+        bind:invoiceEdit={editPanel.item}
+        closePanel={editPanel.close}
+      />
+    {/key}
+  {/if}
+</Modal>
+
+<ConfirmDelete
+  item={deleteModal.item}
+  bind:dialogEl={deleteModal.dialogEl}
+  titleText="Are you sure you want to delete this invoice?"
+  onCancel={deleteModal.close}
+  onDelete={async () => {
+    if (!deleteModal?.item?.id) {
+      return;
+    }
+    await invoicesStore.deleteInvoice(deleteModal.item.id);
+    deleteModal.close();
+  }}
+>
+  {#snippet descriptionSnippet(_item)}
+    This will delete the invoice to
+    <span class={css({ color: "scarlet" })}>{_item?.name ?? "Unknown"}</span>
+    for
+    <span class={css({ color: "scarlet" })}
+      >{formatTotal(_item?.total ?? 0)}</span
+    >
+  {/snippet}
+</ConfirmDelete>

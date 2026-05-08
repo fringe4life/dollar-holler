@@ -9,7 +9,7 @@ const config: Config = {
     alias: {
       $features: "./src/lib/features",
       $lib: "./src/lib",
-      "styled-system": "./styled-system/*",
+      "styled-system": "./styled-system",
     },
     typescript: {
       config: (config) => ({

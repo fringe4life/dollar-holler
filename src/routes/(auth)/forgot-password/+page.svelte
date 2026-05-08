@@ -1,11 +1,11 @@
 <script lang="ts">
   import { css } from "styled-system/css";
   import { resolve } from "$app/paths";
+  import { authHeading } from "$features/auth/styles";
   import Alert from "$lib/components/Alert.svelte";
   import FormField from "$lib/components/FormField.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import Input from "$lib/components/ui/input/Input.svelte";
-  import { authHeading } from "$lib/styles";
   import type { PageProps } from "./$types";
 
   let { form }: PageProps = $props();
@@ -38,7 +38,7 @@
     >
       <a
         href={resolve("/login")}
-        class={css({ textDecoration: "underline", _hover: { textDecoration: "none" } })}
+        class={css({ textDecoration: {base:"underline", _hover: "none"} })}
         >Ready to login?</a
       >
     </p>

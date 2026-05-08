@@ -2,12 +2,14 @@
   import { StarIcon } from "@lucide/svelte";
   import { css, cx } from "styled-system/css";
   import {
+    between,
     circle,
     flex,
     grid,
     hstack,
     stack,
     vstack,
+    wrap,
   } from "styled-system/patterns";
   import { resolve } from "$app/paths";
   import AuroraBlob from "$features/landing-page/components/AuroraBlob.svelte";
@@ -26,7 +28,6 @@
     content="Create professional invoices, track payments, and manage clients — all from one beautiful dashboard."
   >
 </svelte:head>
-<!-- "px-4 pbs-4 md:pbs-10" -->
 <main
   class={css({
     paddingInline: 4,
@@ -36,23 +37,18 @@
   <LandingNav user={data?.user} />
   <!-- ═══════════════════════════════════════════════════ HERO -->
   <section
-    class={stack({align: "center", position: "relative",
+    class={hstack({
+      position: "relative",
       paddingBlockStart: 20,
       paddingBlockEnd: 16,
-      minBlockSize: "dvh",})}
+    })}
   >
     <!-- Aurora background blobs -->
     <AuroraBlob
-      color="lavenderIndigo"
-      size={600}
-      opacity="0.15"
-      position={{ insetInlineStart: 0, insetBlockStart: 0, translate: "25%" }}
+      className={cx(css({ insetInlineStart: 0, insetBlockStart: 0, translate: "25%", opacity: "0.1", backgroundColor: "lavenderIndigo" }),circle({size: 600}))}
     />
     <AuroraBlob
-      color="daisyBush"
-      size={400}
-      opacity="0.1"
-      position={{ insetInlineStart: 0, insetBlockEnd: 0, translate: "33%" }}
+      className={cx(css({ insetInlineStart: 0, insetBlockEnd: 0, translate: "33%", opacity: "0.1", backgroundColor: "daisyBush" }), circle({size: 400}))}
     />
     <div
       class={grid({
@@ -104,8 +100,7 @@
           Stop chasing payments. Create professional invoices, track payments,
           and manage clients — all from one beautiful dashboard.
         </p>
-        <!-- "flex flex-wrap items-center gap-3" -->
-        <div class={flex({ wrap: "wrap", align: "center", gap: 3 })}>
+        <div class={wrap({ align: "center", gap: 3 })}>
           {#if data?.user}
             <Button href={resolve("/invoices")} size="lg">
               Go to Dashboard →
@@ -117,7 +112,6 @@
             <Button href={resolve("/login")} size="lg"> Log in </Button>
           {/if}
         </div>
-        <!-- "text-sm text-stone-400" -->
         <p
           class={css({
             fontSize: "sm",
@@ -129,17 +123,14 @@
       </div>
 
       <!-- Right: Mock Invoice Card -->
-      <div
-        class={flex({justify: {base: "center", lg: "end" }, position: "relative" })}
-      >
+      <div class={flex({justify: "center", position: "relative" })}>
         <!-- Floating badge: Rating -->
         <div
-          class={flex({
-              align: "center",
+          class={hstack({
               gap: 2,
               position: "absolute",
-              insetInlineEnd:{base: 0, lg: -4},
-              insetBlockEnd: { lg: -4 },
+              insetInline:"auto",
+              insetBlockEnd: -4,
               zIndex: 10,
               rounded: "xl",
               shadow: "lg",
@@ -163,14 +154,12 @@
 
         <!-- Mock Invoice Card -->
         <div
-          // class="bg-whisper relative rounded-2xl border border-gray-200 shadow-2xl inline-full max-inline-md"
           class={css({ backgroundColor: "whisper", position: "relative", rounded: "2xl", borderWidth: 1, borderColor: "gray.200", shadow: "2xl", inlineSize: "full", maxInlineSize: "md" })}
           style="box-shadow: 0 25px 60px oklch(38.26% 0.202 288.17 / 0.18), 0 8px 20px oklch(0% 0 0 / 0.08);"
         >
           <!-- Floating badge: Payment -->
-          <!-- // class="absolute inset-s-1/2 -inset-bs-6 z-10 flex -translate-x-1/2 items-center gap-2 rounded-xl bg-white px-4 py-2.5 shadow-lg" -->
           <div
-            class={flex({ align:"center", gap: 2, position: "absolute", insetInlineStart: "50%", insetBlockEnd: -6, zIndex: 10, translate: "-50% 0" , rounded: "xl", backgroundColor: "white", paddingInline: 4, paddingBlock: 2.5, shadow: "lg" })}
+            class={flex({ align:"center", gap: 2, position: "absolute", insetInlineStart: "50%", insetBlockStart: -6, zIndex: 10, translate: "-50% 0" , rounded: "xl", backgroundColor: "white", paddingInline: 4, paddingBlock: 2.5, shadow: "lg" })}
           >
             <div
               class={cx(circle({size: 8}), flex({ align:"center",justify:"center", backgroundColor: "green.100", fontSize: "sm" }) )}
@@ -383,7 +372,7 @@
             </div>
 
             <!-- Total + Status -->
-            <div class={flex({ align: "center", justify: "space-between" })}>
+            <div class={between()}>
               <div>
                 <p
                   class={css({
@@ -468,7 +457,6 @@
       </div>
 
       <!-- Feature Cards Grid -->
-      <!-- "grid gap-6 sm:grid-cols-2 lg:grid-cols-4" -->
       <Features />
     </div>
   </section>
@@ -479,16 +467,10 @@
   >
     <!-- Subtle aurora blob -->
     <AuroraBlob
-      color="lavenderIndigo"
-      size={96}
-      opacity="0.20"
-      position={{ insetInlineEnd: 0, insetBlockEnd: 0, opacity: "0.20", filter: "auto", blur: "3xl", position: "absolute" }}
+      className={cx(circle({size: 96}),css({ insetInlineEnd: 0, insetBlockEnd: 0, opacity: "0.1", backgroundColor: "lavenderIndigo"  }))}
     />
     <AuroraBlob
-      color="black/20"
-      size={64}
-      opacity="0.20"
-      position={{ insetInlineStart: 0, insetBlockEnd: 0, backgroundColor: "black/20", filter: "auto", blur: "3xl", position: "absolute" }}
+      className={cx(circle({size: 64}),css({ insetInlineStart: 0, insetBlockEnd: 0, backgroundColor: "black/20", opacity: "0.1"  }))}
     />
 
     <div
@@ -522,16 +504,10 @@
   >
     <!-- Aurora blobs -->
     <AuroraBlob
-      color="daisyBush"
-      size={96}
-      opacity="0.40"
-      position={{ insetInlineStart: "1/2", insetBlockStart: 0, translate: "-1/2" }}
+      className={cx(circle({size: 96}), css({ insetInlineStart: "1/2", insetBlockStart: 0, translate: "-1/2", backgroundColor: "daisyBush", opacity: "0.4" }))}
     />
     <AuroraBlob
-      color="robinEggBlue"
-      size={72}
-      opacity="0.20"
-      position={{ insetInlineEnd: 0, insetBlockEnd: 0, translate: "1/3" }}
+      className={cx(circle({size: 72}), css({ insetInlineEnd: 0, insetBlockEnd: 0, translate: "1/3", backgroundColor: "robinEggBlue", opacity: "0.2" }))}
     />
 
     <div
@@ -567,7 +543,7 @@
         to streamline their invoicing.
       </p>
       <!-- "flex flex-col items-center gap-4" -->
-      <div class={vstack({ gap: 4, alignItems: "center" })}>
+      <div class={vstack({ gap: 4 })}>
         <Button
           href={resolve("/signup")}
           variant="auth"
@@ -598,10 +574,8 @@
   class={css({ backgroundColor: "daisyBush", borderTopWidth: 1, borderColor: "white/10", paddingBlock: 10 })}
 >
   <div
-    class={flex({
+    class={between({
       direction: { base: "column", sm: "row" },
-      align: "center",
-      justify: "space-between",
       gap: 4,
       maxInlineSize: "6xl",
       paddingInline: 6,
@@ -610,10 +584,8 @@
     <p class={css({ color: "pastelPurple", fontSize: "sm" })}>
       © 2026 Dollar Holler. All rights reserved.
     </p>
-    <!-- "flex items-center gap-6 text-sm" -->
     <nav
-      class={flex({
-          align: "center",
+      class={hstack({
           gap: 6,
           fontSize: "sm"
         })}
@@ -636,11 +608,10 @@
         })}
         >Clients</a
       >
-      <!-- "text-pastelPurple transition-colors duration-200 hover:text-white" -->
       <a
         href={resolve("/login")}
         class={css({
-          color: {base:"pastelPurple", _hover: "white"},
+          color: { base:"pastelPurple", _hover: "white" },
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
@@ -649,13 +620,10 @@
       <a
         href={resolve("/signup")}
         class={css({
-          color: "goldenFizz",
+          color: { base:"goldenFizz", _hover: "white" },
           fontWeight: "semibold",
           transitionProperty: "colors",
           transitionDuration: "normal",
-          _hover: {
-            color: "white",
-          },
         })}
         >Sign Up</a
       >

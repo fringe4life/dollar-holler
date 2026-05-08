@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { center, flex } from "styled-system/patterns";
   import { asset } from "$app/paths";
   import { page } from "$app/state";
 </script>
@@ -8,9 +8,7 @@
 <svelte:head><title>Not Found! | Doller Holla</title></svelte:head>
 
 <div
-  class={flex({
-    align: "center",
-    justify: "center",
+  class={center({
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
     backgroundImage: "var(--bg-error)",

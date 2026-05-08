@@ -8,7 +8,7 @@
   } from "$features/line-items/types";
   import Trash from "$lib/components/icons/Trash.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
-  import { invoiceLineItem } from "$lib/styles";
+  import { invoiceLineItem } from "../styles";
   import { lineItemFieldRecipe } from "./LineItemRecipe";
 
   let props: LineItemRowProps = $props();

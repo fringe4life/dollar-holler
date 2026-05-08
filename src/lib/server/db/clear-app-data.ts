@@ -6,7 +6,7 @@ import { neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-serverless";
 import { ENV } from "varlock/env";
 import { tableRelations } from "./relations";
-import { clients, invoices, lineItems, schemaTables, settings } from "./schema";
+import { clients, invoices, lineItems, settings } from "./schema";
 
 neonConfig.webSocketConstructor = globalThis.WebSocket;
 const pool = new Pool({ connectionString: ENV.DATABASE_URL });
@@ -14,7 +14,6 @@ const pool = new Pool({ connectionString: ENV.DATABASE_URL });
 const db = drizzle({
   client: pool,
   relations: tableRelations,
-  schema: { ...schemaTables, ...tableRelations },
 });
 
 async function main() {

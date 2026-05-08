@@ -2,8 +2,8 @@
   import MenuIcon from "@lucide/svelte/icons/menu";
   import XIcon from "@lucide/svelte/icons/x";
   import type { User } from "better-auth";
-  import { css, cx } from "styled-system/css";
-  import { flex, square, stack } from "styled-system/patterns";
+  import { css } from "styled-system/css";
+  import { between, hstack, square } from "styled-system/patterns";
   import { asset, resolve } from "$app/paths";
   import { Toggle } from "$lib/client/runes/Toggle.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
@@ -17,12 +17,6 @@
   let mobileOpen = new Toggle();
 </script>
 
-<!-- "
-    landing-nav not-supports-scroll-timeline:bg-whisper/95 fixed inset-x-0
-    inset-bs-0 z-50 not-supports-scroll-timeline:shadow-xs
-    not-supports-scroll-timeline:backdrop-blur-xs
-  " -->
-<!-- "nav-solidify linear both" -->
 <nav
   class={css({
       position: "fixed",
@@ -35,7 +29,6 @@
         shadow: "xs",
         backdropFilter: "xs",
       },
-
       _supportsScroll: {
         animationName: "nav-solidify",
         animationTimingFunction: "linear",
@@ -45,20 +38,18 @@
       },
     })}
 >
-  <!-- "mx-auto flex items-center justify-between px-6 py-4 max-inline-6xl" -->
   <div
-    class={cx(css({
+    class={between({
       marginInline: "auto",
       paddingInline: 6,
       paddingBlock: 4,
       maxInlineSize: "6xl",
-    }), flex({ align: "center", justify: "space-between" }))}
+    })}
   >
-    <!-- "flex items-center gap-2.5" -->
     <!-- Logo -->
     <a
       href={resolve("/")}
-      class={flex({ gap: 2.5, align: "center"})}
+      class={hstack({ gap: 2.5 })}
       onclick={mobileOpen.toggle}
     >
       <img
@@ -66,7 +57,6 @@
         alt="Dollar Holler"
         class={square({ size: 8 })}
       >
-      <!-- "font-sansserif text-daisyBush text-xl font-black tracking-tight" -->
       <span
         class={css({
           fontFamily: "sansserif",
@@ -79,7 +69,6 @@
         Dollar Holler
       </span>
     </a>
-    <!-- "hidden items-center gap-3 md:flex" -->
     <!-- Desktop Links -->
     <div
       class={css({
@@ -135,7 +124,7 @@
         display: { base: "flex", md: "none" },
       })}
     >
-      <div class={stack({ gap: 3, align: "center" })}>
+      <div class={hstack({ gap: 3 })}>
         {#if user}
           <Button
             href={resolve("/invoices")}

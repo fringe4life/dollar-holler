@@ -7,15 +7,17 @@
 
   let { children } = $props();
 
+  // value for determining where escape key or back link take you
   let previousPageLink: Maybe<string> = $derived(undefined);
-  const getBackUrl = $derived(previousPageLink ?? resolve("/invoices"));
-  let isExiting = $state(false);
-  let resolveNavigation: (() => void) | undefined;
-
   afterNavigate((navigation) => {
     previousPageLink = navigation?.from?.url?.pathname;
   });
+  // actual derived url
+  const getBackUrl = $derived(previousPageLink ?? resolve("/invoices"));
+  let isExiting = $state(false);
+  let resolveNavigation: (() => void) | undefined = $derived(undefined);
 
+  // used to run exit animation to slide the invoice down and out
   onNavigate(
     () =>
       new Promise((resolve) => {
@@ -58,7 +60,7 @@
         _starting: { translate: "0 var(--slide-distance)" },
       }),
       isExiting && css({
-        animationName: "--slide-down",
+        animationName: "slide-down",
         animationDuration: "normal",
         animationFillMode: "forwards",
       })

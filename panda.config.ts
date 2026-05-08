@@ -22,18 +22,6 @@ export default defineConfig({
   theme: {
     extend: {
       keyframes: {
-        "nav-solidify": {
-          from: {
-            backgroundColor: "transparent",
-            boxShadow: "none",
-            backdropFilter: "none",
-          },
-          to: {
-            backgroundColor: "oklch(from var(--colors-whisper) l c h / 0.95)",
-            boxShadow: "0 1px 3px oklch(from var(--colors-black) l c h / 0.1)",
-            backdropFilter: "sm",
-          },
-        },
         "slide-in": {
           from: {
             translate: "var(--slide-distance) 0",
@@ -164,5 +152,21 @@ export default defineConfig({
   minify: true,
   // The output directory for your css system
   outdir: "styled-system",
+  patterns: {
+    extend: {
+      between: {
+        description:
+          "a flex box that aligns items to center and justifies between",
+        transform(properties) {
+          return {
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            ...properties,
+          };
+        },
+      },
+    },
+  },
   // plugins: [pluginSvelte()],
 });

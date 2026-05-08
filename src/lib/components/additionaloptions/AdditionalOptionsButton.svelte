@@ -16,9 +16,10 @@
   {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
   onclick={additionalMenu.toggle}
   class={css({
-    color: { base:"pastelPurple", _hover: "daisyBush", _groupHover: "daisyBush/50" },
+    color: { base:"pastelPurple", _groupHover: "daisyBush/50", _hover: "daisyBush" },
     transitionProperty: "colors",
     transitionDuration: "normal",
+    cursor: "pointer",
   })}
 >
   <ThreeDots />

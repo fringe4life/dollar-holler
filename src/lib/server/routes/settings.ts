@@ -1,5 +1,3 @@
-/* eslint-disable new-cap */
-
 import { eq } from "drizzle-orm";
 import { Elysia, InternalServerError, NotFoundError } from "elysia";
 import {

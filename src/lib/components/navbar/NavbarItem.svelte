@@ -12,7 +12,7 @@
 
 <li
   class={css({
-    "&:not(:last-child)": { marginBlockEnd: "6" },
+    "&:not(:last-child)": { marginBlockEnd: 6 },
   })}
 >
   <a

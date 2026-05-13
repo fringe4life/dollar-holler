@@ -12,7 +12,7 @@
   data-slot="skeleton"
   aria-hidden="true"
   class={cx(
-    css({ animation: "pulse", rounded: "md", backgroundColor: "gray.500" }),
+    css({ animation: "pulse", rounded: "md", backgroundColor: "gray.300" }),
     className,
   )}
   {...restProps}

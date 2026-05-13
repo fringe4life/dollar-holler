@@ -242,13 +242,12 @@
   {/snippet}
 </InvoiceFormLayout>
 
-{#if deleteModal.item}
-  <ConfirmDelete
-    item={deleteModal.item}
-    dialogEl={deleteModal?.dialogEl}
-    titleText="Are you sure you want to delete this invoice?"
-    onCancel={deleteModal.close}
-    onDelete={async () => {
+<ConfirmDelete
+  item={deleteModal.item}
+  dialogEl={deleteModal?.dialogEl}
+  titleText="Are you sure you want to delete this invoice?"
+  onCancel={deleteModal.close}
+  onDelete={async () => {
       if (!deleteModal.item?.id) {
         return;
       }
@@ -256,12 +255,11 @@
       deleteModal.close();
       closePanel();
     }}
-  >
-    {#snippet descriptionSnippet(inv)}
-      This will delete the invoice to
-      <span class={css({color: "scarlet"})}>{inv.name}</span>
-      for
-      <span class={css({color: "scarlet"})}>{totalDisplay}</span>
-    {/snippet}
-  </ConfirmDelete>
-{/if}
+>
+  {#snippet descriptionSnippet(_invoice)}
+    This will delete the invoice to
+    <span class={css({color: "scarlet"})}>{_invoice?.name ?? "Unknown"}</span>
+    for
+    <span class={css({color: "scarlet"})}>{totalDisplay}</span>
+  {/snippet}
+</ConfirmDelete>

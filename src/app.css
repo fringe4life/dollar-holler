@@ -21,35 +21,42 @@
   }
 }
 
-:active-view-transition-type(forwards) {
+:active-view-transition-type(forward),
+:active-view-transition-type(backward) {
+  /* !important overrides the inline style set by Svelte */
+  & [data-swipeable] {
+    view-transition-name: none !important;
+  }
+  /* keep the rest of your existing rules below */
+}
+
+:active-view-transition-type(forward) {
   &::view-transition-old(paginated-list-rows) {
     --slide-distance: -60px;
     animation:
-      fade-out 250ms ease both,
-      slide-out 250ms ease both;
+      fade-out 250ms both,
+      slide-out 250ms both;
   }
-
   &::view-transition-new(paginated-list-rows) {
     --slide-distance: calc(100vw + 60px);
     animation:
-      fade-in 250ms ease both,
-      slide-in 250ms ease both;
+      fade-in 250ms both,
+      slide-in 250ms both;
   }
 }
 
-:active-view-transition-type(backwards) {
+:active-view-transition-type(backward) {
   &::view-transition-old(paginated-list-rows) {
     --slide-distance: calc(100vw + 60px);
     animation:
-      fade-out 250ms ease both,
-      slide-out 250ms ease both;
+      fade-out 250ms both,
+      slide-out 250ms both;
   }
-
   &::view-transition-new(paginated-list-rows) {
     --slide-distance: -60px;
     animation:
-      fade-in 250ms ease both,
-      slide-in 250ms ease both;
+      fade-in 250ms both,
+      slide-in 250ms both;
   }
 }
 

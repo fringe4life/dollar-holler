@@ -6,12 +6,12 @@ import type { Maybe } from "$lib/types";
  *
  * Example (edit panel):
  *   const editPanel = new ItemPanel<InvoiceSelect>();
- *   <SlidePanel bind:open={editPanel.toggle.isOn}>
+ *   <SlidePanel bind:dialogEl={editPanel.dialogEl}>
  *   handleEdit = (invoice) => editPanel.open(invoice);
  *
  * Example (delete modal):
  *   const deleteModal = new ItemPanel<InvoiceListResponse>();
- *   <ConfirmDelete bind:open={deleteModal.toggle.isOn} ... />
+ *   <ConfirmDelete bind:dialogEl={deleteModal.dialogEl} ... />
  *   handleDeleteClick = (invoice) => deleteModal.open(invoice);
  */
 export class ItemPanel<T> {

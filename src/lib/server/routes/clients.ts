@@ -164,8 +164,8 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       },
     }
   )
-  // PUT /api/clients/:id - Update client
-  .put(
+  // PATCH /api/clients/:id - Update client
+  .patch(
     "/:id",
     async ({ params: { id }, body, user }) => {
       try {
@@ -190,7 +190,6 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     {
       params: idResponseSchema,
       body: clientUpdateSchema,
-
       authMutation: true,
       detail: {
         operationId: "updateClient",
@@ -208,7 +207,7 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
   )
   // PATCH /api/clients/:id - Update client status only
   .patch(
-    "/:id",
+    "/status/:id",
     async ({ params: { id }, body, user }) => {
       try {
         const [updated] = await db

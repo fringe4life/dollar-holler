@@ -120,7 +120,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   async updateClientStatus(clientId: CursorId, clientStatus: ClientStatus) {
     try {
       const { id, ...rest } = await unwrapTreaty(
-        apiClient.clients({ id: clientId }).patch({ clientStatus }),
+        apiClient.clients.status({ id: clientId }).patch({ clientStatus }),
         { fallbackMessage: "Failed to update client status" }
       );
 
@@ -185,7 +185,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
     try {
       const body = transformNullToUndefined(patch);
       const responseData = await unwrapTreaty(
-        apiClient.clients({ id }).put(body),
+        apiClient.clients({ id }).patch(body),
         {
           fallbackMessage: this.fallbackFor(StoreOperation.updateOne),
         }

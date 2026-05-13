@@ -217,7 +217,7 @@ export const settings = pgTable("settings", {
     .$onUpdate(() => /* @__PURE__ */ new Date()),
 });
 
-// Relations (Drizzle Relations v2 - defineRelations)
+// complete schema tables
 export const schemaTables = {
   user,
   session,

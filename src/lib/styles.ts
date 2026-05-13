@@ -1,5 +1,5 @@
-import { css } from "styled-system/css";
-import { grid } from "styled-system/patterns";
+import { css, cx } from "styled-system/css";
+import { grid, hoverShadow } from "styled-system/patterns";
 
 export const actionButton = grid({
   justifyItems: "center",
@@ -7,30 +7,17 @@ export const actionButton = grid({
   color: "daisyBush",
 });
 
-export const tableRowHover = css({
-  transitionProperty: "translate",
-  transitionDuration: "normal",
-  transitionTimingFunction: "anticipate",
-  position: "relative",
-  _after: {
-    content: '""',
-    position: "absolute",
-    inset: 0,
-    opacity: 0,
-    zIndex: -1,
-    borderRadius: "lg",
-    boxShadow: "tableRowHover",
-    transitionProperty: "opacity",
+export const tableRowHover = cx(
+  css({
+    transitionProperty: "translate",
     transitionDuration: "normal",
     transitionTimingFunction: "anticipate",
-  },
-  _hover: {
-    translate: "0 -2px",
-    _after: {
-      opacity: "1",
+    _hover: {
+      translate: "0 -2px",
     },
-  },
-});
+  }),
+  hoverShadow({ shadow: "tableRowHover" })
+);
 
 export const tableRowBase = css({
   alignItems: "center",

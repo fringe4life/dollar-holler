@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css, cx } from "styled-system/css";
-  import { flex, gridItem } from "styled-system/patterns";
+  import { cq, flex, gridItem, vstack } from "styled-system/patterns";
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -28,7 +28,7 @@
 
 <svelte:window onkeydown={handleKeypress} />
 
-<header class={gridItem({ colSpan: { md: 3 }, zIndex: 20 })}>
+<header class={cx(gridItem({ colSpan: { md: 3 }, zIndex: 20 }), cq())}>
   <!-- mobile nav control -->
   <button
     class={cx(
@@ -77,8 +77,7 @@
   </button>
   <nav
     id="primary-navigation"
-    class={cx("group", flex({
-    direction: "column",
+    class={cx("group", vstack({
     backgroundColor: "daisyBush",
     position: { base: "fixed", md: "sticky" },
     inset: 0,
@@ -96,7 +95,7 @@
     blockSize: { md: "100dvh" },
   }))}
   >
-    <div class={css({ marginBlock: {md: 10}, marginBlockEnd: {md:24} })}>
+    <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>
       <a href={resolve("/")}>
         <img
           class={css({ marginInline: "auto" })}
@@ -110,8 +109,8 @@
       style:--active-nav-right={`url(${asset('/images/active-nav--right.svg')})`}
       class={cx("group", css({
       listStyle: "none",
-      fontSize: "2xl",
-      fontWeight: { base: "medium", lg: "bold" },
+      fontSize: { base: "xl", "@/xs": "2xl" },
+      fontWeight: { base: "medium", "@/xs": "semibold" },
     }))}
     >
       {#each navItems as { href, title } (title)}

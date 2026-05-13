@@ -42,9 +42,11 @@
     align: "right",
   });
 </script>
-<!-- "invoice-line-item border-daisyBush border-b-2 pbe-2" -->
 <div
-  class={cx(invoiceLineItem, css({ borderColor: "daisyBush", borderBottomWidth: 2, paddingBlockEnd: 2 }))}
+  class={cx(invoiceLineItem, css({ 
+    borderColor: "daisyBush", 
+    borderBottomWidth: 2, 
+    paddingBlockEnd: 2 }))}
 >
   <div class={lineItemHeaders}>Description</div>
   <div class={cx(lineItemHeaders, css({ textAlign: "right" }))}>Unit price</div>
@@ -75,7 +77,6 @@
 {/if}
 
 <div class={invoiceLineItem}>
-  <!-- "col-span-1 sm:col-span-2" -->
   <div class={gridItem({ colSpan: { base: 1, sm: 2 } })}>
     {#if isEditable && props.mode === "edit"}
       <Button variant="textOnly" onclick={props.addLineItem}
@@ -83,14 +84,13 @@
       >
     {/if}
   </div>
-  <!-- "text-monsoon py-5 text-right font-bold print:col-span-3" -->
   <div
-    class={gridItem({ color: "monsoon", paddingBlock: "5", textAlign: "right", fontWeight: "bold", colSpan: { _print: 3 } })}
+    class={gridItem({ color: "monsoon", paddingBlock: 5, textAlign: "right", fontWeight: "bold", colSpan: { _print: 3 } })}
   >
     Subtotal
   </div>
   <div
-    class={css({ paddingBlock: "5", textAlign: "right", fontFamily: "mono" })}
+    class={gridItem({ paddingBlock: 5, textAlign: "right", fontFamily: "mono" })}
   >
     {subTotal}
   </div>
@@ -102,7 +102,7 @@
   >
     Discount
   </p>
-  <div class={css({ position: "relative" })}>
+  <div class={gridItem({ position: "relative" })}>
     <input
       class={cx(discountStyles.input, css({ paddingInlineEnd: 3 }))}
       type="number"
@@ -118,14 +118,18 @@
       >%</span
     >
   </div>
-  <div class={css({ paddingBlock: 5, textAlign: "right", fontFamily: "mono" })}>
+  <div
+    class={gridItem({ paddingBlock: 5, textAlign: "right", fontFamily: "mono" })}
+  >
     {centsToDollars(discountAmount)}
   </div>
 </div>
 
 <div class={invoiceLineItem}>
   <div
-    class={gridItem({ gridColumn: { base: "span 3", sm: "1 / -1", _print: "1 / -1" } })}
+    class={gridItem({ 
+      gridColumn: { base: "span 3", sm: "1 / -1", _print: "1 / -1" } 
+    })}
   >
     <CircledAmount amount={total} label="Total." />
   </div>

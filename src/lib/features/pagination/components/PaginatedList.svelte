@@ -78,7 +78,7 @@
         class={flex({
           direction: "column-reverse",
           justify: "flex-end",
-          gap: 4,
+          gap: { base: 10, sm: 4 },
           blockSize: "full",
         })}
         style:view-transition-name="paginated-list-rows"

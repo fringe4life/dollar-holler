@@ -8,20 +8,20 @@
   let tableHeaders = ["Status", "Due Date", "ID", "Client", "Amount"] as const;
 </script>
 <TableHeader headers={tableHeaders} className={invoiceTable} {emptyState}>
-  {#snippet headerSnippet(title, emptyState)}
+  {#snippet headerSnippet(_title, _emptyState)}
     <h3
       class={css({
         fontSize: "xl",
         lineHeight: "snug",
         fontWeight: "bold",
-        textAlign: title === "Amount" ? "right" : undefined,
-        overflow: title === "Client" ? "hidden" : undefined,
-        textOverflow: title === "Client" ? "ellipsis" : undefined,
-        whiteSpace: title === "Client" ? "nowrap" : undefined,
-        color: emptyState ? "pastelPurple" : "daisyBush",
+        textAlign: _title === "Amount" ? "right" : undefined,
+        overflow: _title === "Client" ? "hidden" : undefined,
+        textOverflow: _title === "Client" ? "ellipsis" : undefined,
+        whiteSpace: _title === "Client" ? "nowrap" : undefined,
+        color: _emptyState ? "pastelPurple" : "daisyBush",
       })}
     >
-      {title}
+      {_title}
     </h3>
   {/snippet}
 </TableHeader>

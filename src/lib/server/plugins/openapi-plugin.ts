@@ -6,7 +6,7 @@ import {
   getBetterAuthOpenApiPaths,
 } from "$lib/server/utils/better-auth-openapi";
 
-const enabled = dev;
+const enabled = dev ?? false;
 
 const betterAuthOpenApi = enabled
   ? await Promise.all([

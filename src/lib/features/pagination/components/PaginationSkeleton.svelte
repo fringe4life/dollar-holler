@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { between, flex, hstack, square } from "styled-system/patterns";
+  import { between, hstack, square } from "styled-system/patterns";
   import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
 </script>
 

@@ -66,9 +66,9 @@
   {#snippet skeleton()}
     <ClientRowSkeleton />
   {/snippet}
-  {#snippet row(client)}
+  {#snippet row(_client)}
     <ClientRow
-      {client}
+      client={_client}
       onEdit={editPanel.open}
       onDelete={deleteModal.open}
       onActivate={handleActivate}
@@ -149,23 +149,21 @@
   </Modal>
 {/if}
 
-{#if deleteModal.item}
-  <ConfirmDelete
-    item={deleteModal.item}
-    bind:dialogEl={deleteModal.dialogEl}
-    titleText="Are you sure you want to delete this client?"
-    onCancel={deleteModal.close}
-    onDelete={async () => {
+<ConfirmDelete
+  item={deleteModal.item}
+  bind:dialogEl={deleteModal.dialogEl}
+  titleText="Are you sure you want to delete this client?"
+  onCancel={deleteModal.close}
+  onDelete={async () => {
       if (!deleteModal?.item?.id) {
         return;
       }
       await clientsStore.deleteClient(deleteModal.item.id);
       deleteModal.close();
     }}
-  >
-    {#snippet descriptionSnippet(client)}
-      This will delete Client:
-      <span class={css({ color: "scarlet" })}>{client.name}</span>
-    {/snippet}
-  </ConfirmDelete>
-{/if}
+>
+  {#snippet descriptionSnippet(_client)}
+    This will delete Client:
+    <span class={css({ color: "scarlet" })}>{_client?.name ?? "Unknown"}</span>
+  {/snippet}
+</ConfirmDelete>

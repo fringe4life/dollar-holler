@@ -14,18 +14,18 @@
   className={cx(clientTable, className)}
   {emptyState}
 >
-  {#snippet headerSnippet(title, emptyState)}
+  {#snippet headerSnippet(_title, _emptyState)}
     <h3
       class={css({
         fontSize: "xl",
         lineHeight: "snug",
         fontWeight: "bolder",
         textAlign:
-          title === "Received" || title === "Balanced" ? "right" : undefined,
-        color: emptyState ? "pastelPurple" : "daisyBush",
+          _title === "Received" || _title === "Balanced" ? "right" : undefined,
+        color: _emptyState ? "pastelPurple" : "daisyBush",
       })}
     >
-      {title}
+      {_title}
     </h3>
   {/snippet}
 </TableHeader>

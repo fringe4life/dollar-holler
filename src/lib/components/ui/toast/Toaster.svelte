@@ -79,29 +79,29 @@
 
 <Portal>
   <ArkToaster {toaster}>
-    {#snippet children(toastValue)}
+    {#snippet children(_toastValue)}
       <Toast.Root
-        class={toastRootRecipe({ type: getToastVariant(toastValue().type) }).root}
+        class={toastRootRecipe({ type: getToastVariant(_toastValue().type) }).root}
       >
         <Toast.Title
-          class={toastRootRecipe({ type: getToastVariant(toastValue().type) }).title}
-          >{toastValue().title}</Toast.Title
+          class={toastRootRecipe({ type: getToastVariant(_toastValue().type) }).title}
+          >{_toastValue().title}</Toast.Title
         >
         <Toast.CloseTrigger
           class={toastRootRecipe({
-            type: getToastVariant(toastValue().type),
+            type: getToastVariant(_toastValue().type),
           }).closeTrigger}
           aria-label="Close notification"
         >
           x
         </Toast.CloseTrigger>
-        {#if toastValue().description}
+        {#if _toastValue().description}
           <Toast.Description
             class={toastRootRecipe({
-              type: getToastVariant(toastValue().type),
+              type: getToastVariant(_toastValue().type),
             }).description}
           >
-            {toastValue().description}
+            {_toastValue().description}
           </Toast.Description>
         {/if}
       </Toast.Root>

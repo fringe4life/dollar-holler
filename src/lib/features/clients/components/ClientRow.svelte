@@ -149,9 +149,12 @@
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
-      {#snippet content(additionalMenu)}
-        <AdditionalOptionsButton {additionalMenu} />
-        <AdditionalOptionsList {additionalMenu} options={CLIENT_OPTIONS} />
+      {#snippet content(_additionalMenu)}
+        <AdditionalOptionsButton additionalMenu={_additionalMenu} />
+        <AdditionalOptionsList
+          additionalMenu={_additionalMenu}
+          options={CLIENT_OPTIONS}
+        />
       {/snippet}
     </AdditionalOptions>
   {/snippet}

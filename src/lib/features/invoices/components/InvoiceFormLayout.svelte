@@ -156,7 +156,6 @@
   </FormField>
 
   <!-- issue date -->
-  <!-- "field col-span-3 sm:col-span-2 md:col-start-5" -->
   <FormField
     label="Issue Date"
     forId="issueDate"
@@ -226,7 +225,7 @@
   <!-- buttons -->
   <FormField class={gridItem({ colSpan: 2 })}>{@render buttons?.()}</FormField>
   <FormField class={gridItem({ colSpan: 4, justifySelf: "end", columnGap: 5 })}>
-    <Button variant="secondary" onclick={() => closePanel()}>Cancel</Button>
+    <Button variant="secondary" onclick={closePanel}>Cancel</Button>
     <Button variant="default" type="submit">Save</Button>
   </FormField>
 </form>

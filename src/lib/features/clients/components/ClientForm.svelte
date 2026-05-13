@@ -62,9 +62,7 @@
   };
 </script>
 
-<!-- "grid grid-cols-6 gap-x-5" -->
 <form class={grid({ columns: 6, columnGap: 5 })} onsubmit={handleSubmit}>
-  <!-- "field col-span-full" -->
   <FormField label="Client Name" forId="name" class={gridItem({ colSpan: 6 })}>
     <Input
       type="text"

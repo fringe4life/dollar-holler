@@ -64,7 +64,12 @@
 </script>
 
 <div
-  class={grid({ inlineSize: "full", gridAutoFlow: "column", gridTemplateColumns: "24px 1fr", alignItems: "baseline", columnGap: 2 })}
+  class={grid({ 
+    inlineSize: "full", 
+    gridAutoFlow: "column", 
+    gridTemplateColumns: "24px 1fr", 
+    alignItems: "baseline", 
+    columnGap: 2 })}
   aria-busy={loading.isOn}
 >
   <span

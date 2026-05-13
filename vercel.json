@@ -1,6 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "panda codegen && panda cssgen && varlock run -- bun --bun run build",
+  "buildCommand": "svelte-kit sync && panda codegen && panda cssgen && bun --bun run build",
   "installCommand": "bun install",
   "framework": "sveltekit",
   "git": {

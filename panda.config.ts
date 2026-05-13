@@ -20,6 +20,7 @@ export default defineConfig({
   },
   // Useful for theme customization
   theme: {
+    containerSizes: { xs: "20ch" },
     extend: {
       keyframes: {
         "slide-in": {
@@ -163,6 +164,34 @@ export default defineConfig({
             alignItems: "center",
             justifyContent: "space-between",
             ...properties,
+          };
+        },
+      },
+      hoverShadow: {
+        description:
+          "reveals a box shadow via an ::after pseudo-element on hover",
+        properties: {
+          shadow: { type: "token", value: "shadows" },
+        },
+        transform({ shadow }) {
+          return {
+            position: "relative",
+            _after: {
+              content: '""',
+              position: "absolute",
+              inset: "0",
+              rounded: "inherit",
+              opacity: "0",
+              boxShadow: shadow,
+              transitionProperty: "opacity",
+              transitionDuration: "normal",
+              zIndex: -1,
+            },
+            _hover: {
+              _after: {
+                opacity: "1",
+              },
+            },
           };
         },
       },

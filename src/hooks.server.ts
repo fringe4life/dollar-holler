@@ -1,31 +1,28 @@
+// biome-ignore lint/performance/noNamespaceImport: way to use sentry
+import * as Sentry from "@sentry/sveltekit";
 import { type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/environment";
 import { auth } from "$lib/auth.server";
-import { tryCatch } from "$lib/utils/try-catch";
 
 // get session from better auth and populate locals
 const localsHandler: Handle = async ({ event, resolve }) => {
-  const { data: result } = await tryCatch(() =>
-    auth.api.getSession({
-      headers: event.request.headers,
-    })
-  );
-  if (result) {
+  const result = await auth.api.getSession({
+    headers: event.request.headers,
+  });
+
+  if (result?.user) {
     event.locals.user = result.user;
   }
-  return resolve(event);
-};
 
-// auth handler for better auth routes
-const authHandler: Handle = async ({ event, resolve }) =>
-  svelteKitHandler({
+  return svelteKitHandler({
     event,
     resolve,
     auth,
     building,
   });
+};
 
 const PROTECTED_ROUTES = ["/invoices", "/clients", "/settings"];
 
@@ -59,9 +56,11 @@ const fontPreloadHandler: Handle = async ({ event, resolve }) =>
     preload: ({ type }) => type === "js" || type === "css" || type === "font",
   });
 
+// Order: Sentry instruments the request first; session/locals before auth; preload last on resolve.
 export const handle: Handle = sequence(
+  Sentry.sentryHandle(),
   localsHandler,
-  authHandler,
   authGuard,
   fontPreloadHandler
 );
+export const handleError = Sentry.handleErrorWithSentry();

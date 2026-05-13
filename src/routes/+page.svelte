@@ -3,6 +3,7 @@
   import { css, cx } from "styled-system/css";
   import {
     between,
+    center,
     circle,
     flex,
     grid,
@@ -162,7 +163,7 @@
             class={flex({ align:"center", gap: 2, position: "absolute", insetInlineStart: "50%", insetBlockStart: -6, zIndex: 10, translate: "-50% 0" , rounded: "xl", backgroundColor: "white", paddingInline: 4, paddingBlock: 2.5, shadow: "lg" })}
           >
             <div
-              class={cx(circle({size: 8}), flex({ align:"center",justify:"center", backgroundColor: "green.100", fontSize: "sm" }) )}
+              class={cx(circle({size: 8}), center({ backgroundColor: "green.100", fontSize: "sm" }) )}
             >
               💰
             </div>
@@ -195,12 +196,7 @@
               paddingBlock: 4,
             })}
           >
-            <div
-              class={hstack({
-                alignItems: "center",
-                justify: "space-between",
-              })}
-            >
+            <div class={between()}>
               <div>
                 <p
                   class={css({ fontFamily: "sansserif", fontSize: "xs", fontWeight: "bold", letterSpacing: "widest", textTransform: "uppercase", color: "goldenFizz" })}
@@ -347,11 +343,10 @@
                   >
                 </div>
                 <div
-                  class={css({
-                  display: "grid",
+                  class={grid({
                   gridTemplateColumns: "1fr auto",
-                  paddingInline: "4",
-                  paddingBlock: "3",
+                  paddingInline: 4,
+                  paddingBlock: 3,
                   fontSize: "sm",
                 })}
                 >
@@ -484,7 +479,7 @@
           Real People, Real Results
         </p>
         <h2
-          class={css({ fontFamily: "sansserif", fontSize: "4xl", fontWeight: "black", color: "white", sm: { fontSize: "5xl" } })}
+          class={css({ fontFamily: "sansserif", fontSize: {base:"4xl", sm: "5xl"}, fontWeight: "black", color: "white" })}
         >
           What our customers say
         </h2>
@@ -542,7 +537,6 @@
         Join thousands of freelancers and small businesses who use Dollar Holler
         to streamline their invoicing.
       </p>
-      <!-- "flex flex-col items-center gap-4" -->
       <div class={vstack({ gap: 4 })}>
         <Button
           href={resolve("/signup")}

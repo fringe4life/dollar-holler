@@ -1,3 +1,4 @@
+import { sentrySvelteKit } from "@sentry/sveltekit";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { varlockVitePlugin } from "@varlock/vite-integration";
 // Chrome DevTools workspace (com.chrome.devtools.json); not the same as Vite 8's optional @vitejs/devtools
@@ -5,31 +6,43 @@ import { varlockVitePlugin } from "@varlock/vite-integration";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import devToolsJson from "vite-plugin-devtools-json";
-export default defineConfig({
-  plugins: [
-    visualizer({
-      filename: "stats.html", // written next to project root by default
-      gzipSize: true,
-      brotliSize: true,
-      template: "treemap", // or "sunburst" / "network"
-    }),
-    devToolsJson(),
-    varlockVitePlugin({
-      ssrInjectMode: "resolved-env",
-    }),
-    sveltekit(),
-  ],
-  preview: {
-    port: 5173,
-  },
-  build: {
-    rolldownOptions: {
-      output: { minify: { compress: { dropConsole: true } } },
+export default defineConfig(({ mode }) => {
+  const shouldUseSentry = mode !== "development";
+
+  const sentryPlugin = shouldUseSentry
+    ? sentrySvelteKit({
+        org: "coinnich",
+        project: "javascript-sveltekit",
+        authToken: process.env.SENTRY_AUTH_TOKEN,
+      })
+    : [];
+  return {
+    plugins: [
+      sentryPlugin,
+      visualizer({
+        filename: "stats.html", // written next to project root by default
+        gzipSize: true,
+        brotliSize: true,
+        template: "treemap", // or "sunburst" / "network"
+      }),
+      devToolsJson(),
+      varlockVitePlugin({
+        ssrInjectMode: "resolved-env",
+      }),
+      sveltekit(),
+    ],
+    preview: {
+      port: 5173,
     },
-  },
-  server: {
-    fs: {
-      allow: ["styled-system"],
+    build: {
+      rolldownOptions: {
+        output: { minify: { compress: { dropConsole: true } } },
+      },
     },
-  },
+    server: {
+      fs: {
+        allow: ["styled-system"],
+      },
+    },
+  };
 });

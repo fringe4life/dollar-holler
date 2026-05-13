@@ -2,7 +2,8 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { css } from "styled-system/css";
-  import { between, flex, hstack, square } from "styled-system/patterns";
+  import { between, hstack, square } from "styled-system/patterns";
+  import { tick } from "svelte";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
@@ -59,7 +60,10 @@
     try {
       await document.startViewTransition({
         types: [direction],
-        update: () => navigateWithQuery(next),
+        update: async () => {
+          await navigateWithQuery(next);
+          // await tick();
+        },
       }).finished;
     } catch {
       await navigateWithQuery(next);

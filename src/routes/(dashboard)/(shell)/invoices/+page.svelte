@@ -60,9 +60,9 @@
   {#snippet skeleton()}
     <InvoiceRowSkeleton />
   {/snippet}
-  {#snippet row(invoice)}
+  {#snippet row(_invoice)}
     <InvoiceRow
-      {invoice}
+      invoice={_invoice}
       onEdit={editPanel.open}
       onDelete={deleteModal.open}
       onSendInvoice={async (inv) => {
@@ -156,12 +156,12 @@
       deleteModal.close();
     }}
 >
-  {#snippet descriptionSnippet(invoice)}
+  {#snippet descriptionSnippet(_invoice)}
     This will delete the invoice to
-    <span class={css({ color: "scarlet" })}>{invoice?.name ?? "Unknown"}</span>
+    <span class={css({ color: "scarlet" })}>{_invoice?.name ?? "Unknown"}</span>
     for
     <span class={css({ color: "scarlet" })}
-      >{formatTotal(invoice?.total ?? 0)}</span
+      >{formatTotal(_invoice?.total ?? 0)}</span
     >
   {/snippet}
 </ConfirmDelete>

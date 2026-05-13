@@ -60,8 +60,7 @@
   };
 
   const lineItemLabel = css({
-    display: { base: "none", sm: "block" },
-    _print: { display: "none" },
+    display: { base: "none", sm: "block", _print: "none" },
   });
 
   const qtyStyles = lineItemFieldRecipe({
@@ -77,7 +76,7 @@
     align: "right",
   });
 </script>
-<!-- "invoice-line-item border-fog border-b-2 py-4 sm:py-2" -->
+
 <div
   class={cx(invoiceLineItem, css({ borderColor: "fog", borderBottomWidth: 2, paddingBlock: { base: 4, sm: 2 } }))}
 >
@@ -148,9 +147,9 @@
       disabled
     >
   </div>
-  <!-- absolute inset-e-0 inset-bs-0 sm:static -->
+
   <div
-    class={gridItem({ gridArea: "trash", placeSelf: "center", position: {base: "absolute", sm: "static"}, insetInlineEnd: "0", insetBlockStart: "0" })}
+    class={gridItem({ gridArea: "trash", placeSelf: "center", position: { base: "absolute", sm: "static" }, insetInlineEnd: "0", insetBlockStart: "0" })}
   >
     {#if props.canDelete && isEditable}
       <Button

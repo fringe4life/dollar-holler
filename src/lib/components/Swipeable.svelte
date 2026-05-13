@@ -26,6 +26,7 @@
     isolation: "isolate",
   })}
   style:view-transition-name={contentViewTransitionName}
+  data-swipeable
 >
   <!-- CONTENT displayed by default -->
   <div

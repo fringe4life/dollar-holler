@@ -27,3 +27,5 @@ stats.html
 ## Panda
 styled-system
 styled-system-studio
+# Sentry Config File
+.env.sentry-build-plugin

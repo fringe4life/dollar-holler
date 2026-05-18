@@ -1,13 +1,24 @@
+import { Pool } from "@neondatabase/serverless";
+import { drizzle } from "drizzle-orm/neon-serverless";
+import { ENV } from "varlock/env";
 import type { ClientInsert, ClientSelect } from "$features/clients/types";
-import type { InvoiceInsert } from "$features/invoices/types";
 import type { LineItemInsert } from "$features/line-items/types";
-import { createId } from "$features/pagination/utils/create-uuidv7.server";
 import type { SettingsInsert } from "$features/settings/types";
+import { appendInvoiceNotesTermsHtmlForInsert } from "$lib/server/utils/invoice-notes-terms-html.server";
 import type { CursorId } from "$lib/types";
-import { db } from ".";
+import { createId } from "../utils/create-id";
+import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
 
+const DATABASE_URL = ENV.DATABASE_URL;
+
+const pool = new Pool({ connectionString: DATABASE_URL });
+const db = drizzle({
+  client: pool,
+  relations: tableRelations,
+  jit: true,
+});
 // Helper function to generate random date within last 6 months
 function randomDateWithinLast6Months(): Date {
   const now = new Date();
@@ -123,7 +134,7 @@ async function main() {
     "Training workshop",
   ];
 
-  const invoicesData: Array<InvoiceInsert & { userId: string }> = [];
+  const invoicesData: (typeof invoices.$inferInsert)[] = [];
   const lineItemsData: Array<
     LineItemInsert & { userId: string; invoiceId: CursorId }
   > = [];
@@ -163,6 +174,10 @@ async function main() {
       const dueDate = randomDateWithinLast3Months();
       invoiceSeq += 1;
 
+      const notes = Math.random() > 0.5 ? "**Important** please review." : null;
+      const terms =
+        Math.random() > 0.6 ? "_Payment due within 30 days._" : null;
+
       invoicesData.push({
         id: invoiceId,
         userId: u.id,
@@ -173,8 +188,9 @@ async function main() {
         issueDate,
         dueDate,
         discount: Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0,
-        notes: Math.random() > 0.5 ? "**Important** please review." : null,
-        terms: Math.random() > 0.6 ? "_Payment due within 30 days._" : null,
+        notes,
+        terms,
+        ...appendInvoiceNotesTermsHtmlForInsert({ notes, terms }),
         invoiceStatus: (["draft", "sent", "paid"] as const)[
           Math.floor(Math.random() * 3)
         ] as InvoiceStatus,

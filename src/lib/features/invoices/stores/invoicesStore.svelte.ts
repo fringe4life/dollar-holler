@@ -50,12 +50,22 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
     );
   }
 
-  async loadInvoiceById(id: string): Promise<Maybe<InvoiceSelect>> {
+  async loadInvoiceById(
+    id: string,
+    options?: { signal?: AbortSignal }
+  ): Promise<Maybe<InvoiceSelect>> {
     const fallback = this.fallbackFor(StoreOperation.loadOne);
     try {
-      return await unwrapTreaty(apiClient.invoices({ id }).get(), {
-        fallbackMessage: fallback,
-      });
+      return await unwrapTreaty(
+        apiClient
+          .invoices({ id })
+          .get(
+            options?.signal ? { fetch: { signal: options.signal } } : undefined
+          ),
+        {
+          fallbackMessage: fallback,
+        }
+      );
     } catch (error) {
       if (isAbortError(error)) {
         return null;
@@ -125,6 +135,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
         (invoice) => invoice.id === responseData.id
       );
       if (index !== -1) {
+        // PATCH returns `{ id }` only; list rows omit notes/terms HTML anyway.
         this.items[index] = {
           ...this.items[index],
           ...patch,

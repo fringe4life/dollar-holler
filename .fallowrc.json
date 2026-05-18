@@ -9,7 +9,9 @@
     "boundary-violation": "warn"
   },
   "duplicates": {
-    "ignore": ["src/lib/server/db/schema.ts"]
+    "ignore": ["src/lib/server/db/schema.ts"],
+    "enabled": true,
+    "minOccurrences": 3
   },
   "ignorePatterns": ["src/instrumentation.server.ts"],
   "boundaries": {

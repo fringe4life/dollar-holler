@@ -13,10 +13,7 @@
   import InvoiceRowSkeleton from "$features/invoices/components/InvoiceRowSkeleton.svelte";
   import InvoiceSummaryItem from "$features/invoices/components/InvoiceSummaryItem.svelte";
   import { ClientInvoicesStore } from "$features/invoices/stores/clientInvoicesStore.svelte";
-  import type {
-    InvoiceListResponse,
-    InvoiceSelect,
-  } from "$features/invoices/types";
+  import type { InvoiceListResponse } from "$features/invoices/types";
   import ItemsHeader from "$features/pagination/components/ItemsHeader.svelte";
   import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
@@ -29,7 +26,7 @@
   import Modal from "$lib/components/Modal.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton } from "$lib/types";
+  import type { BitsButton, CursorId } from "$lib/types";
   import { centsToDollars, formatTotal } from "$lib/utils/moneyHelpers";
 
   let { data } = $props();
@@ -73,7 +70,7 @@
   });
 
   const formPanel = new ItemPanel<undefined>();
-  const editPanel = new ItemPanel<InvoiceSelect>();
+  const editPanel = new ItemPanel<CursorId>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
   let isEditing = $state<ClientFormProps["formState"]>("create");
   const { invoices: invoicesStore } = getDashboardStores();
@@ -106,14 +103,14 @@
 </div>
 
 <div
-  class={grid({ 
-    columns: { base: 1, sm: 2, lg: 4 }, 
-    gap: 4, 
-    marginBlockEnd: 10, 
-    backgroundColor: "gallery", 
-    borderRadius: "lg", 
-    paddingInline: { base: 6, md: 8, lg: 10 }, 
-    paddingBlock: { base: 4, md: 6, lg: 8 } 
+  class={grid({
+    columns: { base: 1, sm: 2, lg: 4 },
+    gap: 4,
+    marginBlockEnd: 10,
+    backgroundColor: "gallery",
+    borderRadius: "lg",
+    paddingInline: { base: 6, md: 8, lg: 10 },
+    paddingBlock: { base: 4, md: 6, lg: 8 }
     })}
 >
   <InvoiceSummaryItem
@@ -139,7 +136,7 @@
   {#snippet row(_item)}
     <InvoiceRow
       invoice={_item}
-      onEdit={editPanel.open}
+      onEdit={(inv) => editPanel.open(inv.id)}
       onDelete={deleteModal.open}
       onSendInvoice={async (inv) => {
         await clientInvoicesStore.updateInvoiceStatus(
@@ -224,10 +221,10 @@
   {/snippet}
 
   {#if editPanel.item}
-    {#key editPanel.item.id}
+    {#key editPanel.item}
       <InvoiceForm
         mode="edit"
-        bind:invoiceEdit={editPanel.item}
+        invoiceId={editPanel.item}
         closePanel={editPanel.close}
       />
     {/key}

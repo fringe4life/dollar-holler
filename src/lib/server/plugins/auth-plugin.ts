@@ -4,8 +4,15 @@ import {
   verifyInvoice,
   verifyInvoiceStatus,
 } from "$features/invoices/queries/verify-invoice";
-import { invoiceUpdateSchema } from "$features/invoices/schemas.server";
+import {
+  invoiceInsertSchema,
+  invoiceUpdateSchema,
+} from "$features/invoices/schemas.server";
 import { auth } from "$lib/auth.server";
+import {
+  appendInvoiceNotesTermsHtmlForInsert,
+  appendInvoiceNotesTermsHtmlForPatch,
+} from "$lib/server/utils/invoice-notes-terms-html.server";
 import { idResponseSchema } from "../schemas";
 import { UnauthorizedError } from "../utils/errors";
 import { assertAllowedInvoiceStatusTransition } from "../utils/invoice-status-transitions";
@@ -29,6 +36,9 @@ import { assertAllowedInvoiceStatusTransition } from "../utils/invoice-status-tr
  * Macros are registered with **named** `.macro("…")` chains so Elysia can infer `user` (and `params`) in `resolve`;
  * a single `.macro({ … })` object does not get that inference (TypeScript limitation). Missing `user` throws
  * `UnauthorizedError`. Missing resource throws [`NotFoundError`](../errors.ts); [`app.onError`](../app.ts) maps to 404 + `apiErrorBody`.
+ *
+ * **`verifyInvoicePatchMutation`:** after ownership checks, resolves `invoiceNotesTermsHtmlAugment` from markdown fields (no HTML work before auth/404).
+ * **`invoiceInsertNotesTermsHtmlAugment`:** after `authMutation`, resolves `invoiceNotesTermsHtmlAugment` for POST create (same ordering principle).
  *
  * @remarks
  * A single parameterized session + verify macro (or codegen) may reduce API surface; revisit when upgrading
@@ -96,7 +106,7 @@ export const protectedApiPlugin = new Elysia({ name: "protected-api" })
       }
     },
   })
-  /** PATCH /invoices/:id — verifies invoice ownership and legal `invoiceStatus` transitions when present. */
+  /** PATCH /invoices/:id — verifies invoice ownership and legal `invoiceStatus` transitions when present; derives notes/terms HTML only after those checks (authenticated owner). */
   .macro("verifyInvoicePatchMutation", {
     authMutation: true,
     params: idResponseSchema,
@@ -106,14 +116,26 @@ export const protectedApiPlugin = new Elysia({ name: "protected-api" })
       if (!result?.id) {
         throw new NotFoundError("Invoice not found");
       }
-      // TODO: This is a workaround to allow the api endpoint to continue without the invoice status
-      if (!body?.invoiceStatus) {
-        return;
+      if (body?.invoiceStatus) {
+        const current = result.invoiceStatus;
+        if (!current) {
+          throw new NotFoundError("Invoice not found");
+        }
+        assertAllowedInvoiceStatusTransition(current, body.invoiceStatus);
       }
-      const current = result.invoiceStatus;
-      if (!current) {
-        throw new NotFoundError("Invoice not found");
-      }
-      assertAllowedInvoiceStatusTransition(current, body.invoiceStatus);
+      return {
+        invoiceNotesTermsHtmlAugment: appendInvoiceNotesTermsHtmlForPatch(body),
+      };
+    },
+  })
+  /** POST /invoices — derives notes/terms HTML only after `authMutation` succeeds (no work for anonymous traffic). */
+  .macro("invoiceInsertNotesTermsHtmlAugment", {
+    authMutation: true,
+    body: invoiceInsertSchema,
+    resolve({ body }) {
+      return {
+        invoiceNotesTermsHtmlAugment:
+          appendInvoiceNotesTermsHtmlForInsert(body),
+      };
     },
   });

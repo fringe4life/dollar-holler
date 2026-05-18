@@ -9,7 +9,6 @@
 </script>
 
 <div
-  data-slot="skeleton"
   aria-hidden="true"
   class={cx(
     css({ animation: "pulse", rounded: "md", backgroundColor: "gray.300" }),

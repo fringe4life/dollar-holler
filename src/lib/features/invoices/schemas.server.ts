@@ -28,18 +28,20 @@ const invoiceDateRefinement = {
 export const invoiceInsertSchema = createInsertSchema(
   invoices,
   invoiceDateRefinement
-).omit("userId", "createdAt", "updatedAt");
+).omit("userId", "createdAt", "updatedAt", "notesHtml", "termsHtml");
 export const invoiceSelectSchema = createSelectSchema(invoices).omit("userId");
 export const invoiceUpdateSchema = createUpdateSchema(
   invoices,
   invoiceDateRefinement
-).omit("createdAt", "updatedAt", "userId");
+).omit("createdAt", "updatedAt", "userId", "notesHtml", "termsHtml");
 
-/** Cursor list row: invoice + client name + line total. */
-export const invoiceListRowSchema = invoiceSelectSchema.merge({
-  total: "number",
-  name: "string",
-});
+/** Cursor list row: invoice + client name + total (no long markdown/HTML text). */
+export const invoiceListRowSchema = invoiceSelectSchema
+  .omit("notes", "terms", "notesHtml", "termsHtml")
+  .merge({
+    total: "number",
+    name: "string",
+  });
 
 export const invoicePaginatedListSchema =
   paginationSchema(invoiceListRowSchema);

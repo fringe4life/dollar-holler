@@ -69,13 +69,11 @@
   };
 </script>
 
-<!-- "grid grid-cols-6 gap-x-2 md:gap-x-5" -->
 <form class={grid({ columns: 6, columnGap: { base: 2, md: 5 } })} {onsubmit}>
   <!-- client -->
   <ClientField bind:invoice bind:isNewClient bind:newClient />
 
   <!-- invoice number -->
-  <!-- "field -order-1 col-span-6 self-end sm:order-0 sm:col-span-2" -->
   <FormField
     label="InvoiceNumber"
     forId="invoiceNumber"

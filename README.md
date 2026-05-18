@@ -2,11 +2,11 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.59.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.5-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.1-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.9-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-1.11.1-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.52.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.60.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.7-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.1-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.11-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-1.11.1-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.53.1-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
-A modern invoice management application built with SvelteKit 5, featuring Better Auth authentication, Drizzle ORM with Neon database, Sentry error monitoring, and Bun UUIDv7 for resilient ID generation.
+A modern invoice management application built with SvelteKit 5, featuring Better Auth authentication, Drizzle ORM with Neon database, Sentry error monitoring, and UUIDv7 for resilient cursor-friendly IDs.
 
 ## Prerequisites
 
@@ -60,16 +60,16 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ## Available Scripts
 
 - `bun run dev` - Start development server (Vite 8)
-- `bun run build` - Build for production
+- `bun run build` - Build for production (`panda cssgen` then Vite)
 - `bun run preview` - Preview production build
 - `bun run check` - Run Ultracite (Biome) checks
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
-- `bun run db:generate` - Generate Drizzle migrations
-- `bun run db:migrate` - Run database migrations
-- `bun run db:seed` - Seed database with sample data
-- `bun run db:studio` - Open Drizzle Studio
-- `bun run db:push` - Push schema directly to the database
+- `bun run db:generate` - Generate Drizzle migrations (Varlock `run`)
+- `bun run db:migrate` - Run database migrations (Varlock `run`)
+- `bun run db:seed` - Seed database with sample data (Varlock `run`)
+- `bun run db:studio` - Open Drizzle Studio (Varlock `run`)
+- `bun run db:push` - Push schema directly to the database (Varlock `run`)
 - `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
 - `bun run fix` - Run Ultracite fix (`ultracite fix`)
 - `bun run fallow` - Run [Fallow](https://github.com/benefacto/fallow) (project graph and analysis)
@@ -87,7 +87,8 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **Database:** PostgreSQL with Neon serverless
 - **ORM:** Drizzle ORM 1.0 (rc) with Neon serverless driver (WebSocket `Pool`)
 - **Authentication:** Better Auth with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter, bearer + OpenAPI plugins)
-- **ID generation:** `Bun.randomUUIDv7()` via [`create-uuidv7.server.ts`](./src/lib/features/pagination/utils/create-uuidv7.server.ts) (cursor-friendly IDs)
+- **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
+- **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
 - **Deployment:** Vercel adapter
 - **Package manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
@@ -116,7 +117,7 @@ src/
 │   │   ├── app.ts           # Elysia app: OpenAPI plugin, auth mount, API routes, error mapping
 │   │   ├── plugins/         # OpenAPI (dev), auth, list-query
 │   │   ├── schemas.ts       # Shared API response shapes
-│   │   ├── utils/           # better-auth-openapi, api-error-body, errors
+│   │   ├── utils/           # create-id (UUIDv7), invoice-notes-terms-html, invoice-status-transitions, better-auth-openapi, api-error-body, errors
 │   │   └── routes/          # API modules (clients, invoices, settings)
 │   ├── client/            # Client-only: @attach helpers, shared runes (ItemPanel, etc.)
 │   ├── features/          # Domain features: components, stores, schemas, list helpers
@@ -125,7 +126,7 @@ src/
 │   │   ├── invoices/      # includes server queries (list, verify)
 │   │   ├── landing-page/  # Marketing sections, nav, copy constants
 │   │   ├── line-items/
-│   │   ├── pagination/    # PaginatedList, search, blank states, UUIDv7 `createId` (server module)
+│   │   ├── pagination/    # PaginatedList, search, blank states, cursor list-query helpers
 │   │   └── settings/
 │   ├── components/        # Shared UI (navbar/, icons under components/icons/, ui/)
 │   ├── stores/            # Shared list-store bases, dashboard context
@@ -151,11 +152,11 @@ The application uses the following main tables:
 - `account` - OAuth accounts
 - `verification` - Email verification tokens
 - `clients` - Client information (`client_status`: active, archive)
-- `invoices` - Invoice records (`invoice_status`: draft, sent, paid; optional discount)
+- `invoices` - Invoice records (`invoice_status`: draft, sent, paid; optional discount; markdown `notes` / `terms` plus precomputed sanitized `notes_html` / `terms_html`)
 - `line_items` - Invoice line items
 - `settings` - User settings
 
-Primary keys use PostgreSQL `uuid` columns; IDs are Bun UUIDv7 strings from `createId` (including Better Auth `generateId` in [`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Foreign keys use cascade deletes where appropriate.
+Primary keys use PostgreSQL `uuid` columns; IDs are UUIDv7 strings from [`createId`](./src/lib/server/utils/create-id.ts) (uuidv7 package), including Better Auth `generateId` in [`src/lib/auth.server.ts`](./src/lib/auth.server.ts). Foreign keys use cascade deletes where appropriate.
 
 The application uses Drizzle's relations v2 (`defineRelations`) to simplify nested queries (e.g., `db.query.invoices.findMany({ with: { client: true, lineItems: true } })`) and avoid manual joins in API routes.
 
@@ -165,7 +166,8 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Modern Authentication:** Better Auth with email/password support
 - **Type-Safe Database:** Drizzle ORM with full TypeScript support
 - **Serverless Ready:** Neon serverless driver (WebSocket pool) for Vercel deployment
-- **Resilient IDs:** Bun UUIDv7 for cursor-based navigation and performance
+- **Resilient IDs:** UUIDv7 (uuidv7 package) for cursor-based navigation and performance
+- **Safe rich text:** Markdown notes/terms sanitized server-side and stored as both source and HTML
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Reset password supported; token is read from URL and validated
@@ -186,7 +188,8 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 - Lint and format run through Ultracite (`bun run check`, `bun run fix`) with Biome rules extended from `ultracite/biome` for core and Svelte.
 - Panda CSS generates `styled-system/`; `svelte.config.js` aliases `styled-system` and extends TypeScript `include` for `drizzle.config.ts` and `styled-system/*`. After dependency install, `prepare` runs codegen for Panda.
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
-- Better Auth is configured in `auth.server.ts` to use Bun UUIDv7 for user ID generation and includes session caching for performance.
+- Better Auth is configured in `auth.server.ts` to use UUIDv7 (uuidv7 package) for user ID generation and includes session caching for performance.
+- Invoice `notes` and `terms` accept Markdown; create/update endpoints derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks (see [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts)).
 - App configuration lives in `svelte.config.js` (Vercel adapter, preprocess, Svelte 5 async compiler option, experimental server instrumentation for Sentry).
 
 ## License

@@ -10,8 +10,8 @@ import {
   uuid,
   varchar,
 } from "drizzle-orm/pg-core";
-import { createId } from "$features/pagination/utils/create-uuidv7.server";
-import type { CursorId } from "$lib/types";
+import type { CursorId, SanitizedHTML } from "../../types";
+import { createId } from "../utils/create-id";
 
 export const clientStatusEnum = pgEnum("client_status", ["active", "archive"]);
 
@@ -168,6 +168,8 @@ export const invoices = pgTable("invoices", {
   discount: real("discount").notNull().default(0),
   notes: text("notes"),
   terms: text("terms"),
+  notesHtml: text("notes_html").$type<SanitizedHTML>(),
+  termsHtml: text("terms_html").$type<SanitizedHTML>(),
   invoiceStatus: invoiceStatusEnum("invoice_status").default("draft"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")

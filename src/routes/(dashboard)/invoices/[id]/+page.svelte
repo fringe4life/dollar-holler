@@ -129,7 +129,11 @@
   </div>
 
   <div
-    class={gridItem({gridColumnStart: { sm: 5 },  colSpan: { base: 6, sm: 2, _print: 3 }, paddingBlockStart: 4 })}
+    class={gridItem({
+      gridColumnStart: { sm: 5 },  
+      colSpan: { base: 6, sm: 2, _print: 3 }, 
+      paddingBlockStart: 4 
+    })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
     {#if settingsStore.settings?.myName}
@@ -156,7 +160,7 @@
       </div>
     {/if}
   </div>
-  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3} })}>
+  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
     <p>
       {#if data.client}
@@ -214,18 +218,18 @@
     <LineItemRows mode="view" {lineItems} discount={invoice.discount || 0} />
   </div>
 
-  {#if data.notesHtml}
+  {#if invoice.notesHtml}
     <div class={gridItem({ colSpan: 6 })}>
       <div class={css({ color: "monsoon", fontWeight: "bold" })}>Notes:</div>
-      <HtmlContent html={data.notesHtml} />
+      <HtmlContent html={invoice.notesHtml} />
     </div>
   {/if}
-  {#if data.termsHtml}
+  {#if invoice.termsHtml}
     <div class={gridItem({ colSpan: 6 })}>
       <div class={css({ color: "monsoon", fontWeight: "bold" })}>
         Terms and Conditions:
       </div>
-      <HtmlContent html={data.termsHtml} />
+      <HtmlContent html={invoice.termsHtml} />
     </div>
   {/if}
 </section>

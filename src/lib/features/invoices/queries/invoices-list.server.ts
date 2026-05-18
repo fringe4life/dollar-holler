@@ -22,6 +22,11 @@ import { db } from "$lib/server/db";
 import { invoices as invoicesTable } from "$lib/server/db/schema";
 import type { CursorId, Maybe } from "$lib/types";
 
+/** Keys allowed in RQB `columns` for `invoices` (matches Drizzle’s `findMany` config). */
+type InvoicesQueryColumnSelection = NonNullable<
+  NonNullable<Parameters<typeof db.query.invoices.findMany>[0]>["columns"]
+>;
+
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();
   if (!trimmed) {
@@ -59,6 +64,21 @@ const invoiceSubtotalExtras = {
     lineItemsSubtotalSqlForInvoiceId(inv.id),
 };
 
+/** RQB `columns`: booleans only; keys checked against `InvoicesQueryColumnSelection`. */
+const invoiceListColumns = {
+  id: true,
+  userId: true,
+  invoiceNumber: true,
+  clientId: true,
+  subject: true,
+  issueDate: true,
+  dueDate: true,
+  discount: true,
+  invoiceStatus: true,
+  createdAt: true,
+  updatedAt: true,
+} as const satisfies InvoicesQueryColumnSelection;
+
 const mapRows = (
   rows: Array<
     Omit<InvoiceListResponse, "name" | "total"> &
@@ -77,9 +97,10 @@ const mapRows = (
     })
   );
 
-const fetchInvoiceListPage = ({ where, orderBy, limit }: FetchPageArgs) =>
-  db.query.invoices.findMany({
+const fetchInvoiceListPage = async ({ where, orderBy, limit }: FetchPageArgs) =>
+  await db.query.invoices.findMany({
     where,
+    columns: invoiceListColumns,
     with: {
       client: { columns: { name: true } },
     },

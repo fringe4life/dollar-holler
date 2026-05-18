@@ -2,7 +2,6 @@ import { error, redirect } from "@sveltejs/kit";
 import { ArkErrors } from "arktype";
 import { cursorSchema } from "$features/pagination/schemas.server";
 import { db } from "$lib/server/db";
-import { markdownToHtml } from "$lib/utils/markdown.server";
 import { tryCatch } from "$lib/utils/try-catch";
 import type { PageServerLoad } from "./$types";
 export const load: PageServerLoad = async ({ params, locals }) => {
@@ -45,14 +44,9 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     ),
   ]);
 
-  const notesHtml = markdownToHtml(invoice?.notes);
-  const termsHtml = markdownToHtml(invoice?.terms);
-
   return {
     invoice,
     client,
     lineItems,
-    notesHtml,
-    termsHtml,
   };
 };

@@ -11,10 +11,7 @@
   import InvoiceRow from "$features/invoices/components/InvoiceRow.svelte";
   import InvoiceRowHeader from "$features/invoices/components/InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "$features/invoices/components/InvoiceRowSkeleton.svelte";
-  import type {
-    InvoiceListResponse,
-    InvoiceSelect,
-  } from "$features/invoices/types";
+  import type { InvoiceListResponse } from "$features/invoices/types";
   import ItemsHeader from "$features/pagination/components/ItemsHeader.svelte";
   import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
@@ -24,6 +21,7 @@
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import Modal from "$lib/components/Modal.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
+  import type { CursorId } from "$lib/types";
   import { formatTotal } from "$lib/utils/moneyHelpers";
   import type { PageData } from "./$types";
 
@@ -41,7 +39,7 @@
   });
 
   const createForm = new ItemPanel<undefined>();
-  const editPanel = new ItemPanel<InvoiceSelect>();
+  const editPanel = new ItemPanel<CursorId>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
 </script>
 
@@ -63,7 +61,7 @@
   {#snippet row(_invoice)}
     <InvoiceRow
       invoice={_invoice}
-      onEdit={editPanel.open}
+      onEdit={(inv) => editPanel.open(inv.id)}
       onDelete={deleteModal.open}
       onSendInvoice={async (inv) => {
         await invoicesStore.updateInvoiceStatus(inv.id, "sent");
@@ -133,10 +131,10 @@
   {/snippet}
 
   {#if editPanel.item}
-    {#key editPanel.item.id}
+    {#key editPanel.item}
       <InvoiceForm
         mode="edit"
-        bind:invoiceEdit={editPanel.item}
+        invoiceId={editPanel.item}
         closePanel={editPanel.close}
       />
     {/key}

@@ -1,5 +1,4 @@
 import type { BitsButton, CursorId, List } from "$lib/types";
-import type { InvoiceSelect } from "../invoices/types";
 import type {
   lineItemEditRowSchema,
   lineItemInsertSchema,
@@ -23,13 +22,13 @@ interface InvoiceFormPanel {
 }
 
 interface InvoiceFormEditProps extends InvoiceFormPanel {
-  invoiceEdit: InvoiceSelect;
+  invoiceId: CursorId;
   mode: "edit";
 }
 
 type InvoiceFormCreateProps = InvoiceFormPanel & {
   mode: "create";
-  invoiceEdit?: undefined;
+  invoiceId?: undefined;
 };
 
 export type InvoiceFormProps = InvoiceFormEditProps | InvoiceFormCreateProps;

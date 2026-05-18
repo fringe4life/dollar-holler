@@ -34,10 +34,10 @@
 
   interface EditInvoiceFormProps {
     closePanel: () => void;
-    invoiceEdit: InvoiceSelect;
+    invoiceId: CursorId;
   }
 
-  let { closePanel, invoiceEdit }: EditInvoiceFormProps = $props();
+  let { closePanel, invoiceId }: EditInvoiceFormProps = $props();
 
   const {
     clients: clientsStore,
@@ -46,11 +46,24 @@
   } = getDashboardStores();
 
   type EditableInvoice = NewInvoice & Pick<InvoiceSelect, "id">;
+
+  const toEditableInvoice = (full: InvoiceSelect): EditableInvoice => ({
+    clientId: full.clientId,
+    invoiceNumber: full.invoiceNumber,
+    subject: full.subject,
+    discount: full.discount ?? 0,
+    issueDate: toDateInputValue(full.issueDate),
+    dueDate: toDateInputValue(full.dueDate),
+    notes: full.notes ?? null,
+    terms: full.terms ?? null,
+    invoiceStatus: full.invoiceStatus ?? "draft",
+    id: full.id,
+  });
+
   // svelte-ignore state_referenced_locally
   let invoice: EditableInvoice = $state({
-    ...invoiceEdit,
-    issueDate: toDateInputValue(invoiceEdit.issueDate),
-    dueDate: toDateInputValue(invoiceEdit.dueDate),
+    ...invoicesStore.newInvoice(),
+    id: invoiceId,
   });
 
   const counter = new Counter();
@@ -58,7 +71,9 @@
   let lineItems: Array<NewLineItemWithId | LineItemEditRow> = $state([
     lineItemsStore.newLineItem(counter.increment()),
   ]);
+  let invoiceLoaded = $state(false);
   let lineItemsLoaded = $state(false);
+  const formReady = $derived(invoiceLoaded && lineItemsLoaded);
 
   let isNewClient = $state(false);
   let newClient: ClientInsert = $state(clientsStore.newClient());
@@ -73,16 +88,25 @@
     abortController = new AbortController();
     const signal = abortController.signal;
 
-    // TODO: Panel-scoped retry, inline error state, and clearer copy (avoid relying only on toasts).
     try {
-      const [, items] = await Promise.all([
+      const [fullInvoice, items] = await Promise.all([
+        invoicesStore.loadInvoiceById(invoiceId, { signal }),
+        lineItemsStore.loadLineItemsByInvoiceId(invoiceId, { signal }),
         clientsStore.loadClientPickerOptions(signal),
-        lineItemsStore.loadLineItemsByInvoiceId(invoiceEdit.id, { signal }),
       ]);
 
       if (!isMounted) {
         return;
       }
+
+      if (!fullInvoice) {
+        closePanel();
+        return;
+      }
+
+      invoice = toEditableInvoice(fullInvoice);
+      invoiceLoaded = true;
+
       if (items == null) {
         return;
       }
@@ -92,18 +116,16 @@
           ? items
           : [lineItemsStore.newLineItem(counter.increment())];
 
-      baselineInvoiceSnapshot = pickInvoicePatchSnapshot(invoiceEdit);
+      baselineInvoiceSnapshot = pickInvoicePatchSnapshot(fullInvoice);
       baselineLineItemsSnapshot = serializedNormalizedLineItemsForCompare(
         lineItemsStore.normalizeLineItems(lineItems)
       );
+      lineItemsLoaded = true;
     } catch (err) {
       abortController?.abort();
       if (!isAbortError(err)) {
         toast.error("Failed to load invoice form");
-      }
-    } finally {
-      if (isMounted) {
-        lineItemsLoaded = true;
+        closePanel();
       }
     }
   });
@@ -147,7 +169,7 @@
       return;
     }
 
-    if (!lineItemsLoaded) {
+    if (!formReady) {
       toast.error("Still loading invoice");
       return;
     }
@@ -219,7 +241,7 @@
   bind:lineItems
   bind:isNewClient
   bind:newClient
-  {lineItemsLoaded}
+  lineItemsLoaded={formReady}
   mode="edit"
   {closePanel}
   {addLineItem}

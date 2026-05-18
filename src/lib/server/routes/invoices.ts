@@ -65,12 +65,13 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // POST /api/invoices - Create invoice
   .post(
     "/",
-    async ({ body, user }) => {
+    async ({ body, user, invoiceNotesTermsHtmlAugment }) => {
       try {
         const [inserted] = await db
           .insert(invoicesTable)
           .values({
             ...body,
+            ...invoiceNotesTermsHtmlAugment,
             userId: user.id,
           })
           .returning();
@@ -83,7 +84,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     },
     {
       body: invoiceInsertSchema,
-      authMutation: true,
+      invoiceInsertNotesTermsHtmlAugment: true,
       detail: {
         operationId: "createInvoice",
         summary: "Create invoice",
@@ -137,11 +138,14 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
   // PATCH /api/invoices/:id - Update invoice
   .patch(
     "/:id",
-    async ({ params: { id }, body, user }) => {
+    async ({ params: { id }, body, user, invoiceNotesTermsHtmlAugment }) => {
       try {
-        const setPayload = stripNullishEntries({
-          ...body,
-        });
+        const setPayload = {
+          ...stripNullishEntries({
+            ...body,
+          }),
+          ...invoiceNotesTermsHtmlAugment,
+        };
         const [updated] = await db
           .update(invoicesTable)
           .set(setPayload)

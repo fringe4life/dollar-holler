@@ -236,19 +236,18 @@
 </script>
 
 <InvoiceFormLayout
-  onsubmit={handleSubmit}
-  bind:invoice
-  bind:lineItems
-  bind:isNewClient
-  bind:newClient
+  {addLineItem}
+  {closePanel}
   lineItemsLoaded={formReady}
   mode="edit"
-  {closePanel}
-  {addLineItem}
+  onsubmit={handleSubmit}
+  bind:invoice
+  bind:isNewClient
+  bind:lineItems
+  bind:newClient
 >
   {#snippet buttons()}
     <Button
-      variant="textOnlyDestructive"
       onclick={() => {
         if (!invoice.id) {
           return;
@@ -259,15 +258,15 @@
           total: sumLineItems(lineItems),
         });
       }}
+      variant="textOnlyDestructive"
       ><Trash />Delete</Button
     >
   {/snippet}
 </InvoiceFormLayout>
 
 <ConfirmDelete
-  item={deleteModal.item}
   dialogEl={deleteModal?.dialogEl}
-  titleText="Are you sure you want to delete this invoice?"
+  item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
       if (!deleteModal.item?.id) {
@@ -277,6 +276,7 @@
       deleteModal.close();
       closePanel();
     }}
+  titleText="Are you sure you want to delete this invoice?"
 >
   {#snippet descriptionSnippet(_invoice)}
     This will delete the invoice to

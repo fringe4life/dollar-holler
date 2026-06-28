@@ -25,8 +25,8 @@
 <svelte:head>
   <title>Dollar Holler — Invoice Management Made Simple</title>
   <meta
-    name="description"
     content="Create professional invoices, track payments, and manage clients — all from one beautiful dashboard."
+    name="description"
   >
 </svelte:head>
 <main
@@ -141,7 +141,7 @@
               }
           )}
         >
-          <StarIcon size={16} class={css({ color: "daisyBush" })} />
+          <StarIcon class={css({ color: "daisyBush" })} size={16} />
           <p
             class={css({
               fontSize: "sm",
@@ -539,15 +539,14 @@
       </p>
       <div class={vstack({ gap: 4 })}>
         <Button
-          href={resolve("/signup")}
-          variant="auth"
-          size="lg"
           class={css({ fontSize: "lg", minInlineSize: 56 })}
+          href={resolve("/signup")}
+          size="lg"
+          variant="auth"
         >
           Create Free Account
         </Button>
         <a
-          href={resolve("/login")}
           class={css({
             color: {base:"white/60", _hover: "white/90"},
             fontSize: "sm",
@@ -556,6 +555,7 @@
             transitionProperty: "colors",
             transitionDuration: "normal",
           })}
+          href={resolve("/login")}
         >
           Already have an account? Log in
         </a>
@@ -585,40 +585,40 @@
         })}
     >
       <a
-        href={resolve("/invoices")}
         class={css({
           color: {base:"pastelPurple", _hover: "white"},
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
+        href={resolve("/invoices")}
         >Invoices</a
       >
       <a
-        href={resolve("/clients")}
         class={css({
           color: {base:"pastelPurple", _hover: "white"},
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
+        href={resolve("/clients")}
         >Clients</a
       >
       <a
-        href={resolve("/login")}
         class={css({
           color: { base:"pastelPurple", _hover: "white" },
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
+        href={resolve("/login")}
         >Login</a
       >
       <a
-        href={resolve("/signup")}
         class={css({
           color: { base:"goldenFizz", _hover: "white" },
           fontWeight: "semibold",
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
+        href={resolve("/signup")}
         >Sign Up</a
       >
     </nav>

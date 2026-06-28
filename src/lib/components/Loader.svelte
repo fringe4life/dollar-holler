@@ -3,6 +3,7 @@
 </script>
 
 <div
+  aria-hidden="true"
   class={circle({
     animation: "spin",
     borderWidth: 2,
@@ -10,5 +11,4 @@
     borderBottomColor: "transparent",
     size: 5
   })}
-  aria-hidden="true"
 ></div>

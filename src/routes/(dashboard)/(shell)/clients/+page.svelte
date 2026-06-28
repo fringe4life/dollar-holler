@@ -50,15 +50,15 @@
 
 <svelte:head> <title>Clients | Dollar Holler</title> </svelte:head>
 
-<ItemsHeader store={clientsStore} open={createForm.open.bind(null, undefined)}>
+<ItemsHeader open={createForm.open.bind(null, undefined)} store={clientsStore}>
   {#snippet button()}
     + Client
   {/snippet}
 </ItemsHeader>
 
 <PaginatedList
-  store={clientsStore}
   class={css({ gridTemplateRows: "1fr min-content" })}
+  store={clientsStore}
 >
   {#snippet header()}
     <ClientRowHeader />
@@ -69,10 +69,10 @@
   {#snippet row(_client)}
     <ClientRow
       client={_client}
-      onEdit={editPanel.open}
-      onDelete={deleteModal.open}
       onActivate={handleActivate}
       onArchive={handleArchive}
+      onDelete={deleteModal.open}
+      onEdit={editPanel.open}
     />
   {/snippet}
   {#snippet blankState()}
@@ -88,9 +88,9 @@
 </PaginatedList>
 
 <Modal
+  onClose={createForm.close}
   variant="panel"
   bind:dialogEl={createForm.dialogEl}
-  onClose={createForm.close}
 >
   {#snippet title()}
     <h2
@@ -112,16 +112,16 @@
   {/snippet}
 
   <ClientForm
+    closePanel={createForm.close}
     edit={undefined}
     formState="create"
-    closePanel={createForm.close}
   />
 </Modal>
 {#if editPanel.item}
   <Modal
+    onClose={editPanel.close}
     variant="panel"
     bind:dialogEl={editPanel.dialogEl}
-    onClose={editPanel.close}
   >
     {#snippet title()}
       <h2
@@ -142,17 +142,15 @@
     {/snippet}
 
     <ClientForm
-      formState="edit"
-      edit={editPanel.item}
       closePanel={editPanel.close}
+      edit={editPanel.item}
+      formState="edit"
     />
   </Modal>
 {/if}
 
 <ConfirmDelete
   item={deleteModal.item}
-  bind:dialogEl={deleteModal.dialogEl}
-  titleText="Are you sure you want to delete this client?"
   onCancel={deleteModal.close}
   onDelete={async () => {
       if (!deleteModal?.item?.id) {
@@ -161,6 +159,8 @@
       await clientsStore.deleteClient(deleteModal.item.id);
       deleteModal.close();
     }}
+  titleText="Are you sure you want to delete this client?"
+  bind:dialogEl={deleteModal.dialogEl}
 >
   {#snippet descriptionSnippet(_client)}
     This will delete Client:

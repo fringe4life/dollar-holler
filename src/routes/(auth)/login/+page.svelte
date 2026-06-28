@@ -17,22 +17,22 @@
 <Form {form}>
   {#snippet children()}
     <FormField
-      label="Email"
       forId="email"
+      label="Email"
       labelClass={css({ color: "goldenFizz" })}
     >
       <Input
-        required
-        type="email"
+        defaultValue={form?.email ?? ""}
         name="email"
         placeholder="john@email.com"
-        defaultValue={form?.email ?? ""}
+        required
+        type="email"
       />
     </FormField>
     <FormField>
       <!-- "flex items-center justify-between" -->
       <div class={between()}>
-        <Label for="password" class={css({ color: "goldenFizz" })}
+        <Label class={css({ color: "goldenFizz" })} for="password"
           >Password</Label
         >
         <a
@@ -41,7 +41,7 @@
           >Forgot Password</a
         >
       </div>
-      <Input required minlength={6} type="password" name="password" />
+      <Input minlength={6} name="password" required type="password" />
     </FormField>
   {/snippet}
   {#snippet submit()}
@@ -52,8 +52,8 @@
       class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
     >
       <a
-        href={resolve("/signup")}
         class={css({ textDecoration: {base: "underline", _hover: "none" } })}
+        href={resolve("/signup")}
         >Don't have an account yet?</a
       >
     </p>

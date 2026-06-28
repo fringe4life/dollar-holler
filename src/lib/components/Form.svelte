@@ -49,13 +49,13 @@
   }
 </script>
 
-<form {method} {action} use:enhance={handleEnhance} {...rest}>
+<form {action} {method} use:enhance={handleEnhance} {...rest}>
   {#if form?.error}
     <Alert message={form.error} />
   {/if}
   <fieldset disabled={isLoading}>
     {@render children()}
-    <Button variant="auth" type="submit" disabled={isLoading}>
+    <Button disabled={isLoading} type="submit" variant="auth">
       {#if isLoading}
         <Loader />
       {:else}

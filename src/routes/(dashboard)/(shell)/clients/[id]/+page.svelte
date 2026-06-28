@@ -87,8 +87,8 @@
 
 <svelte:head> <title>{client.name} | Doller Holla</title> </svelte:head>
 <ItemsHeader
-  store={clientInvoicesStore}
   open={formPanel.open.bind(null, undefined)}
+  store={clientInvoicesStore}
 >
   {#snippet button()}
     + Client
@@ -99,7 +99,7 @@
   <h1 class={css({ color: "daisyBush", fontSize: "3xl", fontWeight: "bold" })}>
     {client.name}
   </h1>
-  <Button variant="textOnly" onclick={handleEdit}><Edit /> Edit</Button>
+  <Button onclick={handleEdit} variant="textOnly"><Edit /> Edit</Button>
 </div>
 
 <div
@@ -114,16 +114,16 @@
     })}
 >
   <InvoiceSummaryItem
-    title="Total Overdue"
     amount={invoiceSummaryTotals.overdue}
+    title="Total Overdue"
   />
 
   <InvoiceSummaryItem
-    title="Total Outstanding"
     amount={invoiceSummaryTotals.outstanding}
+    title="Total Outstanding"
   />
-  <InvoiceSummaryItem title="Total Draft" amount={invoiceSummaryTotals.draft} />
-  <InvoiceSummaryItem title="Total Paid" amount={invoiceSummaryTotals.paid} />
+  <InvoiceSummaryItem amount={invoiceSummaryTotals.draft} title="Total Draft" />
+  <InvoiceSummaryItem amount={invoiceSummaryTotals.paid} title="Total Paid" />
 </div>
 
 <PaginatedList store={clientInvoicesStore}>
@@ -136,8 +136,8 @@
   {#snippet row(_item)}
     <InvoiceRow
       invoice={_item}
-      onEdit={(inv) => editPanel.open(inv.id)}
       onDelete={deleteModal.open}
+      onEdit={(inv) => editPanel.open(inv.id)}
       onSendInvoice={async (inv) => {
         await clientInvoicesStore.updateInvoiceStatus(
           inv.id,
@@ -163,9 +163,9 @@
 </PaginatedList>
 
 <Modal
+  onClose={formPanel.close}
   variant="panel"
   bind:dialogEl={formPanel.dialogEl}
-  onClose={formPanel.close}
 >
   {#snippet title()}
     <h2
@@ -187,20 +187,20 @@
   {/snippet}
 
   {#if isEditing === "edit"}
-    <ClientForm edit={client} formState="edit" closePanel={formPanel.close} />
+    <ClientForm closePanel={formPanel.close} edit={client} formState="edit" />
   {:else}
     <ClientForm
+      closePanel={formPanel.close}
       edit={undefined}
       formState="create"
-      closePanel={formPanel.close}
     />
   {/if}
 </Modal>
 
 <Modal
+  onClose={editPanel.close}
   variant="panel"
   bind:dialogEl={editPanel.dialogEl}
-  onClose={editPanel.close}
 >
   {#snippet title()}
     <h2
@@ -223,9 +223,9 @@
   {#if editPanel.item}
     {#key editPanel.item}
       <InvoiceForm
-        mode="edit"
-        invoiceId={editPanel.item}
         closePanel={editPanel.close}
+        invoiceId={editPanel.item}
+        mode="edit"
       />
     {/key}
   {/if}
@@ -233,8 +233,6 @@
 
 <ConfirmDelete
   item={deleteModal.item}
-  bind:dialogEl={deleteModal.dialogEl}
-  titleText="Are you sure you want to delete this invoice?"
   onCancel={deleteModal.close}
   onDelete={async () => {
     if (!deleteModal?.item?.id) {
@@ -243,6 +241,8 @@
     await invoicesStore.deleteInvoice(deleteModal.item.id);
     deleteModal.close();
   }}
+  titleText="Are you sure you want to delete this invoice?"
+  bind:dialogEl={deleteModal.dialogEl}
 >
   {#snippet descriptionSnippet(_item)}
     This will delete the invoice to

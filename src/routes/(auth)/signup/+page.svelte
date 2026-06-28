@@ -19,37 +19,37 @@
   <Form {form}>
     {#snippet children()}
       <FormField
-        label="Full Name"
         forId="name"
+        label="Full Name"
         labelClass={css({ color: "goldenFizz" })}
       >
-        <Input type="text" name="name" id="name" />
+        <Input id="name" name="name" type="text" />
       </FormField>
 
       <FormField
-        label="Email"
         forId="email"
+        label="Email"
         labelClass={css({ color: "goldenFizz" })}
       >
-        <Input type="email" name="email" id="email" required />
+        <Input id="email" name="email" required type="email" />
       </FormField>
       <FormField
-        label="Password"
         forId="password"
+        label="Password"
         labelClass={css({ color: "goldenFizz" })}
       >
-        <Input type="password" name="password" id="password" required />
+        <Input id="password" name="password" required type="password" />
       </FormField>
       <FormField
-        label="Confirm Password"
         forId="confirmPassword"
+        label="Confirm Password"
         labelClass={css({ color: "goldenFizz" })}
       >
         <Input
-          type="password"
-          name="confirmPassword"
           id="confirmPassword"
+          name="confirmPassword"
           required
+          type="password"
         />
       </FormField>
     {/snippet}
@@ -61,9 +61,9 @@
         class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
       >
         <a
-          href={resolve("/login")}
           class={css({ textDecoration: { base: "underline", _hover: "none" }})}
           data-sveltekit-preload-data="hover"
+          href={resolve("/login")}
           >Already have an account?</a
         >
       </p>
@@ -71,7 +71,7 @@
   </Form>
 {:else}
   <Alert message="Check your email for confirmation" />
-  <a href={resolve("/login")} class={buttonVariants({ variant: "auth" })}
+  <a class={buttonVariants({ variant: "auth" })} href={resolve("/login")}
     >Login</a
   >
 {/if}

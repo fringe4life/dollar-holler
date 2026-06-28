@@ -11,7 +11,6 @@
 </script>
 
 <div
-  style:--circle={`url(${asset('/images/circle.svg')})`}
   class={center({
     columnGap: 4,
     float: "right",
@@ -22,6 +21,7 @@
     minBlockSize: 24,
     minInlineSize: 64,
     _after: { clear: "right", content: '""' }, })}
+  style:--circle={`url(${asset('/images/circle.svg')})`}
 >
   <div class={css({ fontWeight: "bold" })}>{label}</div>
   <div class={css({ fontSize: "xl" })}>{amount}</div>

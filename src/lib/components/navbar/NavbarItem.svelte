@@ -17,7 +17,6 @@
 >
   <a
     aria-current={isActive}
-    {href}
     class={css({
       position: "relative",
       display: "inline-block",
@@ -63,6 +62,7 @@
         },
       },
     })}
+    {href}
   >
     {title}
   </a>

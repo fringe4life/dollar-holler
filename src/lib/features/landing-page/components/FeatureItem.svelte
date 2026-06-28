@@ -40,7 +40,7 @@
             feature.iconBg
           )}
   >
-    <Icon size={24} class={feature.iconColor} />
+    <Icon class={feature.iconColor} size={24} />
   </div>
   <div>
     <h3

@@ -71,10 +71,10 @@
 </script>
 
 <svelte:element
-  this={href ? "a" : "span"}
+  class={cx(badgeVariants({ variant }), className)}
   data-slot="badge"
   {href}
-  class={cx(badgeVariants({ variant }), className)}
+  this={href ? "a" : "span"}
   {...restProps}
 >
   {@render children?.()}

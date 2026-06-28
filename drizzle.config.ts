@@ -8,7 +8,6 @@ export default defineConfig({
   verbose: true,
   strict: true,
   dbCredentials: {
-    // @ts-expect-error
     url: process.env.DATABASE_URL,
   },
 });

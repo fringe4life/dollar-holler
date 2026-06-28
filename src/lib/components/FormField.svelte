@@ -26,7 +26,7 @@
   }), className)}
 >
   {#if label}
-    <Label for={forId} class={labelClass}>{label}</Label>
+    <Label class={labelClass} for={forId}>{label}</Label>
   {/if}
   {@render children()}
 </div>

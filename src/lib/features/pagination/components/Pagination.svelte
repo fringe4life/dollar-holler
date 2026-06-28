@@ -1,4 +1,4 @@
-<script lang="ts" generics="T extends CursorRow">
+<script generics="T extends CursorRow" lang="ts">
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { css } from "styled-system/css";
@@ -123,9 +123,9 @@
     })}
   >
     <Select
-      name="limit"
       class={css({ aspectRatio: "2/1", inlineSize: 20 })}
       disabled={!canNavigate || store.loading}
+      name="limit"
       onchange={(e) =>
         handleLimitChange(Number((e.currentTarget as HTMLSelectElement).value))}
     >
@@ -140,22 +140,22 @@
     </Select>
     <div class={hstack({  gap: 2 })}>
       <Button
-        type="button"
-        variant="outline"
-        size="default"
         aria-label="Previous page"
         disabled={!pageMeta.hasPreviousPage || store.loading}
         onclick={handleBackward}
+        size="default"
+        type="button"
+        variant="outline"
       >
         <ChevronLeftIcon class={square({ size: 4 })} />
       </Button>
       <Button
-        type="button"
-        variant="outline"
-        size="default"
         aria-label="Next page"
         disabled={!pageMeta.hasNextPage || store.loading}
         onclick={handleForward}
+        size="default"
+        type="button"
+        variant="outline"
       >
         <ChevronRightIcon class={square({ size: 4 })} />
       </Button>

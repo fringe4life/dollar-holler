@@ -81,70 +81,70 @@
   class={cx(invoiceLineItem, css({ borderColor: "fog", borderBottomWidth: 2, paddingBlock: { base: 4, sm: 2 } }))}
 >
   <div class={gridItem({ gridArea: "description", position: "relative" })}>
-    <label for="description-{props.lineItem.id}" class={lineItemLabel}
+    <label class={lineItemLabel} for="description-{props.lineItem.id}"
       >Description</label
     >
     <input
-      value={props.lineItem.description}
-      oninput={isEditable ? onDescriptionInput : undefined}
       class="line-item"
-      type="text"
-      name="description"
-      id="description-{props.lineItem.id}"
-      required={props.isRequired}
       disabled={!isEditable}
+      id="description-{props.lineItem.id}"
+      name="description"
+      oninput={isEditable ? onDescriptionInput : undefined}
+      required={props.isRequired}
+      type="text"
+      value={props.lineItem.description}
     >
     <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
 
   <div class={gridItem({ position: "relative", gridArea: "unitPrice" })}>
-    <label for="unitPrice-{props.lineItem.id}" class={priceStyles.label}
+    <label class={priceStyles.label} for="unitPrice-{props.lineItem.id}"
       >Unit Price</label
     >
     <input
       class={priceStyles.input}
-      type={isEditable ? "number" : "text"}
-      name="unitPrice"
-      id="unitPrice-{props.lineItem.id}"
-      value={isEditable ? unitPrice : displayUnitPrice}
-      oninput={isEditable ? onUnitPriceInput : undefined}
-      onblur={isEditable ? formatUnitPrice : undefined}
-      step={isEditable ? "0.01" : undefined}
-      min={isEditable ? "0" : undefined}
-      required={props.isRequired}
       disabled={!isEditable}
+      id="unitPrice-{props.lineItem.id}"
+      min={isEditable ? "0" : undefined}
+      name="unitPrice"
+      onblur={isEditable ? formatUnitPrice : undefined}
+      oninput={isEditable ? onUnitPriceInput : undefined}
+      required={props.isRequired}
+      step={isEditable ? "0.01" : undefined}
+      type={isEditable ? "number" : "text"}
+      value={isEditable ? unitPrice : displayUnitPrice}
     >
     <!-- "border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200" -->
     <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "quantity", position: "relative" })}>
-    <label for="quantity-{props.lineItem.id}" class={qtyStyles.label}
+    <label class={qtyStyles.label} for="quantity-{props.lineItem.id}"
       >Qty</label
     >
     <input
-      value={props.lineItem.quantity}
-      oninput={isEditable ? onQuantityInput : undefined}
       class={qtyStyles.input}
-      type="number"
-      name="quantity"
+      disabled={!isEditable}
       id="quantity-{props.lineItem.id}"
       min="0"
+      name="quantity"
+      oninput={isEditable ? onQuantityInput : undefined}
       required={props.isRequired}
-      disabled={!isEditable}
+      type="number"
+      value={props.lineItem.quantity}
     >
     <span aria-hidden="true" class={qtyStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "amount" })}>
-    <label for="amount-{props.lineItem.id}" class={amountStyles.label}
+    <label class={amountStyles.label} for="amount-{props.lineItem.id}"
       >Amount</label
     >
     <input
-      value={isEditable ? amount : props.lineItem.amount.toFixed(2)}
       class={amountStyles.input}
-      type="text"
-      name="amount"
-      id="amount-{props.lineItem.id}"
       disabled
+      id="amount-{props.lineItem.id}"
+      name="amount"
+      type="text"
+      value={isEditable ? amount : props.lineItem.amount.toFixed(2)}
     >
   </div>
 
@@ -153,13 +153,13 @@
   >
     {#if props.canDelete && isEditable}
       <Button
+        class={css({ textAlign: "center", blockSize: "10", inlineSize: "full" })}
         onclick={() => {
           if (props.mode !== "view") {
             props.removeLineItem(props.lineItem.id);
           }
         }}
         variant="ghost"
-        class={css({ textAlign: "center", blockSize: "10", inlineSize: "full" })}
         ><Trash /></Button
       >
     {/if}

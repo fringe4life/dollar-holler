@@ -41,8 +41,8 @@
         color: {base: "pastelPurple", _hover: "daisyBush"},
         cursor: "pointer",
          })}
-      type="button"
       onclick={option.onclick}
+      type="button"
     >
       <Icon />
       {option.label}

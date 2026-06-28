@@ -94,8 +94,8 @@
     >
       <Badge
         class={css({ marginInlineStart: { base: "auto", md: 0 } })}
-        variant="draft"
         size="small"
+        variant="draft"
         >{client.clientStatus}</Badge
       >
     </div>
@@ -160,19 +160,19 @@
   {/snippet}
   {#snippet revealed()}
     {#if client.clientStatus === "active"}
-      <button onclick={handleArchive} type="button" class={actionButton}>
-        <Archive width={32} height={32} />
+      <button class={actionButton} onclick={handleArchive} type="button">
+        <Archive height={32} width={32} />
         Archive
       </button>
     {/if}
     {#if client.clientStatus === "archive"}
-      <button onclick={handleActivation} type="button" class={actionButton}>
-        <Activate width={32} height={32} />
+      <button class={actionButton} onclick={handleActivation} type="button">
+        <Activate height={32} width={32} />
         Activate
       </button>
     {/if}
-    <button onclick={handleDelete} type="button" class={actionButton}>
-      <Trash width={32} height={32} />
+    <button class={actionButton} onclick={handleDelete} type="button">
+      <Trash height={32} width={32} />
       Delete
     </button>
     <a class={actionButton} href={resolved}><View height={32} width={32} /></a>

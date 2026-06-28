@@ -75,63 +75,63 @@
 
   <!-- invoice number -->
   <FormField
-    label="InvoiceNumber"
-    forId="invoiceNumber"
     class={gridItem({
       order: { base: -1, sm: 0 },
       colSpan: { base: 6, sm: 2 },
       alignSelf: "end",
     })}
+    forId="invoiceNumber"
+    label="InvoiceNumber"
   >
     <Input
-      type="text"
-      name="invoiceNumber"
       id="invoiceNumber"
+      name="invoiceNumber"
       required
+      type="text"
       bind:value={invoice.invoiceNumber}
     />
   </FormField>
 
   <!-- new client extended fields -->
   {#if isNewClient}
-    <div transition:slide class={gridItem({ colSpan: 6, columnGap: 5 })}>
-      <FormField label="Client's Email" forId="email">
+    <div class={gridItem({ colSpan: 6, columnGap: 5 })} transition:slide>
+      <FormField forId="email" label="Client's Email">
         <Input
-          bind:value={newClient.email}
+          id="email"
+          name="email"
           required={isNewClient}
           type="email"
-          name="email"
-          id="email"
+          bind:value={newClient.email}
         />
       </FormField>
 
-      <FormField label="Street" forId="street">
+      <FormField forId="street" label="Street">
         <Input
-          bind:value={newClient.street}
-          type="text"
-          name="street"
           id="street"
+          name="street"
+          type="text"
+          bind:value={newClient.street}
         />
       </FormField>
 
-      <FormField label="City" forId="city" class={gridItem({ colSpan: 2 })}>
-        <Input bind:value={newClient.city} type="text" name="city" id="city" />
+      <FormField class={gridItem({ colSpan: 2 })} forId="city" label="City">
+        <Input id="city" name="city" type="text" bind:value={newClient.city} />
       </FormField>
 
-      <FormField label="State" forId="state" class={gridItem({ colSpan: 2 })}>
+      <FormField class={gridItem({ colSpan: 2 })} forId="state" label="State">
         <States bind:value={newClient.state} />
       </FormField>
 
       <FormField
-        label="Zip Code"
-        forId="zipCode"
         class={gridItem({ colSpan: 2 })}
+        forId="zipCode"
+        label="Zip Code"
       >
         <Input
-          bind:value={newClient.zip}
-          type="text"
-          name="zipCode"
           id="zipCode"
+          name="zipCode"
+          type="text"
+          bind:value={newClient.zip}
         />
       </FormField>
     </div>
@@ -139,41 +139,41 @@
 
   <!-- due date -->
   <FormField
-    label="Due Date"
-    forId="dueDate"
     class={gridItem({ colSpan: { base: 3, sm: 2 } })}
+    forId="dueDate"
+    label="Due Date"
   >
     <Input
-      required
-      type="date"
-      name="dueDate"
       id="dueDate"
       min={today}
+      name="dueDate"
+      required
+      type="date"
       bind:value={invoice.dueDate}
     />
   </FormField>
 
   <!-- issue date -->
   <FormField
-    label="Issue Date"
-    forId="issueDate"
     class={gridItem({ colSpan: { base: 3, sm: 2 }, colStart: { sm: 5 }, colEnd: { sm: 7 } })}
+    forId="issueDate"
+    label="Issue Date"
   >
     <Input
-      type="date"
-      name="issueDate"
       id="issueDate"
       min={today}
+      name="issueDate"
+      type="date"
       bind:value={invoice.issueDate}
     />
   </FormField>
 
   <!-- subject -->
-  <FormField label="Subject" forId="subject" class={gridItem({ colSpan: 6 })}>
+  <FormField class={gridItem({ colSpan: 6 })} forId="subject" label="Subject">
     <Input
-      type="text"
-      name="subject"
       id="subject"
+      name="subject"
+      type="text"
       bind:value={invoice.subject}
     />
   </FormField>
@@ -184,13 +184,13 @@
       <LineItemSkeleton />
     {:else}
       <LineItemRows
-        {mode}
-        {lineItems}
-        discount={invoice.discount}
-        {updateLineItem}
-        {setDiscount}
         {addLineItem}
+        discount={invoice.discount}
+        {lineItems}
+        {mode}
         {removeLineItem}
+        {setDiscount}
+        {updateLineItem}
       />
     {/if}
   </FormField>
@@ -203,7 +203,7 @@
         >(optional, displayed on invoice)</span
       ></Label
     >
-    <Textarea bind:value={invoice.notes} name="notes" id="notes"></Textarea>
+    <Textarea id="notes" name="notes" bind:value={invoice.notes}></Textarea>
   </FormField>
 
   <!-- terms -->
@@ -214,7 +214,7 @@
         >(optional, displayed on invoice)</span
       ></Label
     >
-    <Textarea bind:value={invoice.terms} name="terms" id="terms"></Textarea>
+    <Textarea id="terms" name="terms" bind:value={invoice.terms}></Textarea>
     <p class={css({ fontSize: "xs", color: "gray.400" })}>
       Formatting tips: <strong>*bold*</strong>, <em>_italic_</em>
     </p>
@@ -223,7 +223,7 @@
   <!-- buttons -->
   <FormField class={gridItem({ colSpan: 2 })}>{@render buttons?.()}</FormField>
   <FormField class={gridItem({ colSpan: 4, justifySelf: "end", columnGap: 5 })}>
-    <Button variant="secondary" onclick={closePanel}>Cancel</Button>
-    <Button variant="default" type="submit">Save</Button>
+    <Button onclick={closePanel} variant="secondary">Cancel</Button>
+    <Button type="submit" variant="default">Save</Button>
   </FormField>
 </form>

@@ -113,7 +113,7 @@ export default defineConfig({
           },
         },
         fonts: {
-          sansserif: { value: "Source Sans 3, sans-serif" },
+          sansserif: { value: "Source Sans 3 Variable, sans-serif" },
           mono: { value: "Source Code Pro, monospace" },
           handwriting: { value: "Kalam, cursive" },
         },

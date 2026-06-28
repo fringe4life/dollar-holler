@@ -10,9 +10,9 @@
 </script>
 
 <TableHeader
-  headers={clientHeaders}
   className={cx(clientTable, className)}
   {emptyState}
+  headers={clientHeaders}
 >
   {#snippet headerSnippet(_title, _emptyState)}
     <h3

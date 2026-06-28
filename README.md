@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.60.1-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.55.7-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.1-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.11-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.28-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-1.11.1-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.53.1-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.68.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.3-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.20-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-1.11.3-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.59.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
@@ -60,7 +60,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ## Available Scripts
 
 - `bun run dev` - Start development server (Vite 8)
-- `bun run build` - Build for production (`panda cssgen` then Vite)
+- `bun run build` - Build for production (`svelte-kit sync`, `panda codegen`, `panda cssgen`, then Vite)
 - `bun run preview` - Preview production build
 - `bun run check` - Run Ultracite (Biome) checks
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
@@ -94,7 +94,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **Validation:** ArkType for runtime-safe form validation
 - **Bundler:** Vite 8 for dev and production builds
 - **UI components:** [Ark UI for Svelte](https://ark-ui.com/) (`@ark-ui/svelte`)
-- **Styling:** [Panda CSS](https://panda-css.com/) with generated `styled-system` (see `panda.config.ts`, PostCSS, `prepare` script)
+- **Styling:** [Panda CSS](https://panda-css.com/) with generated `styled-system` (see `panda.config.ts`, PostCSS, `prepare` script); [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
 - **Lint/format:** [Ultracite](https://ultracite.dev/) on top of [Biome](https://biomejs.dev/) (`biome.jsonc`)
 
 ## Project Structure
@@ -184,7 +184,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 
 ## Notes
 
-- Uses Vite 8 (`vite` in `package.json`). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
+- Uses Vite 8 (`vite` in `package.json`) and Varlock 1.9 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
 - Lint and format run through Ultracite (`bun run check`, `bun run fix`) with Biome rules extended from `ultracite/biome` for core and Svelte.
 - Panda CSS generates `styled-system/`; `svelte.config.js` aliases `styled-system` and extends TypeScript `include` for `drizzle.config.ts` and `styled-system/*`. After dependency install, `prepare` runs codegen for Panda.
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.

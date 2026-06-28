@@ -99,13 +99,13 @@
 </script>
 
 <InvoiceFormLayout
-  onsubmit={handleSubmit}
-  bind:invoice
-  bind:lineItems
-  bind:isNewClient
-  bind:newClient
+  {addLineItem}
+  {closePanel}
   lineItemsLoaded={true}
   mode="create"
-  {closePanel}
-  {addLineItem}
+  onsubmit={handleSubmit}
+  bind:invoice
+  bind:isNewClient
+  bind:lineItems
+  bind:newClient
 />

@@ -58,19 +58,19 @@
   {#each props.lineItems as lineItem, index (lineItem.id)}
     {#if props.mode === "view"}
       <LineItemRow
-        mode="view"
-        {lineItem}
         canDelete={false}
         isRequired={false}
+        {lineItem}
+        mode="view"
       />
     {:else}
       <LineItemRow
-        mode={props.mode}
-        {lineItem}
         canDelete={index !== 0}
         isRequired={index === 0}
-        updateLineItem={props.updateLineItem}
+        {lineItem}
+        mode={props.mode}
         removeLineItem={props.removeLineItem}
+        updateLineItem={props.updateLineItem}
       />
     {/if}
   {/each}
@@ -79,7 +79,7 @@
 <div class={invoiceLineItem}>
   <div class={gridItem({ colSpan: { base: 1, sm: 2 } })}>
     {#if isEditable && props.mode === "edit"}
-      <Button variant="textOnly" onclick={props.addLineItem}
+      <Button onclick={props.addLineItem} variant="textOnly"
         >+ Line Item</Button
       >
     {/if}
@@ -105,13 +105,13 @@
   <div class={gridItem({ position: "relative" })}>
     <input
       class={cx(discountStyles.input, css({ paddingInlineEnd: 3 }))}
-      type="number"
-      name="discount"
       disabled={!isEditable}
-      min="0"
       max="100"
-      value={props.discount}
+      min="0"
+      name="discount"
       oninput={isEditable ? onDiscountInput : undefined}
+      type="number"
+      value={props.discount}
     >
     <span
       class={css({ position: "absolute", insetInlineEnd: 0, insetBlockStart: 2, fontFamily: "mono" })}

@@ -14,11 +14,11 @@
 
 <Form {form} method="POST">
   {#snippet children()}
-    <FormField label="New Password" forId="newPassword">
-      <Input type="password" name="newPassword" id="newPassword" />
+    <FormField forId="newPassword" label="New Password">
+      <Input id="newPassword" name="newPassword" type="password" />
     </FormField>
-    <FormField label="Confirm Password" forId="confirmPassword">
-      <Input type="password" name="confirmPassword" id="confirmPassword" />
+    <FormField forId="confirmPassword" label="Confirm Password">
+      <Input id="confirmPassword" name="confirmPassword" type="password" />
     </FormField>
   {/snippet}
   {#snippet submit()}
@@ -29,8 +29,8 @@
       class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
     >
       <a
-        href={resolve("/login")}
         class={css({ textDecoration: { base:"underline", _hover: "none" }})}
+        href={resolve("/login")}
         >I'm ready to login</a
       >
     </p>

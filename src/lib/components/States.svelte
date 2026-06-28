@@ -10,7 +10,7 @@
   let { value = $bindable() }: Props = $props();
 </script>
 
-<Select name="state" id="state" bind:value>
+<Select id="state" name="state" bind:value>
   {#each states as { value, name } (name)}
     <option {value}>{name}</option>
   {/each}

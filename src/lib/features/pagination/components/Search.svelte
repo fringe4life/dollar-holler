@@ -64,15 +64,16 @@
 </script>
 
 <div
+  aria-busy={loading.isOn}
   class={grid({ 
     inlineSize: "full", 
     gridAutoFlow: "column", 
     gridTemplateColumns: "24px 1fr", 
     alignItems: "baseline", 
     columnGap: 2 })}
-  aria-busy={loading.isOn}
 >
   <span
+    aria-hidden="true"
     class={gridItem({
       color: "pastelPurple",
       aspectRatio: "square",
@@ -80,10 +81,10 @@
       contain: "strict",
     })}
     style:view-transition-name="search-icon-loader"
-    aria-hidden="true"
   >
     {#if loading.isOn}
       <span
+        aria-hidden="true"
         class={circle({
           display: "block",
           size: 5,
@@ -92,7 +93,6 @@
           borderColor: "currentColor",
           borderBottomColor: "transparent",
         })}
-        aria-hidden="true"
       ></span>
     {:else}
       <Search />
@@ -134,12 +134,12 @@
           fontSize:  "xl" ,
         }),
       )}
-      type="search"
-      name="search"
-      placeholder="Search by keyword"
       id="search"
-      bind:value={search}
+      name="search"
       onkeydown={handleKeydown}
+      placeholder="Search by keyword"
+      type="search"
+      bind:value={search}
     >
     <span
       aria-hidden="true"
@@ -167,9 +167,6 @@
       // class="border-b-lavenderIndigo ease-anticipate supports-linear:ease-anticipate pointer-events-none absolute inset-x-0 bottom-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200 block-2 peer-not-placeholder-shown:scale-x-100 peer-not-placeholder-shown:opacity-100 peer-focus:scale-x-100 peer-focus:opacity-100 md:inline-52 lg:inline-72"
     ></span>
     <button
-      type="button"
-      onclick={handleSearchClick}
-      onkeydown={handleKeydown}
       class={css({
         fontFamily: "sansserif",
         color: { base:"pastelPurple", _peerFocus: "lavenderIndigo", _peerHover: "daisyBush" },
@@ -196,6 +193,9 @@
           outlineStyle: "solid",
         },
       })}
+      onclick={handleSearchClick}
+      onkeydown={handleKeydown}
+      type="button"
       // class="font-sansserif text-pastelPurple peer-not-placeholder-shown:text-lavenderIndigo peer-focus:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush supports-linear:ease-anticipate pointer-events-none absolute translate-x-0 transform text-xl font-black transition-transform duration-200 ease-out inline-15.5 not-placeholder-shown:pointer-events-auto"
     >
       Search

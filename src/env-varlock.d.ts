@@ -7,45 +7,45 @@
 /* eslint-disable */
 export type CoercedEnvSchema = {
   /**
-   * **BITWARDEN_ACCESS_TOKEN** 🔐 _sensitive_  
-   * Machine account token (Bitwarden Secrets Manager). Set in `.env.local` or CI; omit if you override DB/auth secrets locally without Bitwarden.  
-   * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2024%2024%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M21.722.296A.96.96%200%200%200%2021.018%200H2.982a.96.96%200%200%200-.703.296a.96.96%200%200%200-.297.702v12q0%201.342.523%202.665q.524%201.319%201.3%202.345q.775%201.021%201.848%201.993a22%2022%200%200%200%201.98%201.609q.907.64%201.893%201.212q.986.571%201.4.772c.276.134.5.241.664.311a.92.92%200%200%200%20.814%200q.251-.11.667-.311c.275-.134.743-.394%201.401-.772a25%2025%200%200%200%201.894-1.212A22%2022%200%200%200%2018.348%2020q1.073-.97%201.847-1.993c.774-1.023.949-1.463%201.3-2.345q.524-1.318.524-2.665V1.001a.95.95%200%200%200-.297-.705m-2.325%2012.815c0%204.344-7.397%208.087-7.397%208.087V2.57h7.397v10.54z%22%2F%3E%3C%2Fsvg%3E)   
-   *   
-   * 📚 {@link https://bitwarden.com/help/secrets-manager-machine-accounts/ | Bitwarden Machine Accounts}  
-   */
-  BITWARDEN_ACCESS_TOKEN: string;
-  
-  /**
    * **DATABASE_URL** 🔐 _sensitive_  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
+   *   
+   * 📚 {@link https://neon.tech/docs/connect/connect-from-any-app | Neon PostgreSQL connection string}  
    */
   DATABASE_URL: string;
   
   /**
    * **BETTER_AUTH_SECRET** 🔐 _sensitive_  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
+   *   
+   * 📚 {@link https://www.better-auth.com/docs/installation | Signing secret for sessions and tokens}  
    */
   BETTER_AUTH_SECRET: string;
   
   /**
    * **PUBLIC_BASE_URL**  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M24%2021V9h-2v14h8v-2zm-4-6v-4c0-1.103-.897-2-2-2h-6v14h2v-6h1.48l2.335%206h2.145l-2.333-6H18c1.103%200%202-.897%202-2m-6-4h4v4h-4zM8%2023H4c-1.103%200-2-.897-2-2V9h2v12h4V9h2v12c0%201.103-.897%202-2%202%22%2F%3E%3C%2Fsvg%3E)   
+   *   
+   * 📚 {@link https://www.better-auth.com/docs/installation | baseURL and trustedOrigins}  
    */
   PUBLIC_BASE_URL: string;
   
   /**
    * **SENTRY_AUTH_TOKEN** 🔐 _sensitive_  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
+   *   
+   * 📚 {@link https://docs.sentry.io/product/accounts/auth-tokens/ | Auth token for source map uploads at build time}  
+   * 📚 {@link https://docs.sentry.io/platforms/javascript/guides/sveltekit/ | Sentry SvelteKit integration}  
    */
   SENTRY_AUTH_TOKEN: string;
   
 };
 
-type _CoercedEnvSchema_b4d6ce0f = CoercedEnvSchema;
+type _CoercedEnvSchema_219ed0a5 = CoercedEnvSchema;
 
 declare module 'varlock/env' {
-  export interface TypedEnvSchema extends Readonly<_CoercedEnvSchema_b4d6ce0f> {}
-  export interface PublicTypedEnvSchema extends Readonly<Pick<_CoercedEnvSchema_b4d6ce0f, 'PUBLIC_BASE_URL'>> {}
+  export interface TypedEnvSchema extends Readonly<_CoercedEnvSchema_219ed0a5> {}
+  export interface PublicTypedEnvSchema extends Readonly<Pick<_CoercedEnvSchema_219ed0a5, 'PUBLIC_BASE_URL'>> {}
 }
 
 
@@ -55,17 +55,17 @@ export type EnvSchemaAsStrings = {
       : (CoercedEnvSchema[Property] extends boolean ? ('true' | 'false') : string)
 };
 
-type _EnvSchemaAsStrings_b4d6ce0f = EnvSchemaAsStrings;
+type _EnvSchemaAsStrings_219ed0a5 = EnvSchemaAsStrings;
 declare global {
 
   // add types for global import.meta.env
-  interface ImportMetaEnv extends _EnvSchemaAsStrings_b4d6ce0f {}
+  interface ImportMetaEnv extends _EnvSchemaAsStrings_219ed0a5 {}
   interface ImportMeta {
     readonly env: ImportMetaEnv;
   }
 
   // add types for global process.env
   namespace NodeJS {
-    interface ProcessEnv extends _EnvSchemaAsStrings_b4d6ce0f {}
+    interface ProcessEnv extends _EnvSchemaAsStrings_219ed0a5 {}
   }
 }

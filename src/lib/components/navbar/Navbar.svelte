@@ -31,6 +31,8 @@
 <header class={cx(gridItem({ colSpan: { md: 3 }, zIndex: 20 }), cq())}>
   <!-- mobile nav control -->
   <button
+    aria-controls="primary-navigation"
+    aria-expanded={nav.isOn}
     class={cx(
     "group",
     css({
@@ -49,8 +51,6 @@
   )}
     onclick={nav.toggle}
     type="button"
-    aria-controls="primary-navigation"
-    aria-expanded={nav.isOn}
   >
     <span class={css({ srOnly: true })}>Menu</span>
     <div
@@ -76,7 +76,6 @@
     ></div>
   </button>
   <nav
-    id="primary-navigation"
     class={cx("group", vstack({
     backgroundColor: "daisyBush",
     position: { base: "fixed", md: "sticky" },
@@ -94,27 +93,28 @@
     inlineSize: "full",
     blockSize: { md: "100dvh" },
   }))}
+    id="primary-navigation"
   >
     <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>
       <a href={resolve("/")}>
         <img
+          alt="Doller Holla company logo"
           class={css({ marginInline: "auto" })}
           src={asset("/images/logo.svg")}
-          alt="Doller Holla company logo"
         >
       </a>
     </div>
     <ul
-      style:--active-nav-left={`url(${asset('/images/active-nav--left.svg')})`}
-      style:--active-nav-right={`url(${asset('/images/active-nav--right.svg')})`}
       class={cx("group", css({
       listStyle: "none",
       fontSize: { base: "xl", "@/xs": "2xl" },
       fontWeight: { base: "medium", "@/xs": "semibold" },
     }))}
+      style:--active-nav-left={`url(${asset('/images/active-nav--left.svg')})`}
+      style:--active-nav-right={`url(${asset('/images/active-nav--right.svg')})`}
     >
       {#each navItems as { href, title } (title)}
-        <NavbarItem {href} {title} isActive={isActive(href, path)} />
+        <NavbarItem {href} isActive={isActive(href, path)} {title} />
       {/each}
     </ul>
   </nav>

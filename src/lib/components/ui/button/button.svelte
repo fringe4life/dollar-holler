@@ -218,18 +218,18 @@
 
 {#if href}
   <a
-    {href}
     class={cx(buttonVariants({ variant, size }), className)}
+    {href}
     {...restProps}
   >
     {@render children?.()}
   </a>
 {:else}
   <button
-    data-slot="button"
     class={cx(buttonVariants({ variant, size }), className)}
-    type="button"
+    data-slot="button"
     {disabled}
+    type="button"
     {...restProps}
   >
     {@render children?.()}

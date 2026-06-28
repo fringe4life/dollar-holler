@@ -142,10 +142,10 @@
 </script>
 
 <dialog
-  bind:this={dialogEl}
   class={cx(modalStyles.dialog, className)}
   onclick={handleBackdropClick}
   onclose={handleDialogClose}
+  bind:this={dialogEl}
 >
   <div class={modalStyles.content}>
     {@render title()}
@@ -153,9 +153,7 @@
     {@render children?.()}
   </div>
   <Button
-    variant="ghost"
-    size="sm"
-    onclick={onClose}
+    aria-label="Close dialog"
     class={css({
     position: "absolute",
     insetInlineEnd: 4,
@@ -163,7 +161,9 @@
     rounded: "md",
     _active: { scale: "0.95" },
   })}
-    aria-label="Close dialog"
+    onclick={onClose}
+    size="sm"
+    variant="ghost"
     ><Cancel /></Button
   >
 </dialog>

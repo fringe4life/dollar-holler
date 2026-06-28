@@ -25,16 +25,16 @@
     position: "relative",
     isolation: "isolate",
   })}
-  style:view-transition-name={contentViewTransitionName}
   data-swipeable
+  style:view-transition-name={contentViewTransitionName}
 >
   <!-- CONTENT displayed by default -->
   <div
+    class={cx(css({ zIndex: 5 }), contentClass)}
     {@attach swipe({
       triggerReset: swipeReset.isOn,
       onResetComplete: swipeReset.off,
     })}
-    class={cx(css({ zIndex: 5 }), contentClass)}
   >
     {@render content()}
   </div>
@@ -50,8 +50,8 @@
       inlineSize: "full",
     })}
   >
-    <button type="button" onclick={swipeReset.toggle} class={actionButton}>
-      <Cancel width={32} height={32} />
+    <button class={actionButton} onclick={swipeReset.toggle} type="button">
+      <Cancel height={32} width={32} />
       Cancel
     </button>
     {@render revealed()}

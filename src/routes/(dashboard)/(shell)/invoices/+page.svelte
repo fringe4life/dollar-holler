@@ -45,7 +45,7 @@
 
 <svelte:head> <title>Invoices | Dollar Holler</title> </svelte:head>
 
-<ItemsHeader store={invoicesStore} open={createForm.open.bind(null, undefined)}>
+<ItemsHeader open={createForm.open.bind(null, undefined)} store={invoicesStore}>
   {#snippet button()}
     + Invoice
   {/snippet}
@@ -61,8 +61,8 @@
   {#snippet row(_invoice)}
     <InvoiceRow
       invoice={_invoice}
-      onEdit={(inv) => editPanel.open(inv.id)}
       onDelete={deleteModal.open}
+      onEdit={(inv) => editPanel.open(inv.id)}
       onSendInvoice={async (inv) => {
         await invoicesStore.updateInvoiceStatus(inv.id, "sent");
       }}
@@ -81,9 +81,9 @@
 </PaginatedList>
 
 <Modal
+  onClose={createForm.close}
   variant="panel"
   bind:dialogEl={createForm.dialogEl}
-  onClose={createForm.close}
 >
   {#snippet title()}
     <h2
@@ -104,13 +104,13 @@
     <h2 class={css({ display: "none" })}>""</h2>
   {/snippet}
 
-  <InvoiceForm mode="create" closePanel={createForm.close} />
+  <InvoiceForm closePanel={createForm.close} mode="create" />
 </Modal>
 
 <Modal
+  onClose={editPanel.close}
   variant="panel"
   bind:dialogEl={editPanel.dialogEl}
-  onClose={editPanel.close}
 >
   {#snippet title()}
     <h2
@@ -133,9 +133,9 @@
   {#if editPanel.item}
     {#key editPanel.item}
       <InvoiceForm
-        mode="edit"
-        invoiceId={editPanel.item}
         closePanel={editPanel.close}
+        invoiceId={editPanel.item}
+        mode="edit"
       />
     {/key}
   {/if}
@@ -143,8 +143,6 @@
 
 <ConfirmDelete
   item={deleteModal.item}
-  bind:dialogEl={deleteModal.dialogEl}
-  titleText="Are you sure you want to delete this invoice?"
   onCancel={deleteModal.close}
   onDelete={async () => {
       if (!deleteModal?.item?.id) {
@@ -153,6 +151,8 @@
       await invoicesStore.deleteInvoice(deleteModal.item.id);
       deleteModal.close();
     }}
+  titleText="Are you sure you want to delete this invoice?"
+  bind:dialogEl={deleteModal.dialogEl}
 >
   {#snippet descriptionSnippet(_invoice)}
     This will delete the invoice to

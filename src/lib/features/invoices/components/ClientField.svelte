@@ -36,11 +36,11 @@
       })}
     >
       <Select
+        class={css({ marginBlockEnd: { base: 2, sm: 0 } })}
         id="client"
         name="client"
         required={!isNewClient}
         bind:value={invoice.clientId}
-        class={css({ marginBlockEnd: { base: 2, sm: 0 } })}
       >
         {#each clientsStore.clientPickerOptions as { id, name } (id)}
           <option value={id}>{name}</option>
@@ -55,13 +55,13 @@
         or
       </p>
       <Button
-        variant="outline"
-        size="sm"
         onclick={() => {
           isNewClient = true;
           newClient.name = "";
           newClient.email = "";
         }}
+        size="sm"
+        variant="outline"
         >+ Client</Button
       >
     </div>
@@ -76,18 +76,18 @@
     >
       <Input
         class={css({ marginBlockEnd: { base: 2, sm: 0 } })}
-        bind:value={newClient.name}
-        type="text"
         name="newClient"
         required={isNewClient}
+        type="text"
+        bind:value={newClient.name}
       />
       <Button
-        variant="outline"
-        size="sm"
         onclick={() => {
           isNewClient = false;
           newClient = clientsStore.newClient();
         }}
+        size="sm"
+        variant="outline"
         >Existing Client</Button
       >
     </div>

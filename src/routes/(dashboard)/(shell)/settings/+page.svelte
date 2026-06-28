@@ -93,54 +93,54 @@
 
 <form class={grid({ columns: 6, columnGap: 5 })}>
   <FormField
-    label="Name"
-    forId="myName"
     class={gridItem({ colSpan: { base: 6, md: 3 } })}
+    forId="myName"
+    label="Name"
   >
     <Input
-      type="text"
-      name="myName"
       id="myName"
+      name="myName"
+      type="text"
       bind:value={mySettings.myName}
     />
   </FormField>
   <FormField
-    label="Email (shown on invoices)"
-    forId="invoiceEmail"
     class={gridItem({ colSpan: { base: 6, md: 3 } })}
+    forId="invoiceEmail"
+    label="Email (shown on invoices)"
   >
     <Input
-      type="email"
-      name="invoiceEmail"
       id="invoiceEmail"
+      name="invoiceEmail"
+      type="email"
       bind:value={mySettings.email}
     />
   </FormField>
-  <FormField label="Address" forId="address" class={gridItem({ colSpan: 6 })}>
+  <FormField class={gridItem({ colSpan: 6 })} forId="address" label="Address">
     <Input
-      type="text"
-      name="address"
       id="address"
+      name="address"
+      type="text"
       bind:value={mySettings.street}
     />
   </FormField>
   <FormField
-    label="City"
-    forId="city"
     class={gridItem({ colSpan: { base: 6, md: 2 } })}
+    forId="city"
+    label="City"
   >
-    <Input type="text" name="city" id="city" bind:value={mySettings.city} />
+    <Input id="city" name="city" type="text" bind:value={mySettings.city} />
   </FormField>
   <FormField class={gridItem({ colSpan: { base: 6, md: 2 } })}>
     <label for="state">State</label>
     <States bind:value={mySettings.state} />
   </FormField>
   <FormField
-    label="Zip"
-    forId="zip"
     class={gridItem({ colSpan: { base: 6, md: 2 } })}
+    forId="zip"
+    label="Zip"
   >
-    <Input type="text" name="zip" id="zip" bind:value={mySettings.zip} />
+    <Input id="zip" name="zip" type="text" bind:value={mySettings.zip} />
   </FormField>
   <FormField
     class={gridItem({ colSpan: { base: 6, md: 2 }, gridColumnStart: { md: 5 } })}
@@ -162,40 +162,40 @@
   {#snippet children()}
     <div class={grid({ columns: 6, columnGap: 5 })}>
       <FormField
-        label="Email"
-        forId="email"
         class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        forId="email"
+        label="Email"
       >
         <Input
-          type="email"
-          name="email"
-          id="email"
           defaultValue={form?.email ?? ""}
+          id="email"
+          name="email"
+          type="email"
         />
       </FormField>
 
       <FormField
-        label="Current Password"
+        class={gridItem({ colSpan: { base: 6, md: 3 } })}
         forId="currentPassword"
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        label="Current Password"
       >
-        <Input type="password" name="currentPassword" id="currentPassword" />
+        <Input id="currentPassword" name="currentPassword" type="password" />
       </FormField>
 
       <FormField
-        label="New Password"
+        class={gridItem({ colSpan: { base: 6, md: 3 } })}
         forId="newPassword"
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        label="New Password"
       >
-        <Input type="password" name="newPassword" id="newPassword" />
+        <Input id="newPassword" name="newPassword" type="password" />
       </FormField>
 
       <FormField
-        label="Confirm Password"
-        forId="confirmPassword"
         class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        forId="confirmPassword"
+        label="Confirm Password"
       >
-        <Input type="password" name="confirmPassword" id="confirmPassword" />
+        <Input id="confirmPassword" name="confirmPassword" type="password" />
       </FormField>
     </div>
   {/snippet}

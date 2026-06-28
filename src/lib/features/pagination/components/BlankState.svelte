@@ -13,8 +13,6 @@
 </script>
 
 <div
-  style:--arrow-left={`url(${asset('/images/arrow-left-up.svg')})`}
-  style:--arrow-right={`url(${asset('/images/arrow-right-up.svg')})`}
   class={css({
       marginInlineStart: 2,
       marginBlockEnd: 10,
@@ -26,6 +24,8 @@
       paddingBlockStart: 12,
       
     })}
+  style:--arrow-left={`url(${asset('/images/arrow-left-up.svg')})`}
+  style:--arrow-right={`url(${asset('/images/arrow-right-up.svg')})`}
 >
   <h2
     class={css({

@@ -88,10 +88,10 @@
           >{_toastValue().title}</Toast.Title
         >
         <Toast.CloseTrigger
+          aria-label="Close notification"
           class={toastRootRecipe({
             type: getToastVariant(_toastValue().type),
           }).closeTrigger}
-          aria-label="Close notification"
         >
           x
         </Toast.CloseTrigger>

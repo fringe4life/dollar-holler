@@ -1,4 +1,5 @@
 import { createToaster } from "@ark-ui/svelte/toast";
+import { pickDefined } from "$lib/utils/strip-nullish-entries";
 
 interface ToastOptions {
   closable?: boolean;
@@ -7,14 +8,11 @@ interface ToastOptions {
   id?: string;
 }
 
+type ToastKind = "success" | "error" | "info" | "warning";
+
 const toToastPayload = (title: string, options?: ToastOptions) => ({
   title,
-  ...(options?.description === undefined
-    ? {}
-    : { description: options.description }),
-  ...(options?.duration === undefined ? {} : { duration: options.duration }),
-  ...(options?.id === undefined ? {} : { id: options.id }),
-  ...(options?.closable === undefined ? {} : { closable: options.closable }),
+  ...pickDefined(options ?? {}),
 });
 
 export const toaster = createToaster({
@@ -24,14 +22,17 @@ export const toaster = createToaster({
   pauseOnPageIdle: true,
 });
 
+const notify = (kind: ToastKind, title: string, options?: ToastOptions) =>
+  toaster[kind](toToastPayload(title, options));
+
 export const toast = {
   success: (title: string, options?: ToastOptions) =>
-    toaster.success(toToastPayload(title, options)),
+    notify("success", title, options),
   error: (title: string, options?: ToastOptions) =>
-    toaster.error(toToastPayload(title, options)),
+    notify("error", title, options),
   info: (title: string, options?: ToastOptions) =>
-    toaster.info(toToastPayload(title, options)),
+    notify("info", title, options),
   warning: (title: string, options?: ToastOptions) =>
-    toaster.warning(toToastPayload(title, options)),
+    notify("warning", title, options),
   dismiss: (id?: string) => toaster.dismiss(id),
 };

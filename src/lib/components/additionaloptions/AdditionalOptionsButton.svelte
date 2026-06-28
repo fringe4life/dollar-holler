@@ -12,15 +12,15 @@
 </script>
 
 <button
-  type="button"
-  {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
-  onclick={additionalMenu.toggle}
   class={css({
     color: { base:"pastelPurple", _groupHover: "daisyBush/50", _hover: "daisyBush" },
     transitionProperty: "colors",
     transitionDuration: "normal",
     cursor: "pointer",
   })}
+  onclick={additionalMenu.toggle}
+  type="button"
+  {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
 >
   <ThreeDots />
 </button>

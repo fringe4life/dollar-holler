@@ -88,8 +88,8 @@
     <div class={gridItem({ justifySelf: "end", gridArea: "status" })}>
       <Badge
         class={css({ marginInlineStart: { base: "auto", md: 0 } })}
-        variant={label}
         size="small"
+        variant={label}
         >{label}</Badge
       >
     </div>
@@ -164,17 +164,17 @@
   {/snippet}
   {#snippet revealed()}
     {#if !isOptionsDisabled}
-      <button onclick={handleEdit} type="button" class={actionButton}>
-        <Edit width={32} height={32} />
+      <button class={actionButton} onclick={handleEdit} type="button">
+        <Edit height={32} width={32} />
         Edit
       </button>
-      <button onclick={handleSendInvoice} type="button" class={actionButton}>
-        <Send width={32} height={32} />
+      <button class={actionButton} onclick={handleSendInvoice} type="button">
+        <Send height={32} width={32} />
         Send
       </button>
     {/if}
-    <button onclick={handleDelete} type="button" class={actionButton}>
-      <Trash width={32} height={32} />
+    <button class={actionButton} onclick={handleDelete} type="button">
+      <Trash height={32} width={32} />
       Delete
     </button>
     <a class={actionButton} href={resolved}><View height={32} width={32} /></a>

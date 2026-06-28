@@ -7,7 +7,6 @@
 </script>
 <!-- "bg-daisyBush bg-none bg-cover bg-center bg-no-repeat inline-full min-block-dvh md:bg-[url('/images/bg-auth.svg')]" -->
 <div
-  style:--bg-image={`url(${asset('/images/bg-auth.svg')})`}
   class={css({
     backgroundColor: "daisyBush",
     backgroundRepeat: "no-repeat",
@@ -17,6 +16,7 @@
     minBlockSize: "100dvh",
     backgroundImage: { base: "none", md: "var(--bg-image)" },
   })}
+  style:--bg-image={`url(${asset('/images/bg-auth.svg')})`}
 >
   <!-- "grid auto-rows-min grid-cols-12 place-content-center px-4 min-block-dvh md:auto-rows-fr md:gap-5 xl:px-0" -->
   <div
@@ -39,9 +39,9 @@
       })}
     >
       <img
-        src={asset('/images/logo.svg')}
         alt="The Doller Holla"
         class={css({ marginInline: "auto" })}
+        src={asset('/images/logo.svg')}
       >
     </div>
     <!-- "col-span-full md:col-span-6 md:my-auto lg:col-span-4 xl:col-span-3" -->

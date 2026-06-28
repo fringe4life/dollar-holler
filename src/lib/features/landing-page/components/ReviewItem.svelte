@@ -33,7 +33,7 @@
   <!-- Stars -->
   <div class={flex({ gap: 1 })}>
     {#each { length: 5 } as _}
-      <StarIcon size={16} class={css({ color: "goldenFizz" })} />
+      <StarIcon class={css({ color: "goldenFizz" })} size={16} />
     {/each}
   </div>
 
@@ -45,11 +45,11 @@
   <!-- Reviewer -->
   <div class={hstack({ gap: 3 })}>
     <img
-      src={review.avatar}
       alt={review.name}
       class={cx(circle({ size: 11 }), css({objectFit: "cover", ring: 2, ringColor: "white/20"}))}
-      width="44"
       height="44"
+      src={review.avatar}
+      width="44"
     >
     <div>
       <p

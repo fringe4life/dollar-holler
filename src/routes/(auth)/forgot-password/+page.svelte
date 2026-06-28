@@ -19,26 +19,26 @@
   {:else}
     <Alert message={form?.error || ""} />
     <FormField
-      label="Email Address"
       forId="email"
+      label="Email Address"
       labelClass={css({ color: "goldenFizz" })}
     >
       <Input
-        value={form?.email ?? ""}
-        type="email"
-        name="email"
         id="email"
+        name="email"
         placeholder="john@email.com"
+        type="email"
+        value={form?.email ?? ""}
       />
     </FormField>
 
-    <Button variant="auth" type="submit">Send me a reset email!</Button>
+    <Button type="submit" variant="auth">Send me a reset email!</Button>
     <p
       class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
     >
       <a
-        href={resolve("/login")}
         class={css({ textDecoration: {base:"underline", _hover: "none"} })}
+        href={resolve("/login")}
         >Ready to login?</a
       >
     </p>

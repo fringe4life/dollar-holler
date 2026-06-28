@@ -63,54 +63,54 @@
 </script>
 
 <form class={grid({ columns: 6, columnGap: 5 })} onsubmit={handleSubmit}>
-  <FormField label="Client Name" forId="name" class={gridItem({ colSpan: 6 })}>
+  <FormField class={gridItem({ colSpan: 6 })} forId="name" label="Client Name">
     <Input
-      type="text"
-      name="name"
       id="name"
-      bind:value={client.name}
+      name="name"
       required
+      type="text"
+      bind:value={client.name}
     />
   </FormField>
 
   <FormField
-    label="Client Email"
-    forId="email"
     class={gridItem({ colSpan: 6 })}
+    forId="email"
+    label="Client Email"
   >
     <Input
-      type="text"
-      name="email"
       id="email"
-      bind:value={client.email}
+      name="email"
       required
+      type="text"
+      bind:value={client.email}
     />
   </FormField>
 
-  <FormField label="Address" forId="street" class={gridItem({ colSpan: 6 })}>
-    <Input type="text" name="street" id="street" bind:value={client.street} />
+  <FormField class={gridItem({ colSpan: 6 })} forId="street" label="Address">
+    <Input id="street" name="street" type="text" bind:value={client.street} />
   </FormField>
 
-  <FormField label="City" forId="city" class={gridItem({ colSpan: 2 })}>
-    <Input type="text" name="city" id="city" bind:value={client.city} />
+  <FormField class={gridItem({ colSpan: 2 })} forId="city" label="City">
+    <Input id="city" name="city" type="text" bind:value={client.city} />
   </FormField>
 
-  <FormField label="State" forId="state" class={gridItem({ colSpan: 2 })}>
+  <FormField class={gridItem({ colSpan: 2 })} forId="state" label="State">
     <States bind:value={client.state} />
   </FormField>
 
-  <FormField label="Zip" forId="zip" class={gridItem({ colSpan: 2 })}>
+  <FormField class={gridItem({ colSpan: 2 })} forId="zip" label="Zip">
     <Input
-      type="text"
-      name="zip"
       id="zip"
       minlength={4}
+      name="zip"
+      type="text"
       bind:value={client.zip}
     />
   </FormField>
 
   <FormField class={gridItem({ colSpan: 3 })}>
-    <Button variant="textOnlyDestructive" onclick={handleDelete}
+    <Button onclick={handleDelete} variant="textOnlyDestructive"
       ><Trash />
       Delete</Button
     >
@@ -119,7 +119,7 @@
   <FormField
     class={cx(gridItem({ colSpan: 3 }), flex({ justify: "end", gap: 5 }))}
   >
-    <Button variant="secondary" onclick={() => closePanel()}>Cancel</Button>
+    <Button onclick={() => closePanel()} variant="secondary">Cancel</Button>
     <Button type="submit"><Check /> Submit</Button>
   </FormField>
 </form>

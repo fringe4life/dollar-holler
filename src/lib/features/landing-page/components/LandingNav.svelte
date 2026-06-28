@@ -48,14 +48,14 @@
   >
     <!-- Logo -->
     <a
-      href={resolve("/")}
       class={hstack({ gap: 2.5 })}
+      href={resolve("/")}
       onclick={mobileOpen.toggle}
     >
       <img
-        src={asset('/images/logo.svg')}
         alt="Dollar Holler"
         class={square({ size: 8 })}
+        src={asset('/images/logo.svg')}
       >
       <span
         class={css({
@@ -78,14 +78,14 @@
       })}
     >
       {#if user}
-        <Button href={resolve("/invoices")} variant="default" size="default">
+        <Button href={resolve("/invoices")} size="default" variant="default">
           Go to Dashboard
         </Button>
       {:else}
-        <Button href={resolve("/login")} variant="outline" size="default">
+        <Button href={resolve("/login")} size="default" variant="outline">
           Log in
         </Button>
-        <Button href={resolve("/signup")} variant="default" size="default">
+        <Button href={resolve("/signup")} size="default" variant="default">
           Sign Up Free
         </Button>
       {/if}
@@ -93,6 +93,7 @@
 
     <!-- Mobile Hamburger -->
     <button
+      aria-label="Toggle navigation"
       class={css({
         color: "daisyBush",
         display: { base: "flex", md: "none" },
@@ -100,7 +101,6 @@
         cursor: "pointer",
       })}
       onclick={mobileOpen.toggle}
-      aria-label="Toggle navigation"
       type="button"
     >
       {#if mobileOpen.isOn}
@@ -128,23 +128,23 @@
         {#if user}
           <Button
             href={resolve("/invoices")}
-            variant="default"
             onclick={mobileOpen.off}
+            variant="default"
           >
             Go to Dashboard
           </Button>
         {:else}
           <Button
             href={resolve("/login")}
-            variant="outline"
             onclick={mobileOpen.off}
+            variant="outline"
           >
             Log in
           </Button>
           <Button
             href={resolve("/signup")}
-            variant="default"
             onclick={mobileOpen.off}
+            variant="default"
           >
             Sign Up Free
           </Button>

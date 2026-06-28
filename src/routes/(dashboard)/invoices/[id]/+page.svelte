@@ -95,13 +95,13 @@
   <div
     class={flex({ align: "center", gap: 2, wrap: { base: "wrap", sm: "nowrap" } })}
   >
-    <Button size="short" onclick={printInvoice} variant="outline">Print</Button>
-    <Button size="short" onclick={copyLink}>Copy Link</Button>
+    <Button onclick={printInvoice} size="short" variant="outline">Print</Button>
+    <Button onclick={copyLink} size="short">Copy Link</Button>
     {#if canPayInvoice}
-      <Button size="short" onclick={payInvoice}>Pay Invoice</Button>
+      <Button onclick={payInvoice} size="short">Pay Invoice</Button>
     {/if}
     {#if canSendInvoice}
-      <Button size="short" onclick={sendInvoice}>Send Invoice</Button>
+      <Button onclick={sendInvoice} size="short">Send Invoice</Button>
     {/if}
   </div>
 </div>
@@ -122,9 +122,9 @@
 >
   <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
     <img
+      alt="Compressed fm"
       src={asset('/images/logo.png')}
       srcset={`${asset('/images/logo@2x.png')} 2x, ${asset('/images/logo.png')} 1x`}
-      alt="Compressed fm"
     >
   </div>
 
@@ -153,8 +153,8 @@
         class={center({ backgroundColor: "gallery", borderRadius: "md", minBlockSize: 17 })}
       >
         <a
-          href={settingsLink}
           class={css({ color: "stone.600", textDecoration: { base:"underline", _hover: "none"} })}
+          href={settingsLink}
           >Add your contact information.</a
         >
       </div>
@@ -215,7 +215,7 @@
 
   <!-- line items div wrapper -->
   <div class={gridItem({ colSpan: 6 })}>
-    <LineItemRows mode="view" {lineItems} discount={invoice.discount || 0} />
+    <LineItemRows discount={invoice.discount || 0} {lineItems} mode="view" />
   </div>
 
   {#if invoice.notesHtml}

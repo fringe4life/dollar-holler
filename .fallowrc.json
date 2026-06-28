@@ -3,17 +3,26 @@
   "ignoreDependencies": [
     "@varlock/bitwarden-plugin",
     "@sveltejs/mcp",
-    "@pandacss/plugin-svelte"
+    "@pandacss/plugin-svelte",
+    "@styled-system/css",
+    "@styled-system/patterns",
+    "@fontsource-variable/source-sans-3",
+    "styled-system"
   ],
   "rules": {
-    "boundary-violation": "warn"
+    "boundary-violation": "warn",
+    "unused-class-members": "off"
   },
   "duplicates": {
     "ignore": ["src/lib/server/db/schema.ts"],
     "enabled": true,
-    "minOccurrences": 3
+    "minOccurrences": 3,
+    "minLines": 18
   },
-  "ignorePatterns": ["src/instrumentation.server.ts"],
+  "ignorePatterns": [
+    "src/instrumentation.server.ts",
+    "src/lib/server/db/seed.ts"
+  ],
   "boundaries": {
     "zones": [
       {
@@ -82,5 +91,10 @@
       { "from": "attachments", "allow": ["shared"] },
       { "from": "shared", "allow": ["features"] }
     ]
+  },
+  "health": {
+    "maxCyclomatic": 25,
+    "maxCognitive": 25,
+    "maxCrap": 75
   }
 }

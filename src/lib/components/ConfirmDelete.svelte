@@ -1,4 +1,4 @@
-<script lang="ts" generics="T">
+<script generics="T" lang="ts">
   import { css } from "styled-system/css";
   import { flex } from "styled-system/patterns";
   import type { Snippet } from "svelte";
@@ -28,7 +28,7 @@
   };
 </script>
 
-<Modal bind:dialogEl onClose={onCancel}>
+<Modal onClose={onCancel} bind:dialogEl>
   {#snippet title()}
     <h2
       class={css({
@@ -57,8 +57,8 @@
     </h2>
   {/snippet}
   <div class={flex({ justify: "center", gap: 4 })}>
-    <Button variant="secondary" onclick={onCancel}>Cancel</Button>
-    <Button variant="destructive" onclick={handleDelete}
+    <Button onclick={onCancel} variant="secondary">Cancel</Button>
+    <Button onclick={handleDelete} variant="destructive"
       >Yes, Delete It.</Button
     >
   </div>

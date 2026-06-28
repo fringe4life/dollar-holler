@@ -1,5 +1,5 @@
-<script lang="ts" generics="T extends CursorRow">
-  import { css, cx } from "styled-system/css";
+<script generics="T extends CursorRow" lang="ts">
+  import { cx } from "styled-system/css";
   import { flex, grid, gridItem, stack } from "styled-system/patterns";
   import type { Snippet } from "svelte";
   import { page } from "$app/state";

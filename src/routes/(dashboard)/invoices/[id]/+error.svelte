@@ -16,7 +16,7 @@
 </svelte:head>
 
 <div
-  class={center({ bgPosition: "center", bgRepeat: "no-repeat", minBlockSize: "calc(100dvh - var(--spacing-16))", backgroundImage: "var(--bg-error)" })}
+  class={center({ backgroundPosition: "center", backgroundRepeat: "no-repeat", minBlockSize: "calc(100dvh - var(--spacing-16))", backgroundImage: "var(--bg-error)" })}
   style:--bg-error={`url('${asset('/images/bg-error.svg')}')`}
 >
   <div>

@@ -29,12 +29,12 @@ export const actions: Actions = {
           newPassword,
         },
         headers: request.headers,
-      })
+      }),
     );
 
     if (error || !data) {
       return fail(400, { error: "Failed to change password", email });
     }
-    throw redirect(303, resolve("/settings"));
+    throw redirect(303, resolve("/settings", {}));
   },
 };

@@ -1,8 +1,9 @@
 import { grid } from "styled-system/patterns";
 
 export const invoiceRow = grid({
+  gap: 0,
   gridTemplateAreas: {
-    base: '"invoicenumber invoicenumber" "clientName    amount" "duedate       status"',
+    base: '"invoicenumber invoicenumber" "clientName amount" "duedate status"',
     lg: '"status duedate invoicenumber clientName amount view threeDots"',
   },
 });

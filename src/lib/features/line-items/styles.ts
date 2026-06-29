@@ -1,8 +1,9 @@
 import { grid } from "styled-system/patterns";
 
 export const invoiceLineItem = grid({
+  gap: 0,
   gridTemplateAreas: {
-    base: '"description description description" "unitPrice   quantity    amount"',
+    base: '"description description description" "unitPrice quantity amount"',
     sm: '"description unitPrice quantity amount trash"',
     _print: '"description unitPrice quantity amount trash"',
   },

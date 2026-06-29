@@ -1,8 +1,14 @@
 import { defineConfig } from "@pandacss/dev";
 
 export default defineConfig({
-  // Whether to use css reset
+  presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
   preflight: true,
+  minify: true,
+  optimize: {
+    removeUnusedTokens: true,
+    removeUnusedKeyframes: true,
+    smartCompoundVariants: true,
+  },
   // Where to look for your css declarations
   include: ["./src/**/*.svelte", "./src/**/*.ts", "./src/**/*.js"],
   // Files to exclude
@@ -150,8 +156,6 @@ export default defineConfig({
       scrollbarGutter: "stable",
     },
   },
-  minify: true,
-  // The output directory for your css system
   outdir: "styled-system",
   patterns: {
     extend: {
@@ -197,5 +201,4 @@ export default defineConfig({
       },
     },
   },
-  // plugins: [pluginSvelte()],
 });

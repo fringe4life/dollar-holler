@@ -1,4 +1,4 @@
-import { drizzleAdapter } from "@better-auth/drizzle-adapter";
+import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { betterAuth } from "better-auth/minimal";
 import { bearer, openAPI } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
@@ -13,6 +13,7 @@ export const auth = betterAuth({
   appName: "Dollar Holler",
   baseURL: PUBLIC_BASE_URL,
   basePath: "/api/auth",
+  experimental: { joins: true },
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: schemaTables,

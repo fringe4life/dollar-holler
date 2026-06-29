@@ -30,7 +30,7 @@
     >
       <a
         class={css({ textDecoration: { base:"underline", _hover: "none" }})}
-        href={resolve("/login")}
+        href={resolve("/login", {})}
         >I'm ready to login</a
       >
     </p>

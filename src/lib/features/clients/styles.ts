@@ -11,6 +11,7 @@ export const clientTable = grid({
 });
 
 export const clientRow = grid({
+  gap: 0,
   gridTemplateAreas: {
     base: '"clientName status" "received balance"',
     lg: '"status clientName received balance view threeDots"',

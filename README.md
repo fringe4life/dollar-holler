@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.68.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.3-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.6.20-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-1.11.3-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.59.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-2.68.0-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.3-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.0-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.5-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.59.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
@@ -60,7 +60,8 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 ## Available Scripts
 
 - `bun run dev` - Start development server (Vite 8)
-- `bun run build` - Build for production (`svelte-kit sync`, `panda codegen`, `panda cssgen`, then Vite)
+- `bun run build` - Build for production (`svelte-kit sync`, `panda build`, then Vite)
+- `bun run panda:build` - Run `svelte-kit sync` and `panda build` only
 - `bun run preview` - Preview production build
 - `bun run check` - Run Ultracite (Biome) checks
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
@@ -77,7 +78,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - `bun run fallow:boundaries` - List configured boundaries
 - `bun run fallow:boundary-violations` - Dead-code with boundary violations
 - `bun run fallow:dupes` - Fallow duplicate detection
-- `bun run prepare` (auto) - `panda codegen` and `svelte-kit sync` after install
+- `bun run prepare` (auto) - `svelte-kit sync` and `panda build` after install
 
 ## Tech Stack
 
@@ -86,7 +87,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`)
 - **Database:** PostgreSQL with Neon serverless
 - **ORM:** Drizzle ORM 1.0 (rc) with Neon serverless driver (WebSocket `Pool`)
-- **Authentication:** Better Auth with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter, bearer + OpenAPI plugins)
+- **Authentication:** Better Auth 1.7 with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), `@better-auth/drizzle-adapter` relations-v2, bearer + OpenAPI plugins)
 - **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
 - **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
 - **Deployment:** Vercel adapter
@@ -94,7 +95,7 @@ A modern invoice management application built with SvelteKit 5, featuring Better
 - **Validation:** ArkType for runtime-safe form validation
 - **Bundler:** Vite 8 for dev and production builds
 - **UI components:** [Ark UI for Svelte](https://ark-ui.com/) (`@ark-ui/svelte`)
-- **Styling:** [Panda CSS](https://panda-css.com/) with generated `styled-system` (see `panda.config.ts`, PostCSS, `prepare` script); [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
+- **Styling:** [Panda CSS](https://panda-css.com/) 2.0 (beta) with generated `styled-system` via `panda build` (see `panda.config.ts`, PostCSS, `prepare` script); [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
 - **Lint/format:** [Ultracite](https://ultracite.dev/) on top of [Biome](https://biomejs.dev/) (`biome.jsonc`)
 
 ## Project Structure
@@ -133,7 +134,7 @@ src/
 │   ├── styles.ts          # Shared class names / style recipes
 │   └── utils/
 ├── routes/
-│   ├── (auth)/            # Login, signup, password reset, logout
+│   ├── (auth)/            # Login, signup, forgot/reset password, logout
 │   ├── (dashboard)/
 │   │   ├── (shell)/       # App shell: clients, invoice list, settings, thanks
 │   │   └── invoices/      # Invoice detail, line items
@@ -170,14 +171,14 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Safe rich text:** Markdown notes/terms sanitized server-side and stored as both source and HTML
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
-- **Auth Flows:** Reset password supported; token is read from URL and validated
+- **Auth Flows:** Forgot and reset password supported; reset token read from URL and validated
 - **Modern UI:** Ark UI components with Panda CSS
 - **Svelte 5 Runes:** Uses @attach directives and reactive patterns
 - **Responsive Design:** Mobile-first with swipe gestures
 
 ## Deployment
 
-The application is configured for Vercel deployment with the Vercel adapter. [`vercel.json`](./vercel.json) sets `buildCommand` to `svelte-kit sync && panda codegen && panda cssgen && bun --bun run build` (aligns with Panda static CSS output on the platform).
+The application is configured for Vercel deployment with the Vercel adapter. [`vercel.json`](./vercel.json) sets `buildCommand` to `svelte-kit sync && panda build && bun --bun run build` (aligns with Panda static CSS output on the platform).
 
 - **Platform env vars:** Set `DATABASE_URL`, `BETTER_AUTH_SECRET`, `PUBLIC_BASE_URL`, and `SENTRY_AUTH_TOKEN` in the Vercel project (and any other keys your schema requires). You can rely on Varlock for validation while storing values only in Vercel.
 - **Bitwarden at build time:** Add `BITWARDEN_ACCESS_TOKEN` to Vercel so the build can resolve `bitwarden(...)` entries in `.env.schema` ([Varlock Vite SSR options](https://varlock.dev/integrations/vite/)).
@@ -186,7 +187,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 
 - Uses Vite 8 (`vite` in `package.json`) and Varlock 1.9 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
 - Lint and format run through Ultracite (`bun run check`, `bun run fix`) with Biome rules extended from `ultracite/biome` for core and Svelte.
-- Panda CSS generates `styled-system/`; `svelte.config.js` aliases `styled-system` and extends TypeScript `include` for `drizzle.config.ts` and `styled-system/*`. After dependency install, `prepare` runs codegen for Panda.
+- Panda CSS 2.0 generates `styled-system/` via `panda build`; `svelte.config.js` aliases `styled-system` and extends TypeScript `include` for `drizzle.config.ts` and `styled-system/*`. After dependency install, `prepare` runs `panda build`.
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` to use UUIDv7 (uuidv7 package) for user ID generation and includes session caching for performance.
 - Invoice `notes` and `terms` accept Markdown; create/update endpoints derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks (see [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts)).

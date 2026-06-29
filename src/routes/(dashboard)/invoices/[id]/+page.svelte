@@ -23,7 +23,7 @@
 
   const invoice = $derived(data.invoice);
   const lineItems = $derived(data.lineItems ?? []);
-  const settingsLink = $derived(resolve("/settings"));
+  const settingsLink = $derived(resolve("/settings", {}));
 
   const canSendInvoice = $derived(invoice.invoiceStatus === "draft");
   const canPayInvoice = $derived(invoice.invoiceStatus === "sent");
@@ -52,7 +52,7 @@
         apiClient.invoices({ id: invoice.id }).patch({ invoiceStatus: "paid" }),
         { fallbackMessage: fb }
       );
-      await goto(resolve("/invoices/thanks"));
+      await goto(resolve("/invoices/thanks", {}));
     } catch (err) {
       toast.error(getErrorMessage(err, fb));
     }
@@ -130,9 +130,9 @@
 
   <div
     class={gridItem({
-      gridColumnStart: { sm: 5 },  
-      colSpan: { base: 6, sm: 2, _print: 3 }, 
-      paddingBlockStart: 4 
+      gridColumnStart: { sm: 5 },
+      colSpan: { base: 6, sm: 2, _print: 3 },
+      paddingBlockStart: 4
     })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>

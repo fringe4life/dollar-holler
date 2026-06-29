@@ -19,6 +19,34 @@
   const nav = new Toggle();
   afterNavigate(nav.off);
 
+  const navShell = vstack({
+    backgroundColor: "daisyBush",
+    position: { base: "fixed", md: "sticky" },
+    inset: 0,
+    zIndex: 9999,
+    overflowY: "clip",
+    textAlign: "center",
+    isolation: "isolate",
+    transitionProperty: "translate",
+    transitionDuration: "normal",
+    inlineSize: "full",
+    blockSize: { md: "100dvh" },
+  });
+
+  const navTranslateClosed = css({
+    translate: { base: "-100% 0", md: "0 0" },
+    _starting: {
+      translate: { base: "-100% 0", md: "0 0" },
+    },
+  });
+
+  const navTranslateOpen = css({
+    translate: { base: "0 0", md: "0 0" },
+    _starting: {
+      translate: { base: "-100% 0", md: "0 0" },
+    },
+  });
+
   const handleKeypress = (event: KeyboardEvent) => {
     if (event.key === "Escape") {
       nav.off();
@@ -76,23 +104,11 @@
     ></div>
   </button>
   <nav
-    class={cx("group", vstack({
-    backgroundColor: "daisyBush",
-    position: { base: "fixed", md: "sticky" },
-    inset: 0,
-    zIndex: 9999,
-    translate: { base: nav.isOn ? "0 0" : "-100% 0", md: "0 0" },
-    _starting: {
-      translate: { base: "-100% 0", md: "0 0" },
-    },
-    overflowY: "clip",
-    textAlign: "center",
-    isolation: "isolate",
-    transitionProperty: "translate",
-    transitionDuration: "normal",
-    inlineSize: "full",
-    blockSize: { md: "100dvh" },
-  }))}
+    class={cx(
+      "group",
+      navShell,
+      nav.isOn ? navTranslateOpen : navTranslateClosed,
+    )}
     id="primary-navigation"
   >
     <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>

@@ -78,7 +78,11 @@
       })}
     >
       {#if user}
-        <Button href={resolve("/invoices", {})} size="default" variant="default">
+        <Button
+          href={resolve("/invoices", {})}
+          size="default"
+          variant="default"
+        >
           Go to Dashboard
         </Button>
       {:else}

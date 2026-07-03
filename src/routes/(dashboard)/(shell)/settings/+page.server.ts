@@ -29,7 +29,7 @@ export const actions: Actions = {
           newPassword,
         },
         headers: request.headers,
-      }),
+      })
     );
 
     if (error || !data) {

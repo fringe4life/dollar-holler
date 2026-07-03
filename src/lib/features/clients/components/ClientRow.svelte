@@ -44,7 +44,7 @@
   // DERIVED STATE
   const receivedDisplay = $derived(centsToDollars(client.received));
   const balanceDisplay = $derived(centsToDollars(client.balance));
-  const resolved = $derived(resolve("/client/[id]", {id:client.id}));
+  const resolved = $derived(resolve("/client/[id]", { id: client.id }));
 
   // ADDITIONAL OPTIONS
   const CLIENT_OPTIONS = $derived([

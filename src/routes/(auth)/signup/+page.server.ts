@@ -9,7 +9,7 @@ export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
     const validationResult = signupSchema(
-      Object.fromEntries(formData.entries()),
+      Object.fromEntries(formData.entries())
     );
     if (validationResult instanceof ArkErrors) {
       return fail(400, { error: validationResult.summary ?? "Invalid input" });
@@ -23,7 +23,7 @@ export const actions: Actions = {
           name: validationResult.name,
         },
         headers: request.headers,
-      }),
+      })
     );
     if (!result?.user) {
       return fail(400, { error: "Signup failed" });

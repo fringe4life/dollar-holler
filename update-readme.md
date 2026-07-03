@@ -4,7 +4,7 @@ Provide ONLY this file in future sessions to have the AI re-scan and update `REA
 
 ## What the AI will do
 
-- Re-scan these sources: `package.json`, `drizzle.config.ts`, `svelte.config.js`, `src/lib/db/schema.ts`, `src/lib/db/seed.ts`, `src/lib/db/index.ts`, `src/lib/auth.ts`, `src/routes/**/*.svelte`, `src/lib/**/*.ts`.
+- Re-scan these sources: `package.json`, `drizzle.config.ts`, `vite.config.ts`, `src/lib/server/db/schema.ts`, `src/lib/server/db/seed.ts`, `src/lib/server/db/index.ts`, `src/lib/auth.server.ts`, `src/routes/**/*.svelte`, `src/lib/**/*.ts`.
 - Update sections in `README.md`:
   - Prerequisites and Getting Started
   - Environment variables block (keep in sync with any `.env` files and `src/lib/db/index.ts`)
@@ -21,7 +21,7 @@ Provide ONLY this file in future sessions to have the AI re-scan and update `REA
 - If `drizzle.config.ts` exists, reflect its usage (schema path, migrations) and note Drizzle Kit commands.
 - Reflect the CSS and linting standards from the project's configuration.
 - Mention Better Auth for authentication and CUID2 for ID generation.
-- Mention centralized auth configuration in `src/lib/auth.ts`.
+- Mention centralized auth configuration in `src/lib/auth.server.ts`.
 - **Badge version sync**: Always check `package.json` for current versions and update README badges accordingly:
   - SvelteKit: `@sveltejs/kit` version
   - Svelte: `svelte` version
@@ -42,5 +42,5 @@ Please update README.md based on the codebase. Keep sections accurate and concis
 
 ## Post-update
 
-- Run format: `bun run format` (if available)
-- Generate commit message: see `git-commit-msg.md` and run AI to produce message under 140 chars.
+- Run format: `bun run fix` (Ultracite)
+- Generate commit message: see `git-commit-msg.md`. If README was updated alongside code changes, the commit message must describe **all** staged changes (config, deps, refactors, etc.), not only documentation.

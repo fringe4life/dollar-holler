@@ -1,11 +1,16 @@
 import { sentrySvelteKit } from "@sentry/sveltekit";
+import adapter from "@sveltejs/adapter-vercel";
 import { sveltekit } from "@sveltejs/kit/vite";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
 // Chrome DevTools workspace (com.chrome.devtools.json); not the same as Vite 8's optional @vitejs/devtools
 // (build analysis UI, build-only for now — see https://devtools.vite.dev/guide). No migration required.
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
 import devToolsJson from "vite-plugin-devtools-json";
+
+const FILE_REGEX = /[/\\]/;
+
 export default defineConfig(({ mode }) => {
   const shouldUseSentry = mode !== "development";
 
@@ -16,6 +21,7 @@ export default defineConfig(({ mode }) => {
         authToken: process.env.SENTRY_AUTH_TOKEN,
       })
     : [];
+
   return {
     plugins: [
       sentryPlugin,
@@ -29,7 +35,42 @@ export default defineConfig(({ mode }) => {
       varlockVitePlugin({
         ssrInjectMode: "resolved-env",
       }),
-      sveltekit(),
+      sveltekit({
+        preprocess: [vitePreprocess()],
+        adapter: adapter(),
+        experimental: {
+          instrumentation: {
+            server: true,
+          },
+          tracing: {
+            server: true,
+          },
+        },
+        alias: {
+          $features: "./src/lib/features",
+          $lib: "./src/lib",
+          "styled-system": "./styled-system",
+        },
+        typescript: {
+          config: (config) => ({
+            ...config,
+            include: [
+              ...config.include,
+              "./drizzle.config.ts",
+              "../styled-system/*",
+            ],
+          }),
+        },
+        compilerOptions: {
+          experimental: {
+            async: true,
+          },
+          runes: ({ filename }) =>
+            filename.split(FILE_REGEX).includes("node_modules")
+              ? undefined
+              : true,
+        },
+      }),
     ],
     preview: {
       port: 5173,
@@ -40,6 +81,7 @@ export default defineConfig(({ mode }) => {
       },
     },
     server: {
+      forwardConsole: true,
       fs: {
         allow: ["styled-system"],
       },

@@ -55,3 +55,4 @@ The AI should:
 7. Use conventional commit format with appropriate type
 8. Focus on the most impactful changes
 9. Use commas instead of dashes between items
+10. When README was updated in the same commit as code changes, describe **all** changes in the message (config, deps, refactors, formatting), not only documentation updates

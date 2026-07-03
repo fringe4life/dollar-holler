@@ -1,15 +1,5 @@
 [install]
 minimumReleaseAge=259200
-minimumReleaseAgeExcludes = [
-  "better-auth",
-  "@better-auth/core",
-  "@better-auth/drizzle-adapter",
-  "@better-auth/kysely-adapter",
-  "@better-auth/memory-adapter",
-  "@better-auth/mongo-adapter",
-  "@better-auth/prisma-adapter",
-  "@better-auth/telemetry",
-]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).
 env = false

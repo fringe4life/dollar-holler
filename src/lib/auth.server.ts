@@ -8,6 +8,11 @@ import { db } from "$lib/server/db/index";
 import { schemaTables } from "$lib/server/db/schema";
 import { createId } from "./server/utils/create-id";
 export const auth = betterAuth({
+  allowedHosts: [
+    "dollar-holler.vercel.app",
+    "dollar-holler-*.vercel.app", // team preview pattern
+    "localhost:*",
+  ],
   trustedOrigins: [ENV.PUBLIC_BASE_URL],
   appName: "Dollar Holler",
   baseURL: ENV.PUBLIC_BASE_URL,

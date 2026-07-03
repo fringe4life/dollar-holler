@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/sveltekit";
 import { type Handle, redirect } from "@sveltejs/kit";
 import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
-import { building } from "$app/environment";
+import { building } from "$app/env";
 import { auth } from "$lib/auth.server";
 
 // get session from better auth and populate locals

@@ -1,6 +1,6 @@
 import { openapi } from "@elysiajs/openapi";
 import type { OpenAPIV3 } from "openapi-types";
-import { dev } from "$app/environment";
+import { dev } from "$app/env";
 import {
   getBetterAuthOpenApiComponents,
   getBetterAuthOpenApiPaths,

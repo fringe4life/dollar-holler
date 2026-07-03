@@ -1,4 +1,5 @@
 {
+  "extends": "./.svelte-kit/tsconfig.json",
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
@@ -8,41 +9,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "moduleResolution": "bundler",
-    "module": "esnext",
-    "target": "esnext",
-    "noEmit": true,
-    "isolatedModules": true,
-    "verbatimModuleSyntax": true,
-    "lib": ["esnext", "DOM", "DOM.Iterable"],
     "types": ["bun", "node", "ws"],
-    "exactOptionalPropertyTypes": false,
-    "paths": {
-      "$features": ["./src/lib/features"],
-      "$features/*": ["./src/lib/features/*"],
-      "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"],
-      "styled-system": ["./styled-system"],
-      "styled-system/*": ["./styled-system/*"],
-      "$app/types": ["./.svelte-kit/types/index.d.ts"]
-    },
-    "rootDirs": [".", "./.svelte-kit/types"]
-  },
-  "include": [
-    "src/**/*.js",
-    "src/**/*.ts",
-    "src/**/*.svelte",
-    "panda.config.ts",
-    "vite.config.ts",
-    "drizzle.config.ts",
-    "styled-system/**/*",
-    ".svelte-kit/types/**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules/**",
-    "src/service-worker.js",
-    "src/service-worker/**/*.js",
-    "src/service-worker.ts",
-    "src/service-worker/**/*.ts"
-  ]
+    "exactOptionalPropertyTypes": false
+  }
 }

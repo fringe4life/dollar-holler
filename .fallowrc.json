@@ -4,10 +4,12 @@
     "@varlock/bitwarden-plugin",
     "@sveltejs/mcp",
     "@pandacss/plugin-svelte",
-    "@styled-system/css",
-    "@styled-system/patterns",
-    "@fontsource-variable/source-sans-3",
-    "styled-system"
+    "@fontsource-variable/source-sans-3"
+  ],
+  "ignoreUnresolvedImports": [
+    "styled-system",
+    "styled-system/*",
+    "$features/*"
   ],
   "rules": {
     "boundary-violation": "warn",

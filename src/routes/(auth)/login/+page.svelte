@@ -36,7 +36,7 @@
         >
         <a
           class={css({ color: "whisper", fontSize: "sm", textDecoration: { base: "underline", _hover: "none"} })}
-          href={resolve("/forgot-password", {})}
+          href={resolve("/forgot-password")}
           >Forgot Password</a
         >
       </div>
@@ -52,7 +52,7 @@
     >
       <a
         class={css({ textDecoration: {base: "underline", _hover: "none" } })}
-        href={resolve("/signup", {})}
+        href={resolve("/signup")}
         >Don't have an account yet?</a
       >
     </p>

@@ -59,11 +59,12 @@
     "ultracite:upgrade": "bun x ultracite@latest init --pm bun --linter biome --agents cursor-cli --editors vscode --hooks cursor --frameworks svelte --quiet",
     "fix": "ultracite fix",
     "env:typegen": "varlock typegen",
-    "fallow": "fallow",
-    "fallow:dead-code": "fallow dead-code",
-    "fallow:boundaries": "fallow list --boundaries",
-    "fallow:boundary-violations": "fallow dead-code --boundary-violations",
-    "fallow:dupes": "fallow dupes"
+    "fallow:prepare": "svelte-kit sync && panda build",
+    "fallow": "bun run fallow:prepare && fallow",
+    "fallow:dead-code": "bun run fallow:prepare && fallow dead-code",
+    "fallow:boundaries": "bun run fallow:prepare && fallow list --boundaries",
+    "fallow:boundary-violations": "bun run fallow:prepare && fallow dead-code --boundary-violations",
+    "fallow:dupes": "bun run fallow:prepare && fallow dupes"
   },
   "type": "module",
   "version": "0.9.0",

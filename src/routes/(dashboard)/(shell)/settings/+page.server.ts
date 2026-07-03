@@ -35,6 +35,6 @@ export const actions: Actions = {
     if (error || !data) {
       return fail(400, { error: "Failed to change password", email });
     }
-    throw redirect(303, resolve("/settings", {}));
+    throw redirect(303, resolve("/settings"));
   },
 };

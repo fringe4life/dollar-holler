@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/suspicious/noExplicitAny: seems to be official practise for svelte typescript config */
 import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-vercel";
 import { sveltekit } from "@sveltejs/kit/vite";
@@ -52,12 +53,14 @@ export default defineConfig(({ mode }) => {
           "styled-system": "./styled-system",
         },
         typescript: {
-          config: (config) => ({
+          config: (config: Record<string, any>) => ({
             ...config,
             include: [
-              ...config.include,
-              "./drizzle.config.ts",
-              "../styled-system/*",
+              ...config.include.filter(
+                (entry: string) => !entry.includes("styled-system")
+              ),
+              "../panda.config.ts",
+              "../drizzle.config.ts",
             ],
           }),
         },

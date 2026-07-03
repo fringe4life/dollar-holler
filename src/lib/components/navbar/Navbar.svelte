@@ -9,10 +9,10 @@
   import NavbarItem from "./NavbarItem.svelte";
 
   const navItems = [
-    { href: resolve("/invoices", {}), title: "Invoices" },
-    { href: resolve("/clients", {}), title: "Clients" },
-    { href: resolve("/settings", {}), title: "Settings" },
-    { href: resolve("/logout", {}), title: "Logout" },
+    { href: resolve("/invoices"), title: "Invoices" },
+    { href: resolve("/clients"), title: "Clients" },
+    { href: resolve("/settings"), title: "Settings" },
+    { href: resolve("/logout"), title: "Logout" },
   ];
   const path = $derived(page.url.pathname);
 
@@ -112,7 +112,7 @@
     id="primary-navigation"
   >
     <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>
-      <a href={resolve("/", {})}>
+      <a href={resolve("/")}>
         <img
           alt="Doller Holla company logo"
           class={css({ marginInline: "auto" })}

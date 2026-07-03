@@ -49,7 +49,7 @@
     <!-- Logo -->
     <a
       class={hstack({ gap: 2.5 })}
-      href={resolve("/", {})}
+      href={resolve("/")}
       onclick={mobileOpen.toggle}
     >
       <img
@@ -78,18 +78,14 @@
       })}
     >
       {#if user}
-        <Button
-          href={resolve("/invoices", {})}
-          size="default"
-          variant="default"
-        >
+        <Button href={resolve("/invoices")} size="default" variant="default">
           Go to Dashboard
         </Button>
       {:else}
-        <Button href={resolve("/login", {})} size="default" variant="outline">
+        <Button href={resolve("/login")} size="default" variant="outline">
           Log in
         </Button>
-        <Button href={resolve("/signup", {})} size="default" variant="default">
+        <Button href={resolve("/signup")} size="default" variant="default">
           Sign Up Free
         </Button>
       {/if}
@@ -131,7 +127,7 @@
       <div class={hstack({ gap: 3 })}>
         {#if user}
           <Button
-            href={resolve("/invoices", {})}
+            href={resolve("/invoices")}
             onclick={mobileOpen.off}
             variant="default"
           >
@@ -139,14 +135,14 @@
           </Button>
         {:else}
           <Button
-            href={resolve("/login", {})}
+            href={resolve("/login")}
             onclick={mobileOpen.off}
             variant="outline"
           >
             Log in
           </Button>
           <Button
-            href={resolve("/signup", {})}
+            href={resolve("/signup")}
             onclick={mobileOpen.off}
             variant="default"
           >

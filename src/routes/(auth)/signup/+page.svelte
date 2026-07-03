@@ -63,7 +63,7 @@
         <a
           class={css({ textDecoration: { base: "underline", _hover: "none" }})}
           data-sveltekit-preload-data="hover"
-          href={resolve("/login", {})}
+          href={resolve("/login")}
           >Already have an account?</a
         >
       </p>
@@ -71,7 +71,7 @@
   </Form>
 {:else}
   <Alert message="Check your email for confirmation" />
-  <a class={buttonVariants({ variant: "auth" })} href={resolve("/login", {})}
+  <a class={buttonVariants({ variant: "auth" })} href={resolve("/login")}
     >Login</a
   >
 {/if}

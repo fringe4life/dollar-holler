@@ -1,7 +1,8 @@
 <script lang="ts" module>
   import { cva, cx, type RecipeVariant } from "styled-system/css";
+  import type { HTMLAnchorAttributes } from "svelte/elements";
 
-  export const badgeVariants = cva({
+  const badgeVariants = cva({
     base: {
       inlineSize: 20,
       blockSize: 20,
@@ -44,21 +45,16 @@
       size: "small",
     },
   });
-
+</script>
+<script lang="ts">
   export type BadgeVariant = RecipeVariant<typeof badgeVariants>["variant"];
   export type BadgeSize = RecipeVariant<typeof badgeVariants>["size"];
-
-  export type BadgeProps = HTMLAnchorAttributes &
+  type BadgeProps = HTMLAnchorAttributes &
     HTMLAnchorAttributes & {
       variant?: BadgeVariant;
       size?: BadgeSize;
       class?: string;
     };
-</script>
-
-<script lang="ts">
-  import type { HTMLAnchorAttributes } from "svelte/elements";
-
   let {
     href,
     class: className,

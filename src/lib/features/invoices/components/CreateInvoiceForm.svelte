@@ -9,10 +9,11 @@
   import { toNormalizedListQuery } from "$features/pagination/utils/list-query";
   import { Counter } from "$lib/client/runes/Counter.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton, CursorId, Maybe } from "$lib/types";
+  import type { BitsButton } from "$lib/types";
   import { isAbortError } from "$lib/utils/error-message";
   import { toast } from "$lib/utils/toast.svelte";
   import type { NewInvoice } from "../types";
+  import { resolveClientId } from "../utils/resolve-client-id";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
   let { closePanel }: { closePanel: () => void } = $props();
@@ -59,25 +60,20 @@
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    let clientId: Maybe<CursorId> = null;
-    if (isNewClient) {
-      clientId = await clientsStore.createClient(newClient);
-      if (!clientId) {
-        toast.error("Failed to create client");
-        return;
-      }
-    } else {
-      clientId = invoice.clientId ?? null;
-    }
-
-    if (!clientId) {
-      toast.error("Client is required");
+    const client = await resolveClientId({
+      isNewClient,
+      newClient,
+      existingClientId: invoice.clientId,
+      createClient: (clientData) => clientsStore.createClient(clientData),
+    });
+    if (!client.ok) {
+      toast.error(client.message);
       return;
     }
 
     const invoiceData = {
       ...invoice,
-      clientId,
+      clientId: client.clientId,
       issueDate: new Date(invoice.issueDate),
       dueDate: new Date(invoice.dueDate),
     };

@@ -1,6 +1,17 @@
-import type { LineItemInsert } from "$features/line-items/types";
+import type {
+  LineItemEditRow,
+  LineItemInsert,
+  NewLineItemWithId,
+} from "$features/line-items/types";
+import type { CursorId } from "$lib/types";
+import { err, ok, type Result } from "$lib/utils/result";
 import { stripNullishEntries } from "$lib/utils/strip-nullish-entries";
-import type { InvoiceInsert, InvoiceSelect, InvoiceUpdate } from "../types";
+import type {
+  InvoiceInsert,
+  InvoiceSelect,
+  InvoiceUpdate,
+  NewInvoice,
+} from "../types";
 
 /** Invoice columns allowed on PATCH (excludes id, userId, timestamps). */
 const INVOICE_PATCH_KEYS = [
@@ -50,7 +61,7 @@ export const pickInvoicePatchSnapshot = (
   invoiceStatus: invoice.invoiceStatus ?? "draft",
 });
 
-export const computeInvoicePatchDelta = (
+const computeInvoicePatchDelta = (
   baseline: InvoicePatchSnapshot,
   current: InvoicePatchSnapshot
 ): InvoiceUpdate => {
@@ -88,4 +99,100 @@ export const serializedNormalizedLineItemsForCompare = (
     }))
     .sort((a, b) => a.id.localeCompare(b.id));
   return JSON.stringify(rows);
+};
+
+type EditableInvoice = NewInvoice & { id: CursorId };
+
+interface AssertEditReadyInput {
+  baselineInvoiceSnapshot: InvoicePatchSnapshot | null;
+  baselineLineItemsSnapshot: string | null;
+  formReady: boolean;
+  invoiceId?: CursorId;
+}
+
+type AssertEditReadyResult = Result<{
+  baselineInvoiceSnapshot: InvoicePatchSnapshot;
+  baselineLineItemsSnapshot: string;
+  invoiceId: CursorId;
+}>;
+
+export const assertEditReady = ({
+  formReady,
+  baselineInvoiceSnapshot,
+  baselineLineItemsSnapshot,
+  invoiceId,
+}: AssertEditReadyInput): AssertEditReadyResult => {
+  if (!formReady) {
+    return err({ message: "Still loading invoice" });
+  }
+
+  if (
+    baselineInvoiceSnapshot === null ||
+    baselineLineItemsSnapshot === null ||
+    !invoiceId
+  ) {
+    return err({ message: "Invoice not ready" });
+  }
+
+  return ok({
+    baselineInvoiceSnapshot,
+    baselineLineItemsSnapshot,
+    invoiceId,
+  });
+};
+
+interface BuildEditPatchInput {
+  baselineInvoiceSnapshot: InvoicePatchSnapshot;
+  baselineLineItemsSnapshot: string;
+  clientId: CursorId;
+  invoice: EditableInvoice;
+  lineItems: Array<NewLineItemWithId | LineItemEditRow>;
+  normalizeLineItems: (
+    items: Array<NewLineItemWithId | LineItemEditRow>
+  ) => LineItemInsert[];
+}
+
+interface EditPatchResult {
+  delta: InvoiceUpdate;
+  invoiceUnchanged: boolean;
+  lineItemsUnchanged: boolean;
+  normalizedLineItems: LineItemInsert[];
+  unchanged: boolean;
+}
+
+export const buildEditPatch = ({
+  invoice,
+  clientId,
+  lineItems,
+  baselineInvoiceSnapshot,
+  baselineLineItemsSnapshot,
+  normalizeLineItems,
+}: BuildEditPatchInput): EditPatchResult => {
+  const updatedInvoice = {
+    ...invoice,
+    clientId,
+    issueDate: new Date(invoice.issueDate),
+    dueDate: new Date(invoice.dueDate),
+  };
+
+  const currentSnapshot = pickInvoicePatchSnapshot(updatedInvoice);
+  const delta = computeInvoicePatchDelta(
+    baselineInvoiceSnapshot,
+    currentSnapshot
+  );
+
+  const normalizedLineItems = normalizeLineItems(lineItems);
+  const lineItemsSnap =
+    serializedNormalizedLineItemsForCompare(normalizedLineItems);
+
+  const invoiceUnchanged = Object.keys(delta).length === 0;
+  const lineItemsUnchanged = lineItemsSnap === baselineLineItemsSnapshot;
+
+  return {
+    delta,
+    normalizedLineItems,
+    invoiceUnchanged,
+    lineItemsUnchanged,
+    unchanged: invoiceUnchanged && lineItemsUnchanged,
+  };
 };

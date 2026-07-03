@@ -14,7 +14,7 @@
   import Trash from "$lib/components/icons/Trash.svelte";
   import Button from "$lib/components/ui/button/button.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton, CursorId, Maybe } from "$lib/types";
+  import type { BitsButton, CursorId } from "$lib/types";
   import { toDateInputValue } from "$lib/utils/dateHelpers";
   import { isAbortError } from "$lib/utils/error-message";
   import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
@@ -25,11 +25,14 @@
     NewInvoice,
   } from "../types";
   import {
-    computeInvoicePatchDelta,
+    assertEditReady,
+    buildEditPatch,
     type InvoicePatchSnapshot,
     pickInvoicePatchSnapshot,
     serializedNormalizedLineItemsForCompare,
   } from "../utils/invoice-diff";
+  import { persistInvoiceEdits } from "../utils/persist-invoice-edits";
+  import { resolveClientId } from "../utils/resolve-client-id";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
   interface EditInvoiceFormProps {
@@ -155,79 +158,56 @@
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    let clientId: Maybe<CursorId> = invoice.clientId ?? null;
-    if (isNewClient) {
-      clientId = await clientsStore.createClient(newClient);
-      if (!clientId) {
-        toast.error("Failed to create client");
-        return;
-      }
-    }
-
-    if (!clientId) {
-      toast.error("Client is required");
+    const client = await resolveClientId({
+      isNewClient,
+      newClient,
+      existingClientId: invoice.clientId,
+      createClient: (clientData) => clientsStore.createClient(clientData),
+    });
+    if (!client.ok) {
+      toast.error(client.message);
       return;
     }
 
-    if (!formReady) {
-      toast.error("Still loading invoice");
-      return;
-    }
-
-    if (
-      baselineInvoiceSnapshot === null ||
-      baselineLineItemsSnapshot === null ||
-      !invoice.id
-    ) {
-      toast.error("Invoice not ready");
-      return;
-    }
-
-    const updatedInvoice = {
-      ...invoice,
-      clientId,
-      issueDate: new Date(invoice.issueDate),
-      dueDate: new Date(invoice.dueDate),
-    };
-
-    const currentSnapshot = pickInvoicePatchSnapshot(updatedInvoice);
-    const delta = computeInvoicePatchDelta(
+    const ready = assertEditReady({
+      formReady,
       baselineInvoiceSnapshot,
-      currentSnapshot
-    );
+      baselineLineItemsSnapshot,
+      invoiceId: invoice.id,
+    });
+    if (!ready.ok) {
+      toast.error(ready.message);
+      return;
+    }
 
-    const normalizedLineItemsNow = lineItemsStore.normalizeLineItems(lineItems);
-    const lineItemsSnap = serializedNormalizedLineItemsForCompare(
-      normalizedLineItemsNow
-    );
+    const patch = buildEditPatch({
+      invoice,
+      clientId: client.clientId,
+      lineItems,
+      baselineInvoiceSnapshot: ready.baselineInvoiceSnapshot,
+      baselineLineItemsSnapshot: ready.baselineLineItemsSnapshot,
+      normalizeLineItems: (items) => lineItemsStore.normalizeLineItems(items),
+    });
 
-    const invoiceUnchanged = Object.keys(delta).length === 0;
-    const lineItemsUnchanged = lineItemsSnap === baselineLineItemsSnapshot;
-
-    if (invoiceUnchanged && lineItemsUnchanged) {
+    if (patch.unchanged) {
       toast.info("No changes to save");
       return;
     }
 
-    let effectiveInvoiceId: CursorId = invoice.id;
-
-    if (!invoiceUnchanged) {
-      const updatedId = await invoicesStore.updateInvoice(invoice.id, delta);
-      if (!updatedId) {
-        toast.error("Failed to update invoice");
-        return;
+    const saved = await persistInvoiceEdits({
+      invoiceId: ready.invoiceId,
+      delta: patch.delta,
+      invoiceUnchanged: patch.invoiceUnchanged,
+      lineItemsUnchanged: patch.lineItemsUnchanged,
+      normalizedLineItems: patch.normalizedLineItems,
+      updateInvoice: (id, delta) => invoicesStore.updateInvoice(id, delta),
+      updateLineItems: (id, items) => lineItemsStore.updateLineItems(id, items),
+    });
+    if (!saved.ok) {
+      if (saved.message) {
+        toast.error(saved.message);
       }
-      effectiveInvoiceId = updatedId;
-    }
-
-    if (!lineItemsUnchanged) {
-      const lineResult = await lineItemsStore.updateLineItems(
-        effectiveInvoiceId,
-        normalizedLineItemsNow
-      );
-      if (lineResult === null) {
-        return;
-      }
+      return;
     }
 
     await invoicesStore.loadItems(toNormalizedListQuery(undefined, {}));

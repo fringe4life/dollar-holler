@@ -4,6 +4,7 @@ import type {
   ListDirection,
   NormalizeListQueryResult,
   PaginationSearchParams,
+  PaginationSearchParamsRaw,
 } from "../types";
 import { tryParseCursorId } from "./parse-cursor-id";
 
@@ -21,6 +22,20 @@ const parseLimit = (raw: Maybe<string>): number => parseLimitParam(raw);
  */
 const parseDirection = (raw: Maybe<string>): ListDirection =>
   raw === "backward" ? "backward" : "forward";
+
+/** Backward without cursor: first page (same as forward, no cursor). */
+const effectiveDirection = (
+  direction: ListDirection | undefined,
+  cursor: CursorId | undefined
+): ListDirection => {
+  const resolved = direction ?? "forward";
+  return resolved === "backward" && !cursor ? "forward" : resolved;
+};
+
+const coerceLimit = (limit?: number): number =>
+  limit !== undefined && LIMITS.includes(limit as (typeof LIMITS)[number])
+    ? limit
+    : DEFAULT_LIMIT;
 
 /**
  * Shared list-query normalization for SSR, Elysia GET handlers, and client.
@@ -53,15 +68,11 @@ export const normalizeListQuery = (raw: {
     raw.limit === undefined || raw.limit === "" ? undefined : String(raw.limit);
   const limit = parseLimit(limitWire);
 
-  /** Backward without cursor: first page (same as forward, no cursor). */
-  const effectiveDirection: ListDirection =
-    direction === "backward" && !cursor ? "forward" : direction;
-
   return {
     normalized: {
       q,
       cursor,
-      direction: effectiveDirection,
+      direction: effectiveDirection(direction, cursor),
       limit,
     },
     listCursorWasNormalized,
@@ -82,12 +93,7 @@ const firstParam = (
 /** First `cursor` wins (matches `URLSearchParams.get`). */
 const parseSearchParamsToRaw = (
   searchParams: URLSearchParams
-): {
-  q?: string;
-  cursor?: string;
-  direction?: string;
-  limit?: string;
-} => ({
+): PaginationSearchParamsRaw => ({
   q: firstParam(searchParams, "q"),
   cursor: firstParam(searchParams, "cursor"),
   direction: firstParam(searchParams, "direction"),
@@ -120,25 +126,10 @@ export const parseLimitParam = (raw: Maybe<string>): number => {
  */
 export const toNormalizedListQuery = (
   q: Maybe<string>,
-  options?: {
-    cursor?: CursorId;
-    direction?: ListDirection;
-    limit?: number;
-  }
-): PaginationSearchParams => {
-  const limit =
-    options?.limit !== undefined &&
-    LIMITS.includes(options.limit as (typeof LIMITS)[number])
-      ? options.limit
-      : DEFAULT_LIMIT;
-  let direction: ListDirection = options?.direction ?? "forward";
-  if (direction === "backward" && !options?.cursor) {
-    direction = "forward";
-  }
-  return {
-    q: q?.trim() || undefined,
-    cursor: options?.cursor,
-    direction,
-    limit,
-  };
-};
+  options?: Partial<PaginationSearchParams>
+): PaginationSearchParams => ({
+  q: q?.trim() || undefined,
+  cursor: options?.cursor,
+  direction: effectiveDirection(options?.direction, options?.cursor),
+  limit: coerceLimit(options?.limit),
+});

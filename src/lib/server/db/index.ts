@@ -9,6 +9,6 @@ const pool = new Pool({ connectionString: ENV.DATABASE_URL });
 
 export const db = drizzle({
   client: pool,
-  relations: tableRelations,
   jit: true,
+  relations: tableRelations,
 });

@@ -4,7 +4,7 @@ import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query
 import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url, locals }) => {
-  const user = locals.user;
+  const { user } = locals;
   if (!user) {
     throw error(401, "Unauthorized");
   }

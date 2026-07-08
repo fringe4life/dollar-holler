@@ -16,9 +16,9 @@
 <div
   class={cx(
     css({
-      position: "relative",
       display: { base: "none", lg: "grid" },
       placeSelf: "center",
+      position: "relative",
     }),
     classes,
   )}

@@ -22,8 +22,8 @@
 
 <div
   class={css({
-    position: "relative",
     isolation: "isolate",
+    position: "relative",
   })}
   data-swipeable
   style:view-transition-name={contentViewTransitionName}
@@ -42,12 +42,12 @@
   <div
     class={flex({
       align: "center",
+      blockSize: "full",
+      inlineSize: "full",
+      inset: 0,
       justify: "space-around",
       position: "absolute",
-      inset: 0,
       zIndex: 1,
-      blockSize: "full", 
-      inlineSize: "full",
     })}
   >
     <button class={actionButton} onclick={swipeReset.toggle} type="button">

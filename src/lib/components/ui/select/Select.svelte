@@ -3,36 +3,36 @@
   import type { HTMLSelectAttributes } from "svelte/elements";
 
   const selectClass = css({
-    borderColor: "silver",
-    appearance: "none",
-    borderRadius: "lg",
-    borderWidth: 2,
-    backgroundImage: "url('/images/chevron-down.svg')",
-    backgroundPosition: "97% center",
-    backgroundRepeat: "no-repeat",
-    paddingInline: 4,
-    transitionProperty: "colors",
-    transitionDuration: "normal",
-    blockSize: 10,
-    inlineSize: "full",
+    _disabled: {
+      _hover: {
+        backgroundColor: "inherit",
+        borderColor: "inherit",
+        color: "inherit",
+      },
+      backgroundColor: "transparent",
+      borderColor: "red.500",
+      color: "red.500",
+      cursor: "not-allowed",
+    },
 
     _focusVisible: {
       borderColor: "lavenderIndigo",
       outlineColor: "lavenderIndigo",
-      outlineWidth: "2px",
       outlineStyle: "solid",
+      outlineWidth: "2px",
     },
-    _disabled: {
-      borderColor: "red.500",
-      color: "red.500",
-      backgroundColor: "transparent",
-      cursor: "not-allowed",
-      _hover: {
-        borderColor: "inherit",
-        color: "inherit",
-        backgroundColor: "inherit",
-      },
-    },
+    appearance: "none",
+    backgroundImage: "url('/images/chevron-down.svg')",
+    backgroundPosition: "97% center",
+    backgroundRepeat: "no-repeat",
+    blockSize: 10,
+    borderColor: "silver",
+    borderRadius: "lg",
+    borderWidth: 2,
+    inlineSize: "full",
+    paddingInline: 4,
+    transitionDuration: "normal",
+    transitionProperty: "colors",
   });
 
   let {

@@ -52,24 +52,24 @@
 
   const INVOICE_OPTIONS = $derived([
     {
-      label: "Edit",
+      disabled: isOptionsDisabled,
       icon: Edit,
+      label: "Edit",
       onclick: handleEdit,
-      disabled: isOptionsDisabled,
     },
 
     {
-      label: "Delete",
-      icon: Trash,
-      onclick: handleDelete,
       disabled: false,
+      icon: Trash,
+      label: "Delete",
+      onclick: handleDelete,
     },
 
     {
-      label: "Send",
-      icon: Send,
-      onclick: handleSendInvoice,
       disabled: isOptionsDisabled,
+      icon: Send,
+      label: "Send",
+      onclick: handleSendInvoice,
     },
   ] satisfies Option[]);
 </script>

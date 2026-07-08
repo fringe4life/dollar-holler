@@ -61,10 +61,10 @@
     e.preventDefault();
 
     const client = await resolveClientId({
+      createClient: (clientData) => clientsStore.createClient(clientData),
+      existingClientId: invoice.clientId,
       isNewClient,
       newClient,
-      existingClientId: invoice.clientId,
-      createClient: (clientData) => clientsStore.createClient(clientData),
     });
     if (!client.ok) {
       toast.error(client.message);
@@ -74,8 +74,8 @@
     const invoiceData = {
       ...invoice,
       clientId: client.clientId,
-      issueDate: new Date(invoice.issueDate),
       dueDate: new Date(invoice.dueDate),
+      issueDate: new Date(invoice.issueDate),
     };
 
     const invoiceId = await invoicesStore.createInvoice(invoiceData);

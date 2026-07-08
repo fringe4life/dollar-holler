@@ -51,13 +51,13 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     },
     {
       auth: true,
-      listQuery: true,
       detail: {
-        operationId: "listClients",
-        summary: "List clients",
         description:
           "Cursor-paginated list of clients for the authenticated user, including received amount and balance. Supports optional search and cursor query params (`cursor`, `direction`, `limit`, `q`). Unauthenticated requests return 401.",
+        operationId: "listClients",
+        summary: "List clients",
       },
+      listQuery: true,
       response: {
         200: clientPaginatedListSchema,
         401: apiErrorBodySchema,
@@ -85,13 +85,13 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      body: clientInsertSchema,
       authMutation: true,
+      body: clientInsertSchema,
       detail: {
-        operationId: "createClient",
-        summary: "Create client",
         description:
           "Creates a client owned by the authenticated user (`userId` from session). Mutations validate the session without cookie cache. Returns the new client's id.",
+        operationId: "createClient",
+        summary: "Create client",
       },
       response: {
         200: idResponseSchema,
@@ -115,10 +115,10 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
     {
       auth: true,
       detail: {
-        operationId: "getClientPickerOptions",
-        summary: "Client picker options",
         description:
           "Returns id and display fields for every client belonging to the user, for dropdowns and pickers. Not paginated.",
+        operationId: "getClientPickerOptions",
+        summary: "Client picker options",
       },
       response: {
         200: clientPickerOptionsResponseSchema,
@@ -148,14 +148,14 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: idResponseSchema,
       auth: true,
       detail: {
-        operationId: "getClient",
-        summary: "Get client by id",
         description:
           "Returns a single client if it exists and belongs to the authenticated user. Missing or other users' clients return 404.",
+        operationId: "getClient",
+        summary: "Get client by id",
       },
+      params: idResponseSchema,
       response: {
         200: clientSelectSchema,
         401: apiErrorBodySchema,
@@ -188,15 +188,15 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: idResponseSchema,
-      body: clientUpdateSchema,
       authMutation: true,
+      body: clientUpdateSchema,
       detail: {
-        operationId: "updateClient",
-        summary: "Update client",
         description:
           "Full update of client fields. The client must belong to the authenticated user; otherwise returns 404.",
+        operationId: "updateClient",
+        summary: "Update client",
       },
+      params: idResponseSchema,
       response: {
         200: clientSelectSchema,
         401: apiErrorBodySchema,
@@ -217,8 +217,8 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
           })
           .where(and(eq(clientsTable.id, id), eq(clientsTable.userId, user.id)))
           .returning({
-            id: clientsTable.id,
             clientStatus: clientsTable.clientStatus,
+            id: clientsTable.id,
             updatedAt: clientsTable.updatedAt,
           });
 
@@ -236,15 +236,15 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: idResponseSchema,
-      body: clientStatusSchema,
       authMutation: true,
+      body: clientStatusSchema,
       detail: {
-        operationId: "patchClientStatus",
-        summary: "Update client status",
         description:
           "Updates only the client status. The client must belong to the authenticated user; otherwise returns 404.",
+        operationId: "patchClientStatus",
+        summary: "Update client status",
       },
+      params: idResponseSchema,
       response: {
         200: clientStatusPatchResponseSchema,
         401: apiErrorBodySchema,
@@ -276,14 +276,14 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: idResponseSchema,
       authMutation: true,
       detail: {
-        operationId: "deleteClient",
-        summary: "Delete client",
         description:
           "Deletes the client if it belongs to the authenticated user. Missing client returns 404.",
+        operationId: "deleteClient",
+        summary: "Delete client",
       },
+      params: idResponseSchema,
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,
@@ -304,21 +304,21 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: idResponseSchema,
-      verifyClientGet: true,
-      query: querySchema,
       detail: {
-        operationId: "getClientInvoiceSummary",
-        summary: "Invoice summary for client",
         description:
           "Returns aggregated invoice totals (cents) for the client's invoices. Optional `q` narrows the invoice set. Returns 404 if the client does not exist or is not owned by the user.",
+        operationId: "getClientInvoiceSummary",
+        summary: "Invoice summary for client",
       },
+      params: idResponseSchema,
+      query: querySchema,
       response: {
         200: clientInvoiceSummarySchema,
         401: apiErrorBodySchema,
         404: apiErrorBodySchema,
         500: apiErrorBodySchema,
       },
+      verifyClientGet: true,
     }
   )
   // GET /api/clients/:id/invoices - Client's invoices (cursor pagination)
@@ -333,20 +333,20 @@ export const clientsRoutes = new Elysia({ prefix: "/clients" })
       }
     },
     {
-      params: idResponseSchema,
-      verifyClientGet: true,
-      listQuery: true,
       detail: {
-        operationId: "listClientInvoices",
-        summary: "List invoices for client",
         description:
           "Cursor-paginated invoices for this client (`cursor`, `direction`, `limit`, optional `q`). Returns 404 if the client does not exist or is not owned by the user.",
+        operationId: "listClientInvoices",
+        summary: "List invoices for client",
       },
+      listQuery: true,
+      params: idResponseSchema,
       response: {
         200: invoicePaginatedListSchema,
         401: apiErrorBodySchema,
         404: apiErrorBodySchema,
         500: apiErrorBodySchema,
       },
+      verifyClientGet: true,
     }
   );

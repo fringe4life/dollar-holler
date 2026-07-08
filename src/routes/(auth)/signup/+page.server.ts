@@ -19,8 +19,8 @@ export const actions: Actions = {
       auth.api.signUpEmail({
         body: {
           email: validationResult.email,
-          password: validationResult.password,
           name: validationResult.name,
+          password: validationResult.password,
         },
         headers: request.headers,
       })

@@ -5,67 +5,67 @@
   import { toaster } from "$lib/utils/toast.svelte";
 
   const toastRootRecipe = sva({
-    slots: ["root", "title", "description", "closeTrigger"],
     base: {
-      root: {
-        borderRadius: "md",
-        borderWidth: "1px",
-        boxShadow: "md",
-        inlineSize: "sm",
-        paddingInline: 4,
-        paddingBlock: 3,
-        display: "grid",
-        gridTemplateColumns: "1fr auto",
-        alignItems: "start",
-        columnGap: 3,
-        rowGap: 1,
-        backgroundColor: "white",
-        translate: "var(--x) var(--y)",
-        scale: "var(--scale)",
-        zIndex: "var(--z-index)",
-        height: "var(--height)",
-        opacity: "var(--opacity)",
-        willChange: "translate, opacity, scale",
-        transitionProperty: "translate, scale, opacity, height, box-shadow",
-        transitionDuration: "400ms, 400ms, 400ms, 400ms, 200ms",
-        transitionTimingFunction: "cubic-bezier(0.21, 1.02, 0.73, 1)",
-        _closed: {
-          transitionDuration: "400ms, 400ms, 200ms, 400ms, 200ms",
-          transitionTimingFunction: "cubic-bezier(0.06, 0.71, 0.55, 1)",
-        },
-      },
-      title: {
-        fontWeight: "bold",
-        lineHeight: "short",
+      closeTrigger: {
+        _hover: { backgroundColor: "black/5" },
+        alignItems: "center",
+        blockSize: 6,
+        borderRadius: "sm",
+        color: "currentColor",
+        display: "inline-flex",
+        inlineSize: 6,
+        justifyContent: "center",
       },
       description: {
         color: "monsoon",
         fontSize: "sm",
         gridColumn: "1 / -1",
       },
-      closeTrigger: {
-        borderRadius: "sm",
-        color: "currentColor",
-        inlineSize: 6,
-        blockSize: 6,
-        display: "inline-flex",
-        alignItems: "center",
-        justifyContent: "center",
-        _hover: { backgroundColor: "black/5" },
-      },
-    },
-    variants: {
-      type: {
-        success: {
-          root: { borderColor: "caribbeanGreen", color: "daisyBush" },
+      root: {
+        _closed: {
+          transitionDuration: "400ms, 400ms, 200ms, 400ms, 200ms",
+          transitionTimingFunction: "cubic-bezier(0.06, 0.71, 0.55, 1)",
         },
-        error: { root: { borderColor: "scarlet", color: "scarlet" } },
-        warning: { root: { borderColor: "goldenFizz", color: "daisyBush" } },
-        info: { root: { borderColor: "lavenderIndigo", color: "daisyBush" } },
+        alignItems: "start",
+        backgroundColor: "white",
+        borderRadius: "md",
+        borderWidth: "1px",
+        boxShadow: "md",
+        columnGap: 3,
+        display: "grid",
+        gridTemplateColumns: "1fr auto",
+        height: "var(--height)",
+        inlineSize: "sm",
+        opacity: "var(--opacity)",
+        paddingBlock: 3,
+        paddingInline: 4,
+        rowGap: 1,
+        scale: "var(--scale)",
+        transitionDuration: "400ms, 400ms, 400ms, 400ms, 200ms",
+        transitionProperty: "translate, scale, opacity, height, box-shadow",
+        transitionTimingFunction: "cubic-bezier(0.21, 1.02, 0.73, 1)",
+        translate: "var(--x) var(--y)",
+        willChange: "translate, opacity, scale",
+        zIndex: "var(--z-index)",
+      },
+      title: {
+        fontWeight: "bold",
+        lineHeight: "short",
       },
     },
     defaultVariants: {
       type: "info",
+    },
+    slots: ["root", "title", "description", "closeTrigger"],
+    variants: {
+      type: {
+        error: { root: { borderColor: "scarlet", color: "scarlet" } },
+        info: { root: { borderColor: "lavenderIndigo", color: "daisyBush" } },
+        success: {
+          root: { borderColor: "caribbeanGreen", color: "daisyBush" },
+        },
+        warning: { root: { borderColor: "goldenFizz", color: "daisyBush" } },
+      },
     },
   });
 

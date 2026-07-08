@@ -11,6 +11,8 @@ import {
 import { apiClient } from "$lib/api";
 import type { InvoiceStatus } from "$lib/server/db/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
+import type { StoreOption } from "$lib/stores/types";
+import { mergeAbortSignals } from "$lib/stores/utils";
 import type { CursorId, Maybe } from "$lib/types";
 import {
   getErrorMessage,
@@ -36,8 +38,8 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
   ): Promise<CursorPaginatedList<InvoiceListResponse>> {
     return unwrapTreatyResult(
       await apiClient.clients({ id: this.clientId }).invoices.get({
-        query,
         fetch: { signal },
+        query,
       }),
       { fallbackMessage: this.fallbackFor(StoreOperation.loadMany) }
     );
@@ -49,8 +51,8 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
   ): Promise<ClientInvoiceSummaryCents> {
     return unwrapTreatyResult(
       await apiClient.clients({ id: this.clientId }).invoices.summary.get({
-        query: normalized.q ? { q: normalized.q } : {},
         fetch: { signal },
+        query: normalized.q ? { q: normalized.q } : {},
       }),
       { fallbackMessage: "Failed to load invoice summary" }
     );
@@ -96,19 +98,13 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
     }
   }
 
-  async loadItems(
-    normalized: PaginationSearchParams,
-    options?: { signal?: AbortSignal }
-  ) {
+  async loadItems(normalized: PaginationSearchParams, options?: StoreOption) {
     this.listAbortController?.abort();
     this.listAbortController = new AbortController();
     const generation = ++this.listLoadGeneration;
 
     const internal = this.listAbortController.signal;
-    const signal =
-      options?.signal && typeof AbortSignal.any === "function"
-        ? AbortSignal.any([internal, options.signal])
-        : internal;
+    const signal = mergeAbortSignals(internal, options?.signal);
 
     this.loading = true;
     this.error = null;

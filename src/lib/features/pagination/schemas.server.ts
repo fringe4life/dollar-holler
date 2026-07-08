@@ -24,10 +24,10 @@ export const querySchema = type({
 
 /** Loose wire shape for Elysia query (all string | undefined). */
 export const listQueryWireSchema = type({
-  "q?": "string",
   "cursor?": cursorSchema,
   "direction?": listDirectionSchema,
   "limit?": limitSchema,
+  "q?": "string",
 });
 
 export const paginationSchema = <t extends CursorRow>(of: type.Any<t>) =>

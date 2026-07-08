@@ -51,16 +51,16 @@ export const resolveCursorListQuery = <TBase extends Record<string, unknown>>(
       return { kind: "first-page" };
     }
     return {
-      kind: "query",
-      where: mergeBaseAndCursor(baseWhere, cursor, "backward"),
-      orderBy: { id: "desc" },
       direction: "backward",
+      kind: "query",
+      orderBy: { id: "desc" },
+      where: mergeBaseAndCursor(baseWhere, cursor, "backward"),
     };
   }
   return {
-    kind: "query",
-    where: mergeBaseAndCursor(baseWhere, cursor, "forward"),
-    orderBy: { id: "asc" },
     direction: "forward",
+    kind: "query",
+    orderBy: { id: "asc" },
+    where: mergeBaseAndCursor(baseWhere, cursor, "forward"),
   };
 };

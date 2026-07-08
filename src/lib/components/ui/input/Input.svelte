@@ -3,14 +3,14 @@
   import type { HTMLInputAttributes } from "svelte/elements";
 
   const inputClass = css({
-    borderColor: "silver",
     backgroundColor: "whisper",
-    fontFamily: "sansserif",
+    blockSize: { base: "10", lg: "14" },
+    borderColor: "silver",
     borderRadius: "lg",
     borderWidth: 2,
-    paddingInline: 4,
-    blockSize: { base: "10", lg: "14" },
+    fontFamily: "sansserif",
     inlineSize: "full",
+    paddingInline: 4,
   });
 
   let {

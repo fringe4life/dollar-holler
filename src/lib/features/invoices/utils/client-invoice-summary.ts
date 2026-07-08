@@ -37,5 +37,5 @@ export const aggregateClientInvoiceBuckets = (
   }
 
   const grandTotal = overdue + outstanding + draft + paid;
-  return { overdue, outstanding, draft, paid, grandTotal };
+  return { draft, grandTotal, outstanding, overdue, paid };
 };

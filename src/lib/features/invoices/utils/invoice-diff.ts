@@ -3,7 +3,7 @@ import type {
   LineItemInsert,
   NewLineItemWithId,
 } from "$features/line-items/types";
-import type { CursorId } from "$lib/types";
+import type { CursorId, Maybe } from "$lib/types";
 import { err, ok, type Result } from "$lib/utils/result";
 import { stripNullishEntries } from "$lib/utils/strip-nullish-entries";
 import type {
@@ -30,20 +30,11 @@ type InvoicePatchKey = (typeof INVOICE_PATCH_KEYS)[number];
 
 export type InvoicePatchSnapshot = Pick<InvoiceInsert, InvoicePatchKey>;
 
-const normalizeOptionalText = (
-  value: string | null | undefined
-): string | null => {
-  if (value == null) {
-    return null;
-  }
-  const trimmed = value.trim();
-  return trimmed === "" ? null : trimmed;
-};
+const normalizeOptionalText = (value: Maybe<string>): string | null =>
+  value ? value.trim() : null;
 
-const optionalTextEqual = (
-  a: string | null | undefined,
-  b: string | null | undefined
-): boolean => normalizeOptionalText(a) === normalizeOptionalText(b);
+const optionalTextEqual = (a: Maybe<string>, b: Maybe<string>): boolean =>
+  normalizeOptionalText(a) === normalizeOptionalText(b);
 
 const datesEqual = (a: Date, b: Date): boolean => a.getTime() === b.getTime();
 
@@ -51,14 +42,14 @@ export const pickInvoicePatchSnapshot = (
   invoice: InvoiceInsert | InvoiceSelect
 ): InvoicePatchSnapshot => ({
   clientId: invoice.clientId,
-  invoiceNumber: invoice.invoiceNumber,
-  subject: invoice.subject,
-  issueDate: invoice.issueDate,
-  dueDate: invoice.dueDate,
   discount: invoice.discount,
-  notes: invoice.notes ?? null,
-  terms: invoice.terms ?? null,
+  dueDate: invoice.dueDate,
+  invoiceNumber: invoice.invoiceNumber,
   invoiceStatus: invoice.invoiceStatus ?? "draft",
+  issueDate: invoice.issueDate,
+  notes: invoice.notes ?? null,
+  subject: invoice.subject,
+  terms: invoice.terms ?? null,
 });
 
 const computeInvoicePatchDelta = (
@@ -92,10 +83,10 @@ export const serializedNormalizedLineItemsForCompare = (
 ): string => {
   const rows = items
     .map((item) => ({
-      id: item.id ?? "",
-      description: String(item.description ?? "").trim(),
-      quantity: item.quantity,
       amount: item.amount,
+      description: String(item.description ?? "").trim(),
+      id: item.id ?? "",
+      quantity: item.quantity,
     }))
     .sort((a, b) => a.id.localeCompare(b.id));
   return JSON.stringify(rows);
@@ -171,8 +162,8 @@ export const buildEditPatch = ({
   const updatedInvoice = {
     ...invoice,
     clientId,
-    issueDate: new Date(invoice.issueDate),
     dueDate: new Date(invoice.dueDate),
+    issueDate: new Date(invoice.issueDate),
   };
 
   const currentSnapshot = pickInvoicePatchSnapshot(updatedInvoice);
@@ -190,9 +181,9 @@ export const buildEditPatch = ({
 
   return {
     delta,
-    normalizedLineItems,
     invoiceUnchanged,
     lineItemsUnchanged,
+    normalizedLineItems,
     unchanged: invoiceUnchanged && lineItemsUnchanged,
   };
 };

@@ -8,37 +8,37 @@ import { db } from "$lib/server/db/index";
 import { schemaTables } from "$lib/server/db/schema";
 import { createId } from "./server/utils/create-id";
 export const auth = betterAuth({
+  advanced: {
+    database: {
+      generateId: createId,
+    },
+  },
   allowedHosts: [
     "dollar-holler.vercel.app",
     "dollar-holler-*.vercel.app", // team preview pattern
     "localhost:*",
   ],
-  trustedOrigins: [ENV.PUBLIC_BASE_URL],
   appName: "Dollar Holler",
-  baseURL: ENV.PUBLIC_BASE_URL,
   basePath: "/api/auth",
-  experimental: { joins: true },
+  baseURL: ENV.PUBLIC_BASE_URL,
   database: drizzleAdapter(db, {
     provider: "pg",
     schema: schemaTables,
   }),
-  secret: ENV.BETTER_AUTH_SECRET,
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: false,
   },
+  experimental: { joins: true },
+  // Bearer: `Authorization: Bearer <token>` for APIs (OpenAPI "Try it", CLI, non-browser clients).
+  // sveltekit must be the last plugin
+  plugins: [openAPI(), bearer(), sveltekitCookies(getRequestEvent)],
+  secret: ENV.BETTER_AUTH_SECRET,
   session: {
     cookieCache: {
       enabled: true,
       maxAge: 5 * 60,
     },
   },
-  // Bearer: `Authorization: Bearer <token>` for APIs (OpenAPI "Try it", CLI, non-browser clients).
-  // sveltekit must be the last plugin
-  plugins: [openAPI(), bearer(), sveltekitCookies(getRequestEvent)],
-  advanced: {
-    database: {
-      generateId: createId,
-    },
-  },
+  trustedOrigins: [ENV.PUBLIC_BASE_URL],
 });

@@ -4,7 +4,8 @@
     "@varlock/bitwarden-plugin",
     "@sveltejs/mcp",
     "@pandacss/plugin-svelte",
-    "@fontsource-variable/source-sans-3"
+    "@fontsource-variable/source-sans-3",
+    "styled-system"
   ],
   "ignoreUnresolvedImports": [
     "styled-system",

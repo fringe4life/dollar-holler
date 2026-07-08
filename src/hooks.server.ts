@@ -17,10 +17,10 @@ const localsHandler: Handle = async ({ event, resolve }) => {
   }
 
   return svelteKitHandler({
-    event,
-    resolve,
     auth,
     building,
+    event,
+    resolve,
   });
 };
 

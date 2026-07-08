@@ -9,11 +9,11 @@ import {
 export const pickSettingsEditableSnapshot = (
   settings: SettingsSelect
 ): SettingsEditableSnapshot => ({
-  myName: settings.myName,
-  email: settings.email,
-  street: settings.street,
   city: settings.city,
+  email: settings.email,
+  myName: settings.myName,
   state: settings.state,
+  street: settings.street,
   zip: settings.zip,
 });
 

@@ -16,11 +16,11 @@
 {#if additionalMenu.isOn}
   <ul
     class={css({
-      position: "absolute",
-      insetInlineStart: 0,
-      insetBlockStart: 4,
-      rounded: "lg",
       bgColor: "white",
+      insetBlockStart: 4,
+      insetInlineStart: 0,
+      position: "absolute",
+      rounded: "lg",
       shadow: "lg",
     })}
   >

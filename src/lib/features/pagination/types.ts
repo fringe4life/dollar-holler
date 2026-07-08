@@ -1,3 +1,4 @@
+import type { StoreOption } from "$lib/stores/types";
 import type { CursorId, Maybe } from "$lib/types";
 import type {
   listDirectionSchema,
@@ -37,16 +38,16 @@ export interface CursorRow {
 /** Contract for list pages that load rows with optional `q` search and expose a loading flag for the Search UI. */
 export interface SearchableListStore {
   readonly error?: string | null;
-  loadItems(
+  loadItems: (
     normalized: PaginationSearchParams,
-    options?: { signal?: AbortSignal }
-  ): Promise<void>;
+    options?: StoreOption
+  ) => Promise<void>;
   readonly loading: boolean;
   /**
    * Call immediately before `pushState` when changing list query from the client so
    * URL-sync effects do not refetch using a stale URL while `loadItems` is in flight.
    */
-  presetClientListQueryKey?(normalized: PaginationSearchParams): void;
+  presetClientListQueryKey?: (normalized: PaginationSearchParams) => void;
 }
 
 /** Cursor-paginated list store: list rows, URL sync key, and pagination flags for UI. */

@@ -6,9 +6,9 @@
   aria-hidden="true"
   class={circle({
     animation: "spin",
-    borderWidth: 2,
-    borderColor: "currentColor",
     borderBottomColor: "transparent",
-    size: 5
+    borderColor: "currentColor",
+    borderWidth: 2,
+    size: 5,
   })}
 ></div>

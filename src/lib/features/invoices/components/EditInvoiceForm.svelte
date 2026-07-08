@@ -52,15 +52,15 @@
 
   const toEditableInvoice = (full: InvoiceSelect): EditableInvoice => ({
     clientId: full.clientId,
-    invoiceNumber: full.invoiceNumber,
-    subject: full.subject,
     discount: full.discount ?? 0,
-    issueDate: toDateInputValue(full.issueDate),
     dueDate: toDateInputValue(full.dueDate),
-    notes: full.notes ?? null,
-    terms: full.terms ?? null,
-    invoiceStatus: full.invoiceStatus ?? "draft",
     id: full.id,
+    invoiceNumber: full.invoiceNumber,
+    invoiceStatus: full.invoiceStatus ?? "draft",
+    issueDate: toDateInputValue(full.issueDate),
+    notes: full.notes ?? null,
+    subject: full.subject,
+    terms: full.terms ?? null,
   });
 
   // svelte-ignore state_referenced_locally
@@ -89,7 +89,7 @@
 
   onMount(async () => {
     abortController = new AbortController();
-    const signal = abortController.signal;
+    const { signal } = abortController;
 
     try {
       const [fullInvoice, items] = await Promise.all([
@@ -110,7 +110,7 @@
       invoice = toEditableInvoice(fullInvoice);
       invoiceLoaded = true;
 
-      if (items == null) {
+      if (!items) {
         return;
       }
 
@@ -159,10 +159,10 @@
     e.preventDefault();
 
     const client = await resolveClientId({
+      createClient: (clientData) => clientsStore.createClient(clientData),
+      existingClientId: invoice.clientId,
       isNewClient,
       newClient,
-      existingClientId: invoice.clientId,
-      createClient: (clientData) => clientsStore.createClient(clientData),
     });
     if (!client.ok) {
       toast.error(client.message);
@@ -170,9 +170,9 @@
     }
 
     const ready = assertEditReady({
-      formReady,
       baselineInvoiceSnapshot,
       baselineLineItemsSnapshot,
+      formReady,
       invoiceId: invoice.id,
     });
     if (!ready.ok) {
@@ -181,11 +181,11 @@
     }
 
     const patch = buildEditPatch({
-      invoice,
-      clientId: client.clientId,
-      lineItems,
       baselineInvoiceSnapshot: ready.baselineInvoiceSnapshot,
       baselineLineItemsSnapshot: ready.baselineLineItemsSnapshot,
+      clientId: client.clientId,
+      invoice,
+      lineItems,
       normalizeLineItems: (items) => lineItemsStore.normalizeLineItems(items),
     });
 
@@ -195,8 +195,8 @@
     }
 
     const saved = await persistInvoiceEdits({
-      invoiceId: ready.invoiceId,
       delta: patch.delta,
+      invoiceId: ready.invoiceId,
       invoiceUnchanged: patch.invoiceUnchanged,
       lineItemsUnchanged: patch.lineItemsUnchanged,
       normalizedLineItems: patch.normalizedLineItems,

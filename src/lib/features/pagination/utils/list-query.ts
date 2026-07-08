@@ -69,13 +69,13 @@ export const normalizeListQuery = (raw: {
   const limit = parseLimit(limitWire);
 
   return {
+    listCursorWasNormalized,
     normalized: {
-      q,
       cursor,
       direction: effectiveDirection(direction, cursor),
       limit,
+      q,
     },
-    listCursorWasNormalized,
   };
 };
 
@@ -94,10 +94,10 @@ const firstParam = (
 const parseSearchParamsToRaw = (
   searchParams: URLSearchParams
 ): PaginationSearchParamsRaw => ({
-  q: firstParam(searchParams, "q"),
   cursor: firstParam(searchParams, "cursor"),
   direction: firstParam(searchParams, "direction"),
   limit: firstParam(searchParams, "limit"),
+  q: firstParam(searchParams, "q"),
 });
 
 /**
@@ -128,8 +128,8 @@ export const toNormalizedListQuery = (
   q: Maybe<string>,
   options?: Partial<PaginationSearchParams>
 ): PaginationSearchParams => ({
-  q: q?.trim() || undefined,
   cursor: options?.cursor,
   direction: effectiveDirection(options?.direction, options?.cursor),
   limit: coerceLimit(options?.limit),
+  q: q?.trim() || undefined,
 });

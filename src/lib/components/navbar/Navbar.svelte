@@ -21,30 +21,30 @@
 
   const navShell = vstack({
     backgroundColor: "daisyBush",
-    position: { base: "fixed", md: "sticky" },
-    inset: 0,
-    zIndex: 9999,
-    overflowY: "clip",
-    textAlign: "center",
-    isolation: "isolate",
-    transitionProperty: "translate",
-    transitionDuration: "normal",
-    inlineSize: "full",
     blockSize: { md: "100dvh" },
+    inlineSize: "full",
+    inset: 0,
+    isolation: "isolate",
+    overflowY: "clip",
+    position: { base: "fixed", md: "sticky" },
+    textAlign: "center",
+    transitionDuration: "normal",
+    transitionProperty: "translate",
+    zIndex: 9999,
   });
 
   const navTranslateClosed = css({
-    translate: { base: "-100% 0", md: "0 0" },
     _starting: {
       translate: { base: "-100% 0", md: "0 0" },
     },
+    translate: { base: "-100% 0", md: "0 0" },
   });
 
   const navTranslateOpen = css({
-    translate: { base: "0 0", md: "0 0" },
     _starting: {
       translate: { base: "-100% 0", md: "0 0" },
     },
+    translate: { base: "0 0", md: "0 0" },
   });
 
   const handleKeypress = (event: KeyboardEvent) => {

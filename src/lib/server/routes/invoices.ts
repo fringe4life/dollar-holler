@@ -48,13 +48,13 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     },
     {
       auth: true,
-      listQuery: true,
       detail: {
-        operationId: "listInvoices",
-        summary: "List invoices",
         description:
           "Cursor-paginated invoices for the authenticated user (includes client name and totals). Supports `cursor`, `direction`, `limit`, and optional `q`.",
+        operationId: "listInvoices",
+        summary: "List invoices",
       },
+      listQuery: true,
       response: {
         200: invoicePaginatedListSchema,
         401: apiErrorBodySchema,
@@ -84,13 +84,13 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
     },
     {
       body: invoiceInsertSchema,
-      invoiceInsertNotesTermsHtmlAugment: true,
       detail: {
-        operationId: "createInvoice",
-        summary: "Create invoice",
         description:
           "Creates an invoice owned by the authenticated user. Returns the full inserted row.",
+        operationId: "createInvoice",
+        summary: "Create invoice",
       },
+      invoiceInsertNotesTermsHtmlAugment: true,
       response: {
         200: invoiceSelectSchema,
         401: apiErrorBodySchema,
@@ -119,14 +119,14 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       }
     },
     {
-      params: idResponseSchema,
       auth: true,
       detail: {
-        operationId: "getInvoice",
-        summary: "Get invoice by id",
         description:
           "Returns one invoice if it exists and belongs to the authenticated user; otherwise 404.",
+        operationId: "getInvoice",
+        summary: "Get invoice by id",
       },
+      params: idResponseSchema,
       response: {
         200: invoiceSelectSchema,
         401: apiErrorBodySchema,
@@ -167,15 +167,14 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       }
     },
     {
-      params: idResponseSchema,
       body: invoiceUpdateSchema,
-      verifyInvoicePatchMutation: true,
       detail: {
-        operationId: "patchInvoice",
-        summary: "Update invoice",
         description:
           "Partial update; omitted fields are left unchanged (including `invoiceStatus`). When `invoiceStatus` is set, only draft→sent, sent→paid, or a no-op same value is allowed. Returns only `{ id }` on success. Missing or non-owned invoice returns 404.",
+        operationId: "patchInvoice",
+        summary: "Update invoice",
       },
+      params: idResponseSchema,
       response: {
         200: idResponseSchema,
         400: apiErrorBodySchema,
@@ -183,6 +182,7 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         404: apiErrorBodySchema,
         500: apiErrorBodySchema,
       },
+      verifyInvoicePatchMutation: true,
     }
   )
   // DELETE /api/invoices/:id - Delete invoice
@@ -210,14 +210,14 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
       }
     },
     {
-      params: idResponseSchema,
       authMutation: true,
       detail: {
-        operationId: "deleteInvoice",
-        summary: "Delete invoice",
         description:
           "Deletes the invoice if it belongs to the authenticated user. Missing invoice returns 404.",
+        operationId: "deleteInvoice",
+        summary: "Delete invoice",
       },
+      params: idResponseSchema,
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,
@@ -251,20 +251,20 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           }
         },
         {
-          params: idResponseSchema,
-          verifyInvoiceGet: true,
           detail: {
-            operationId: "listInvoiceLineItems",
-            summary: "List line items for invoice",
             description:
               "All line item columns for the invoice. Path `id` is the invoice id. Returns 404 if the invoice does not exist or is not owned by the user.",
+            operationId: "listInvoiceLineItems",
+            summary: "List line items for invoice",
           },
+          params: idResponseSchema,
           response: {
             200: lineItemSelectSchema.array(),
             401: apiErrorBodySchema,
             404: apiErrorBodySchema,
             500: apiErrorBodySchema,
           },
+          verifyInvoiceGet: true,
         }
       )
       // GET /api/invoices/:id/line-items/edit — id, description, quantity, amount only
@@ -273,15 +273,15 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
         async ({ params: { id }, user }) => {
           try {
             const rows = await db.query.lineItems.findMany({
+              columns: {
+                amount: true,
+                description: true,
+                id: true,
+                quantity: true,
+              },
               where: {
                 invoiceId: { eq: id },
                 userId: { eq: user.id },
-              },
-              columns: {
-                id: true,
-                description: true,
-                quantity: true,
-                amount: true,
               },
             });
             return rows;
@@ -291,20 +291,20 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           }
         },
         {
-          params: idResponseSchema,
-          verifyInvoiceGet: true,
           detail: {
-            operationId: "listInvoiceLineItemsForEdit",
-            summary: "Line items for edit form",
             description:
               "Returns id, description, quantity, and amount only—suitable for editing UI. Path `id` is the invoice id. Returns 404 if the invoice does not exist or is not owned by the user.",
+            operationId: "listInvoiceLineItemsForEdit",
+            summary: "Line items for edit form",
           },
+          params: idResponseSchema,
           response: {
             200: lineItemEditRowSchema.array(),
             401: apiErrorBodySchema,
             404: apiErrorBodySchema,
             500: apiErrorBodySchema,
           },
+          verifyInvoiceGet: true,
         }
       )
       // POST /api/invoices/:id/line-items - Create line items
@@ -324,21 +324,21 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           }
         },
         {
-          params: idResponseSchema,
           body: type({ lineItems: lineItemInsertSchema.array().required() }),
-          verifyInvoiceMutation: true,
           detail: {
-            operationId: "createInvoiceLineItems",
-            summary: "Create line items on invoice",
             description:
               "Inserts one or more line items for the invoice. Path `id` is the invoice id. Returns 404 if the invoice does not exist or is not owned by the user.",
+            operationId: "createInvoiceLineItems",
+            summary: "Create line items on invoice",
           },
+          params: idResponseSchema,
           response: {
             200: lineItemSelectSchema.array(),
             401: apiErrorBodySchema,
             404: apiErrorBodySchema,
             500: apiErrorBodySchema,
           },
+          verifyInvoiceMutation: true,
         }
       )
       // PUT /api/invoices/:id/line-items - Replace line items
@@ -360,8 +360,8 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
               .values(
                 body.lineItems.map((item) => ({
                   ...item,
-                  userId: user.id,
                   invoiceId: id,
+                  userId: user.id,
                 }))
               )
               .returning();
@@ -371,21 +371,21 @@ export const invoicesRoutes = new Elysia({ prefix: "/invoices" })
           }
         },
         {
-          params: idResponseSchema,
           body: type({ lineItems: lineItemInsertSchema.array().required() }),
-          verifyInvoiceMutation: true,
           detail: {
-            operationId: "replaceInvoiceLineItems",
-            summary: "Replace all line items on invoice",
             description:
               "Deletes existing line items for the invoice, then inserts the provided set. Path `id` is the invoice id. Returns 404 if the invoice does not exist or is not owned by the user.",
+            operationId: "replaceInvoiceLineItems",
+            summary: "Replace all line items on invoice",
           },
+          params: idResponseSchema,
           response: {
             200: lineItemSelectSchema.array(),
             401: apiErrorBodySchema,
             404: apiErrorBodySchema,
             500: apiErrorBodySchema,
           },
+          verifyInvoiceMutation: true,
         }
       )
   );
@@ -414,10 +414,10 @@ export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
     {
       auth: true,
       detail: {
-        operationId: "listAllLineItems",
-        summary: "List all line items",
         description:
           "Returns every line item belonging to the authenticated user across all invoices.",
+        operationId: "listAllLineItems",
+        summary: "List all line items",
       },
       response: {
         200: lineItemSelectSchema.array(),
@@ -451,14 +451,14 @@ export const lineItemsRoutes = new Elysia({ prefix: "/line-items" })
       }
     },
     {
-      params: idResponseSchema,
       authMutation: true,
       detail: {
-        operationId: "deleteLineItem",
-        summary: "Delete line item",
         description:
           "Deletes a single line item by id if it belongs to the authenticated user. Missing line item returns 404.",
+        operationId: "deleteLineItem",
+        summary: "Delete line item",
       },
+      params: idResponseSchema,
       response: {
         200: deleteSuccessSchema,
         401: apiErrorBodySchema,

@@ -1,13 +1,13 @@
 /** Cursor list + CRUD copy: which noun phrase (singular vs plural) and HTTP-ish verb. */
 export const StoreOperation = {
-  loadMany: "loadMany",
-  loadOne: "loadOne",
   createMany: "createMany",
   createOne: "createOne",
-  updateMany: "updateMany",
-  updateOne: "updateOne",
   deleteMany: "deleteMany",
   deleteOne: "deleteOne",
+  loadMany: "loadMany",
+  loadOne: "loadOne",
+  updateMany: "updateMany",
+  updateOne: "updateOne",
 } as const;
 
 export type StoreOperation =
@@ -17,14 +17,14 @@ const OP_TO_VERB: Record<
   StoreOperation,
   "load" | "create" | "update" | "delete"
 > = {
-  loadMany: "load",
-  loadOne: "load",
   createMany: "create",
   createOne: "create",
-  updateMany: "update",
-  updateOne: "update",
   deleteMany: "delete",
   deleteOne: "delete",
+  loadMany: "load",
+  loadOne: "load",
+  updateMany: "update",
+  updateOne: "update",
 };
 
 /** User-facing "Failed to {verb} {singular|plural}" for store operations. */

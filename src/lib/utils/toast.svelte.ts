@@ -16,23 +16,23 @@ const toToastPayload = (title: string, options?: ToastOptions) => ({
 });
 
 export const toaster = createToaster({
-  placement: "bottom-end",
   max: 4,
   offsets: "1rem",
   pauseOnPageIdle: true,
+  placement: "bottom-end",
 });
 
 const notify = (kind: ToastKind, title: string, options?: ToastOptions) =>
   toaster[kind](toToastPayload(title, options));
 
 export const toast = {
-  success: (title: string, options?: ToastOptions) =>
-    notify("success", title, options),
+  dismiss: (id?: string) => toaster.dismiss(id),
   error: (title: string, options?: ToastOptions) =>
     notify("error", title, options),
   info: (title: string, options?: ToastOptions) =>
     notify("info", title, options),
+  success: (title: string, options?: ToastOptions) =>
+    notify("success", title, options),
   warning: (title: string, options?: ToastOptions) =>
     notify("warning", title, options),
-  dismiss: (id?: string) => toaster.dismiss(id),
 };

@@ -7,8 +7,8 @@ export const verifyInvoice = async (
   invoiceId: CursorId
 ): Promise<Maybe<CursorId>> => {
   const invoice = await db.query.invoices.findFirst({
-    where: { id: { eq: invoiceId }, userId: { eq: userId } },
     columns: { id: true },
+    where: { id: { eq: invoiceId }, userId: { eq: userId } },
   });
   return invoice?.id;
 };
@@ -21,8 +21,8 @@ export const verifyInvoiceStatus = async (
 > => {
   const { data: invoice } = await tryCatch(() =>
     db.query.invoices.findFirst({
-      where: { id: { eq: invoiceId }, userId: { eq: userId } },
       columns: { id: true, invoiceStatus: true },
+      where: { id: { eq: invoiceId }, userId: { eq: userId } },
     })
   );
   return { id: invoice?.id, invoiceStatus: invoice?.invoiceStatus };

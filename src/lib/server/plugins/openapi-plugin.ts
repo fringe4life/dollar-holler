@@ -17,30 +17,28 @@ const betterAuthOpenApi = enabled
 
 /** OpenAPI / Scalar docs for the Elysia API; Better Auth paths merged when `enabled` (dev). */
 export const openApiPlugin = openapi({
-  enabled,
   documentation: {
     info: {
-      title: "Dollar Holler API",
-      version: "0.0.1",
       description:
         "Application API and Better Auth endpoints. Use session cookies from the browser or Bearer tokens where supported.",
+      title: "Dollar Holler API",
+      version: "0.0.1",
     },
     tags: [
       {
-        name: "Clients",
         description: "Client records, lists, and picker options",
+        name: "Clients",
       },
-      { name: "Invoices", description: "Invoices and pagination" },
-      { name: "Line items", description: "Invoice line items" },
-      { name: "Settings", description: "Per-user application settings" },
+      { description: "Invoices and pagination", name: "Invoices" },
+      { description: "Invoice line items", name: "Line items" },
+      { description: "Per-user application settings", name: "Settings" },
       {
-        name: "Better Auth",
         description: "Authentication and session endpoints",
+        name: "Better Auth",
       },
     ],
     ...(betterAuthOpenApi
       ? {
-          paths: betterAuthOpenApi[0] as OpenAPIV3.PathsObject,
           components: {
             ...(betterAuthOpenApi[1] as OpenAPIV3.ComponentsObject),
             securitySchemes: {
@@ -48,12 +46,14 @@ export const openApiPlugin = openapi({
                 .securitySchemes,
               /** Better Auth session token; use Authorize in Scalar/Swagger with a token from sign-in (`set-auth-token`). */
               betterAuthSession: {
-                type: "http",
                 scheme: "bearer",
+                type: "http",
               },
             },
           },
+          paths: betterAuthOpenApi[0] as OpenAPIV3.PathsObject,
         }
       : {}),
   },
+  enabled,
 });

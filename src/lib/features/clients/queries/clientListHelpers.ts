@@ -19,10 +19,10 @@ import type { clients as clientsTable } from "$lib/server/db/schema";
  * previous `GROUP BY clientId` CASE/SUM semantics over per-invoice totals.
  */
 export const clientReceivedBalanceExtras = {
-  received: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
+  balance: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
     sq<number>`(
       SELECT COALESCE(SUM(
-        CASE WHEN i.invoice_status = 'paid'
+        CASE WHEN i.invoice_status IS NULL OR i.invoice_status <> 'paid'
         THEN ROUND(
           COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0)
           - COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0) * COALESCE(i.discount, 0) / 100
@@ -32,10 +32,10 @@ export const clientReceivedBalanceExtras = {
       FROM invoices i
       WHERE i.client_id = ${clients.id}
     )`,
-  balance: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
+  received: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
     sq<number>`(
       SELECT COALESCE(SUM(
-        CASE WHEN i.invoice_status IS NULL OR i.invoice_status <> 'paid'
+        CASE WHEN i.invoice_status = 'paid'
         THEN ROUND(
           COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0)
           - COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0) * COALESCE(i.discount, 0) / 100

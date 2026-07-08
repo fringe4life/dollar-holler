@@ -51,28 +51,28 @@
   // ADDITIONAL OPTIONS
   const CLIENT_OPTIONS = $derived([
     {
-      label: "Edit",
+      disabled: false,
       icon: Edit,
+      label: "Edit",
       onclick: handleEdit,
-      disabled: false,
     },
     {
-      label: "Delete",
+      disabled: false,
       icon: Trash,
+      label: "Delete",
       onclick: handleDelete,
-      disabled: false,
     },
     {
-      label: "Active",
-      icon: Activate,
-      onclick: handleActivation,
       disabled: client.clientStatus === "active",
+      icon: Activate,
+      label: "Active",
+      onclick: handleActivation,
     },
     {
-      label: "Archive",
-      icon: Archive,
-      onclick: handleArchive,
       disabled: client.clientStatus === "archive",
+      icon: Archive,
+      label: "Archive",
+      onclick: handleArchive,
     },
   ] satisfies Option[]);
 </script>

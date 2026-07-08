@@ -1,62 +1,62 @@
 import { sva } from "styled-system/css";
 
 export const lineItemFieldRecipe = sva({
-  slots: ["root", "label", "input", "border"],
   base: {
-    label: {
-      display: { base: "block", sm: "none" },
-      fontFamily: "sansserif",
-      color: "monsoon",
-      fontWeight: "bold",
-    },
-    input: {
-      display: "block",
-      blockSize: 10,
-      inlineSize: "full",
-      borderBottomWidth: 2,
-      borderStyle: "dashed",
-      borderColor: "stone.300",
-      transitionProperty: "colors",
-      transitionDuration: "normal",
-      _disabled: { borderBottomWidth: 0, bg: "transparent" },
-      _focus: { outline: "none" },
-    },
     border: {
       // the animated span border
       borderColor: "lavenderIndigo",
-      transitionTimingFunction: "anticipate",
+      borderStyle: "solid",
+      borderWidth: 2,
+      inset: 0,
+      opacity: "0",
       pointerEvents: "none",
       position: "absolute",
-      inset: 0,
-      transformOrigin: "left",
       scaleX: 0.9,
-      borderWidth: 2,
-      borderStyle: "solid",
-      opacity: "0",
-      transitionProperty: ["opacity", "scale"],
+      transformOrigin: "left",
       transitionDuration: "normal",
+      transitionProperty: ["opacity", "scale"],
+      transitionTimingFunction: "anticipate",
+    },
+    input: {
+      _disabled: { bg: "transparent", borderBottomWidth: 0 },
+      _focus: { outline: "none" },
+      blockSize: 10,
+      borderBottomWidth: 2,
+      borderColor: "stone.300",
+      borderStyle: "dashed",
+      display: "block",
+      inlineSize: "full",
+      transitionDuration: "normal",
+      transitionProperty: "colors",
+    },
+    label: {
+      color: "monsoon",
+      display: { base: "block", sm: "none" },
+      fontFamily: "sansserif",
+      fontWeight: "bold",
     },
   },
+  defaultVariants: {
+    align: "left",
+    inputType: "text",
+  },
+  slots: ["root", "label", "input", "border"],
   variants: {
-    inputType: {
-      text: {
-        input: { fontFamily: "sansserif", fontSize: "xl", fontWeight: "bold" },
-      },
-      number: {
-        input: { fontFamily: "mono" },
-      },
-    },
     align: {
-      left: { input: { textAlign: "left" }, label: { textAlign: "left" } },
       center: {
         input: { textAlign: "center" },
         label: { textAlign: "center" },
       },
+      left: { input: { textAlign: "left" }, label: { textAlign: "left" } },
       right: { input: { textAlign: "right" }, label: { textAlign: "right" } },
     },
-  },
-  defaultVariants: {
-    inputType: "text",
-    align: "left",
+    inputType: {
+      number: {
+        input: { fontFamily: "mono" },
+      },
+      text: {
+        input: { fontFamily: "sansserif", fontSize: "xl", fontWeight: "bold" },
+      },
+    },
   },
 });

@@ -33,9 +33,9 @@ const mapRows = (rows: ClientListResponse[]): ClientListResponse[] =>
   rows.map(
     (row): ClientListResponse => ({
       ...row,
+      balance: Math.round(Number(row.balance ?? 0)),
       clientStatus: row.clientStatus,
       received: Math.round(Number(row.received ?? 0)),
-      balance: Math.round(Number(row.balance ?? 0)),
     })
   );
 
@@ -50,16 +50,16 @@ export const fetchPaginatedClients = async (
 ): Promise<CursorPaginatedList<ClientListResponse>> => {
   const ws = withUserAndSearch(userId, searchWhere(input.q));
   return fetchCursorPaginatedList({
-    input,
     baseWhere: ws,
-    idColumn: clientsTable.id,
-    map: mapRows,
     fetchPage: ({ where, orderBy, limit }) =>
       db.query.clients.findMany({
-        where,
         extras: clientReceivedBalanceExtras,
-        orderBy,
         limit,
+        orderBy,
+        where,
       }),
+    idColumn: clientsTable.id,
+    input,
+    map: mapRows,
   });
 };

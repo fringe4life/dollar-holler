@@ -66,17 +66,17 @@ const invoiceSubtotalExtras = {
 
 /** RQB `columns`: booleans only; keys checked against `InvoicesQueryColumnSelection`. */
 const invoiceListColumns = {
-  id: true,
-  userId: true,
-  invoiceNumber: true,
   clientId: true,
-  subject: true,
-  issueDate: true,
-  dueDate: true,
-  discount: true,
-  invoiceStatus: true,
   createdAt: true,
+  discount: true,
+  dueDate: true,
+  id: true,
+  invoiceNumber: true,
+  invoiceStatus: true,
+  issueDate: true,
+  subject: true,
   updatedAt: true,
+  userId: true,
 } as const satisfies InvoicesQueryColumnSelection;
 
 const mapRows = (
@@ -99,14 +99,14 @@ const mapRows = (
 
 const fetchInvoiceListPage = async ({ where, orderBy, limit }: FetchPageArgs) =>
   await db.query.invoices.findMany({
-    where,
     columns: invoiceListColumns,
+    extras: invoiceSubtotalExtras,
+    limit,
+    orderBy,
+    where,
     with: {
       client: { columns: { name: true } },
     },
-    extras: invoiceSubtotalExtras,
-    orderBy,
-    limit,
   });
 
 // biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
@@ -116,11 +116,11 @@ export const fetchPaginatedInvoices = async (
 ): Promise<CursorPaginatedList<InvoiceListResponse>> => {
   const ws = withUserAndSearch(userId, searchWhere(input.q));
   return fetchCursorPaginatedList({
-    input,
     baseWhere: ws,
-    idColumn: invoicesTable.id,
-    map: mapRows,
     fetchPage: fetchInvoiceListPage,
+    idColumn: invoicesTable.id,
+    input,
+    map: mapRows,
   });
 };
 
@@ -132,11 +132,11 @@ export const fetchPaginatedInvoicesForClient = async (
 ): Promise<CursorPaginatedList<InvoiceListResponse>> => {
   const ws = clientInvoiceListWhere(userId, clientId, input.q);
   return fetchCursorPaginatedList({
-    input,
     baseWhere: ws,
-    idColumn: invoicesTable.id,
-    map: mapRows,
     fetchPage: fetchInvoiceListPage,
+    idColumn: invoicesTable.id,
+    input,
+    map: mapRows,
   });
 };
 
@@ -147,22 +147,22 @@ export const fetchClientInvoiceSummary = async (
 ): Promise<ClientInvoiceSummaryCents> => {
   const where = clientInvoiceListWhere(userId, clientId, q);
   const raw = await db.query.invoices.findMany({
-    where,
     columns: {
-      dueDate: true,
       discount: true,
+      dueDate: true,
       invoiceStatus: true,
     },
     extras: invoiceSubtotalExtras,
     orderBy: { id: "asc" },
+    where,
   });
 
   const withTotal = mapRowsWithTotal(raw);
   return aggregateClientInvoiceBuckets(
     withTotal.map((row) => ({
-      total: row.total,
-      invoiceStatus: row.invoiceStatus,
       dueDate: row.dueDate,
+      invoiceStatus: row.invoiceStatus,
+      total: row.total,
     }))
   );
 };

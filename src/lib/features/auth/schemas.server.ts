@@ -16,8 +16,8 @@ export const forgotPassword = type({
 });
 
 const updatePasswordSchema = type({
-  newPassword: passwordSchema,
   confirmPassword: passwordSchema,
+  newPassword: passwordSchema,
 });
 
 export const signupSchema = type({
@@ -30,8 +30,8 @@ export const signupSchema = type({
       return true;
     }
     return context.reject({
-      expected: "identical to password",
       actual: "",
+      expected: "identical to password",
       path: ["confirmPassword"],
     });
   });
@@ -44,15 +44,15 @@ export const resetPasswordSchema = type({
       return true;
     }
     return context.reject({
-      expected: "New Password and Confirm Password must be identical",
       actual: "New Password and Confirm Password are not identical",
+      expected: "New Password and Confirm Password must be identical",
       path: ["confirmPassword"],
     });
   });
 
 export const changePasswordSchema = type({
-  email: emailSchema,
   currentPassword: passwordSchema,
+  email: emailSchema,
 })
   .merge(updatePasswordSchema)
   .narrow((data, context) => {
@@ -60,8 +60,8 @@ export const changePasswordSchema = type({
       return true;
     }
     return context.reject({
-      expected: "New Password and Confirm Password must be identical",
       actual: "New Password and Confirm Password are not identical",
+      expected: "New Password and Confirm Password must be identical",
       path: ["confirmPassword"],
     });
   });

@@ -2,6 +2,7 @@ import type { CursorPaginatedList } from "$features/pagination/types";
 import { apiClient } from "$lib/api";
 import type { InvoiceStatus } from "$lib/server/db/types";
 import { CursorPaginatedListStoreBase } from "$lib/stores/cursor-paginated-base.svelte";
+import type { StoreOption } from "$lib/stores/types";
 import type { CursorId, Maybe } from "$lib/types";
 import { today } from "$lib/utils/dateHelpers";
 import {
@@ -26,14 +27,14 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
   newInvoice(): NewInvoice {
     return {
       clientId: undefined,
-      invoiceNumber: "",
-      subject: "",
       discount: 0,
-      issueDate: today,
       dueDate: today,
-      notes: null,
-      terms: null,
+      invoiceNumber: "",
       invoiceStatus: "draft",
+      issueDate: today,
+      notes: null,
+      subject: "",
+      terms: null,
     };
   }
 
@@ -43,8 +44,8 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
   ): Promise<CursorPaginatedList<InvoiceListResponse>> {
     return unwrapTreatyResult(
       await apiClient.invoices.get({
-        query,
         fetch: { signal },
+        query,
       }),
       { fallbackMessage: this.fallbackFor(StoreOperation.loadMany) }
     );
@@ -52,7 +53,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
 
   async loadInvoiceById(
     id: string,
-    options?: { signal?: AbortSignal }
+    options?: StoreOption
   ): Promise<Maybe<InvoiceSelect>> {
     const fallback = this.fallbackFor(StoreOperation.loadOne);
     try {

@@ -11,8 +11,8 @@ import { BadRequestError, UnauthorizedError } from "./utils/errors";
 export const app = new Elysia({ prefix: "/api" })
   .use(openApiPlugin)
   .error({
-    UNAUTHORIZED: UnauthorizedError,
     BAD_REQUEST: BadRequestError,
+    UNAUTHORIZED: UnauthorizedError,
   })
   .mount(auth.handler)
   .use(clientsRoutes)

@@ -46,9 +46,9 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
     return {
       client,
       items: listResult.items,
+      listCursorWasNormalized,
       paginationMetadata: listResult.paginationMetadata,
       summary,
-      listCursorWasNormalized,
     };
   } catch {
     throw error(500, { message: "Failed to load client invoices" });

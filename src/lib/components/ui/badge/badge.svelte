@@ -4,45 +4,45 @@
 
   const badgeVariants = cva({
     base: {
-      inlineSize: 20,
       blockSize: 20,
       borderRadius: "full",
       borderWidth: "1px",
-      fontWeight: "bold",
       fontSize: "md",
+      fontWeight: "bold",
+      inlineSize: 20,
       textAlign: "center",
       textTransform: "capitalize",
     },
+    defaultVariants: {
+      size: "small",
+      variant: "draft",
+    },
     variants: {
+      size: {
+        default: { paddingBlock: 1, paddingInline: 3 },
+        small: { paddingInline: 2 },
+      },
       variant: {
-        sent: {
-          borderColor: "robinEggBlue",
-          backgroundColor: "robinEggBlue",
-          color: "blueGem",
-        },
         draft: {
           borderColor: "pastelPurple",
           color: "pastelPurple",
         },
         late: {
-          borderColor: "scarlet",
           backgroundColor: "scarlet",
+          borderColor: "scarlet",
           color: "goldenFizz",
         },
         paid: {
-          borderColor: "pastelPurple",
           backgroundColor: "pastelPurple",
+          borderColor: "pastelPurple",
           color: "white",
         },
+        sent: {
+          backgroundColor: "robinEggBlue",
+          borderColor: "robinEggBlue",
+          color: "blueGem",
+        },
       },
-      size: {
-        default: { paddingInline: 3, paddingBlock: 1 },
-        small: { paddingInline: 2 },
-      },
-    },
-    defaultVariants: {
-      variant: "draft",
-      size: "small",
     },
   });
 </script>

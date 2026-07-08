@@ -33,9 +33,9 @@
     <h2
       class={css({
         color: "daisyBush",
-        textAlign: "center",
         fontSize: "xl",
         fontWeight: "bold",
+        textAlign: "center",
       })}
     >
       {titleText}
@@ -46,9 +46,9 @@
     <h2
       class={css({
         color: "daisyBush",
-        textAlign: "center",
         fontSize: "lg",
         fontWeight: "medium",
+        textAlign: "center",
       })}
     >
       {#if descriptionSnippet}
@@ -56,7 +56,7 @@
       {/if}
     </h2>
   {/snippet}
-  <div class={flex({ justify: "center", gap: 4 })}>
+  <div class={flex({ gap: 4, justify: "center" })}>
     <Button onclick={onCancel} variant="secondary">Cancel</Button>
     <Button onclick={handleDelete} variant="destructive"
       >Yes, Delete It.</Button

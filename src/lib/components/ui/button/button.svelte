@@ -7,187 +7,187 @@
 
   export const buttonVariants = cva({
     base: {
-      display: "inline-flex",
-      cursor: "pointer",
       alignItems: "center",
-      justifyContent: "center",
-      gap: 2,
-      whiteSpace: "nowrap",
-      rounded: "lg",
+      cursor: "pointer",
+      display: "inline-flex",
       fontFamily: "sansserif",
+      gap: 2,
+      justifyContent: "center",
+      rounded: "lg",
+      whiteSpace: "nowrap",
     },
     variants: {
-      variant: {
-        default: {
-          position: "relative",
-          backgroundColor: "lavenderIndigo",
-          fontWeight: "black",
-          color: "white",
-          transitionProperty: "translate",
-          transitionDuration: "normal",
-          transitionTimingFunction: "anticipate",
-          _after: {
-            position: "absolute",
-            content: "''",
-            inset: 0,
-            rounded: "inherit",
-            opacity: "0",
-            shadow: "lg",
-            transitionProperty: "opacity",
-            transitionDuration: "normal",
-          },
-          _hover: {
-            translate: "-2px -2px",
-            _after: {
-              opacity: "1",
-            },
-          },
-        },
-        destructive: {
-          backgroundColor: { base: "scarlet", _hover: "scarlet/90" },
-          color: "goldenFizz",
-          shadow: "xs",
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-        },
-        auth: {
-          inlineSize: "full",
-          minBlockSize: 14,
-          position: "relative",
-          rounded: "lg",
-          backgroundColor: "robinEggBlue",
-          paddingInline: 4,
-          paddingBlock: 3,
-          fontWeight: "bold",
-          color: "daisyBush",
-          fontSize: "xl",
-          transitionProperty: "translate",
-          transitionDuration: "normal",
-          _after: {
-            position: "absolute",
-            content: "''",
-            inset: 0,
-            rounded: "inherit",
-            opacity: "0",
-            shadow: "lg",
-            transitionProperty: "opacity",
-            transitionDuration: "normal",
-          },
-          _supportsLinear: {
-            transitionTimingFunction: "glide",
-          },
-          _hover: {
-            translate: "0 -4px",
-            _after: {
-              opacity: "1",
-            },
-          },
-        },
-        ghost: {
-          color: { base: "pastelPurple", _hover: "blueGem" },
-          shadow: "xs",
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-        },
-        outline: {
-          borderWidth: 2,
-          borderStyle: "solid",
-          borderColor: "daisyBush",
-          color: { base: "daisyBush", _hover: "white" },
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-          backgroundColor: { base: "transparent", _hover: "daisyBush/90" },
-          _disabled: {
-            borderColor: "red.500",
-            color: "red.500",
-            backgroundColor: "transparent",
-            cursor: "not-allowed",
-            _hover: {
-              borderColor: "red.500",
-              color: "red.500",
-              backgroundColor: "transparent",
-            },
-          },
-        },
-        textOnlyDestructive: {
-          backgroundColor: "transparent",
-          paddingInline: 0,
-          color: "scarlet",
-          textDecoration: "underline",
-          _hover: {
-            textDecoration: "none",
-          },
-        },
-        textOnly: {
-          backgroundColor: "transparent",
-          color: "lavenderIndigo",
-          textDecoration: "none",
-          _hover: {
-            textDecoration: "underline",
-          },
-        },
-        secondary: {
-          backgroundColor: "gallery/80",
-          fontWeight: "bold",
-          color: "blueGem/90",
-          shadow: "colored",
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-          _hover: {
-            backgroundColor: "gallery",
-            color: "blueGem",
-          },
-        },
-        link: {
-          color: "primary",
-          textDecoration: "underline",
-          textUnderlineOffset: 4,
-          _hover: {
-            textDecoration: "none",
-          },
-        },
-
-        defaultVariants: {
-          variant: "default",
-          size: "default",
-        },
-      },
       size: {
         default: {
-          paddingInline: 5,
-          paddingBlock: 2,
           has: {
             svg: {
               paddingInline: 3,
             },
           },
+          paddingBlock: 2,
+          paddingInline: 5,
         },
-        sm: {
-          blockSize: 9,
-          gap: 1.5,
-          rounded: "md",
-          paddingInline: 3,
-          has: {
-            svg: {
-              paddingInline: 2.5,
-            },
-          },
+        icon: {
+          inlineSize: 5,
         },
         lg: {
-          paddingInline: 10,
-          paddingBlock: 3,
           has: {
             svg: {
               paddingInline: 4,
             },
           },
-        },
-        icon: {
-          inlineSize: 5,
+          paddingBlock: 3,
+          paddingInline: 10,
         },
         short: {
-          paddingInline: 4,
           paddingBlock: 1,
+          paddingInline: 4,
+        },
+        sm: {
+          blockSize: 9,
+          gap: 1.5,
+          has: {
+            svg: {
+              paddingInline: 2.5,
+            },
+          },
+          paddingInline: 3,
+          rounded: "md",
+        },
+      },
+      variant: {
+        auth: {
+          _after: {
+            content: "''",
+            inset: 0,
+            opacity: "0",
+            position: "absolute",
+            rounded: "inherit",
+            shadow: "lg",
+            transitionDuration: "normal",
+            transitionProperty: "opacity",
+          },
+          _hover: {
+            _after: {
+              opacity: "1",
+            },
+            translate: "0 -4px",
+          },
+          _supportsLinear: {
+            transitionTimingFunction: "glide",
+          },
+          backgroundColor: "robinEggBlue",
+          color: "daisyBush",
+          fontSize: "xl",
+          fontWeight: "bold",
+          inlineSize: "full",
+          minBlockSize: 14,
+          paddingBlock: 3,
+          paddingInline: 4,
+          position: "relative",
+          rounded: "lg",
+          transitionDuration: "normal",
+          transitionProperty: "translate",
+        },
+        default: {
+          _after: {
+            content: "''",
+            inset: 0,
+            opacity: "0",
+            position: "absolute",
+            rounded: "inherit",
+            shadow: "lg",
+            transitionDuration: "normal",
+            transitionProperty: "opacity",
+          },
+          _hover: {
+            _after: {
+              opacity: "1",
+            },
+            translate: "-2px -2px",
+          },
+          backgroundColor: "lavenderIndigo",
+          color: "white",
+          fontWeight: "black",
+          position: "relative",
+          transitionDuration: "normal",
+          transitionProperty: "translate",
+          transitionTimingFunction: "anticipate",
+        },
+
+        defaultVariants: {
+          size: "default",
+          variant: "default",
+        },
+        destructive: {
+          backgroundColor: { _hover: "scarlet/90", base: "scarlet" },
+          color: "goldenFizz",
+          shadow: "xs",
+          transitionDuration: "normal",
+          transitionProperty: "colors",
+        },
+        ghost: {
+          color: { _hover: "blueGem", base: "pastelPurple" },
+          shadow: "xs",
+          transitionDuration: "normal",
+          transitionProperty: "colors",
+        },
+        link: {
+          _hover: {
+            textDecoration: "none",
+          },
+          color: "primary",
+          textDecoration: "underline",
+          textUnderlineOffset: 4,
+        },
+        outline: {
+          _disabled: {
+            _hover: {
+              backgroundColor: "transparent",
+              borderColor: "red.500",
+              color: "red.500",
+            },
+            backgroundColor: "transparent",
+            borderColor: "red.500",
+            color: "red.500",
+            cursor: "not-allowed",
+          },
+          backgroundColor: { _hover: "daisyBush/90", base: "transparent" },
+          borderColor: "daisyBush",
+          borderStyle: "solid",
+          borderWidth: 2,
+          color: { _hover: "white", base: "daisyBush" },
+          transitionDuration: "normal",
+          transitionProperty: "colors",
+        },
+        secondary: {
+          _hover: {
+            backgroundColor: "gallery",
+            color: "blueGem",
+          },
+          backgroundColor: "gallery/80",
+          color: "blueGem/90",
+          fontWeight: "bold",
+          shadow: "colored",
+          transitionDuration: "normal",
+          transitionProperty: "colors",
+        },
+        textOnly: {
+          _hover: {
+            textDecoration: "underline",
+          },
+          backgroundColor: "transparent",
+          color: "lavenderIndigo",
+          textDecoration: "none",
+        },
+        textOnlyDestructive: {
+          _hover: {
+            textDecoration: "none",
+          },
+          backgroundColor: "transparent",
+          color: "scarlet",
+          paddingInline: 0,
+          textDecoration: "underline",
         },
       },
     },

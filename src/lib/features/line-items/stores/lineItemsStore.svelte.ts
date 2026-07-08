@@ -5,6 +5,7 @@ import type {
 } from "$features/line-items/types";
 import { apiClient } from "$lib/api";
 import { StoreResourceErrorBase } from "$lib/stores/store-resource-error-base.svelte";
+import type { StoreOption } from "$lib/stores/types";
 import type { CursorId, List } from "$lib/types";
 import {
   getErrorMessage,
@@ -22,17 +23,17 @@ export class LineItemsStore extends StoreResourceErrorBase<LineItemEditRow> {
   /** Returns a blank LineItem for form rows (new id and timestamps each call). */
   newLineItem(id: UIKey): NewLineItemWithId {
     return {
-      id,
-      description: "",
-      quantity: 0,
       amount: 0,
+      description: "",
+      id,
+      quantity: 0,
     };
   }
 
   // Load line items for a specific invoice
   async loadLineItemsByInvoiceId(
     invoiceId: string,
-    options?: { signal?: AbortSignal }
+    options?: StoreOption
   ): Promise<List<LineItemEditRow>> {
     this.loading = true;
     this.error = null;

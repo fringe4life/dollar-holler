@@ -34,8 +34,8 @@ const transformElement = (
 const INITIAL_SPRING_STATE = { x: 0, y: 0 };
 // Spring configuration
 const SPRING_CONFIG: SpringOptions = {
-  stiffness: 0.2,
   damping: 0.4,
+  stiffness: 0.2,
 };
 
 /**
@@ -71,7 +71,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     let documentCleanups: (() => void)[] = [];
 
     $effect(() => {
-      const x = spring.current.x;
+      const { x } = spring.current;
       transformElement(x, element, isTypedOm);
     });
 

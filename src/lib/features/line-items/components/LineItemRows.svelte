@@ -34,12 +34,12 @@
 
   const lineItemHeaders = css({
     color: "daisyBush",
-    display: { base: "none", sm: "block", _print: "block" },
+    display: { _print: "block", base: "none", sm: "block" },
   });
 
   const discountStyles = lineItemFieldRecipe({
-    inputType: "number",
     align: "right",
+    inputType: "number",
   });
 </script>
 <div

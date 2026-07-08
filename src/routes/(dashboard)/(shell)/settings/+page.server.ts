@@ -15,8 +15,8 @@ export const actions: Actions = {
     const validationResult = changePasswordSchema(entries);
     if (validationResult instanceof ArkErrors) {
       return fail(400, {
-        error: validationResult.summary ?? "Invalid input",
         email,
+        error: validationResult.summary ?? "Invalid input",
       });
     }
 
@@ -33,7 +33,7 @@ export const actions: Actions = {
     );
 
     if (error || !data) {
-      return fail(400, { error: "Failed to change password", email });
+      return fail(400, { email, error: "Failed to change password" });
     }
     throw redirect(303, resolve("/settings"));
   },

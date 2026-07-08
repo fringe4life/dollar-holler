@@ -1,206 +1,206 @@
 export const states = [
   {
-    value: "AK",
     name: "Alaska",
+    value: "AK",
   },
   {
-    value: "AL",
     name: "Alabama",
+    value: "AL",
   },
   {
-    value: "AR",
     name: "Arkansas",
+    value: "AR",
   },
   {
-    value: "AZ",
     name: "Arizona",
+    value: "AZ",
   },
   {
-    value: "CA",
     name: "California",
+    value: "CA",
   },
   {
-    value: "CO",
     name: "Colorado",
+    value: "CO",
   },
   {
-    value: "CT",
     name: "Connecticut",
+    value: "CT",
   },
   {
-    value: "DC",
     name: "District of Columbia",
+    value: "DC",
   },
   {
-    value: "DE",
     name: "Delaware",
+    value: "DE",
   },
   {
-    value: "FL",
     name: "Florida",
+    value: "FL",
   },
   {
-    value: "GA",
     name: "Georgia",
+    value: "GA",
   },
   {
-    value: "HI",
     name: "Hawaii",
+    value: "HI",
   },
   {
-    value: "IA",
     name: "Iowa",
+    value: "IA",
   },
   {
-    value: "ID",
     name: "Idaho",
+    value: "ID",
   },
   {
-    value: "IL",
     name: "Illinois",
+    value: "IL",
   },
   {
-    value: "IN",
     name: "Indiana",
+    value: "IN",
   },
   {
-    value: "KS",
     name: "Kansas",
+    value: "KS",
   },
   {
-    value: "KY",
     name: "Kentucky",
+    value: "KY",
   },
   {
-    value: "LA",
     name: "Louisiana",
+    value: "LA",
   },
   {
-    value: "MA",
     name: "Massachusetts",
+    value: "MA",
   },
   {
-    value: "MD",
     name: "Maryland",
+    value: "MD",
   },
   {
-    value: "ME",
     name: "Maine",
+    value: "ME",
   },
   {
-    value: "MI",
     name: "Michigan",
+    value: "MI",
   },
   {
-    value: "MN",
     name: "Minnesota",
+    value: "MN",
   },
   {
-    value: "MO",
     name: "Missouri",
+    value: "MO",
   },
   {
-    value: "MS",
     name: "Mississippi",
+    value: "MS",
   },
   {
-    value: "MT",
     name: "Montana",
+    value: "MT",
   },
   {
-    value: "NC",
     name: "North Carolina",
+    value: "NC",
   },
   {
-    value: "ND",
     name: "North Dakota",
+    value: "ND",
   },
   {
-    value: "NE",
     name: "Nebraska",
+    value: "NE",
   },
   {
-    value: "NH",
     name: "New Hampshire",
+    value: "NH",
   },
   {
-    value: "NJ",
     name: "New Jersey",
+    value: "NJ",
   },
   {
-    value: "NM",
     name: "New Mexico",
+    value: "NM",
   },
   {
-    value: "NV",
     name: "Nevada",
+    value: "NV",
   },
   {
-    value: "NY",
     name: "New York",
+    value: "NY",
   },
   {
-    value: "OH",
     name: "Ohio",
+    value: "OH",
   },
   {
-    value: "OK",
     name: "Oklahoma",
+    value: "OK",
   },
   {
-    value: "OR",
     name: "Oregon",
+    value: "OR",
   },
   {
-    value: "PA",
     name: "Pennsylvania",
+    value: "PA",
   },
   {
-    value: "RI",
     name: "Rhode Island",
+    value: "RI",
   },
   {
-    value: "SC",
     name: "South Carolina",
+    value: "SC",
   },
   {
-    value: "SD",
     name: "South Dakota",
+    value: "SD",
   },
   {
-    value: "TN",
     name: "Tennessee",
+    value: "TN",
   },
   {
-    value: "TX",
     name: "Texas",
+    value: "TX",
   },
   {
-    value: "UT",
     name: "Utah",
+    value: "UT",
   },
   {
-    value: "VA",
     name: "Virginia",
+    value: "VA",
   },
   {
-    value: "VT",
     name: "Vermont",
+    value: "VT",
   },
   {
-    value: "WA",
     name: "Washington",
+    value: "WA",
   },
   {
-    value: "WI",
     name: "Wisconsin",
+    value: "WI",
   },
   {
-    value: "WV",
     name: "West Virginia",
+    value: "WV",
   },
   {
-    value: "WY",
     name: "Wyoming",
+    value: "WY",
   },
 ];

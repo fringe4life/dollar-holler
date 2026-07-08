@@ -9,6 +9,14 @@ import type { Maybe, SanitizedHTML } from "$lib/types";
 type SanitizeOptions = NonNullable<Parameters<typeof sanitizeHtml>[1]>;
 
 const MARKDOWN_SANITIZE_OPTIONS: SanitizeOptions = Object.freeze({
+  allowedAttributes: {
+    a: ["href"],
+    code: ["class"],
+  },
+  allowedClasses: {
+    code: ["language-*"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
   allowedTags: [
     "p",
     "br",
@@ -33,14 +41,6 @@ const MARKDOWN_SANITIZE_OPTIONS: SanitizeOptions = Object.freeze({
     "del",
     "s",
   ],
-  allowedAttributes: {
-    a: ["href"],
-    code: ["class"],
-  },
-  allowedClasses: {
-    code: ["language-*"],
-  },
-  allowedSchemes: ["http", "https", "mailto"],
   allowProtocolRelative: false,
 });
 

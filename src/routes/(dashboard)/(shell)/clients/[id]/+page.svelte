@@ -53,19 +53,19 @@
     const s = clientInvoicesStore.summary;
     if (!s) {
       return {
-        overdue: "—",
-        outstanding: "—",
         draft: "—",
-        paid: "—",
         grandTotal: "—",
+        outstanding: "—",
+        overdue: "—",
+        paid: "—",
       };
     }
     return {
-      overdue: centsToDollars(s.overdue),
-      outstanding: centsToDollars(s.outstanding),
       draft: centsToDollars(s.draft),
-      paid: centsToDollars(s.paid),
       grandTotal: centsToDollars(s.grandTotal),
+      outstanding: centsToDollars(s.outstanding),
+      overdue: centsToDollars(s.overdue),
+      paid: centsToDollars(s.paid),
     };
   });
 

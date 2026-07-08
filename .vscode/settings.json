@@ -1,5 +1,5 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.defaultFormatter": "biomejs.biome",
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.biome": "explicit",
@@ -15,14 +15,13 @@
   "editor.quickSuggestions": {
     "strings": "on"
   },
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
   "[typescript]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
   "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "typescript.tsdk": "node_modules/typescript/lib",
   "[json]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
@@ -66,5 +65,6 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "js/ts.tsdk.path": "node_modules/typescript/lib",
-  "js/ts.tsdk.promptToUseWorkspaceVersion": true
+  "js/ts.tsdk.promptToUseWorkspaceVersion": true,
+  "js/ts.experimental.useTsgo": false
 }

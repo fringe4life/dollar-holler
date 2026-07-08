@@ -1,5 +1,5 @@
 /** biome-ignore-all lint/suspicious/noExplicitAny: seems to be official practise for svelte typescript config */
-import { sentrySvelteKit } from "@sentry/sveltekit";
+// import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-vercel";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
@@ -12,82 +12,75 @@ import devToolsJson from "vite-plugin-devtools-json";
 
 const FILE_REGEX = /[/\\]/;
 
-export default defineConfig(({ mode }) => {
-  const shouldUseSentry = mode !== "development";
+export default defineConfig({
+  // const shouldUseSentry = mode !== "development";
 
-  const sentryPlugin = shouldUseSentry
-    ? sentrySvelteKit({
-        org: "coinnich",
-        project: "javascript-sveltekit",
-        authToken: process.env.SENTRY_AUTH_TOKEN,
-      })
-    : [];
+  // const sentryPlugin = shouldUseSentry
+  //   ? sentrySvelteKit({
+  //       authToken: process.env.SENTRY_AUTH_TOKEN,
+  //       org: "coinnich",
+  //       project: "javascript-sveltekit",
+  //     })
+  //   : [];
 
-  return {
-    plugins: [
-      sentryPlugin,
-      visualizer({
-        filename: "stats.html", // written next to project root by default
-        gzipSize: true,
-        brotliSize: true,
-        template: "treemap", // or "sunburst" / "network"
-      }),
-      devToolsJson(),
-      varlockVitePlugin({
-        ssrInjectMode: "resolved-env",
-      }),
-      sveltekit({
-        preprocess: [vitePreprocess()],
-        adapter: adapter(),
+  build: {
+    rolldownOptions: {
+      output: { minify: { compress: { dropConsole: true } } },
+    },
+  },
+  plugins: [
+    // sentryPlugin,
+    visualizer({
+      brotliSize: true,
+      filename: "stats.html", // written next to project root by default
+      gzipSize: true,
+      template: "treemap", // or "sunburst" / "network"
+    }),
+    devToolsJson(),
+    varlockVitePlugin({
+      ssrInjectMode: "resolved-env",
+    }),
+    sveltekit({
+      adapter: adapter(),
+      alias: {
+        $features: "./src/lib/features",
+        $lib: "./src/lib",
+        "styled-system": "./styled-system",
+      },
+      compilerOptions: {
         experimental: {
-          instrumentation: {
-            server: true,
-          },
-          tracing: {
-            server: true,
-          },
+          async: true,
         },
-        alias: {
-          $features: "./src/lib/features",
-          $lib: "./src/lib",
-          "styled-system": "./styled-system",
-        },
-        typescript: {
-          config: (config: Record<string, any>) => ({
-            ...config,
-            include: [
-              ...config.include.filter(
-                (entry: string) => !entry.includes("styled-system")
-              ),
-              "../panda.config.ts",
-              "../drizzle.config.ts",
-            ],
-          }),
-        },
-        compilerOptions: {
-          experimental: {
-            async: true,
-          },
-          runes: ({ filename }) =>
-            filename.split(FILE_REGEX).includes("node_modules")
-              ? undefined
-              : true,
-        },
-      }),
-    ],
-    preview: {
-      port: 5173,
-    },
-    build: {
-      rolldownOptions: {
-        output: { minify: { compress: { dropConsole: true } } },
+        runes: ({ filename }) =>
+          filename.split(FILE_REGEX).includes("node_modules")
+            ? undefined
+            : true,
       },
-    },
-    server: {
-      forwardConsole: true,
-      fs: {
-        allow: ["styled-system"],
+      preprocess: [vitePreprocess()],
+      tracing: {
+        server: true,
       },
+      typescript: {
+        config: (config: Record<string, any>) => ({
+          ...config,
+          include: [
+            ...config.include.filter(
+              (entry: string) => !entry.includes("styled-system")
+            ),
+            "../panda.config.ts",
+            "../drizzle.config.ts",
+          ],
+        }),
+      },
+    }),
+  ],
+  preview: {
+    port: 5173,
+  },
+  server: {
+    forwardConsole: true,
+    fs: {
+      allow: ["styled-system"],
     },
-  };
+  },
 });

@@ -46,25 +46,25 @@ export const fetchCursorPaginatedList = async <
   const plan = resolveCursorListQuery(baseWhere, cursor, direction, idColumn);
   if (plan.kind === "first-page") {
     return fetchCursorPaginatedList({
-      input: { ...input, direction: "forward", cursor: undefined },
       baseWhere,
-      idColumn,
-      map,
       fetchPage,
+      idColumn,
+      input: { ...input, cursor: undefined, direction: "forward" },
+      map,
     });
   }
 
   const raw = await fetchPage({
-    where: plan.where,
-    orderBy: plan.orderBy,
     limit: take,
+    orderBy: plan.orderBy,
+    where: plan.where,
   });
 
   return toPagination({
-    rows: raw,
-    limit,
     cursor,
     direction: plan.direction,
+    limit,
     map,
+    rows: raw,
   });
 };

@@ -18,6 +18,8 @@ import {
 } from "$lib/utils/error-message";
 import { toast } from "$lib/utils/toast.svelte";
 import { StoreResourceErrorBase } from "./store-resource-error-base.svelte";
+import type { StoreOption } from "./types";
+import { mergeAbortSignals } from "./utils";
 
 export abstract class CursorPaginatedListStoreBase<T extends CursorRow>
   extends StoreResourceErrorBase<T>
@@ -57,10 +59,7 @@ export abstract class CursorPaginatedListStoreBase<T extends CursorRow>
     this.lastSuccessfulListKey = serializeNormalizedForKey(normalized);
   }
 
-  async loadItems(
-    normalized: PaginationSearchParams,
-    options?: { signal?: AbortSignal }
-  ) {
+  async loadItems(normalized: PaginationSearchParams, options?: StoreOption) {
     // abort any previous work
     this.listAbortController?.abort();
     // create a new abort controller
@@ -71,10 +70,7 @@ export abstract class CursorPaginatedListStoreBase<T extends CursorRow>
     // get the internal signal
     const internal = this.listAbortController.signal;
     // get the signal from the options
-    const signal =
-      options?.signal && typeof AbortSignal.any === "function"
-        ? AbortSignal.any([internal, options.signal])
-        : internal;
+    const signal = mergeAbortSignals(internal, options?.signal);
 
     // set the loading state to true
     this.loading = true;

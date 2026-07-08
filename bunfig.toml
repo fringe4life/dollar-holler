@@ -2,7 +2,7 @@
 minimumReleaseAge=259200
 minimumReleaseAgeExcludes = [
   "@sveltejs/adapter-vercel",
-  "@sveltejs/kit@3.0.0-next.4",
+  "@sveltejs/kit"
 ]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).

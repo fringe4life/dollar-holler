@@ -11,13 +11,11 @@ import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
 
-const DATABASE_URL = ENV.DATABASE_URL;
-
-const pool = new Pool({ connectionString: DATABASE_URL });
+const pool = new Pool({ connectionString: ENV.DATABASE_URL });
 const db = drizzle({
   client: pool,
-  relations: tableRelations,
   jit: true,
+  relations: tableRelations,
 });
 // Helper function to generate random date within last 6 months
 function randomDateWithinLast6Months(): Date {
@@ -69,14 +67,14 @@ async function main() {
   // 3) Create settings for each user
   const settingsData: Array<SettingsInsert & { userId: string }> = users.map(
     (u) => ({
-      userId: u.id,
-      myName: `${u.name || u.email}`,
-      email: u.email,
-      street: `${Math.floor(Math.random() * 9999) + 1} Main Street`,
       city: ["Coolville", "Tech City", "Dev Town", "Code Springs"][
         Math.floor(Math.random() * 4)
       ],
+      email: u.email,
+      myName: `${u.name || u.email}`,
       state: ["TN", "CA", "NY", "TX"][Math.floor(Math.random() * 4)],
+      street: `${Math.floor(Math.random() * 9999) + 1} Main Street`,
+      userId: u.id,
       zip: `${Math.floor(Math.random() * 90_000) + 10_000}`,
     })
   );
@@ -94,17 +92,17 @@ async function main() {
       }
       const peer = settingsData[j];
       clientsData.push({
-        id: createId(),
-        userId: u.id,
-        name: peer.myName,
-        email: peer.email,
-        street: peer.street,
         city: peer.city,
-        state: peer.state,
-        zip: peer.zip,
         clientStatus: (Math.random() > 0.2
           ? "active"
           : "archive") as ClientStatus,
+        email: peer.email,
+        id: createId(),
+        name: peer.myName,
+        state: peer.state,
+        street: peer.street,
+        userId: u.id,
+        zip: peer.zip,
       });
     }
   }
@@ -179,17 +177,17 @@ async function main() {
         Math.random() > 0.6 ? "_Payment due within 30 days._" : null;
 
       invoicesData.push({
-        id: invoiceId,
-        userId: u.id,
         clientId: client.id,
+        discount: Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0,
+        dueDate,
+        id: invoiceId,
         invoiceNumber: `${u.id.slice(0, 6).toUpperCase()}-${String(invoiceSeq).padStart(4, "0")}`,
+        issueDate,
+        notes,
         subject:
           invoiceSubjects[Math.floor(Math.random() * invoiceSubjects.length)],
-        issueDate,
-        dueDate,
-        discount: Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0,
-        notes,
         terms,
+        userId: u.id,
         ...appendInvoiceNotesTermsHtmlForInsert({ notes, terms }),
         invoiceStatus: (["draft", "sent", "paid"] as const)[
           Math.floor(Math.random() * 3)
@@ -199,13 +197,13 @@ async function main() {
       const lineItemCount = Math.floor(Math.random() * 3) + 1;
       for (let j = 0; j < lineItemCount; j++) {
         lineItemsData.push({
-          id: createId(),
-          userId: u.id,
-          invoiceId,
+          amount: Math.floor(Math.random() * 5000) + 100,
           description:
             descriptions[Math.floor(Math.random() * descriptions.length)],
+          id: createId(),
+          invoiceId,
           quantity: Math.floor(Math.random() * 5) + 1,
-          amount: Math.floor(Math.random() * 5000) + 100,
+          userId: u.id,
         });
       }
     }

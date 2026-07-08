@@ -27,8 +27,8 @@ export const clientStatusSchema = type({
 });
 
 const clientReceivedBalanceSchema = type({
-  received: "number",
   balance: "number",
+  received: "number",
 });
 
 /** Cursor list row: client + aggregates from list queries. */

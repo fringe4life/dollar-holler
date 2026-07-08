@@ -11,9 +11,9 @@ const fetchClientPickerOptions = async (
 ): Promise<ClientPickerOptionsResponse["options"]> => {
   const { data: clients } = await tryCatch(() =>
     db.query.clients.findMany({
-      where: { userId: { eq: userId } },
       columns: { id: true, name: true },
       orderBy: { name: "asc" },
+      where: { userId: { eq: userId } },
     })
   );
   return clients ?? [];

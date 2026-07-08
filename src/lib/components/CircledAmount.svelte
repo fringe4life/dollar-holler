@@ -12,15 +12,16 @@
 
 <div
   class={center({
-    columnGap: 4,
-    float: "right",
+    _after: { clear: "right", content: '""' },
     backgroundImage: "var(--circle)",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
-    textAlign: "center",
+    columnGap: 4,
+    float: "right",
     minBlockSize: 24,
     minInlineSize: 64,
-    _after: { clear: "right", content: '""' }, })}
+    textAlign: "center",
+  })}
   style:--circle={`url(${asset('/images/circle.svg')})`}
 >
   <div class={css({ fontWeight: "bold" })}>{label}</div>

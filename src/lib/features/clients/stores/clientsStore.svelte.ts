@@ -29,12 +29,12 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   newClient(): ClientInsert {
     return {
       city: "",
+      clientStatus: "active",
       email: "",
       name: "",
       state: "",
       street: "",
       zip: "",
-      clientStatus: "active",
     };
   }
 
@@ -44,8 +44,8 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
   ): Promise<CursorPaginatedList<ClientListResponse>> {
     return unwrapTreatyResult(
       await apiClient.clients.get({
-        query,
         fetch: { signal },
+        query,
       }),
       { fallbackMessage: this.fallbackFor(StoreOperation.loadMany) }
     );
@@ -151,19 +151,19 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
           fallbackMessage: this.fallbackFor(StoreOperation.createOne),
         }
       );
-      const id = responseData.id;
+      const { id } = responseData;
       if (!id) {
         throw new Error("Failed to create client");
       }
       const now = new Date();
       const newClient = {
         ...insertBody,
-        id,
+        balance: 0,
         clientStatus: insertBody.clientStatus ?? "active",
         createdAt: now,
-        updatedAt: now,
+        id,
         received: 0,
-        balance: 0,
+        updatedAt: now,
       } satisfies ClientListResponse;
       this.items.push(newClient);
       this.upsertPickerOption({ id, name: clientData.name });

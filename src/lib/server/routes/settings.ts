@@ -42,10 +42,10 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
     {
       auth: true,
       detail: {
-        operationId: "getSettings",
-        summary: "Get settings",
         description:
           "Returns the authenticated user's settings row. If no row exists yet, responds with 404.",
+        operationId: "getSettings",
+        summary: "Get settings",
       },
       response: {
         200: settingsSelectSchema,
@@ -84,10 +84,10 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
       authMutation: true,
       body: settingsUpdateSchema,
       detail: {
-        operationId: "updateSettings",
-        summary: "Update settings",
         description:
           "Patches fields on the user's settings. Returns 404 if no settings row exists for the user.",
+        operationId: "updateSettings",
+        summary: "Update settings",
       },
       response: {
         200: settingsSelectSchema,
@@ -119,10 +119,10 @@ export const settingsRoutes = new Elysia({ prefix: "/settings" })
       authMutation: true,
       body: settingsInsertSchema,
       detail: {
-        operationId: "createSettings",
-        summary: "Create settings",
         description:
           "Creates the settings row for the authenticated user with the provided fields.",
+        operationId: "createSettings",
+        summary: "Create settings",
       },
       response: {
         200: settingsSelectSchema,

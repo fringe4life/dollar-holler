@@ -22,14 +22,14 @@ export const invoiceStatusEnum = pgEnum("invoice_status", [
 ]);
 // better auth tables
 export const user = pgTable("user", {
-  id: uuid("id").primaryKey(),
-  name: text("name").notNull(),
-  email: varchar("email", { length: 255 }).notNull().unique(),
-  emailVerified: boolean("email_verified").default(false).notNull(),
-  image: text("image"),
   createdAt: timestamp("created_at", { precision: 6, withTimezone: true })
     .defaultNow()
     .notNull(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  emailVerified: boolean("email_verified").default(false).notNull(),
+  id: uuid("id").primaryKey(),
+  image: text("image"),
+  name: text("name").notNull(),
   updatedAt: timestamp("updated_at", { precision: 6, withTimezone: true })
     .defaultNow()
     .$onUpdate(() => /* @__PURE__ */ new Date())
@@ -39,24 +39,24 @@ export const user = pgTable("user", {
 export const session = pgTable(
   "session",
   {
-    id: uuid("id").primaryKey(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    token: varchar("token", { length: 255 }).notNull().unique(),
+    createdAt: timestamp("created_at", { precision: 6, withTimezone: true })
+      .defaultNow()
+      .notNull(),
     expiresAt: timestamp("expires_at", {
       precision: 6,
       withTimezone: true,
     }).notNull(),
+    id: uuid("id").primaryKey(),
     ipAddress: text("ip_address"),
-    userAgent: text("user_agent"),
-    createdAt: timestamp("created_at", { precision: 6, withTimezone: true })
-      .defaultNow()
-      .notNull(),
+    token: varchar("token", { length: 255 }).notNull().unique(),
     updatedAt: timestamp("updated_at", { precision: 6, withTimezone: true })
       .defaultNow()
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+    userAgent: text("user_agent"),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => [index("session_userId_idx").on(table.userId)]
 );
@@ -64,37 +64,37 @@ export const session = pgTable(
 export const account = pgTable(
   "account",
   {
-    id: uuid("id").primaryKey(),
-    userId: uuid("user_id")
-      .notNull()
-      .references(() => user.id, { onDelete: "cascade" }),
-    accountId: text("account_id").notNull(),
-    providerId: text("provider_id").notNull(),
     accessToken: text("access_token"),
-    refreshToken: text("refresh_token"),
     accessTokenExpiresAt: timestamp("access_token_expires_at", {
       precision: 6,
       withTimezone: true,
     }),
-    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
-      precision: 6,
-      withTimezone: true,
-    }),
-    scope: text("scope"),
-    idToken: text("id_token"),
-    password: text("password"),
+    accountId: text("account_id").notNull(),
     createdAt: timestamp("created_at", {
       precision: 6,
       withTimezone: true,
     })
       .defaultNow()
       .notNull(),
+    id: uuid("id").primaryKey(),
+    idToken: text("id_token"),
+    password: text("password"),
+    providerId: text("provider_id").notNull(),
+    refreshToken: text("refresh_token"),
+    refreshTokenExpiresAt: timestamp("refresh_token_expires_at", {
+      precision: 6,
+      withTimezone: true,
+    }),
+    scope: text("scope"),
     updatedAt: timestamp("updated_at", {
       precision: 6,
       withTimezone: true,
     })
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => [index("account_userId_idx").on(table.userId)]
 );
@@ -102,131 +102,131 @@ export const account = pgTable(
 export const verification = pgTable(
   "verification",
   {
-    id: uuid("id").primaryKey(),
-    identifier: text("identifier").notNull(),
-    value: text("value").notNull(),
-    expiresAt: timestamp("expires_at", {
-      precision: 6,
-      withTimezone: true,
-    }).notNull(),
     createdAt: timestamp("created_at", {
       precision: 6,
       withTimezone: true,
     })
       .defaultNow()
       .notNull(),
+    expiresAt: timestamp("expires_at", {
+      precision: 6,
+      withTimezone: true,
+    }).notNull(),
+    id: uuid("id").primaryKey(),
+    identifier: text("identifier").notNull(),
     updatedAt: timestamp("updated_at", {
       precision: 6,
       withTimezone: true,
     })
       .$onUpdate(() => /* @__PURE__ */ new Date())
       .notNull(),
+    value: text("value").notNull(),
   },
   (table) => [index("verification_identifier_idx").on(table.identifier)]
 );
 
 // Clients table
 export const clients = pgTable("clients", {
+  city: varchar("city", { length: 255 }).notNull(),
+  clientStatus: clientStatusEnum("client_status").default("active").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
   id: uuid("id")
     .$defaultFn(() => createId())
     .$type<CursorId>()
     .primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
   name: varchar("name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  street: varchar("street", { length: 255 }).notNull(),
-  city: varchar("city", { length: 255 }).notNull(),
   state: varchar("state", { length: 255 }).notNull(),
-  zip: varchar("zip", { length: 255 }).notNull(),
-  clientStatus: clientStatusEnum("client_status").default("active").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
+  street: varchar("street", { length: 255 }).notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
     .$onUpdate(() => /* @__PURE__ */ new Date()),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
+  zip: varchar("zip", { length: 255 }).notNull(),
 });
 
 // Invoices table
 export const invoices = pgTable("invoices", {
-  id: uuid("id")
-    .$defaultFn(() => createId())
-    .$type<CursorId>()
-    .primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  invoiceNumber: text("invoice_number").notNull(),
   clientId: uuid("client_id")
     .notNull()
     .$type<CursorId>()
     .references(() => clients.id, { onDelete: "cascade" }),
-  subject: text("subject").notNull(),
-  issueDate: timestamp("issue_date").notNull(),
-  dueDate: timestamp("due_date").notNull(),
-  discount: real("discount").notNull().default(0),
-  notes: text("notes"),
-  terms: text("terms"),
-  notesHtml: text("notes_html").$type<SanitizedHTML>(),
-  termsHtml: text("terms_html").$type<SanitizedHTML>(),
-  invoiceStatus: invoiceStatusEnum("invoice_status").default("draft"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => /* @__PURE__ */ new Date()),
-});
-
-// Line items table
-export const lineItems = pgTable("line_items", {
+  discount: real("discount").notNull().default(0),
+  dueDate: timestamp("due_date").notNull(),
   id: uuid("id")
     .$defaultFn(() => createId())
     .$type<CursorId>()
     .primaryKey(),
+  invoiceNumber: text("invoice_number").notNull(),
+  invoiceStatus: invoiceStatusEnum("invoice_status").default("draft"),
+  issueDate: timestamp("issue_date").notNull(),
+  notes: text("notes"),
+  notesHtml: text("notes_html").$type<SanitizedHTML>(),
+  subject: text("subject").notNull(),
+  terms: text("terms"),
+  termsHtml: text("terms_html").$type<SanitizedHTML>(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .notNull()
+    .$onUpdate(() => /* @__PURE__ */ new Date()),
   userId: uuid("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
+});
+
+// Line items table
+export const lineItems = pgTable("line_items", {
+  amount: real("amount").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  description: text("description").notNull(),
+  id: uuid("id")
+    .$defaultFn(() => createId())
+    .$type<CursorId>()
+    .primaryKey(),
   invoiceId: uuid("invoice_id")
     .notNull()
     .$type<CursorId>()
     .references(() => invoices.id, { onDelete: "cascade" }),
-  description: text("description").notNull(),
   quantity: integer("quantity").notNull().default(1),
-  amount: real("amount").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
     .$onUpdate(() => /* @__PURE__ */ new Date()),
+  userId: uuid("user_id")
+    .notNull()
+    .references(() => user.id, { onDelete: "cascade" }),
 });
 
 // Settings table
 export const settings = pgTable("settings", {
-  userId: uuid("user_id")
-    .primaryKey()
-    .references(() => user.id, { onDelete: "cascade" }),
-  myName: varchar("my_name", { length: 255 }).notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  street: varchar("street", { length: 255 }).notNull(),
   city: varchar("city", { length: 255 }).notNull(),
-  state: varchar("state", { length: 255 }).notNull(),
-  zip: varchar("zip", { length: 255 }).notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
+  email: varchar("email", { length: 255 }).notNull(),
+  myName: varchar("my_name", { length: 255 }).notNull(),
+  state: varchar("state", { length: 255 }).notNull(),
+  street: varchar("street", { length: 255 }).notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
     .notNull()
     .$onUpdate(() => /* @__PURE__ */ new Date()),
+  userId: uuid("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  zip: varchar("zip", { length: 255 }).notNull(),
 });
 
 // complete schema tables
 export const schemaTables = {
-  user,
-  session,
   account,
-  verification,
   clients,
   invoices,
   lineItems,
+  session,
   settings,
+  user,
+  verification,
 };

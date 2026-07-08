@@ -24,23 +24,23 @@
 {#if !option.disabled}
   <li
     class={css({
+      _last: { borderBottomColor: "transparent", borderBottomWidth: 0 },
       borderBottomColor: "whisper",
-      borderBottomWidth: 2,
       borderBottomStyle: "solid",
-      _last: { borderBottomWidth: 0, borderBottomColor: "transparent" },
+      borderBottomWidth: 2,
     })}
   >
     <button
       class={flex({
+        color: { _hover: "daisyBush", base: "pastelPurple" },
         columnGap: 2,
+        cursor: "pointer",
+        fontWeight: "bold",
         inlineSize: "full",
         padding: 4,
-        fontWeight: "bold",
-        transitionProperty: "colors",
         transitionDuration: "normal",
-        color: {base: "pastelPurple", _hover: "daisyBush"},
-        cursor: "pointer",
-         })}
+        transitionProperty: "colors",
+      })}
       onclick={option.onclick}
       type="button"
     >

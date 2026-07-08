@@ -109,8 +109,8 @@ export const protectedApiPlugin = new Elysia({ name: "protected-api" })
   /** PATCH /invoices/:id — verifies invoice ownership and legal `invoiceStatus` transitions when present; derives notes/terms HTML only after those checks (authenticated owner). */
   .macro("verifyInvoicePatchMutation", {
     authMutation: true,
-    params: idResponseSchema,
     body: invoiceUpdateSchema,
+    params: idResponseSchema,
     async resolve({ user, params: { id }, body }) {
       const result = await verifyInvoiceStatus(user.id, id);
       if (!result?.id) {

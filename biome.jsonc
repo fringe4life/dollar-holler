@@ -1,6 +1,19 @@
 {
   "extends": ["ultracite/biome/core", "ultracite/biome/svelte"],
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "overrides": [
+    {
+      "includes": ["**/*.svelte"],
+      "assist": {
+        "actions": {
+          "source": {
+            // Biome detects useSortedKeys in embedded Svelte expressions but cannot apply fixes.
+            "useSortedKeys": "off"
+          }
+        }
+      }
+    }
+  ],
   "linter": {
     "rules": {
       "style": {

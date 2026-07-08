@@ -16,8 +16,8 @@ export const actions: Actions = {
     );
     if (validationResult instanceof ArkErrors) {
       return fail(400, {
-        error: validationResult.summary ?? "Invalid input",
         email,
+        error: validationResult.summary ?? "Invalid input",
       });
     }
 
@@ -29,7 +29,7 @@ export const actions: Actions = {
     );
     if (!data || error) {
       console.error("error ", error);
-      return fail(400, { error: "Login failed", email });
+      return fail(400, { email, error: "Login failed" });
     }
 
     throw redirect(303, resolve("/invoices"));

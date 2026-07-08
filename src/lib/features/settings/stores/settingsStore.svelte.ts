@@ -15,11 +15,11 @@ export class SettingsStore extends LoadableListStoreBase<SettingsSelect> {
   /** Returns a blank Settings for forms (before load or when no settings exist). */
   newSettings(): SettingsSelect {
     return {
-      myName: "",
-      email: "",
-      street: "",
       city: "",
+      email: "",
+      myName: "",
       state: "",
+      street: "",
       zip: "",
     };
   }

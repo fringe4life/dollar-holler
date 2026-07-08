@@ -10,8 +10,8 @@ export const actions: Actions = {
     const result = forgotPassword(Object.fromEntries(formData.entries()));
     if (result instanceof ArkErrors) {
       return fail(400, {
-        error: result.summary ?? "Invalid input",
         email: (formData.get("email") as string | undefined) ?? "",
+        error: result.summary ?? "Invalid input",
       });
     }
 
@@ -23,18 +23,18 @@ export const actions: Actions = {
     );
     if (error) {
       return fail(400, {
-        error: "Failed to send reset email",
         email: result.email,
+        error: "Failed to send reset email",
       });
     }
 
     if (!passwordReset?.status) {
       return fail(400, {
-        error: "Failed to send reset email",
         email: result.email,
+        error: "Failed to send reset email",
       });
     }
 
-    return { success: true, email: result.email };
+    return { email: result.email, success: true };
   },
 };

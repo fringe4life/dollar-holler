@@ -3,21 +3,21 @@
   import type { HTMLTextareaAttributes } from "svelte/elements";
 
   const textareaClass = css({
-    borderColor: "silver",
-    fontFamily: "sansserif",
-    resize: "none",
-    borderWidth: 2,
-    p: 4,
-    transitionProperty: "colors",
-    transitionDuration: "normal",
-    blockSize: 32,
-    inlineSize: "full",
     _focusVisible: {
       borderColor: "lavenderIndigo",
       outlineColor: "lavenderIndigo",
-      outlineWidth: "2px",
       outlineStyle: "solid",
+      outlineWidth: "2px",
     },
+    blockSize: 32,
+    borderColor: "silver",
+    borderWidth: 2,
+    fontFamily: "sansserif",
+    inlineSize: "full",
+    p: 4,
+    resize: "none",
+    transitionDuration: "normal",
+    transitionProperty: "colors",
   });
 
   let {

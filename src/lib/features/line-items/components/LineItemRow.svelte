@@ -40,8 +40,8 @@
   const onQuantityInput: FormEventHandler<HTMLInputElement> = (e) => {
     const q = Number(e.currentTarget.value);
     patch({
-      quantity: q,
       amount: q * Number(unitPrice),
+      quantity: q,
     });
   };
 
@@ -60,20 +60,20 @@
   };
 
   const lineItemLabel = css({
-    display: { base: "none", sm: "block", _print: "none" },
+    display: { _print: "none", base: "none", sm: "block" },
   });
 
   const qtyStyles = lineItemFieldRecipe({
-    inputType: "number",
     align: "center",
+    inputType: "number",
   });
   const priceStyles = lineItemFieldRecipe({
-    inputType: "number",
     align: "right",
+    inputType: "number",
   });
   const amountStyles = lineItemFieldRecipe({
-    inputType: "text",
     align: "right",
+    inputType: "text",
   });
 </script>
 

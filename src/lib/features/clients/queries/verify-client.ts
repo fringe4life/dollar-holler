@@ -6,8 +6,8 @@ export const verifyClient = async (
   clientId: CursorId
 ): Promise<Maybe<CursorId>> => {
   const client = await db.query.clients.findFirst({
-    where: { id: { eq: clientId }, userId: { eq: userId } },
     columns: { id: true },
+    where: { id: { eq: clientId }, userId: { eq: userId } },
   });
   return client?.id;
 };

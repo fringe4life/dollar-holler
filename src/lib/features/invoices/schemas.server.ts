@@ -21,8 +21,8 @@ const isoTimestampFromWire = () =>
     .pipe((v) => (v instanceof Date ? v : new Date(v)));
 
 const invoiceDateRefinement = {
-  issueDate: isoTimestampFromWire,
   dueDate: isoTimestampFromWire,
+  issueDate: isoTimestampFromWire,
 } as const;
 
 export const invoiceInsertSchema = createInsertSchema(
@@ -39,8 +39,8 @@ export const invoiceUpdateSchema = createUpdateSchema(
 export const invoiceListRowSchema = invoiceSelectSchema
   .omit("notes", "terms", "notesHtml", "termsHtml")
   .merge({
-    total: "number",
     name: "string",
+    total: "number",
   });
 
 export const invoicePaginatedListSchema =
@@ -48,9 +48,9 @@ export const invoicePaginatedListSchema =
 
 /** Integer cents per bucket (matches `InvoiceListResponse.total`). */
 export const clientInvoiceSummarySchema = type({
-  overdue: "number",
-  outstanding: "number",
   draft: "number",
-  paid: "number",
   grandTotal: "number",
+  outstanding: "number",
+  overdue: "number",
+  paid: "number",
 });

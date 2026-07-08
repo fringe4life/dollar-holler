@@ -13,10 +13,14 @@
 
 <button
   class={css({
-    color: { base:"pastelPurple", _groupHover: "daisyBush/50", _hover: "daisyBush" },
-    transitionProperty: "colors",
-    transitionDuration: "normal",
+    color: {
+      _groupHover: "daisyBush/50",
+      _hover: "daisyBush",
+      base: "pastelPurple",
+    },
     cursor: "pointer",
+    transitionDuration: "normal",
+    transitionProperty: "colors",
   })}
   onclick={additionalMenu.toggle}
   type="button"

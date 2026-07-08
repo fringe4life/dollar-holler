@@ -4,9 +4,9 @@
 
   //  font-sansserif text-monsoon block text-base font-bold
   const labelClass = css({
+    color: "monsoon",
     display: "block",
     fontFamily: "sansserif",
-    color: "monsoon",
     fontWeight: "bold",
   });
 

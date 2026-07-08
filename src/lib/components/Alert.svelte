@@ -12,12 +12,12 @@
   <div
     class={css({
       backgroundColor: "lavenderIndigo",
-      marginBlockEnd: 8,
-      rounded: "md",
-      p: 4,
-      textAlign: "center",
       color: "white",
+      marginBlockEnd: 8,
       minBlockSize: 14,
+      p: 4,
+      rounded: "md",
+      textAlign: "center",
     })}
   >
     <p>{message}</p>

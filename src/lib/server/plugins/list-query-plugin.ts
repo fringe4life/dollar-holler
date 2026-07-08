@@ -12,10 +12,10 @@ export const listQueryPlugin = new Elysia({ name: "list-query" }).macro(
     query: listQueryWireSchema,
     resolve({ query }) {
       const { normalized } = normalizeListQuery({
-        q: query.q,
         cursor: query.cursor,
         direction: query.direction,
         limit: query.limit,
+        q: query.q,
       });
       return { normalized };
     },

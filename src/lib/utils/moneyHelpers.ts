@@ -24,8 +24,8 @@ export const sumLineItems = (
   }, 0);
 };
 const MONEY_FORMATTER = new Intl.NumberFormat("en", {
-  style: "currency",
   currency: "USD",
+  style: "currency",
 });
 /**
  * @abstract turns cent based money amounts into dollars

@@ -9,11 +9,11 @@ export const invoiceRow = grid({
 });
 
 export const invoiceTable = grid({
+  columnGap: 4,
   gridTemplateColumns: {
     base: "1fr max-content",
     lg: "max-content 12ch 12ch max-content 1fr 32px 32px",
   },
-  columnGap: 4,
-  paddingInline: { base: 4, lg: 6 },
   inlineSize: "full",
+  paddingInline: { base: 4, lg: 6 },
 });

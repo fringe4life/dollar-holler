@@ -45,8 +45,8 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   ]);
 
   return {
-    invoice,
     client,
+    invoice,
     lineItems,
   };
 };

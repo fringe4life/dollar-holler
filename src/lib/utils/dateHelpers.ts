@@ -40,9 +40,8 @@ export const isLate = (myDate: Maybe<string>): boolean => {
  */
 const splitDate = (myDate: string): string[] => myDate.split("-");
 
-const getInputDate = (date?: Date) => {
-  const actualDate = date ? date : new Date();
-  return actualDate.toISOString().split("T")[0];
+const getInputDate = (date: Date = new Date()) => {
+  return date.toISOString().split("T")[0];
 };
 
 export const today = getInputDate();

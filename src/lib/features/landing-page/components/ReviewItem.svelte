@@ -25,14 +25,14 @@
       transitionDuration: "normal",
       backdropFilter: "auto",
       backdropBlur: "sm",
-      _hover: { scale: 1.02 }
+      _hover: { scale: 1.02 },
     }),
     review.rotate
   )}
 >
   <!-- Stars -->
   <div class={flex({ gap: 1 })}>
-    {#each { length: 5 } as _}
+    {#each { length: 5 } as _, i (i)}
       <StarIcon class={css({ color: "goldenFizz" })} size={16} />
     {/each}
   </div>
@@ -46,14 +46,22 @@
   <div class={hstack({ gap: 3 })}>
     <img
       alt={review.name}
-      class={cx(circle({ size: 11 }), css({objectFit: "cover", ring: 2, ringColor: "white/20"}))}
+      class={cx(
+        circle({ size: 11 }),
+        css({ objectFit: "cover", ring: 2, ringColor: "white/20" })
+      )}
       height="44"
       src={review.avatar}
       width="44"
-    >
+    />
     <div>
       <p
-        class={css({ fontFamily: "sansserif", fontSize: "sm", fontWeight: "bold", color: "white" })}
+        class={css({
+          fontFamily: "sansserif",
+          fontSize: "sm",
+          fontWeight: "bold",
+          color: "white",
+        })}
       >
         {review.name}
       </p>

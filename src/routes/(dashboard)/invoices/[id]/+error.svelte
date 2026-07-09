@@ -16,12 +16,22 @@
 </svelte:head>
 
 <div
-  class={center({ backgroundPosition: "center", backgroundRepeat: "no-repeat", minBlockSize: "calc(100dvh - var(--spacing-16))", backgroundImage: "var(--bg-error)" })}
-  style:--bg-error={`url('${asset('/images/bg-error.svg')}')`}
+  class={center({
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    minBlockSize: "calc(100dvh - var(--spacing-16))",
+    backgroundImage: "var(--bg-error)",
+  })}
+  style:--bg-error={`url('${asset("/images/bg-error.svg")}')`}
 >
   <div>
     <h1
-      class={css({ color: "daisyBush", fontSize: "5xl", lineHeight: "none", fontWeight: "black" })}
+      class={css({
+        color: "daisyBush",
+        fontSize: "5xl",
+        lineHeight: "none",
+        fontWeight: "black",
+      })}
     >
       Not Found!
     </h1>

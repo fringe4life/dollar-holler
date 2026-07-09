@@ -58,8 +58,7 @@
   {/snippet}
   <div class={flex({ gap: 4, justify: "center" })}>
     <Button onclick={onCancel} variant="secondary">Cancel</Button>
-    <Button onclick={handleDelete} variant="destructive"
-      >Yes, Delete It.</Button
+    <Button onclick={handleDelete} variant="destructive">Yes, Delete It.</Button
     >
   </div>
 </Modal>

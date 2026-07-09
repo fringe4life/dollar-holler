@@ -93,6 +93,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
       this.items[index] = {
         ...this.items[index],
         invoiceStatus,
+        // eslint-disable-next-line svelte/prefer-svelte-reactivity -- one-shot timestamp for list row
         updatedAt: new Date(),
       };
       toast.success("Invoice updated successfully");
@@ -140,6 +141,7 @@ export class InvoicesStore extends CursorPaginatedListStoreBase<InvoiceListRespo
         this.items[index] = {
           ...this.items[index],
           ...patch,
+          // eslint-disable-next-line svelte/prefer-svelte-reactivity -- one-shot timestamp for list row
           updatedAt: new Date(),
         };
       }

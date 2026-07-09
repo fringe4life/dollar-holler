@@ -5,6 +5,7 @@
 
   let { children } = $props();
 </script>
+
 <!-- "bg-daisyBush bg-none bg-cover bg-center bg-no-repeat inline-full min-block-dvh md:bg-[url('/images/bg-auth.svg')]" -->
 <div
   class={css({
@@ -16,7 +17,7 @@
     minBlockSize: "100dvh",
     backgroundImage: { base: "none", md: "var(--bg-image)" },
   })}
-  style:--bg-image={`url(${asset('/images/bg-auth.svg')})`}
+  style:--bg-image={`url(${asset("/images/bg-auth.svg")})`}
 >
   <!-- "grid auto-rows-min grid-cols-12 place-content-center px-4 min-block-dvh md:auto-rows-fr md:gap-5 xl:px-0" -->
   <div
@@ -35,20 +36,20 @@
         colSpan: { base: 12, md: 6, lg: 4, xl: 3 },
         gridColumnStart: { lg: 3, xl: 4 },
         paddingBlockStart: 8,
-        marginBlock: { md: "auto" }
+        marginBlock: { md: "auto" },
       })}
     >
       <img
         alt="The Doller Holla"
         class={css({ marginInline: "auto" })}
-        src={asset('/images/logo.svg')}
-      >
+        src={asset("/images/logo.svg")}
+      />
     </div>
     <!-- "col-span-full md:col-span-6 md:my-auto lg:col-span-4 xl:col-span-3" -->
     <div
       class={gridItem({
         colSpan: { base: 12, md: 6, lg: 4, xl: 3 },
-        marginBlock: { md: "auto" }
+        marginBlock: { md: "auto" },
       })}
     >
       {@render children()}

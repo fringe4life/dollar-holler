@@ -11,7 +11,12 @@
     {title}
   </div>
   <div
-    class={css({ color: "purple", fontSize: "3xl", fontWeight: "bold", truncate:true })}
+    class={css({
+      color: "purple",
+      fontSize: "3xl",
+      fontWeight: "bold",
+      truncate: true,
+    })}
   >
     {amount}
   </div>

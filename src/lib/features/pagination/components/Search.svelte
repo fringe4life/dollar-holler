@@ -65,12 +65,13 @@
 
 <div
   aria-busy={loading.isOn}
-  class={grid({ 
-    inlineSize: "full", 
-    gridAutoFlow: "column", 
-    gridTemplateColumns: "24px 1fr", 
-    alignItems: "baseline", 
-    columnGap: 2 })}
+  class={grid({
+    inlineSize: "full",
+    gridAutoFlow: "column",
+    gridTemplateColumns: "24px 1fr",
+    alignItems: "baseline",
+    columnGap: 2,
+  })}
 >
   <span
     aria-hidden="true"
@@ -100,12 +101,12 @@
   </span>
   <div
     class={flex({
-      align: "baseline", 
+      align: "baseline",
       position: "relative",
       isolation: "isolate",
       inlineSize: "full",
-      zIndex: 0,  
-      })}
+      zIndex: 0,
+    })}
   >
     <!-- "peer search border-b-pastelPurple font-sansserif border-b-2 border-dashed bg-transparent pe-16 text-black transition-colors duration-200 inline-full placeholder:text-transparent md:pe-0 md:inline-52 lg:text-xl lg:inline-72" -->
     <input
@@ -125,14 +126,14 @@
           _placeholder: {
             color: "transparent",
           },
-          _focus: {outline: "none"},
+          _focus: { outline: "none" },
           _focusVisible: {
             outlineColor: "lavenderIndigo",
             outlineWidth: "2px",
             outlineStyle: "solid",
           },
-          fontSize:  "xl" ,
-        }),
+          fontSize: "xl",
+        })
       )}
       id="search"
       name="search"
@@ -140,7 +141,7 @@
       placeholder="Search by keyword"
       type="search"
       bind:value={search}
-    >
+    />
     <span
       aria-hidden="true"
       class={css({
@@ -152,8 +153,8 @@
           scale: "1",
           opacity: "1",
         },
-          transitionTimingFunction: "anticipate",
-        
+        transitionTimingFunction: "anticipate",
+
         position: "absolute",
         insetInlineStart: 0,
         insetBlockEnd: 0,
@@ -162,14 +163,18 @@
         borderBottomWidth: 2,
         borderBottomStyle: "solid",
         borderBottomColor: "lavenderIndigo",
-        _focus: {outline: "none"},
+        _focus: { outline: "none" },
       })}
       // class="border-b-lavenderIndigo ease-anticipate supports-linear:ease-anticipate pointer-events-none absolute inset-x-0 bottom-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200 block-2 peer-not-placeholder-shown:scale-x-100 peer-not-placeholder-shown:opacity-100 peer-focus:scale-x-100 peer-focus:opacity-100 md:inline-52 lg:inline-72"
     ></span>
     <button
       class={css({
         fontFamily: "sansserif",
-        color: { base:"pastelPurple", _peerFocus: "lavenderIndigo", _peerHover: "daisyBush" },
+        color: {
+          base: "pastelPurple",
+          _peerFocus: "lavenderIndigo",
+          _peerHover: "daisyBush",
+        },
         pointerEvents: "none",
         position: "absolute",
         _peerPlaceholderShown: { pointerEvents: "auto" },
@@ -177,16 +182,23 @@
           pointerEvents: "auto",
           color: "lavenderIndigo",
           insetInlineEnd: { base: 0, md: "auto" },
-          translate : { base: "0 100%", md: "token(sizes.52) 0", lg: "token(sizes.72) 0"},
+          translate: {
+            base: "0 100%",
+            md: "token(sizes.52) 0",
+            lg: "token(sizes.72) 0",
+          },
         },
         insetInlineStart: 0,
         fontSize: "xl",
         fontWeight: "black",
         transitionProperty: "translate",
         transitionDuration: "normal",
-        transitionTimingFunction: { base:"ease-out", _supportsLinear: "anticipate" },
+        transitionTimingFunction: {
+          base: "ease-out",
+          _supportsLinear: "anticipate",
+        },
         inlineSize: 15,
-        _focus: {outline: "none"},
+        _focus: { outline: "none" },
         _focusVisible: {
           outlineColor: "lavenderIndigo",
           outlineWidth: "2px",

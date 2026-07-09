@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css } from "styled-system/css";
   import { grid, gridItem } from "styled-system/patterns";
   import { onMount } from "svelte";
   import {
@@ -83,7 +83,12 @@
 </script>
 
 <h2
-  class={css({ color: "daisyBush", marginBlockEnd: 1, fontSize: "3xl", fontWeight: "black" })}
+  class={css({
+    color: "daisyBush",
+    marginBlockEnd: 1,
+    fontSize: "3xl",
+    fontWeight: "black",
+  })}
 >
   Invoice Details
 </h2>
@@ -143,14 +148,22 @@
     <Input id="zip" name="zip" type="text" bind:value={mySettings.zip} />
   </FormField>
   <FormField
-    class={gridItem({ colSpan: { base: 6, md: 2 }, gridColumnStart: { md: 5 } })}
+    class={gridItem({
+      colSpan: { base: 6, md: 2 },
+      gridColumnStart: { md: 5 },
+    })}
   >
     <Button onclick={saveSettings}><Check /> Save</Button>
   </FormField>
 </form>
 <div class={gridItem({ colSpan: 6 })}>
   <h2
-    class={css({ color: "daisyBush", marginBlockEnd: 1, fontSize: "3xl", fontWeight: "black" })}
+    class={css({
+      color: "daisyBush",
+      marginBlockEnd: 1,
+      fontSize: "3xl",
+      fontWeight: "black",
+    })}
   >
     Update Account Information
   </h2>
@@ -159,46 +172,44 @@
   </p>
 </div>
 <Form {form} onSuccess={handlePasswordSuccess}>
-  {#snippet children()}
-    <div class={grid({ columns: 6, columnGap: 5 })}>
-      <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
-        forId="email"
-        label="Email"
-      >
-        <Input
-          defaultValue={form?.email ?? ""}
-          id="email"
-          name="email"
-          type="email"
-        />
-      </FormField>
+  <div class={grid({ columns: 6, columnGap: 5 })}>
+    <FormField
+      class={gridItem({ colSpan: { base: 6, md: 3 } })}
+      forId="email"
+      label="Email"
+    >
+      <Input
+        defaultValue={form?.email ?? ""}
+        id="email"
+        name="email"
+        type="email"
+      />
+    </FormField>
 
-      <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
-        forId="currentPassword"
-        label="Current Password"
-      >
-        <Input id="currentPassword" name="currentPassword" type="password" />
-      </FormField>
+    <FormField
+      class={gridItem({ colSpan: { base: 6, md: 3 } })}
+      forId="currentPassword"
+      label="Current Password"
+    >
+      <Input id="currentPassword" name="currentPassword" type="password" />
+    </FormField>
 
-      <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
-        forId="newPassword"
-        label="New Password"
-      >
-        <Input id="newPassword" name="newPassword" type="password" />
-      </FormField>
+    <FormField
+      class={gridItem({ colSpan: { base: 6, md: 3 } })}
+      forId="newPassword"
+      label="New Password"
+    >
+      <Input id="newPassword" name="newPassword" type="password" />
+    </FormField>
 
-      <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
-        forId="confirmPassword"
-        label="Confirm Password"
-      >
-        <Input id="confirmPassword" name="confirmPassword" type="password" />
-      </FormField>
-    </div>
-  {/snippet}
+    <FormField
+      class={gridItem({ colSpan: { base: 6, md: 3 } })}
+      forId="confirmPassword"
+      label="Confirm Password"
+    >
+      <Input id="confirmPassword" name="confirmPassword" type="password" />
+    </FormField>
+  </div>
   {#snippet submit()}
     <Check />
     Save

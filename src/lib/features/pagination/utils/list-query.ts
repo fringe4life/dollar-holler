@@ -111,7 +111,7 @@ export const parseLimitParam = (raw: Maybe<string>): number => {
   }
   const n = Number(raw);
   return LIMITS.includes(
-    // @ts-expect-error
+    // @ts-expect-error LIMITS is a readonly tuple; n is narrowed by includes()
     n
   )
     ? n

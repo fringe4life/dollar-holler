@@ -12,7 +12,7 @@
   aria-hidden="true"
   class={cx(
     css({ animation: "pulse", rounded: "md", backgroundColor: "gray.300" }),
-    className,
+    className
   )}
   {...restProps}
 ></div>

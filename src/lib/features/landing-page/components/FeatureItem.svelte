@@ -17,48 +17,50 @@
 
   const Icon = $derived(feature.icon);
 </script>
+
 <div
-  class={cx("group",
-          stack({
-              gap: 4,
-              rounded: "2xl",
-              borderWidth: 1,
-              borderStyle: "solid",
-              padding: 6,
-              transitionProperty: "translate",
-              transitionDuration: "normal",
-              transitionTimingFunction: { base: "ease-out", _supportsLinear: "glide"},
-              _hover: {
-                  translate: "0 -1px",
-              }
-  }), hoverShadow({ shadow: "lg" }), feature.accent, feature.border)}
+  class={cx(
+    "group",
+    stack({
+      gap: 4,
+      rounded: "2xl",
+      borderWidth: 1,
+      borderStyle: "solid",
+      padding: 6,
+      transitionProperty: "translate",
+      transitionDuration: "normal",
+      transitionTimingFunction: { base: "ease-out", _supportsLinear: "glide" },
+      _hover: {
+        translate: "0 -1px",
+      },
+    }),
+    hoverShadow({ shadow: "lg" }),
+    feature.accent,
+    feature.border
+  )}
 >
   <div
-    class={cx(
-            center({ rounded: "xl" }),
-            square({ size: 12 }),
-            feature.iconBg
-          )}
+    class={cx(center({ rounded: "xl" }), square({ size: 12 }), feature.iconBg)}
   >
     <Icon class={feature.iconColor} size={24} />
   </div>
   <div>
     <h3
       class={css({
-              color: "daisyBush",
-              marginBlockEnd: 2,
-              fontSize: "lg",
-              fontWeight: "black",
-            })}
+        color: "daisyBush",
+        marginBlockEnd: 2,
+        fontSize: "lg",
+        fontWeight: "black",
+      })}
     >
       {feature.title}
     </h3>
     <p
       class={css({
-              fontSize: "sm",
-              lineHeight: "relaxed",
-              color: "stone.600",
-            })}
+        fontSize: "sm",
+        lineHeight: "relaxed",
+        color: "stone.600",
+      })}
     >
       {feature.description}
     </p>

@@ -30,14 +30,12 @@ const searchWhere = (q: Maybe<string>) => {
 };
 
 const mapRows = (rows: ClientListResponse[]): ClientListResponse[] =>
-  rows.map(
-    (row): ClientListResponse => ({
-      ...row,
-      balance: Math.round(Number(row.balance ?? 0)),
-      clientStatus: row.clientStatus,
-      received: Math.round(Number(row.received ?? 0)),
-    })
-  );
+  rows.map((row): ClientListResponse => ({
+    ...row,
+    balance: Math.round(Number(row.balance ?? 0)),
+    clientStatus: row.clientStatus,
+    received: Math.round(Number(row.received ?? 0)),
+  }));
 
 /**
  * Paginated clients list (one row per client). Used by Elysia GET and +page.server.ts load.

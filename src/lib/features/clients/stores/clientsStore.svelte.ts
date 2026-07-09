@@ -119,7 +119,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
 
   async updateClientStatus(clientId: CursorId, clientStatus: ClientStatus) {
     try {
-      const { id, ...rest } = await unwrapTreaty(
+      const { id: _id, ...rest } = await unwrapTreaty(
         apiClient.clients.status({ id: clientId }).patch({ clientStatus }),
         { fallbackMessage: "Failed to update client status" }
       );
@@ -155,6 +155,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
       if (!id) {
         throw new Error("Failed to create client");
       }
+      // eslint-disable-next-line svelte/prefer-svelte-reactivity -- one-shot timestamp for list row
       const now = new Date();
       const newClient = {
         ...insertBody,
@@ -195,6 +196,7 @@ export class ClientsStore extends CursorPaginatedListStoreBase<ClientListRespons
         this.items[index] = {
           ...this.items[index],
           ...body,
+          // eslint-disable-next-line svelte/prefer-svelte-reactivity -- one-shot timestamp for list row
           updatedAt: new Date(),
         };
       }

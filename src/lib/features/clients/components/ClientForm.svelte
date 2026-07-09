@@ -39,7 +39,11 @@
   // svelte-ignore state_referenced_locally
   if (formState === "edit" && edit) {
     // Extract only the fields we need for the form
-    const { createdAt, updatedAt, ...clientData } = edit;
+    const {
+      createdAt: _createdAt,
+      updatedAt: _updatedAt,
+      ...clientData
+    } = edit;
     client = clientData;
   }
 

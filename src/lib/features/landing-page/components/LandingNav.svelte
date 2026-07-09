@@ -19,24 +19,24 @@
 
 <nav
   class={css({
-      position: "fixed",
-      insetInline: 0,
-      insetBlockStart: 0,
-      zIndex: "50",
-      backdropFilter: "auto",
-      _notSupportsScroll: {
-        backgroundColor: "whisper/95",
-        shadow: "xs",
-        backdropFilter: "xs",
-      },
-      _supportsScroll: {
-        animationName: "nav-solidify",
-        animationTimingFunction: "linear",
-        animationFillMode: "both",
-        animationTimeline: "scroll(root block)",
-        animationRange: "0px 80px",
-      },
-    })}
+    position: "fixed",
+    insetInline: 0,
+    insetBlockStart: 0,
+    zIndex: "50",
+    backdropFilter: "auto",
+    _notSupportsScroll: {
+      backgroundColor: "whisper/95",
+      shadow: "xs",
+      backdropFilter: "xs",
+    },
+    _supportsScroll: {
+      animationName: "nav-solidify",
+      animationTimingFunction: "linear",
+      animationFillMode: "both",
+      animationTimeline: "scroll(root block)",
+      animationRange: "0px 80px",
+    },
+  })}
 >
   <div
     class={between({
@@ -55,8 +55,8 @@
       <img
         alt="Dollar Holler"
         class={square({ size: 8 })}
-        src={asset('/images/logo.svg')}
-      >
+        src={asset("/images/logo.svg")}
+      />
       <span
         class={css({
           fontFamily: "sansserif",

@@ -155,7 +155,11 @@
 
   <!-- issue date -->
   <FormField
-    class={gridItem({ colSpan: { base: 3, sm: 2 }, colStart: { sm: 5 }, colEnd: { sm: 7 } })}
+    class={gridItem({
+      colSpan: { base: 3, sm: 2 },
+      colStart: { sm: 5 },
+      colEnd: { sm: 7 },
+    })}
     forId="issueDate"
     label="Issue Date"
   >

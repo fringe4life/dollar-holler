@@ -46,6 +46,7 @@
     },
   });
 </script>
+
 <script lang="ts">
   export type BadgeVariant = RecipeVariant<typeof badgeVariants>["variant"];
   export type BadgeSize = RecipeVariant<typeof badgeVariants>["size"];
@@ -67,10 +68,10 @@
 </script>
 
 <svelte:element
-  class={cx(badgeVariants({ variant }), className)}
+  this={href ? "a" : "span"}
+  class={cx(badgeVariants({ size, variant }), className)}
   data-slot="badge"
   {href}
-  this={href ? "a" : "span"}
   {...restProps}
 >
   {@render children?.()}

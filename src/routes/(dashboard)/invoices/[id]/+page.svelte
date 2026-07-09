@@ -75,25 +75,33 @@
 
 <div
   class={grid({
-      gridAutoFlow: { base: "row", md: "column" },
-      justifyContent: "space-between",
-      rowGap: 5,
-      inlineSize: "full",
-      maxInlineSize: "5xl" ,
-      paddingInline: { base: 4, lg: 0 },
-      position: "fixed",
-      zIndex: 0,
-      marginBlockEnd: 16,
-      _print: { display: "none" }
-    })}
+    gridAutoFlow: { base: "row", md: "column" },
+    justifyContent: "space-between",
+    rowGap: 5,
+    inlineSize: "full",
+    maxInlineSize: "5xl",
+    paddingInline: { base: 4, lg: 0 },
+    position: "fixed",
+    zIndex: 0,
+    marginBlockEnd: 16,
+    _print: { display: "none" },
+  })}
 >
   <h1
-    class={gridItem({ color: "daisyBush", fontSize: "3xl", fontWeight: "bold" })}
+    class={gridItem({
+      color: "daisyBush",
+      fontSize: "3xl",
+      fontWeight: "bold",
+    })}
   >
     Invoice
   </h1>
   <div
-    class={flex({ align: "center", gap: 2, wrap: { base: "wrap", sm: "nowrap" } })}
+    class={flex({
+      align: "center",
+      gap: 2,
+      wrap: { base: "wrap", sm: "nowrap" },
+    })}
   >
     <Button onclick={printInvoice} size="short" variant="outline">Print</Button>
     <Button onclick={copyLink} size="short">Copy Link</Button>
@@ -108,41 +116,41 @@
 
 <section
   class={grid({
-      columns: 6,
-      columnGap: 5,
-      rowGap: 8,
-      paddingInline: { base: 5, md: 32 },
-      paddingBlock: { base: 8, md: 16 },
-      position: "relative",
-      insetBlockStart: { base: 36, _print: 0 },
-      zIndex: 10,
-      shadow: { base: "addInvoice", _print: "none" },
-      backgroundColor: "white",
-    })}
+    columns: 6,
+    columnGap: 5,
+    rowGap: 8,
+    paddingInline: { base: 5, md: 32 },
+    paddingBlock: { base: 8, md: 16 },
+    position: "relative",
+    insetBlockStart: { base: 36, _print: 0 },
+    zIndex: 10,
+    shadow: { base: "addInvoice", _print: "none" },
+    backgroundColor: "white",
+  })}
 >
   <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
     <img
       alt="Compressed fm"
-      src={asset('/images/logo.png')}
-      srcset={`${asset('/images/logo@2x.png')} 2x, ${asset('/images/logo.png')} 1x`}
-    >
+      src={asset("/images/logo.png")}
+      srcset={`${asset("/images/logo@2x.png")} 2x, ${asset("/images/logo.png")} 1x`}
+    />
   </div>
 
   <div
     class={gridItem({
       gridColumnStart: { sm: 5 },
       colSpan: { base: 6, sm: 2, _print: 3 },
-      paddingBlockStart: 4
+      paddingBlockStart: 4,
     })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
     {#if settingsStore.settings?.myName}
       <p>
         {#if settingsStore.settings.myName}
-          {settingsStore.settings.myName}<br>
+          {settingsStore.settings.myName}<br />
         {/if}
         {#if settingsStore.settings.city && settingsStore.settings.street && settingsStore.settings.state && settingsStore.settings.zip}
-          {settingsStore.settings.street}<br>
+          {settingsStore.settings.street}<br />
           {settingsStore.settings.city}
           {settingsStore.settings.state}
           {settingsStore.settings.zip}
@@ -150,12 +158,18 @@
       </p>
     {:else}
       <div
-        class={center({ backgroundColor: "gallery", borderRadius: "md", minBlockSize: 17 })}
+        class={center({
+          backgroundColor: "gallery",
+          borderRadius: "md",
+          minBlockSize: 17,
+        })}
       >
         <a
-          class={css({ color: "stone.600", textDecoration: { base:"underline", _hover: "none"} })}
-          href={settingsLink}
-          >Add your contact information.</a
+          class={css({
+            color: "stone.600",
+            textDecoration: { base: "underline", _hover: "none" },
+          })}
+          href={settingsLink}>Add your contact information.</a
         >
       </div>
     {/if}
@@ -165,13 +179,13 @@
     <p>
       {#if data.client}
         {#if data.client.name}
-          <strong>{data.client.name}</strong><br>
+          <strong>{data.client.name}</strong><br />
         {/if}
         {#if data.client.email}
-          {data.client.email}<br>
+          {data.client.email}<br />
         {/if}
         {#if data.client.street}
-          {data.client.street}<br>
+          {data.client.street}<br />
         {/if}
         {#if data.client.state}
           {data.client.state}
@@ -185,7 +199,10 @@
     </p>
   </div>
   <div
-    class={gridItem({ colSpan: { base: 6, sm: 2, _print: 3 }, gridColumnStart: { sm: 5 } })}
+    class={gridItem({
+      colSpan: { base: 6, sm: 2, _print: 3 },
+      gridColumnStart: { sm: 5 },
+    })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>Invoice Id:</div>
     <p>{invoice.invoiceNumber}</p>
@@ -198,12 +215,15 @@
   </div>
 
   <div
-    class={gridItem({ colSpan: { base: 3, sm: 2, _print: 3 }, gridColumnStart: { sm: 5 } })}
+    class={gridItem({
+      colSpan: { base: 3, sm: 2, _print: 3 },
+      gridColumnStart: { sm: 5 },
+    })}
   >
     <div class={css({ color: "monsoon", fontWeight: "bold" })}>Issue Date:</div>
     <p>
       {convertDate(
-        invoice.issueDate === null ? null : String(invoice.issueDate),
+        invoice.issueDate === null ? null : String(invoice.issueDate)
       )}
     </p>
   </div>

@@ -70,7 +70,7 @@
           rowGap: 4,
           minBlockSize: "full",
         }),
-        extraClass,
+        extraClass
       )}
     >
       {@render header()}

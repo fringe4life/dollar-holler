@@ -20,4 +20,4 @@
   }: Omit<HTMLInputAttributes, "class"> & { class?: string } = $props();
 </script>
 
-<input class={cx(inputClass, className)} {...rest} bind:value>
+<input class={cx(inputClass, className)} {...rest} bind:value />

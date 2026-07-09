@@ -81,11 +81,12 @@
   <ArkToaster {toaster}>
     {#snippet children(_toastValue)}
       <Toast.Root
-        class={toastRootRecipe({ type: getToastVariant(_toastValue().type) }).root}
+        class={toastRootRecipe({ type: getToastVariant(_toastValue().type) })
+          .root}
       >
         <Toast.Title
-          class={toastRootRecipe({ type: getToastVariant(_toastValue().type) }).title}
-          >{_toastValue().title}</Toast.Title
+          class={toastRootRecipe({ type: getToastVariant(_toastValue().type) })
+            .title}>{_toastValue().title}</Toast.Title
         >
         <Toast.CloseTrigger
           aria-label="Close notification"

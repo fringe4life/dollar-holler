@@ -85,7 +85,7 @@
   );
 </script>
 
-<svelte:head> <title>{client.name} | Doller Holla</title> </svelte:head>
+<svelte:head><title>{client.name} | Doller Holla</title></svelte:head>
 <ItemsHeader
   open={formPanel.open.bind(null, undefined)}
   store={clientInvoicesStore}
@@ -110,8 +110,8 @@
     backgroundColor: "gallery",
     borderRadius: "lg",
     paddingInline: { base: 6, md: 8, lg: 10 },
-    paddingBlock: { base: 4, md: 6, lg: 8 }
-    })}
+    paddingBlock: { base: 4, md: 6, lg: 8 },
+  })}
 >
   <InvoiceSummaryItem
     amount={invoiceSummaryTotals.overdue}

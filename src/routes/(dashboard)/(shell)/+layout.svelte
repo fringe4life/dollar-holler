@@ -12,7 +12,7 @@
     overflowX: "clip",
     minBlockSize: "100dvh",
     columnGap: { base: 0, md: 16 },
-    position: "relative"
+    position: "relative",
   })}
 >
   <Navbar />

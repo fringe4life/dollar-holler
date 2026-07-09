@@ -16,33 +16,32 @@
 <!-- <div> -->
 <div
   class={css({
-      marginInlineStart: 2,
-      marginBlockEnd: 10,
-      backgroundImage: "var(--arrow-left)",
-      backgroundPosition: "bottom left",
-      backgroundRepeat: "no-repeat",
-      paddingInlineStart: 28,
-      paddingBlockStart: 2,
-      
-    })}
-  style:--arrow-left={`url(${asset('/images/arrow-left-up.svg')})`}
+    marginInlineStart: 2,
+    marginBlockEnd: 10,
+    backgroundImage: "var(--arrow-left)",
+    backgroundPosition: "bottom left",
+    backgroundRepeat: "no-repeat",
+    paddingInlineStart: 28,
+    paddingBlockStart: 2,
+  })}
+  style:--arrow-left={`url(${asset("/images/arrow-left-up.svg")})`}
 >
   <h2
     class={css({
-        fontFamily: "handwriting",
-        color: "caribbeanGreen",
-        fontSize: "4xl",
-        fontWeight: "bold",
-      })}
+      fontFamily: "handwriting",
+      color: "caribbeanGreen",
+      fontSize: "4xl",
+      fontWeight: "bold",
+    })}
   >
     Bummer
   </h2>
   <p
     class={css({
-        color: "caribbeanGreen",
-        fontSize: "xl",
-        fontWeight: "bold",
-      })}
+      color: "caribbeanGreen",
+      fontSize: "xl",
+      fontWeight: "bold",
+    })}
   >
     {message}
   </p>

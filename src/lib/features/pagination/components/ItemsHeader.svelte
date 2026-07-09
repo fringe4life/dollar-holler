@@ -20,15 +20,15 @@
 </script>
 
 <div
-  class={flex({ 
-      direction: { base: "column-reverse", md: "row" }, 
-      align: { base: "start", md: "center" }, 
-      justify: "space-between", 
-      rowGap: { base: 6, md: 4 } ,
-      marginBlockEnd: 6,
-      paddingBlock: { base: 2, lg: 3 },
-      fontSize: "lg",
-    })}
+  class={flex({
+    direction: { base: "column-reverse", md: "row" },
+    align: { base: "start", md: "center" },
+    justify: "space-between",
+    rowGap: { base: 6, md: 4 },
+    marginBlockEnd: 6,
+    paddingBlock: { base: 2, lg: 3 },
+    fontSize: "lg",
+  })}
 >
   <Search {store} />
   <div

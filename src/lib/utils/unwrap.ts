@@ -49,7 +49,7 @@ export const unwrapTreatyResult = <TData>(
     );
     throw new ApiError(msg, result.error.status, result.error.value);
   }
-  if (result.data == null) {
+  if (result.data === null) {
     throw new Error(options.emptyDataMessage ?? options.fallbackMessage);
   }
   return result.data;

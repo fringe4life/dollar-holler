@@ -97,8 +97,7 @@
       <Badge
         class={css({ marginInlineStart: { base: "auto", md: 0 } })}
         size="small"
-        variant="draft"
-        >{client.clientStatus}</Badge
+        variant="draft">{client.clientStatus}</Badge
       >
     </div>
     <div
@@ -113,12 +112,17 @@
     </div>
     <div
       class={gridItem({
-            gridArea: "received",
-            _before: { content: { base: "'Received: ' / 'your received money is'", lg:"''" }},
-            textAlign: {base: "left", lg: "right"},
-            fontSize: { base: "sm", lg: "lg" },
-            fontWeight: "bold",
-        })}
+        gridArea: "received",
+        _before: {
+          content: {
+            base: "'Received: ' / 'your received money is'",
+            lg: "''",
+          },
+        },
+        textAlign: { base: "left", lg: "right" },
+        fontSize: { base: "sm", lg: "lg" },
+        fontWeight: "bold",
+      })}
     >
       {receivedDisplay}
     </div>
@@ -126,7 +130,9 @@
       class={gridItem({
         gridArea: "balance",
         justifySelf: "end",
-        _before: { content: { base: "'Balance: ' / 'your balance is'", lg:"''" }},
+        _before: {
+          content: { base: "'Balance: ' / 'your balance is'", lg: "''" },
+        },
         textAlign: "right",
         fontSize: { base: "sm", lg: "lg" },
         fontWeight: "bold",
@@ -138,16 +144,21 @@
     <div
       class={gridItem({
         display: { base: "none", lg: "block" },
-        gridArea: "view",placeSelf: "center"})}
+        gridArea: "view",
+        placeSelf: "center",
+      })}
     >
       <a
         class={css({
-          color:{ base:"pastelPurple", _hover: "daisyBush", _groupHover: "daisyBush/50"},
+          color: {
+            base: "pastelPurple",
+            _hover: "daisyBush",
+            _groupHover: "daisyBush/50",
+          },
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolved}
-        ><View /></a
+        href={resolved}><View /></a
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>

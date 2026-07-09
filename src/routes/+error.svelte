@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { center, flex } from "styled-system/patterns";
+  import { center } from "styled-system/patterns";
   import { asset } from "$app/paths";
   import { page } from "$app/state";
 </script>
@@ -15,7 +15,7 @@
     inlineSize: "full",
     minBlockSize: "100dvh",
   })}
-  style:--bg-error={`url(${asset('/images/bg-error.svg')})`}
+  style:--bg-error={`url(${asset("/images/bg-error.svg")})`}
 >
   <div>
     <h1

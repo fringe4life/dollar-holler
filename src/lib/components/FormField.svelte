@@ -21,9 +21,12 @@
 </script>
 
 <div
-  class={cx(css({
-    marginBlockEnd: 5,
-  }), className)}
+  class={cx(
+    css({
+      marginBlockEnd: 5,
+    }),
+    className
+  )}
 >
   {#if label}
     <Label class={labelClass} for={forId}>{label}</Label>

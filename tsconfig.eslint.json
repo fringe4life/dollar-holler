@@ -1,0 +1,22 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src/env-varlock.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte",
+    "src/**/*.svelte.ts",
+    "src/**/*.svelte.js",
+    "vite.config.ts",
+    "panda.config.ts",
+    "drizzle.config.ts",
+    "eslint.config.mjs",
+    "prettier.config.mjs",
+    "stylelint.config.mjs",
+    "postcss.config.cjs"
+  ],
+  "compilerOptions": {
+    "allowJs": true,
+    "checkJs": false
+  }
+}

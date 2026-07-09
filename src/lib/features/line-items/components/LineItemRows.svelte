@@ -42,11 +42,16 @@
     inputType: "number",
   });
 </script>
+
 <div
-  class={cx(invoiceLineItem, css({ 
-    borderColor: "daisyBush", 
-    borderBottomWidth: 2, 
-    paddingBlockEnd: 2 }))}
+  class={cx(
+    invoiceLineItem,
+    css({
+      borderColor: "daisyBush",
+      borderBottomWidth: 2,
+      paddingBlockEnd: 2,
+    })
+  )}
 >
   <div class={lineItemHeaders}>Description</div>
   <div class={cx(lineItemHeaders, css({ textAlign: "right" }))}>Unit price</div>
@@ -79,18 +84,27 @@
 <div class={invoiceLineItem}>
   <div class={gridItem({ colSpan: { base: 1, sm: 2 } })}>
     {#if isEditable && props.mode === "edit"}
-      <Button onclick={props.addLineItem} variant="textOnly"
-        >+ Line Item</Button
+      <Button onclick={props.addLineItem} variant="textOnly">+ Line Item</Button
       >
     {/if}
   </div>
   <div
-    class={gridItem({ color: "monsoon", paddingBlock: 5, textAlign: "right", fontWeight: "bold", colSpan: { _print: 3 } })}
+    class={gridItem({
+      color: "monsoon",
+      paddingBlock: 5,
+      textAlign: "right",
+      fontWeight: "bold",
+      colSpan: { _print: 3 },
+    })}
   >
     Subtotal
   </div>
   <div
-    class={gridItem({ paddingBlock: 5, textAlign: "right", fontFamily: "mono" })}
+    class={gridItem({
+      paddingBlock: 5,
+      textAlign: "right",
+      fontFamily: "mono",
+    })}
   >
     {subTotal}
   </div>
@@ -98,7 +112,13 @@
 
 <div class={invoiceLineItem}>
   <p
-    class={gridItem({ color: "monsoon", paddingBlock: 5, textAlign: "right", fontWeight: "bold", colSpan: { base: 1, sm: 2 , _print: 3 } })}
+    class={gridItem({
+      color: "monsoon",
+      paddingBlock: 5,
+      textAlign: "right",
+      fontWeight: "bold",
+      colSpan: { base: 1, sm: 2, _print: 3 },
+    })}
   >
     Discount
   </p>
@@ -112,14 +132,22 @@
       oninput={isEditable ? onDiscountInput : undefined}
       type="number"
       value={props.discount}
-    >
+    />
     <span
-      class={css({ position: "absolute", insetInlineEnd: 0, insetBlockStart: 2, fontFamily: "mono" })}
-      >%</span
+      class={css({
+        position: "absolute",
+        insetInlineEnd: 0,
+        insetBlockStart: 2,
+        fontFamily: "mono",
+      })}>%</span
     >
   </div>
   <div
-    class={gridItem({ paddingBlock: 5, textAlign: "right", fontFamily: "mono" })}
+    class={gridItem({
+      paddingBlock: 5,
+      textAlign: "right",
+      fontFamily: "mono",
+    })}
   >
     {centsToDollars(discountAmount)}
   </div>
@@ -127,8 +155,8 @@
 
 <div class={invoiceLineItem}>
   <div
-    class={gridItem({ 
-      gridColumn: { base: "span 3", sm: "1 / -1", _print: "1 / -1" } 
+    class={gridItem({
+      gridColumn: { base: "span 3", sm: "1 / -1", _print: "1 / -1" },
     })}
   >
     <CircledAmount amount={total} label="Total." />

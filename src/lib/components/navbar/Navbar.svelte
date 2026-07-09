@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css, cx } from "styled-system/css";
-  import { cq, flex, gridItem, vstack } from "styled-system/patterns";
+  import { cq, gridItem, vstack } from "styled-system/patterns";
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -62,52 +62,52 @@
     aria-controls="primary-navigation"
     aria-expanded={nav.isOn}
     class={cx(
-    "group",
-    css({
-      position: "fixed",
-      insetInlineEnd: 6,
-      insetBlockStart: 6,
-      zIndex: 10_000,
-      cursor: "pointer",
-      transitionProperty: "colors",
-      transitionDuration: "normal",
-      display: { md: "none" },
-      color: nav.isOn ? "goldenFizz" : "daisyBush",
-      blockSize: 12,
-      padding: 2,
-    }),
-  )}
+      "group",
+      css({
+        position: "fixed",
+        insetInlineEnd: 6,
+        insetBlockStart: 6,
+        zIndex: 10_000,
+        cursor: "pointer",
+        transitionProperty: "colors",
+        transitionDuration: "normal",
+        display: { md: "none" },
+        color: nav.isOn ? "goldenFizz" : "daisyBush",
+        blockSize: 12,
+        padding: 2,
+      })
+    )}
     onclick={nav.toggle}
     type="button"
   >
     <span class={css({ srOnly: true })}>Menu</span>
     <div
       class={css({
-      "&::after,&::before,&": {
-        content: "''",
-        display: "block",
-        blockSize: "5px",
-        inlineSize: "32px",
-        rounded: "3px",
-        transitionProperty: ["rotate", "translate", "opacity"],
-        transitionDuration: "normal",
-        backgroundColor: "currentColor",
-      },
-      _before: { translate: "0 -10px" },
-      _after: { translate: "0 5px" },
-      _groupExpanded: {
-        rotate: "45deg" ,
-        _before: { opacity: "0" },
-        _after: { translate: "0 -3px", rotate: "-90deg" },
-      },
-    })}
+        "&::after,&::before,&": {
+          content: "''",
+          display: "block",
+          blockSize: "5px",
+          inlineSize: "32px",
+          rounded: "3px",
+          transitionProperty: ["rotate", "translate", "opacity"],
+          transitionDuration: "normal",
+          backgroundColor: "currentColor",
+        },
+        _before: { translate: "0 -10px" },
+        _after: { translate: "0 5px" },
+        _groupExpanded: {
+          rotate: "45deg",
+          _before: { opacity: "0" },
+          _after: { translate: "0 -3px", rotate: "-90deg" },
+        },
+      })}
     ></div>
   </button>
   <nav
     class={cx(
       "group",
       navShell,
-      nav.isOn ? navTranslateOpen : navTranslateClosed,
+      nav.isOn ? navTranslateOpen : navTranslateClosed
     )}
     id="primary-navigation"
   >
@@ -117,17 +117,20 @@
           alt="Doller Holla company logo"
           class={css({ marginInline: "auto" })}
           src={asset("/images/logo.svg")}
-        >
+        />
       </a>
     </div>
     <ul
-      class={cx("group", css({
-      listStyle: "none",
-      fontSize: { base: "xl", "@/xs": "2xl" },
-      fontWeight: { base: "medium", "@/xs": "semibold" },
-    }))}
-      style:--active-nav-left={`url(${asset('/images/active-nav--left.svg')})`}
-      style:--active-nav-right={`url(${asset('/images/active-nav--right.svg')})`}
+      class={cx(
+        "group",
+        css({
+          listStyle: "none",
+          fontSize: { base: "xl", "@/xs": "2xl" },
+          fontWeight: { base: "medium", "@/xs": "semibold" },
+        })
+      )}
+      style:--active-nav-left={`url(${asset("/images/active-nav--left.svg")})`}
+      style:--active-nav-right={`url(${asset("/images/active-nav--right.svg")})`}
     >
       {#each navItems as { href, title } (title)}
         <NavbarItem {href} isActive={isActive(href, path)} {title} />

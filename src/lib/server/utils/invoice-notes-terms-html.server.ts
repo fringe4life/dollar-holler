@@ -6,8 +6,7 @@
 import type { InvoiceInsert } from "$features/invoices/types";
 import { markdownToHtml } from "$lib/utils/markdown.server";
 
-interface InvoiceNotesTermsMarkdown
-  extends Pick<InvoiceInsert, "notes" | "terms"> {}
+type InvoiceNotesTermsMarkdown = Pick<InvoiceInsert, "notes" | "terms">;
 
 type InvoiceNotesSanitizedHTML = {
   [K in keyof InvoiceNotesTermsMarkdown as `${K}Html`]: ReturnType<

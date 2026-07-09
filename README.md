@@ -63,16 +63,20 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - `bun run build` - Build for production (`svelte-kit sync`, `panda build`, then Vite)
 - `bun run panda:build` - Run `svelte-kit sync` and `panda build` only
 - `bun run preview` - Preview production build
-- `bun run check` - Run Ultracite (Biome) checks
+- `bun run lint` - Run ESLint
+- `bun run lint:fix` - Run ESLint with auto-fix
+- `bun run format` - Format with Prettier
+- `bun run format:check` - Check Prettier formatting
+- `bun run stylelint` - Lint CSS under `src/**/*.css`
+- `bun run check` - ESLint, Prettier check, Stylelint, then `svelte-check`
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
+- `bun run fix` - `lint:fix`, `format`, and Stylelint with `--fix`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations (Varlock `run`)
 - `bun run db:migrate` - Run database migrations (Varlock `run`)
 - `bun run db:seed` - Seed database with sample data (Varlock `run`)
 - `bun run db:studio` - Open Drizzle Studio (Varlock `run`)
 - `bun run db:push` - Push schema directly to the database (Varlock `run`)
-- `bun run ultracite:upgrade` - Re-run Ultracite init/upgrade for this stack
-- `bun run fix` - Run Ultracite fix (`ultracite fix`)
 - `bun run fallow:prepare` - `svelte-kit sync` and `panda build` (run before Fallow if you invoke the CLI directly; other `fallow:*` scripts call this automatically)
 - `bun run fallow` - Full Fallow analysis (after prepare)
 - `bun run fallow:dead-code` - Dead code analysis (after prepare)
@@ -84,7 +88,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 ## Tech Stack
 
 - **Framework:** SvelteKit 3 (`3.0.0-next.7`) with `@sveltejs/adapter-vercel` 7 and Svelte 5 runes (experimental server instrumentation and tracing in [`vite.config.ts`](./vite.config.ts))
-- **Observability:** [Sentry](https://sentry.io/) for SvelteKit ([`src/hooks.server.ts`](./src/hooks.server.ts), [`src/hooks.client.ts`](./src/hooks.client.ts), [`src/instrumentation.server.ts`](./src/instrumentation.server.ts), Vite plugin in [`vite.config.ts`](./vite.config.ts) when not in `development`)
+- **Observability:** [Sentry](https://sentry.io/) on the server ([`src/instrumentation.server.ts`](./src/instrumentation.server.ts), [`src/hooks.server.ts`](./src/hooks.server.ts)); client SDK in [`src/hooks.client.ts`](./src/hooks.client.ts) is temporarily disabled pending SvelteKit 3 support in Sentry v11; Vite release plugin in [`vite.config.ts`](./vite.config.ts) is commented out
 - **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`)
 - **Database:** PostgreSQL with Neon serverless
 - **ORM:** Drizzle ORM 1.0 (rc.4) with Neon serverless driver (WebSocket `Pool`)
@@ -97,7 +101,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **Bundler:** Vite 8 for dev and production builds
 - **UI components:** [Ark UI for Svelte](https://ark-ui.com/) (`@ark-ui/svelte`)
 - **Styling:** [Panda CSS](https://panda-css.com/) 2.0 (beta) with generated `styled-system` via `panda build` (see `panda.config.ts`, PostCSS, `prepare` script); [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
-- **Lint/format:** [Ultracite](https://ultracite.dev/) on top of [Biome](https://biomejs.dev/) (`biome.jsonc`)
+- **Lint/format:** ESLint 10 with TypeScript ESLint and eslint-plugin-svelte ([`eslint.config.mjs`](./eslint.config.mjs)), Prettier 3 with prettier-plugin-svelte ([`prettier.config.mjs`](./prettier.config.mjs)), Stylelint 17 for CSS ([`stylelint.config.mjs`](./stylelint.config.mjs))
 
 ## Project Structure
 
@@ -164,7 +168,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Features
 
-- **Error monitoring:** Sentry on server and client with Kit instrumentation
+- **Error monitoring:** Sentry on server with Kit instrumentation (client SDK disabled until Sentry v11)
 - **Modern Authentication:** Better Auth with email/password support
 - **Type-Safe Database:** Drizzle ORM with full TypeScript support
 - **Serverless Ready:** Neon serverless driver (WebSocket pool) for Vercel deployment
@@ -186,7 +190,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 ## Notes
 
 - Uses Vite 8 (`vite` in `package.json`) and Varlock 1.9 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
-- Lint and format run through Ultracite (`bun run check`, `bun run fix`) with Biome rules extended from `ultracite/biome` for core and Svelte.
+- Lint and format run through ESLint, Prettier, and Stylelint (`bun run check`, `bun run fix`). ESLint ignores generated paths (`styled-system/`, `.svelte-kit/`) and defers CSS to Stylelint.
 - [Fallow](https://docs.fallow.tools) resolves `styled-system/*` imports from the generated Panda output and `$lib` path aliases (including `.svelte` → `.svelte.ts` modules). Custom `kit.alias` paths such as `$features/*` are ignored in [`.fallowrc.json`](./.fallowrc.json) because the SvelteKit plugin does not resolve them the same way Vite does. Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`.
 - Panda CSS 2.0 generates `styled-system/` via `panda build`; path aliases (`$lib`, `$features`, `styled-system`) live in `kit.alias` inside [`vite.config.ts`](./vite.config.ts). Root [`tsconfig.json`](./tsconfig.json) extends `.svelte-kit/tsconfig.json` only—do not duplicate `paths` there. The Kit TypeScript hook adds `panda.config.ts` and `drizzle.config.ts` to the generated include list and omits generated `styled-system` sources from typechecking. After dependency install, `prepare` runs `panda build`.
 - SvelteKit 3 uses `$app/env` (not `$app/environment`) for `building` / `dev` in server code. Typed routes use filesystem route IDs with `resolve()` (for example `/(dashboard)/invoices/[id]`).

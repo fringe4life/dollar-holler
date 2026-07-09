@@ -1,4 +1,3 @@
-/// <reference path="./src/env-varlock.d.ts" />
 import { defineConfig } from "drizzle-kit";
 
 export default defineConfig({

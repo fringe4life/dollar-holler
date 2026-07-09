@@ -1,18 +1,28 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { center, flex } from "styled-system/patterns";
+  import { center } from "styled-system/patterns";
   import { asset } from "$app/paths";
 </script>
 
-<svelte:head> <title>Thank You! | Doller Holla</title> </svelte:head>
+<svelte:head><title>Thank You! | Doller Holla</title></svelte:head>
 
 <div
-  class={center({ backgroundPosition: "center", backgroundRepeat: "no-repeat", inlineSize: "full", backgroundImage: "var(--bg-thankYou)" })}
-  style:--bg-thankYou={`url(${asset('/images/bg-thankYou.svg')})`}
+  class={center({
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    inlineSize: "full",
+    backgroundImage: "var(--bg-thankYou)",
+  })}
+  style:--bg-thankYou={`url(${asset("/images/bg-thankYou.svg")})`}
 >
   <div>
     <h1
-      class={css({ color: "daisyBush", fontSize: "5xl", lineHeight: "none", fontWeight: "black" })}
+      class={css({
+        color: "daisyBush",
+        fontSize: "5xl",
+        lineHeight: "none",
+        fontWeight: "black",
+      })}
     >
       Thank You!
     </h1>

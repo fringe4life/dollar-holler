@@ -3,7 +3,7 @@ export const stripNullishEntries = <T extends Record<string, unknown>>(
   object: T
 ): Partial<T> =>
   Object.fromEntries(
-    Object.entries(object).filter(([, value]) => value != null)
+    Object.entries(object).filter(([, value]) => value !== null)
   ) as Partial<T>;
 
 /** Drops entries whose values are `undefined`. */

@@ -48,7 +48,7 @@
     await clientsStore.updateClientStatus(clientId, "archive");
 </script>
 
-<svelte:head> <title>Clients | Dollar Holler</title> </svelte:head>
+<svelte:head><title>Clients | Dollar Holler</title></svelte:head>
 
 <ItemsHeader open={createForm.open.bind(null, undefined)} store={clientsStore}>
   {#snippet button()}
@@ -126,12 +126,12 @@
     {#snippet title()}
       <h2
         class={css({
-      fontFamily: "sansserif",
-      color: "daisyBush",
-      marginBlockEnd: 7,
-      fontSize: "3xl",
-      fontWeight: "bold",
-    })}
+          fontFamily: "sansserif",
+          color: "daisyBush",
+          marginBlockEnd: 7,
+          fontSize: "3xl",
+          fontWeight: "bold",
+        })}
       >
         Edit a Client
       </h2>
@@ -153,12 +153,12 @@
   item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
-      if (!deleteModal?.item?.id) {
-        return;
-      }
-      await clientsStore.deleteClient(deleteModal.item.id);
-      deleteModal.close();
-    }}
+    if (!deleteModal?.item?.id) {
+      return;
+    }
+    await clientsStore.deleteClient(deleteModal.item.id);
+    deleteModal.close();
+  }}
   titleText="Are you sure you want to delete this client?"
   bind:dialogEl={deleteModal.dialogEl}
 >

@@ -52,7 +52,6 @@ export interface SearchableListStore {
 
 /** Cursor-paginated list store: list rows, URL sync key, and pagination flags for UI. */
 export interface PaginatableItems<T extends CursorRow>
-  extends SearchableListStore,
-    CursorPaginatedList<T> {
+  extends SearchableListStore, CursorPaginatedList<T> {
   lastSuccessfulListKey: Maybe<string>;
 }

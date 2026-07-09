@@ -7,13 +7,7 @@
 </script>
 
 <div class={css({ position: "relative", isolation: "isolate" })}>
-  <div
-    class={cx(
-      invoiceTable,
-      invoiceRow,
-      tableRowBase,
-    )}
-  >
+  <div class={cx(invoiceTable, invoiceRow, tableRowBase)}>
     <!-- status: badge-shaped pill ~54px wide -->
     <div
       class={gridItem({
@@ -74,7 +68,6 @@
         display: { base: "none", lg: "block" },
         placeSelf: "center",
         gridArea: "threeDots",
-
       })}
     >
       <Skeleton class={circle({ bg: "prim/40", size: 8 })} />

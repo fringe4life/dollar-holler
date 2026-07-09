@@ -3,7 +3,6 @@
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { css } from "styled-system/css";
   import { between, hstack, square } from "styled-system/patterns";
-  import { tick } from "svelte";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
@@ -138,7 +137,7 @@
         </option>
       {/each}
     </Select>
-    <div class={hstack({  gap: 2 })}>
+    <div class={hstack({ gap: 2 })}>
       <Button
         aria-label="Previous page"
         disabled={!pageMeta.hasPreviousPage || store.loading}

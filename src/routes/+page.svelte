@@ -27,7 +27,7 @@
   <meta
     content="Create professional invoices, track payments, and manage clients — all from one beautiful dashboard."
     name="description"
-  >
+  />
 </svelte:head>
 <main
   class={css({
@@ -46,10 +46,28 @@
   >
     <!-- Aurora background blobs -->
     <AuroraBlob
-      className={cx(css({ insetInlineStart: 0, insetBlockStart: 0, translate: "25%", opacity: "0.1", backgroundColor: "lavenderIndigo" }),circle({size: 600}))}
+      className={cx(
+        css({
+          insetInlineStart: 0,
+          insetBlockStart: 0,
+          translate: "25%",
+          opacity: "0.1",
+          backgroundColor: "lavenderIndigo",
+        }),
+        circle({ size: 600 })
+      )}
     />
     <AuroraBlob
-      className={cx(css({ insetInlineStart: 0, insetBlockEnd: 0, translate: "33%", opacity: "0.1", backgroundColor: "daisyBush" }), circle({size: 400}))}
+      className={cx(
+        css({
+          insetInlineStart: 0,
+          insetBlockEnd: 0,
+          translate: "33%",
+          opacity: "0.1",
+          backgroundColor: "daisyBush",
+        }),
+        circle({ size: 400 })
+      )}
     />
     <div
       class={grid({
@@ -61,7 +79,7 @@
         paddingInline: 6,
         inlineSize: "full",
         maxInlineSize: "6xl",
-        })}
+      })}
     >
       <!-- Left: Copy -->
       <div class={stack({ gap: 6, align: "start" })}>
@@ -86,9 +104,16 @@
         </span>
 
         <h1
-          class={css({ fontFamily: "sansserif", lineHeight: "1.1", fontWeight: "black", letterSpacing: "tight", fontSize: {base:"5xl", sm: "6xl", lg: "7xl" }, color: "daisyBush" })}
+          class={css({
+            fontFamily: "sansserif",
+            lineHeight: "1.1",
+            fontWeight: "black",
+            letterSpacing: "tight",
+            fontSize: { base: "5xl", sm: "6xl", lg: "7xl" },
+            color: "daisyBush",
+          })}
         >
-          Get Paid,<br>Faster Than<br>Ever Before.
+          Get Paid,<br />Faster Than<br />Ever Before.
         </h1>
         <p
           class={css({
@@ -110,7 +135,7 @@
             <Button href={resolve("/signup")} size="lg">
               Start for Free →
             </Button>
-            <Button href={resolve("/login")} size="lg"> Log in </Button>
+            <Button href={resolve("/login")} size="lg">Log in</Button>
           {/if}
         </div>
         <p
@@ -124,22 +149,21 @@
       </div>
 
       <!-- Right: Mock Invoice Card -->
-      <div class={flex({justify: "center", position: "relative" })}>
+      <div class={flex({ justify: "center", position: "relative" })}>
         <!-- Floating badge: Rating -->
         <div
           class={hstack({
-              gap: 2,
-              position: "absolute",
-              insetInline:"auto",
-              insetBlockEnd: -4,
-              zIndex: 10,
-              rounded: "xl",
-              shadow: "lg",
-              paddingInline: 4,
-              paddingBlock: 2.5,
-              backgroundColor: "goldenFizz/90",
-              }
-          )}
+            gap: 2,
+            position: "absolute",
+            insetInline: "auto",
+            insetBlockEnd: -4,
+            zIndex: 10,
+            rounded: "xl",
+            shadow: "lg",
+            paddingInline: 4,
+            paddingBlock: 2.5,
+            backgroundColor: "goldenFizz/90",
+          })}
         >
           <StarIcon class={css({ color: "daisyBush" })} size={16} />
           <p
@@ -155,15 +179,40 @@
 
         <!-- Mock Invoice Card -->
         <div
-          class={css({ backgroundColor: "whisper", position: "relative", rounded: "2xl", borderWidth: 1, borderColor: "gray.200", shadow: "2xl", inlineSize: "full", maxInlineSize: "md" })}
+          class={css({
+            backgroundColor: "whisper",
+            position: "relative",
+            rounded: "2xl",
+            borderWidth: 1,
+            borderColor: "gray.200",
+            shadow: "2xl",
+            inlineSize: "full",
+            maxInlineSize: "md",
+          })}
           style="box-shadow: 0 25px 60px oklch(38.26% 0.202 288.17 / 0.18), 0 8px 20px oklch(0% 0 0 / 0.08);"
         >
           <!-- Floating badge: Payment -->
           <div
-            class={flex({ align:"center", gap: 2, position: "absolute", insetInlineStart: "50%", insetBlockStart: -6, zIndex: 10, translate: "-50% 0" , rounded: "xl", backgroundColor: "white", paddingInline: 4, paddingBlock: 2.5, shadow: "lg" })}
+            class={flex({
+              align: "center",
+              gap: 2,
+              position: "absolute",
+              insetInlineStart: "50%",
+              insetBlockStart: -6,
+              zIndex: 10,
+              translate: "-50% 0",
+              rounded: "xl",
+              backgroundColor: "white",
+              paddingInline: 4,
+              paddingBlock: 2.5,
+              shadow: "lg",
+            })}
           >
             <div
-              class={cx(circle({size: 8}), center({ backgroundColor: "green.100", fontSize: "sm" }) )}
+              class={cx(
+                circle({ size: 8 }),
+                center({ backgroundColor: "green.100", fontSize: "sm" })
+              )}
             >
               💰
             </div>
@@ -199,7 +248,14 @@
             <div class={between()}>
               <div>
                 <p
-                  class={css({ fontFamily: "sansserif", fontSize: "xs", fontWeight: "bold", letterSpacing: "widest", textTransform: "uppercase", color: "goldenFizz" })}
+                  class={css({
+                    fontFamily: "sansserif",
+                    fontSize: "xs",
+                    fontWeight: "bold",
+                    letterSpacing: "widest",
+                    textTransform: "uppercase",
+                    color: "goldenFizz",
+                  })}
                 >
                   Dollar Holler
                 </p>
@@ -314,7 +370,7 @@
                   fontSize: "xs",
                   fontWeight: "semibold",
                   textTransform: "uppercase",
-                  letterSpacing: "wide"
+                  letterSpacing: "wide",
                 })}
               >
                 <span>Description</span>
@@ -323,11 +379,11 @@
               <div class={css({ divideY: "gray.50" })}>
                 <div
                   class={grid({
-                  gridTemplateColumns: "1fr auto",
-                  paddingInline: 4,
-                  paddingBlock: 3,
-                  fontSize: "sm",
-                })}
+                    gridTemplateColumns: "1fr auto",
+                    paddingInline: 4,
+                    paddingBlock: 3,
+                    fontSize: "sm",
+                  })}
                 >
                   <div>
                     <p class={css({ fontSize: "sm", color: "gray.800" })}>
@@ -338,20 +394,23 @@
                     </p>
                   </div>
                   <span
-                    class={css({ color: "daisyBush", alignSelf: "center", fontWeight: "semibold" })}
-                    >$3,000.00</span
+                    class={css({
+                      color: "daisyBush",
+                      alignSelf: "center",
+                      fontWeight: "semibold",
+                    })}>$3,000.00</span
                   >
                 </div>
                 <div
                   class={grid({
-                  gridTemplateColumns: "1fr auto",
-                  paddingInline: 4,
-                  paddingBlock: 3,
-                  fontSize: "sm",
-                })}
+                    gridTemplateColumns: "1fr auto",
+                    paddingInline: 4,
+                    paddingBlock: 3,
+                    fontSize: "sm",
+                  })}
                 >
                   <div>
-                    <p class={css({fontWeight: "medium", color: "gray.800" })}>
+                    <p class={css({ fontWeight: "medium", color: "gray.800" })}>
                       Website Redesign
                     </p>
                     <p class={css({ fontSize: "xs", color: "gray.400" })}>
@@ -359,8 +418,11 @@
                     </p>
                   </div>
                   <span
-                    class={css({ color: "daisyBush", alignSelf: "center", fontWeight: "semibold" })}
-                    >$1,200.00</span
+                    class={css({
+                      color: "daisyBush",
+                      alignSelf: "center",
+                      fontWeight: "semibold",
+                    })}>$1,200.00</span
                   >
                 </div>
               </div>
@@ -446,7 +508,7 @@
         >
           Everything you need<br
             class={css({ display: { base: "none", sm: "block" } })}
-          >
+          />
           to get paid on time
         </h2>
       </div>
@@ -458,28 +520,66 @@
 
   <!-- ══════════════════════════════════════════════ REVIEWS -->
   <section
-    class={css({ backgroundColor: "daisyBush", position: "relative", overflow: "hidden", paddingBlock: 24 })}
+    class={css({
+      backgroundColor: "daisyBush",
+      position: "relative",
+      overflow: "hidden",
+      paddingBlock: 24,
+    })}
   >
     <!-- Subtle aurora blob -->
     <AuroraBlob
-      className={cx(circle({size: 96}),css({ insetInlineEnd: 0, insetBlockEnd: 0, opacity: "0.1", backgroundColor: "lavenderIndigo"  }))}
+      className={cx(
+        circle({ size: 96 }),
+        css({
+          insetInlineEnd: 0,
+          insetBlockEnd: 0,
+          opacity: "0.1",
+          backgroundColor: "lavenderIndigo",
+        })
+      )}
     />
     <AuroraBlob
-      className={cx(circle({size: 64}),css({ insetInlineStart: 0, insetBlockEnd: 0, backgroundColor: "black/20", opacity: "0.1"  }))}
+      className={cx(
+        circle({ size: 64 }),
+        css({
+          insetInlineStart: 0,
+          insetBlockEnd: 0,
+          backgroundColor: "black/20",
+          opacity: "0.1",
+        })
+      )}
     />
 
     <div
-      class={css({ position: "relative", marginInline: "auto", paddingInline: 6, maxInlineSize: "6xl" })}
+      class={css({
+        position: "relative",
+        marginInline: "auto",
+        paddingInline: 6,
+        maxInlineSize: "6xl",
+      })}
     >
       <!-- Section header -->
       <div class={css({ marginBlockEnd: 16, textAlign: "center" })}>
         <p
-          class={css({ color: "goldenFizz", marginBlockEnd: 3, fontSize: "sm", fontWeight: "bold", letterSpacing: "widest", textTransform: "uppercase" })}
+          class={css({
+            color: "goldenFizz",
+            marginBlockEnd: 3,
+            fontSize: "sm",
+            fontWeight: "bold",
+            letterSpacing: "widest",
+            textTransform: "uppercase",
+          })}
         >
           Real People, Real Results
         </p>
         <h2
-          class={css({ fontFamily: "sansserif", fontSize: {base:"4xl", sm: "5xl"}, fontWeight: "black", color: "white" })}
+          class={css({
+            fontFamily: "sansserif",
+            fontSize: { base: "4xl", sm: "5xl" },
+            fontWeight: "black",
+            color: "white",
+          })}
         >
           What our customers say
         </h2>
@@ -495,14 +595,37 @@
 
   <!-- ══════════════════════════════════════════════════ CTA -->
   <section
-    class={css({ backgroundColor: "lavenderIndigo", position: "relative", overflow: "hidden", paddingBlock: 28 })}
+    class={css({
+      backgroundColor: "lavenderIndigo",
+      position: "relative",
+      overflow: "hidden",
+      paddingBlock: 28,
+    })}
   >
     <!-- Aurora blobs -->
     <AuroraBlob
-      className={cx(circle({size: 96}), css({ insetInlineStart: "1/2", insetBlockStart: 0, translate: "-1/2", backgroundColor: "daisyBush", opacity: "0.4" }))}
+      className={cx(
+        circle({ size: 96 }),
+        css({
+          insetInlineStart: "1/2",
+          insetBlockStart: 0,
+          translate: "-1/2",
+          backgroundColor: "daisyBush",
+          opacity: "0.4",
+        })
+      )}
     />
     <AuroraBlob
-      className={cx(circle({size: 72}), css({ insetInlineEnd: 0, insetBlockEnd: 0, translate: "1/3", backgroundColor: "robinEggBlue", opacity: "0.2" }))}
+      className={cx(
+        circle({ size: 72 }),
+        css({
+          insetInlineEnd: 0,
+          insetBlockEnd: 0,
+          translate: "1/3",
+          backgroundColor: "robinEggBlue",
+          opacity: "0.2",
+        })
+      )}
     />
 
     <div
@@ -511,7 +634,7 @@
         marginInline: "auto",
         paddingInline: 6,
         textAlign: "center",
-        maxInlineSize: "3xl"
+        maxInlineSize: "3xl",
       })}
     >
       <h2
@@ -548,7 +671,7 @@
         </Button>
         <a
           class={css({
-            color: {base:"white/60", _hover: "white/90"},
+            color: { base: "white/60", _hover: "white/90" },
             fontSize: "sm",
             textDecoration: "underline",
             textUnderlineOffset: 4,
@@ -565,7 +688,12 @@
 </main>
 <!-- ══════════════════════════════════════════════ FOOTER -->
 <footer
-  class={css({ backgroundColor: "daisyBush", borderTopWidth: 1, borderColor: "white/10", paddingBlock: 10 })}
+  class={css({
+    backgroundColor: "daisyBush",
+    borderTopWidth: 1,
+    borderColor: "white/10",
+    paddingBlock: 10,
+  })}
 >
   <div
     class={between({
@@ -573,53 +701,50 @@
       gap: 4,
       maxInlineSize: "6xl",
       paddingInline: 6,
-      marginInline: "auto", })}
+      marginInline: "auto",
+    })}
   >
     <p class={css({ color: "pastelPurple", fontSize: "sm" })}>
       © 2026 Dollar Holler. All rights reserved.
     </p>
     <nav
       class={hstack({
-          gap: 6,
-          fontSize: "sm"
-        })}
+        gap: 6,
+        fontSize: "sm",
+      })}
     >
       <a
         class={css({
-          color: {base:"pastelPurple", _hover: "white"},
+          color: { base: "pastelPurple", _hover: "white" },
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/invoices")}
-        >Invoices</a
+        href={resolve("/invoices")}>Invoices</a
       >
       <a
         class={css({
-          color: {base:"pastelPurple", _hover: "white"},
+          color: { base: "pastelPurple", _hover: "white" },
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/clients")}
-        >Clients</a
+        href={resolve("/clients")}>Clients</a
       >
       <a
         class={css({
-          color: { base:"pastelPurple", _hover: "white" },
+          color: { base: "pastelPurple", _hover: "white" },
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/login")}
-        >Login</a
+        href={resolve("/login")}>Login</a
       >
       <a
         class={css({
-          color: { base:"goldenFizz", _hover: "white" },
+          color: { base: "goldenFizz", _hover: "white" },
           fontWeight: "semibold",
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/signup")}
-        >Sign Up</a
+        href={resolve("/signup")}>Sign Up</a
       >
     </nav>
   </div>

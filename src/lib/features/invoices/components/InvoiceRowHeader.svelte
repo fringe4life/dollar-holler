@@ -7,6 +7,7 @@
   let { emptyState = false }: HeaderProps = $props();
   let tableHeaders = ["Status", "Due Date", "ID", "Client", "Amount"] as const;
 </script>
+
 <TableHeader className={invoiceTable} {emptyState} headers={tableHeaders}>
   {#snippet headerSnippet(_title, _emptyState)}
     <h3

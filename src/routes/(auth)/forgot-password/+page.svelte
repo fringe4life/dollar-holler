@@ -34,12 +34,16 @@
 
     <Button type="submit" variant="auth">Send me a reset email!</Button>
     <p
-      class={css({ marginBlockStart: 4, textAlign: "center", fontSize: "sm", color: "white" })}
+      class={css({
+        marginBlockStart: 4,
+        textAlign: "center",
+        fontSize: "sm",
+        color: "white",
+      })}
     >
       <a
-        class={css({ textDecoration: {base:"underline", _hover: "none"} })}
-        href={resolve("/login")}
-        >Ready to login?</a
+        class={css({ textDecoration: { base: "underline", _hover: "none" } })}
+        href={resolve("/login")}>Ready to login?</a
       >
     </p>
   {/if}

@@ -5,7 +5,8 @@
     "@sveltejs/mcp",
     "@pandacss/plugin-svelte",
     "@fontsource-variable/source-sans-3",
-    "styled-system"
+    "styled-system",
+    "svelte-eslint-parser"
   ],
   "ignoreUnresolvedImports": [
     "styled-system",

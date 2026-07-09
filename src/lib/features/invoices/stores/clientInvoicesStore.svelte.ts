@@ -84,6 +84,7 @@ export class ClientInvoicesStore extends CursorPaginatedListStoreBase<InvoiceLis
         this.items[index] = {
           ...this.items[index],
           invoiceStatus,
+          // eslint-disable-next-line svelte/prefer-svelte-reactivity -- one-shot timestamp for list row
           updatedAt: new Date(),
         };
       }

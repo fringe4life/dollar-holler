@@ -163,7 +163,6 @@
     })}
     onclick={onClose}
     size="sm"
-    variant="ghost"
-    ><Cancel /></Button
+    variant="ghost"><Cancel /></Button
   >
 </dialog>

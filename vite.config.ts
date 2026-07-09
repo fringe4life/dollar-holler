@@ -1,4 +1,3 @@
-/** biome-ignore-all lint/suspicious/noExplicitAny: seems to be official practise for svelte typescript config */
 // import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-vercel";
 import { sveltekit } from "@sveltejs/kit/vite";
@@ -11,6 +10,8 @@ import { defineConfig } from "vite";
 import devToolsJson from "vite-plugin-devtools-json";
 
 const FILE_REGEX = /[/\\]/;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any -- SvelteKit typescript.config param is Record<string, any>
+type Config = Record<string, any>;
 
 export default defineConfig({
   // const shouldUseSentry = mode !== "development";
@@ -61,7 +62,7 @@ export default defineConfig({
         server: true,
       },
       typescript: {
-        config: (config: Record<string, any>) => ({
+        config: (config: Config) => ({
           ...config,
           include: [
             ...config.include.filter(

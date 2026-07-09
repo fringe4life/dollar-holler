@@ -61,8 +61,7 @@
           newClient.email = "";
         }}
         size="sm"
-        variant="outline"
-        >+ Client</Button
+        variant="outline">+ Client</Button
       >
     </div>
   {:else}
@@ -87,8 +86,7 @@
           newClient = clientsStore.newClient();
         }}
         size="sm"
-        variant="outline"
-        >Existing Client</Button
+        variant="outline">Existing Client</Button
       >
     </div>
   {/if}

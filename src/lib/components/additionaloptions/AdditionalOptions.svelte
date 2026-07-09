@@ -20,7 +20,7 @@
       placeSelf: "center",
       position: "relative",
     }),
-    classes,
+    classes
   )}
 >
   {@render content(additionalMenu)}

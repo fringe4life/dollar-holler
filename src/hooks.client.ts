@@ -1,9 +1,9 @@
+// biome-ignore lint/suspicious/noEmptySource: empty source
 // Disabled: @sentry/sveltekit v10 client SDK imports `$app/stores`, which SvelteKit 3
 // removed (throws on subscribe during Sentry.init). Re-enable once Sentry SDK v11 ships,
 // which drops pre-Svelte 5 support and migrates to `$app/state`.
 // Tracking: https://github.com/getsentry/sentry-javascript/issues/21502 (SvelteKit 3 support)
 //           https://github.com/getsentry/sentry-javascript/issues/18853 (drop Svelte 3/4, milestone 11.0.0)
-// biome-ignore lint/performance/noNamespaceImport: way to use sentry
 // import * as Sentry from "@sentry/sveltekit";
 // import { handleErrorWithSentry } from "@sentry/sveltekit";
 

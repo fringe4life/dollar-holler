@@ -43,7 +43,7 @@
   const deleteModal = new ItemPanel<InvoiceListResponse>();
 </script>
 
-<svelte:head> <title>Invoices | Dollar Holler</title> </svelte:head>
+<svelte:head><title>Invoices | Dollar Holler</title></svelte:head>
 
 <ItemsHeader open={createForm.open.bind(null, undefined)} store={invoicesStore}>
   {#snippet button()}
@@ -115,12 +115,12 @@
   {#snippet title()}
     <h2
       class={css({
-      fontFamily: "sansserif",
-      color: "daisyBush",
-      marginBlockEnd: 7,
-      fontSize: "3xl",
-      fontWeight: "bold",
-    })}
+        fontFamily: "sansserif",
+        color: "daisyBush",
+        marginBlockEnd: 7,
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
     >
       Edit an Invoice
     </h2>
@@ -145,12 +145,12 @@
   item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
-      if (!deleteModal?.item?.id) {
-        return;
-      }
-      await invoicesStore.deleteInvoice(deleteModal.item.id);
-      deleteModal.close();
-    }}
+    if (!deleteModal?.item?.id) {
+      return;
+    }
+    await invoicesStore.deleteInvoice(deleteModal.item.id);
+    deleteModal.close();
+  }}
   titleText="Are you sure you want to delete this invoice?"
   bind:dialogEl={deleteModal.dialogEl}
 >

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css } from "styled-system/css";
   import { flex } from "styled-system/patterns";
   import type { Component } from "svelte";
   import type { MouseEventHandler } from "svelte/elements";

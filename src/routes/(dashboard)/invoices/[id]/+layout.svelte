@@ -39,12 +39,30 @@
   }}
 />
 <a
-  class={css({ zIndex: 1000, color: {base: "pastelPurple", _hover: "daisyBush"}, position: "fixed", insetInlineStart: 7, insetBlockStart: 5, transitionProperty: "colors", transitionDuration: "normal", maxInlineSize: "full", _print: { display: "none" } })}
-  href={getBackUrl}
-  ><Arrow /></a
+  class={css({
+    zIndex: 1000,
+    color: { base: "pastelPurple", _hover: "daisyBush" },
+    position: "fixed",
+    insetInlineStart: 7,
+    insetBlockStart: 5,
+    transitionProperty: "colors",
+    transitionDuration: "normal",
+    maxInlineSize: "full",
+    _print: { display: "none" },
+  })}
+  href={getBackUrl}><Arrow /></a
 >
 <div
-  class={css({ backgroundColor: { base:"whisper", _print: "transparent" }, overflowY: "clip", paddingBlockStart: { base:16, lg:12 }, paddingBlockEnd: { lg:32 }, blockSize: "full", inlineSize: "full", minBlockSize: "100dvh", paddingY: { _print: 0 } })}
+  class={css({
+    backgroundColor: { base: "whisper", _print: "transparent" },
+    overflowY: "clip",
+    paddingBlockStart: { base: 16, lg: 12 },
+    paddingBlockEnd: { lg: 32 },
+    blockSize: "full",
+    inlineSize: "full",
+    minBlockSize: "100dvh",
+    paddingY: { _print: 0 },
+  })}
 >
   <main
     class={cx(
@@ -57,11 +75,12 @@
         transitionDuration: "normal",
         _starting: { translate: "0 var(--slide-distance)" },
       }),
-      isExiting && css({
-        animationName: "slide-down",
-        animationDuration: "normal",
-        animationFillMode: "forwards",
-      })
+      isExiting &&
+        css({
+          animationName: "slide-down",
+          animationDuration: "normal",
+          animationFillMode: "forwards",
+        })
     )}
     onanimationend={handleAnimationEnd}
     style="--slide-distance: 100dvh"

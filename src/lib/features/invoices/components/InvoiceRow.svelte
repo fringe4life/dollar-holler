@@ -80,7 +80,7 @@
     invoiceTable,
     invoiceRow,
     tableRowHover,
-    tableRowBase,
+    tableRowBase
   )}
   contentViewTransitionName={`invoice-${id}`}
 >
@@ -89,8 +89,7 @@
       <Badge
         class={css({ marginInlineStart: { base: "auto", md: 0 } })}
         size="small"
-        variant={label}
-        >{label}</Badge
+        variant={label}>{label}</Badge
       >
     </div>
     <div
@@ -98,7 +97,7 @@
         gridArea: "duedate",
         truncate: true,
         fontSize: { base: "sm", lg: "lg" },
-        textAlign: { base:"left", lg: "center"}
+        textAlign: { base: "left", lg: "center" },
       })}
     >
       {convertDate(dueDate.toISOString())}
@@ -134,22 +133,23 @@
     </div>
     <div
       class={gridItem({
-          gridArea: "view",
-          display: { base: "none", lg: "block" },
-          placeSelf: { md: "center" },
-        })}
+        gridArea: "view",
+        display: { base: "none", lg: "block" },
+        placeSelf: { md: "center" },
+      })}
     >
       <a
-        class={css({ fontSize: { base: "sm", lg: "lg" },
+        class={css({
+          fontSize: { base: "sm", lg: "lg" },
           transitionProperty: "colors",
           transitionDuration: "normal",
           color: {
             base: "pastelPurple",
             _groupHover: "daisyBush/50",
             _hover: "daisyBush",
-          },})}
-        href={resolved}
-        ><View /></a
+          },
+        })}
+        href={resolved}><View /></a
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>

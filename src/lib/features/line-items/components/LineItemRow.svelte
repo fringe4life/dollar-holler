@@ -78,7 +78,14 @@
 </script>
 
 <div
-  class={cx(invoiceLineItem, css({ borderColor: "fog", borderBottomWidth: 2, paddingBlock: { base: 4, sm: 2 } }))}
+  class={cx(
+    invoiceLineItem,
+    css({
+      borderColor: "fog",
+      borderBottomWidth: 2,
+      paddingBlock: { base: 4, sm: 2 },
+    })
+  )}
 >
   <div class={gridItem({ gridArea: "description", position: "relative" })}>
     <label class={lineItemLabel} for="description-{props.lineItem.id}"
@@ -93,7 +100,7 @@
       required={props.isRequired}
       type="text"
       value={props.lineItem.description}
-    >
+    />
     <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
 
@@ -113,13 +120,12 @@
       step={isEditable ? "0.01" : undefined}
       type={isEditable ? "number" : "text"}
       value={isEditable ? unitPrice : displayUnitPrice}
-    >
+    />
     <!-- "border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200" -->
     <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "quantity", position: "relative" })}>
-    <label class={qtyStyles.label} for="quantity-{props.lineItem.id}"
-      >Qty</label
+    <label class={qtyStyles.label} for="quantity-{props.lineItem.id}">Qty</label
     >
     <input
       class={qtyStyles.input}
@@ -131,7 +137,7 @@
       required={props.isRequired}
       type="number"
       value={props.lineItem.quantity}
-    >
+    />
     <span aria-hidden="true" class={qtyStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "amount" })}>
@@ -145,22 +151,31 @@
       name="amount"
       type="text"
       value={isEditable ? amount : props.lineItem.amount.toFixed(2)}
-    >
+    />
   </div>
 
   <div
-    class={gridItem({ gridArea: "trash", placeSelf: "center", position: { base: "absolute", sm: "static" }, insetInlineEnd: "0", insetBlockStart: "0" })}
+    class={gridItem({
+      gridArea: "trash",
+      placeSelf: "center",
+      position: { base: "absolute", sm: "static" },
+      insetInlineEnd: "0",
+      insetBlockStart: "0",
+    })}
   >
     {#if props.canDelete && isEditable}
       <Button
-        class={css({ textAlign: "center", blockSize: "10", inlineSize: "full" })}
+        class={css({
+          textAlign: "center",
+          blockSize: "10",
+          inlineSize: "full",
+        })}
         onclick={() => {
           if (props.mode !== "view") {
             props.removeLineItem(props.lineItem.id);
           }
         }}
-        variant="ghost"
-        ><Trash /></Button
+        variant="ghost"><Trash /></Button
       >
     {/if}
   </div>

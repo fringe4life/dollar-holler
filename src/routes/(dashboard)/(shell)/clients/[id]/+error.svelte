@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { center, flex } from "styled-system/patterns";
+  import { center } from "styled-system/patterns";
   import { asset } from "$app/paths";
   import { page } from "$app/state";
 </script>
@@ -15,12 +15,22 @@
   </style>
 </svelte:head>
 <div
-  class={center({ backgroundImage: "var(--bg-error)", backgroundPosition: "center", backgroundRepeat: "no-repeat", minBlockSize: "calc(100dvh - var(--spacing-16))" })}
-  style:--bg-error={`url(${asset('/images/bg-error.svg')})`}
+  class={center({
+    backgroundImage: "var(--bg-error)",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    minBlockSize: "calc(100dvh - var(--spacing-16))",
+  })}
+  style:--bg-error={`url(${asset("/images/bg-error.svg")})`}
 >
   <div>
     <h1
-      class={css({ color: "daisyBush", fontSize: "5xl", lineHeight: "none", fontWeight: "black" })}
+      class={css({
+        color: "daisyBush",
+        fontSize: "5xl",
+        lineHeight: "none",
+        fontWeight: "black",
+      })}
     >
       Not Found!
     </h1>

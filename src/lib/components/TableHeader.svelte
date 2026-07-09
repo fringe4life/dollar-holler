@@ -20,12 +20,13 @@
     headerSnippet,
   }: TableHeaderProps = $props();
 </script>
+
 <div
   class={cx(
     css({
       display: { base: "none", lg: "grid" },
     }),
-    className,
+    className
   )}
 >
   {#each headers as header (header)}

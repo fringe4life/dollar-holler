@@ -22,7 +22,7 @@
     minInlineSize: 64,
     textAlign: "center",
   })}
-  style:--circle={`url(${asset('/images/circle.svg')})`}
+  style:--circle={`url(${asset("/images/circle.svg")})`}
 >
   <div class={css({ fontWeight: "bold" })}>{label}</div>
   <div class={css({ fontSize: "xl" })}>{amount}</div>

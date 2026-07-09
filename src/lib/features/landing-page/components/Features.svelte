@@ -6,9 +6,9 @@
 
 <div
   class={grid({
-          gap: 6,
-          columns: { base: 1, sm: 2, lg: 4 },
-        })}
+    gap: 6,
+    columns: { base: 1, sm: 2, lg: 4 },
+  })}
 >
   {#each features as feature (feature.title)}
     <FeatureItem {feature} />

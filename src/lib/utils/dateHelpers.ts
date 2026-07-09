@@ -40,20 +40,24 @@ export const isLate = (myDate: Maybe<string>): boolean => {
  */
 const splitDate = (myDate: string): string[] => myDate.split("-");
 
-export const today = new Date().toISOString().split("T")[0];
+const getInputDate = (date?: Date) => {
+  const actualDate = date ? date : new Date();
+  return actualDate.toISOString().split("T")[0];
+};
 
+export const today = getInputDate();
 /**
  * Converts a Date or ISO string to "yyyy-MM-dd" for HTML date inputs.
  * @param date - Date object or ISO date string
  * @returns "yyyy-MM-dd" string, or today if invalid
  */
 export const toDateInputValue = (date: Maybe<Date | string>): string => {
-  if (date == null) {
+  if (!date) {
     return today;
   }
   const d = typeof date === "string" ? new Date(date) : date;
   if (Number.isNaN(d.getTime())) {
     return today;
   }
-  return d.toISOString().split("T")[0];
+  return getInputDate(d);
 };

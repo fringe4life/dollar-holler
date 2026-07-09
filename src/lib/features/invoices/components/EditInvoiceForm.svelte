@@ -238,8 +238,7 @@
           total: sumLineItems(lineItems),
         });
       }}
-      variant="textOnlyDestructive"
-      ><Trash />Delete</Button
+      variant="textOnlyDestructive"><Trash />Delete</Button
     >
   {/snippet}
 </InvoiceFormLayout>
@@ -249,19 +248,19 @@
   item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
-      if (!deleteModal.item?.id) {
-        return;
-      }
-      await invoicesStore.deleteInvoice(deleteModal.item.id);
-      deleteModal.close();
-      closePanel();
-    }}
+    if (!deleteModal.item?.id) {
+      return;
+    }
+    await invoicesStore.deleteInvoice(deleteModal.item.id);
+    deleteModal.close();
+    closePanel();
+  }}
   titleText="Are you sure you want to delete this invoice?"
 >
   {#snippet descriptionSnippet(_invoice)}
     This will delete the invoice to
-    <span class={css({color: "scarlet"})}>{_invoice?.name ?? "Unknown"}</span>
+    <span class={css({ color: "scarlet" })}>{_invoice?.name ?? "Unknown"}</span>
     for
-    <span class={css({color: "scarlet"})}>{totalDisplay}</span>
+    <span class={css({ color: "scarlet" })}>{totalDisplay}</span>
   {/snippet}
 </ConfirmDelete>

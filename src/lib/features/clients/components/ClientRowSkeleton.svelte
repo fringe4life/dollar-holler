@@ -7,16 +7,13 @@
 </script>
 
 <div class={css({ position: "relative", isolation: "isolate" })}>
-  <div
-    class={cx(
-      clientTable,
-      clientRow,
-      tableRowBase,
-    )}
-  >
+  <div class={cx(clientTable, clientRow, tableRowBase)}>
     <!-- status: badge-shaped pill ~54px wide -->
     <div
-      class={gridItem({ gridArea: "status", justifySelf: { base: "end", lg: "start" } })}
+      class={gridItem({
+        gridArea: "status",
+        justifySelf: { base: "end", lg: "start" },
+      })}
     >
       <Skeleton
         class={css({
@@ -51,14 +48,22 @@
 
     <!-- view button: 32px circle, hidden on mobile -->
     <div
-      class={gridItem({ gridArea: "view", display: { base: "none", lg: "block" }, placeSelf: "center" })}
+      class={gridItem({
+        gridArea: "view",
+        display: { base: "none", lg: "block" },
+        placeSelf: "center",
+      })}
     >
       <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
     </div>
 
     <!-- three dots: 32px circle, hidden on mobile -->
     <div
-      class={gridItem({ gridArea: "threeDots", display: { base: "none", lg: "block" }, placeSelf: "center" })}
+      class={gridItem({
+        gridArea: "threeDots",
+        display: { base: "none", lg: "block" },
+        placeSelf: "center",
+      })}
     >
       <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
     </div>

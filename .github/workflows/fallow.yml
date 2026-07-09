@@ -8,11 +8,22 @@ on:
 jobs:
   boundaries:
     runs-on: ubuntu-latest
+    env:
+      # Machine account token — resolves bitwarden() entries in .env.schema
+      BITWARDEN_ACCESS_TOKEN: ${{ secrets.BITWARDEN_ACCESS_TOKEN }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: latest
-      - run: bun install --frozen-lockfile
+
+      # Install packages first so @varlock/bitwarden-plugin is available.
+      # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
+      - run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Load environment variables
+        uses: dmno-dev/varlock-action@v1.0.1
+
       - name: Architecture boundaries
         run: bun run fallow:boundary-violations

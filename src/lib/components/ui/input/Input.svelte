@@ -20,4 +20,10 @@
   }: Omit<HTMLInputAttributes, "class"> & { class?: string } = $props();
 </script>
 
+<!--
+  Prefer spreading caller attrs after class. When used with remote form
+  `.as()`, `value`/`name`/`type` come from props (including $bindable value).
+  Avoid binding when parent only spreads read-only field attrs: value still
+  flows through $bindable from the `value` prop.
+-->
 <input class={cx(inputClass, className)} {...rest} bind:value />

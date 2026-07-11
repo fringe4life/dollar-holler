@@ -7,7 +7,6 @@
 
   interface Props<T> {
     descriptionSnippet?: Snippet<[item: T]>;
-    dialogEl?: HTMLDialogElement | undefined;
     item: T;
     onCancel?: () => void;
     onDelete: () => Promise<void> | void;
@@ -20,7 +19,7 @@
     onCancel,
     onDelete,
     descriptionSnippet,
-    dialogEl = $bindable<HTMLDialogElement | undefined>(),
+    ...rest
   }: Props<T> = $props();
 
   const handleDelete = async () => {
@@ -28,7 +27,7 @@
   };
 </script>
 
-<Modal onClose={onCancel} bind:dialogEl>
+<Modal {...rest} onClose={onCancel}>
   {#snippet title()}
     <h2
       class={css({

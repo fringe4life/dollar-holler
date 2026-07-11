@@ -10,6 +10,7 @@
     SettingsEditableSnapshot,
     SettingsSelect,
   } from "$features/settings/types";
+  import { changePassword } from "$features/auth/auth.remote";
   import Form from "$lib/components/Form.svelte";
   import FormField from "$lib/components/FormField.svelte";
   import Check from "$lib/components/icons/Check.svelte";
@@ -18,8 +19,6 @@
   import Input from "$lib/components/ui/input/Input.svelte";
   import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
   import { toast } from "$lib/utils/toast.svelte.js";
-
-  const { form } = $props();
 
   const { settings: settingsStore } = getDashboardStores();
 
@@ -72,13 +71,8 @@
     baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
   };
 
-  function handlePasswordSuccess(result: { type: string; data?: unknown }) {
-    if (
-      result.type === "success" &&
-      (result.data as { success?: boolean })?.success
-    ) {
-      toast.success("Password changed successfully");
-    }
+  function handlePasswordSuccess() {
+    toast.success("Password changed successfully");
   }
 </script>
 
@@ -171,19 +165,14 @@
     This information is used to access your account.
   </p>
 </div>
-<Form {form} onSuccess={handlePasswordSuccess}>
+<Form onSuccess={handlePasswordSuccess} remote={changePassword}>
   <div class={grid({ columns: 6, columnGap: 5 })}>
     <FormField
       class={gridItem({ colSpan: { base: 6, md: 3 } })}
       forId="email"
       label="Email"
     >
-      <Input
-        defaultValue={form?.email ?? ""}
-        id="email"
-        name="email"
-        type="email"
-      />
+      <Input id="email" required {...changePassword.fields.email.as("email")} />
     </FormField>
 
     <FormField
@@ -191,7 +180,12 @@
       forId="currentPassword"
       label="Current Password"
     >
-      <Input id="currentPassword" name="currentPassword" type="password" />
+      <Input
+        id="currentPassword"
+        minlength={6}
+        required
+        {...changePassword.fields._currentPassword.as("password")}
+      />
     </FormField>
 
     <FormField
@@ -199,7 +193,12 @@
       forId="newPassword"
       label="New Password"
     >
-      <Input id="newPassword" name="newPassword" type="password" />
+      <Input
+        id="newPassword"
+        minlength={6}
+        required
+        {...changePassword.fields._newPassword.as("password")}
+      />
     </FormField>
 
     <FormField
@@ -207,7 +206,12 @@
       forId="confirmPassword"
       label="Confirm Password"
     >
-      <Input id="confirmPassword" name="confirmPassword" type="password" />
+      <Input
+        id="confirmPassword"
+        minlength={6}
+        required
+        {...changePassword.fields._confirmPassword.as("password")}
+      />
     </FormField>
   </div>
   {#snippet submit()}

@@ -122,11 +122,10 @@
     })}
   >
     <Select
-      class={css({ aspectRatio: "2/1", inlineSize: 20 })}
+      class={css({ aspectRatio: "2/1", maxInlineSize: "fit-content" })}
       disabled={!canNavigate || store.loading}
       name="limit"
-      onchange={(e) =>
-        handleLimitChange(Number((e.currentTarget as HTMLSelectElement).value))}
+      onchange={(e) => handleLimitChange(Number(e.currentTarget.value))}
     >
       {#each LIMITS as limitOption (limitOption)}
         <option

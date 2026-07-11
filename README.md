@@ -2,11 +2,11 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.7-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.1-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon%20serverless-1.1.0-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.8-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.63.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.7-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.1-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon-PostgreSQL-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![pg](https://img.shields.io/badge/pg-8.22.0-336791?logo=postgresql&logoColor=white)](https://node-postgres.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.8-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.63.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
-A modern invoice management application built with SvelteKit 3 (pre-release) and Svelte 5, featuring Better Auth authentication, Drizzle ORM with Neon database, Sentry error monitoring, and UUIDv7 for resilient cursor-friendly IDs.
+A modern invoice management application built with SvelteKit 3 (pre-release) and Svelte 5, featuring Better Auth authentication, Drizzle ORM on Neon PostgreSQL (`pg` + Vercel Fluid pool lifecycle), Sentry error monitoring, and UUIDv7 for resilient cursor-friendly IDs.
 
 ## Prerequisites
 
@@ -87,12 +87,12 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 
 ## Tech Stack
 
-- **Framework:** SvelteKit 3 (`3.0.0-next.7`) with `@sveltejs/adapter-vercel` 7 and Svelte 5 runes (experimental server instrumentation and tracing in [`vite.config.ts`](./vite.config.ts))
+- **Framework:** SvelteKit 3 (`3.0.0-next.7`) with `@sveltejs/adapter-vercel` 7 and Svelte 5 runes (experimental `remoteFunctions`, async compiler, server instrumentation and tracing in [`vite.config.ts`](./vite.config.ts))
 - **Observability:** [Sentry](https://sentry.io/) on the server ([`src/instrumentation.server.ts`](./src/instrumentation.server.ts), [`src/hooks.server.ts`](./src/hooks.server.ts)); client SDK in [`src/hooks.client.ts`](./src/hooks.client.ts) is temporarily disabled pending SvelteKit 3 support in Sentry v11; Vite release plugin in [`vite.config.ts`](./vite.config.ts) is commented out
-- **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`)
-- **Database:** PostgreSQL with Neon serverless
-- **ORM:** Drizzle ORM 1.0 (rc.4) with Neon serverless driver (WebSocket `Pool`)
-- **Authentication:** Better Auth 1.7 with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), `allowedHosts` for production and Vercel preview URLs, `@better-auth/drizzle-adapter` relations-v2, bearer + OpenAPI plugins)
+- **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`); auth forms use Kit remote `form`s in [`auth.remote.ts`](./src/lib/features/auth/auth.remote.ts) (see [`docs/remote-functions-migration.md`](./docs/remote-functions-migration.md))
+- **Database:** Neon PostgreSQL
+- **ORM:** Drizzle ORM 1.0 (rc.4) with `node-postgres` (`pg` `Pool`); [`attachDatabasePool`](https://vercel.com/docs/functions/functions-api-reference/vercel-functions-package#attachdatabasepool) from `@vercel/functions` for Fluid Compute idle cleanup ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts))
+- **Authentication:** Better Auth 1.7 with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), `allowedHosts` for production and Vercel preview URLs, `@better-auth/drizzle-adapter` relations-v2, bearer + OpenAPI plugins); login/signup/forgot/reset/change-password via remote forms
 - **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
 - **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
 - **Deployment:** Vercel adapter (`@sveltejs/adapter-vercel` 7)
@@ -115,7 +115,7 @@ src/
 │   ├── api.ts               # Eden Treaty client (`apiClient`)
 │   ├── server/
 │   │   ├── db/
-│   │   │   ├── index.ts     # Database connection (Neon serverless WebSocket pool)
+│   │   │   ├── index.ts     # Database connection (pg Pool + Vercel attachDatabasePool)
 │   │   │   ├── schema.ts    # Drizzle tables and enums
 │   │   │   ├── types.ts     # Enum-derived types (e.g. client/invoice status)
 │   │   │   ├── relations.ts # Drizzle relations v2 (`defineRelations`)
@@ -125,21 +125,21 @@ src/
 │   │   ├── schemas.ts       # Shared API response shapes
 │   │   ├── utils/           # create-id (UUIDv7), invoice-notes-terms-html, invoice-status-transitions, better-auth-openapi, api-error-body, errors
 │   │   └── routes/          # API modules (clients, invoices, settings)
-│   ├── client/            # Client-only: @attach helpers, shared runes (ItemPanel, etc.)
-│   ├── features/          # Domain features: components, stores, schemas, list helpers
-│   │   ├── auth/
+│   ├── client/            # Client-only: @attach helpers (dialogController, swipe), shared runes (ItemPanel, etc.)
+│   ├── features/          # Domain features: components, stores, schemas, list helpers, remotes
+│   │   ├── auth/          # auth.remote.ts (Kit remote forms), ArkType schemas
 │   │   ├── clients/       # includes server queries (list, options, verify)
 │   │   ├── invoices/      # includes server queries (list, verify)
 │   │   ├── landing-page/  # Marketing sections, nav, copy constants
 │   │   ├── line-items/
 │   │   ├── pagination/    # PaginatedList, search, blank states, cursor list-query helpers
 │   │   └── settings/
-│   ├── components/        # Shared UI (navbar/, icons under components/icons/, ui/)
+│   ├── components/        # Shared UI (Form remote binding, Modal, navbar/, icons, ui/)
 │   ├── stores/            # Shared list-store bases, dashboard context
 │   ├── styles.ts          # Shared class names / style recipes
 │   └── utils/
 ├── routes/
-│   ├── (auth)/            # Login, signup, forgot/reset password, logout
+│   ├── (auth)/            # Login, signup, forgot/reset password, logout (remote forms; no +page.server.ts)
 │   ├── (dashboard)/
 │   │   ├── (shell)/       # App shell: clients, invoice list, settings, thanks
 │   │   └── invoices/      # Invoice detail, line items
@@ -170,8 +170,9 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 - **Error monitoring:** Sentry on server with Kit instrumentation (client SDK disabled until Sentry v11)
 - **Modern Authentication:** Better Auth with email/password support
+- **Remote forms:** Auth (and settings password change) via SvelteKit remote `form`s; dashboard lists still Eden/stores (migration plan in docs)
 - **Type-Safe Database:** Drizzle ORM with full TypeScript support
-- **Serverless Ready:** Neon serverless driver (WebSocket pool) for Vercel deployment
+- **Serverless Ready:** `pg` pool + `@vercel/functions` `attachDatabasePool` for Vercel Fluid Compute
 - **Resilient IDs:** UUIDv7 (uuidv7 package) for cursor-based navigation and performance
 - **Safe rich text:** Markdown notes/terms sanitized server-side and stored as both source and HTML
 - **Recent Data:** Seed script generates realistic data from the last 6 months
@@ -189,7 +190,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 
 ## Notes
 
-- Uses Vite 8 (`vite` in `package.json`) and Varlock 1.9 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
+- Uses Vite 8 (`vite` in `package.json`) and Varlock 1.10 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
 - Lint and format run through ESLint, Prettier, and Stylelint (`bun run check`, `bun run fix`). ESLint ignores generated paths (`styled-system/`, `.svelte-kit/`) and defers CSS to Stylelint.
 - [Fallow](https://docs.fallow.tools) resolves `styled-system/*` imports from the generated Panda output and `$lib` path aliases (including `.svelte` → `.svelte.ts` modules). Custom `kit.alias` paths such as `$features/*` are ignored in [`.fallowrc.json`](./.fallowrc.json) because the SvelteKit plugin does not resolve them the same way Vite does. Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`.
 - Panda CSS 2.0 generates `styled-system/` via `panda build`; path aliases (`$lib`, `$features`, `styled-system`) live in `kit.alias` inside [`vite.config.ts`](./vite.config.ts). Root [`tsconfig.json`](./tsconfig.json) extends `.svelte-kit/tsconfig.json` only—do not duplicate `paths` there. The Kit TypeScript hook adds `panda.config.ts` and `drizzle.config.ts` to the generated include list and omits generated `styled-system` sources from typechecking. After dependency install, `prepare` runs `panda build`.
@@ -197,7 +198,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` to use UUIDv7 (uuidv7 package) for user ID generation and includes session caching for performance.
 - Invoice `notes` and `terms` accept Markdown; create/update endpoints derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks (see [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts)).
-- SvelteKit configuration lives in the `sveltekit()` Vite plugin in `vite.config.ts` (`@sveltejs/adapter-vercel` 7, preprocess, Svelte 5 async compiler option, experimental server instrumentation for Sentry).
+- SvelteKit configuration lives in the `sveltekit()` Vite plugin in `vite.config.ts` (`@sveltejs/adapter-vercel` 7, preprocess, Svelte 5 async compiler option, `experimental.remoteFunctions`, tracing/server instrumentation for Sentry).
 
 ## License
 

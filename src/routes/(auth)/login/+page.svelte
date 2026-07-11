@@ -2,30 +2,27 @@
   import { css } from "styled-system/css";
   import { between } from "styled-system/patterns";
   import { resolve } from "$app/paths";
+  import { login } from "$features/auth/auth.remote";
   import { authHeading } from "$features/auth/styles";
   import Form from "$lib/components/Form.svelte";
   import FormField from "$lib/components/FormField.svelte";
   import Input from "$lib/components/ui/input/Input.svelte";
   import Label from "$lib/components/ui/label/Label.svelte";
-  import type { PageProps } from "./$types";
-
-  let { form }: PageProps = $props();
 </script>
 
 <h1 class={authHeading}>Login</h1>
 
-<Form {form}>
+<Form remote={login}>
   <FormField
     forId="email"
     label="Email"
     labelClass={css({ color: "goldenFizz" })}
   >
     <Input
-      defaultValue={form?.email ?? ""}
-      name="email"
+      id="email"
       placeholder="john@email.com"
       required
-      type="email"
+      {...login.fields.email.as("email")}
     />
   </FormField>
   <FormField>
@@ -41,7 +38,12 @@
         href={resolve("/forgot-password")}>Forgot Password</a
       >
     </div>
-    <Input minlength={6} name="password" required type="password" />
+    <Input
+      id="password"
+      minlength={6}
+      required
+      {...login.fields._password.as("password")}
+    />
   </FormField>
   {#snippet submit()}
     Let's do this!

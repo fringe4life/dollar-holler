@@ -1,5 +1,5 @@
-import { Pool } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-serverless";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 import { ENV } from "varlock/env";
 import type { ClientInsert, ClientSelect } from "$features/clients/types";
 import type { LineItemInsert } from "$features/line-items/types";
@@ -224,7 +224,11 @@ async function main() {
   console.log(`   - ${lineItemsData.length} line items`);
 }
 
-main().catch((err) => {
-  console.error("❌ Seeding failed:", err);
-  process.exit(1);
-});
+main()
+  .catch((err) => {
+    console.error("❌ Seeding failed:", err);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await pool.end();
+  });

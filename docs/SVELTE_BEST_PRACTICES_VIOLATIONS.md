@@ -1,147 +1,127 @@
 # Svelte Best Practices Violations Report
 
 **Generated:** March 19, 2025  
-**Svelte Version:** 5.54.0  
-**Analysis Tool:** Svelte MCP svelte-autofixer
+**Last rechecked:** July 11, 2026  
+**Svelte Version:** 5.56.4  
+**Analysis Tool:** Svelte MCP `svelte-autofixer` + manual review against [Svelte best practices](https://svelte.dev/docs/svelte/best-practices)
 
 This document catalogs violations of Svelte 5 best practices found in the dollar-holler project. Use it as a baseline to track improvement over time—re-run the Svelte MCP autofixer periodically and compare results.
 
 ---
 
-## Summary
+## Summary (July 2026 recheck)
 
-| Category                                     | Count |
-| -------------------------------------------- | ----- |
-| **Issues** (errors / compiler warnings)      | 0     |
-| **Suggestions** (best practice improvements) | 15+   |
-| **Files with violations**                    | 1     |
-| **Files analyzed**                           | 20+   |
+| Category                                           | Count   |
+| -------------------------------------------------- | ------- |
+| **Open issues** (incorrect rune usage / real bugs) | 0       |
+| **Autofixer suggestions** (review / optional)      | ~8      |
+| **Suppressed warnings** (`svelte-ignore`)          | 4 files |
+| **Previously fixed**                               | 5       |
+| **Files scanned this recheck**                     | ~38     |
 
----
-
-## Issues (Errors / Compiler Warnings)
-
-These are actual problems that can cause incorrect behavior or trigger Svelte compiler warnings.
-
-### 1. `InvoiceRow.svelte` — `state_referenced_locally` — **FIXED**
-
-**Status:** Resolved by wrapping `INVOICE_OPTIONS` in `$derived` so it updates when `isOptionsDisabled` changes. Svelte autofixer reports no issues.
-
-~~**Fix:** Use `$derived` for the options array so it updates when `isOptionsDisabled` changes:~~
-
-```svelte
-const INVOICE_OPTIONS = $derived([
-  {
-    label: "Edit",
-    icon: Edit,
-    onclick: handleEdit,
-    disabled: isOptionsDisabled,
-  },
-  // ... rest of options
-] satisfies Option[]);
-```
+**Verdict:** Layout `$derived` misuse fixed. Modal uses `dialogController` attach (no exposed `dialogEl`). Autofixer mostly clean outside `swipe.svelte.ts`. No legacy Svelte 4 patterns.
 
 ---
 
-### 2. `ClientRow.svelte` — `state_referenced_locally` — **FIXED**
+## Autofixer Suggestions (Review / Optional)
 
-**Status:** Resolved by wrapping `CLIENT_OPTIONS` in `$derived` so it updates when `client` changes. Svelte autofixer reports no issues.
+### 2. `swipe.svelte.ts` — Functions called inside `$effect`
 
-~~**Fix:** Use `$derived` for the options array:~~
+**Category:** `$effect` usage in attachments  
+**Status:** Intentional — keep
 
-```svelte
-const CLIENT_OPTIONS = $derived([
-  {
-    label: "Edit",
-    icon: Edit,
-    onclick: handleEdit,
-    disabled: false,
-  },
-  // ...
-  {
-    label: "Active",
-    icon: Activate,
-    onclick: handleActivation,
-    disabled: client.clientStatus === "active",
-  },
-  {
-    label: "Archive",
-    icon: Archive,
-    onclick: handleArchive,
-    disabled: client.clientStatus === "archive",
-  },
-] satisfies Option[]);
-```
+**Suggestions (8):** `transformElement`, `reset`, `onResetComplete`, `on`, `offMouse`, `offTouch` called inside `$effect`.
+
+**Context:** DOM mutation + event listener setup/teardown. Docs list DOM / third-party side effects as intended `$effect` uses. Malpractice is **updating state** inside effects, not calling side-effect helpers.
+
+**Alternatives if refactoring later:** `{@attach ...}` for element lifecycle; keep effects only where reactive deps must re-run.
 
 ---
 
-## Suggestions (Best Practice Improvements)
+## Suppressed Warnings (`svelte-ignore state_referenced_locally`)
 
-These are recommendations from the Svelte autofixer. Some may be intentional; use judgment when applying.
+These silence “state/prop read once at init” warnings. Intentional init-once patterns — document so they are not “fixed” blindly into `$derived` (which would re-init form/store state on every prop change).
 
-### 3. `InvoiceForm.svelte` — `$effect` malpractice — **FIXED**
+| File | Pattern |
+| --- | --- |
+| `Search.svelte` | Seed `$state` search input from URL `q` once |
+| `ClientForm.svelte` | Seed form `$state` from `edit` prop once |
+| `EditInvoiceForm.svelte` | Seed invoice `$state` from `invoiceId` once |
+| `clients/[id]/+page.svelte` | Construct / hydrate `ClientInvoicesStore` once from load data |
 
-**Category:** Reactivity / `$effect` usage
-
-**Status:** Resolved by refactoring to use `onMount`/`onDestroy` lifecycle methods instead of `$effect`. The refactor also added: a keyed block `{#key editPanel.item.id}` in the parent so each invoice edit gets a fresh component instance; `AbortController` with Eden Treaty's `fetch` option to cancel in-flight line-item fetches when the component unmounts; an `isMounted` flag to avoid updating state after unmount when the user closes the panel before the load completes.
-
----
-
-### 4. `swipe.svelte.ts` — Functions called inside `$effect`
-
-**Category:** `$effect` usage in attachments
-
-**Suggestions:**
-
-- `transformElement` called inside `$effect` — The autofixer suggests checking if it reassigns state. Here it only mutates the DOM; this is a valid side effect.
-- `reset` and `onResetComplete` called inside `$effect` — Used for reset-on-trigger behavior; appropriate for `$effect`.
-- `on`, `offMouse`, `offTouch` — Event listener setup/teardown in `$effect` is the correct pattern for Svelte 5 attachments.
-
-**What the Svelte docs say:** The docs explicitly list DOM manipulation as an intended use of `$effect` (e.g. drawing on canvas, calling third-party libraries). The malpractice is **updating state** inside effects, not calling functions that perform side effects like DOM updates.
-
-**Alternatives from the docs:** When effects are not ideal: `{@attach ...}` for external libs; event handlers/function bindings for user interaction; `$derived` for computed values; `createSubscriber` for external systems.
-
-**Context:** These are intentional side effects (DOM updates, event listeners). The autofixer’s generic suggestions don’t fully apply; the current usage is reasonable. The comment in the file about stable callback references is good practice.
+If prop changes must remount fresh state, prefer `{#key ...}` in parent over removing the ignore.
 
 ---
 
-## Files With No Violations
+## Previously Fixed (still clean)
 
-The following files passed the autofixer with no issues or suggestions:
+### 3. `Modal.svelte` / `ItemPanel` — `bind:this` + exposed `dialogEl` — **FIXED**
 
-- `AdditionalOptions.svelte`
-- `InvoiceForm.svelte`
-- `InvoiceRow.svelte`
-- `ClientRow.svelte`
-- `invoices/+page.svelte`
-- `clients/+page.svelte`
-- `Modal.svelte`
-- `SlidePanel.svelte`
-- `Swipeable.svelte`
-- `ConfirmDelete.svelte`
-- `Search.svelte`
-- `Navbar.svelte`
-- `Alert.svelte`
-- `ItemPanel.svelte.ts`
-- `Toggle.svelte.ts`
-- `BlankState.svelte`
-- `NoSearchResults.svelte`
-- `button.svelte` (UI)
+Uses `dialogController` attach (`src/lib/client/attachments/dialogController.ts`). Parents: `{@attach panel.attach}`. `ItemPanel` holds `{ show, close }` only. Autofixer: clean.
+
+### 4. `invoices/[id]/+layout.svelte` — `$derived` for mutable callback state — **FIXED**
+
+`previousPageLink` / `resolveNavigation` now `$state`. `getBackUrl` stays `$derived`. Autofixer: clean.
+
+### 5. `InvoiceRow.svelte` — `state_referenced_locally` — **FIXED**
+
+`INVOICE_OPTIONS` wrapped in `$derived`. Autofixer: clean.
+
+### 6. `ClientRow.svelte` — `state_referenced_locally` — **FIXED**
+
+`CLIENT_OPTIONS` wrapped in `$derived`. Autofixer: clean.
+
+### 7. `InvoiceForm.svelte` / edit-create split — `$effect` malpractice — **FIXED**
+
+Load/cancel via `onMount` / `onDestroy` + `AbortController` in `EditInvoiceForm` / `CreateInvoiceForm`. Autofixer: clean.
+
+---
+
+## Clean Patterns Confirmed
+
+- **Keyed `{#each}`** — list iterations use stable keys (`item.id`, `option.label`, etc.)
+- **No legacy APIs** — no `on:click`, `export let`, `<slot>`, `$:` reactive statements in `src/`
+- **Context** — `createContext` in `dashboard-stores-context.svelte.ts`
+- **Auth / Form remote functions** — login, signup, forgot/reset password, settings, `Form.svelte`: autofixer clean
+- **Writable `$derived` in `LineItemRow`** — `unitPrice` override-until-deps-change is valid documented pattern
+
+---
+
+## Files Scanned Clean (July 2026)
+
+Autofixer issues + suggestions empty (except noted above):
+
+- `InvoiceRow.svelte`, `ClientRow.svelte`, `InvoiceForm.svelte`
+- `EditInvoiceForm.svelte`, `CreateInvoiceForm.svelte`, `InvoiceFormLayout.svelte`
+- `ClientForm.svelte`, `ClientField.svelte`
+- `Search.svelte`, `Pagination.svelte`, `PaginatedList.svelte`
+- `Form.svelte`, `Swipeable.svelte`, `ConfirmDelete.svelte`, `Alert.svelte`
+- `AdditionalOptions.svelte`, `AdditionalOptionsList.svelte`
+- `LineItemRow.svelte`, `LineItemRows.svelte`
+- `Navbar.svelte`, `Input.svelte`
+- `ItemPanel.svelte.ts`, `Toggle.svelte.ts`, `dashboard-stores-context.svelte.ts`
+- Auth pages: login, signup, forgot-password, reset-password
+- Dashboard: invoices/+page, clients/+page, clients/\[id\]/+page, settings/+page, +layout
+- Invoice detail: invoices/\[id\]/+page, invoices/\[id\]/+layout
+- Landing: Features.svelte
 
 ---
 
 ## Recommendations
 
-1. **Re-run periodically** — Use the Svelte MCP `svelte-autofixer` on changed files to track progress and catch regressions.
+1. **Leave swipe `$effect`** — DOM/listener side effects are correct.
+2. **Re-run periodically** — `bun x @sveltejs/mcp svelte-autofixer <file> --svelte-version 5` on changed `.svelte` / `.svelte.ts` files.
 
 ---
 
 ## How to Re-run Analysis
 
-Use the Svelte MCP server’s `svelte-autofixer` tool with:
+```bash
+bun x @sveltejs/mcp svelte-autofixer ./src/path/to/Component.svelte --svelte-version 5
+```
+
+Or use Svelte MCP `svelte-autofixer` with:
 
 - `code`: Full component/module source
 - `desired_svelte_version`: 5
 - `filename`: Component name (e.g. `InvoiceRow.svelte`)
-
-Or run it via Cursor’s Svelte integration when editing Svelte files.

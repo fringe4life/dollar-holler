@@ -162,11 +162,7 @@
   {/snippet}
 </PaginatedList>
 
-<Modal
-  onClose={formPanel.close}
-  variant="panel"
-  bind:dialogEl={formPanel.dialogEl}
->
+<Modal onClose={formPanel.close} variant="panel" {@attach formPanel.attach}>
   {#snippet title()}
     <h2
       class={css({
@@ -197,11 +193,7 @@
   {/if}
 </Modal>
 
-<Modal
-  onClose={editPanel.close}
-  variant="panel"
-  bind:dialogEl={editPanel.dialogEl}
->
+<Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
   {#snippet title()}
     <h2
       class={css({
@@ -242,7 +234,7 @@
     deleteModal.close();
   }}
   titleText="Are you sure you want to delete this invoice?"
-  bind:dialogEl={deleteModal.dialogEl}
+  {@attach deleteModal.attach}
 >
   {#snippet descriptionSnippet(_item)}
     This will delete the invoice to

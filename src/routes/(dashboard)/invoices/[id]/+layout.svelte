@@ -8,14 +8,14 @@
   let { children } = $props();
 
   // value for determining where escape key or back link take you
-  let previousPageLink: Maybe<string> = $derived(undefined);
+  let previousPageLink: Maybe<string> = $state(undefined);
   afterNavigate((navigation) => {
     previousPageLink = navigation?.from?.url?.pathname;
   });
   // actual derived url
   const getBackUrl = $derived(previousPageLink ?? resolve("/invoices"));
   let isExiting = $state(false);
-  let resolveNavigation: (() => void) | undefined = $derived(undefined);
+  let resolveNavigation: (() => void) | undefined = $state(undefined);
 
   // used to run exit animation to slide the invoice down and out
   onNavigate(

@@ -57,6 +57,9 @@ export default defineConfig({
             ? undefined
             : true,
       },
+      experimental: {
+        remoteFunctions: true,
+      },
       preprocess: [vitePreprocess()],
       tracing: {
         server: true,

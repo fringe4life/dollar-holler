@@ -87,11 +87,7 @@
   {/snippet}
 </PaginatedList>
 
-<Modal
-  onClose={createForm.close}
-  variant="panel"
-  bind:dialogEl={createForm.dialogEl}
->
+<Modal onClose={createForm.close} variant="panel" {@attach createForm.attach}>
   {#snippet title()}
     <h2
       class={css({
@@ -118,11 +114,7 @@
   />
 </Modal>
 {#if editPanel.item}
-  <Modal
-    onClose={editPanel.close}
-    variant="panel"
-    bind:dialogEl={editPanel.dialogEl}
-  >
+  <Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
     {#snippet title()}
       <h2
         class={css({
@@ -160,7 +152,7 @@
     deleteModal.close();
   }}
   titleText="Are you sure you want to delete this client?"
-  bind:dialogEl={deleteModal.dialogEl}
+  {@attach deleteModal.attach}
 >
   {#snippet descriptionSnippet(_client)}
     This will delete Client:

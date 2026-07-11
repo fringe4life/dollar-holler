@@ -8,60 +8,61 @@ const nameSchema = type("string >= 1");
 
 export const loginSchema = type({
   email: emailSchema,
-  password: passwordSchema,
+  _password: passwordSchema,
 });
 
-export const forgotPassword = type({
+export const forgotPasswordSchema = type({
   email: emailSchema,
 });
 
 const updatePasswordSchema = type({
-  confirmPassword: passwordSchema,
-  newPassword: passwordSchema,
+  _confirmPassword: passwordSchema,
+  _newPassword: passwordSchema,
 });
 
 export const signupSchema = type({
-  confirmPassword: passwordSchema,
+  _confirmPassword: passwordSchema,
   name: nameSchema,
 })
   .merge(loginSchema)
   .narrow((data, context) => {
-    if (data.password === data.confirmPassword) {
+    if (data._password === data._confirmPassword) {
       return true;
     }
     return context.reject({
       actual: "",
       expected: "identical to password",
-      path: ["confirmPassword"],
+      path: ["_confirmPassword"],
     });
   });
+
 export const resetPasswordSchema = type({
   token: "string >= 1",
 })
   .merge(updatePasswordSchema)
   .narrow((data, context) => {
-    if (data.newPassword === data.confirmPassword) {
+    if (data._newPassword === data._confirmPassword) {
       return true;
     }
     return context.reject({
       actual: "New Password and Confirm Password are not identical",
       expected: "New Password and Confirm Password must be identical",
-      path: ["confirmPassword"],
+      path: ["_confirmPassword"],
     });
   });
 
 export const changePasswordSchema = type({
-  currentPassword: passwordSchema,
+  _currentPassword: passwordSchema,
   email: emailSchema,
 })
   .merge(updatePasswordSchema)
   .narrow((data, context) => {
-    if (data.newPassword === data.confirmPassword) {
+    if (data._newPassword === data._confirmPassword) {
       return true;
     }
     return context.reject({
       actual: "New Password and Confirm Password are not identical",
       expected: "New Password and Confirm Password must be identical",
-      path: ["confirmPassword"],
+      path: ["_confirmPassword"],
     });
   });

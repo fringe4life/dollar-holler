@@ -244,9 +244,9 @@
 </InvoiceFormLayout>
 
 <ConfirmDelete
-  dialogEl={deleteModal?.dialogEl}
   item={deleteModal.item}
   onCancel={deleteModal.close}
+  {@attach deleteModal.attach}
   onDelete={async () => {
     if (!deleteModal.item?.id) {
       return;

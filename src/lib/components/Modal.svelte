@@ -111,27 +111,27 @@
     children?: Snippet;
     className?: string;
     description: Snippet;
-    dialogEl: HTMLDialogElement | undefined;
     onClose?: () => void;
     title: Snippet;
     variant?: "modal" | "panel";
   }
 
   let {
-    dialogEl = $bindable<HTMLDialogElement | undefined>(),
     variant = "modal",
     children,
     title,
     description,
     className = "",
     onClose,
+    ...rest
   }: Props = $props();
 
   const modalStyles = $derived(modalRecipe({ variant }));
 
+  let dialogEl = $state<HTMLDialogElement | undefined>();
+
   const handleBackdropClick = (e: MouseEvent) => {
     if (e.target === dialogEl) {
-      // open = false;
       onClose?.();
     }
   };
@@ -145,7 +145,13 @@
   class={cx(modalStyles.dialog, className)}
   onclick={handleBackdropClick}
   onclose={handleDialogClose}
-  bind:this={dialogEl}
+  {...rest}
+  {@attach (el) => {
+    dialogEl = el;
+    return () => {
+      dialogEl = undefined;
+    };
+  }}
 >
   <div class={modalStyles.content}>
     {@render title()}

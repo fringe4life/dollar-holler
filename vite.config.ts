@@ -3,10 +3,12 @@ import adapter from "@sveltejs/adapter-vercel";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
-// Chrome DevTools workspace (com.chrome.devtools.json); not the same as Vite 8's optional @vitejs/devtools
-// (build analysis UI, build-only for now — see https://devtools.vite.dev/guide). No migration required.
+import { DevTools } from "@vitejs/devtools";
 import { visualizer } from "rollup-plugin-visualizer";
 import { defineConfig } from "vite";
+import { svelteDevtools } from "vite-devtools-svelte";
+// Chrome DevTools workspace (com.chrome.devtools.json) — separate from @vitejs/devtools
+// (Vite/Rolldown UI + vite-devtools-svelte panels). See https://devtools.vite.dev/guide
 import devToolsJson from "vite-plugin-devtools-json";
 
 const FILE_REGEX = /[/\\]/;
@@ -26,6 +28,8 @@ export default defineConfig({
 
   build: {
     rolldownOptions: {
+      // Enable Rolldown build-analysis metadata for Vite DevTools panels
+      devtools: {},
       output: { minify: { compress: { dropConsole: true } } },
     },
   },
@@ -37,6 +41,9 @@ export default defineConfig({
       gzipSize: true,
       template: "treemap", // or "sunburst" / "network"
     }),
+    // svelteDevtools must run before sveltekit so transforms hit source first
+    svelteDevtools(),
+    DevTools(),
     devToolsJson(),
     varlockVitePlugin({
       ssrInjectMode: "resolved-env",

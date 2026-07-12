@@ -126,80 +126,99 @@ export const verification = pgTable(
 );
 
 // Clients table
-export const clients = pgTable("clients", {
-  city: varchar("city", { length: 255 }).notNull(),
-  clientStatus: clientStatusEnum("client_status").default("active").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  email: varchar("email", { length: 255 }).notNull(),
-  id: uuid("id")
-    .$defaultFn(() => createId())
-    .$type<CursorId>()
-    .primaryKey(),
-  name: varchar("name", { length: 255 }).notNull(),
-  state: varchar("state", { length: 255 }).notNull(),
-  street: varchar("street", { length: 255 }).notNull(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => /* @__PURE__ */ new Date()),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-  zip: varchar("zip", { length: 255 }).notNull(),
-});
+export const clients = pgTable(
+  "clients",
+  {
+    city: varchar("city", { length: 255 }).notNull(),
+    clientStatus: clientStatusEnum("client_status").default("active").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    email: varchar("email", { length: 255 }).notNull(),
+    id: uuid("id")
+      .$defaultFn(() => createId())
+      .$type<CursorId>()
+      .primaryKey(),
+    name: varchar("name", { length: 255 }).notNull(),
+    state: varchar("state", { length: 255 }).notNull(),
+    street: varchar("street", { length: 255 }).notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    zip: varchar("zip", { length: 255 }).notNull(),
+  },
+  (table) => [index("clients_userId_id_idx").on(table.userId, table.id)]
+);
 
 // Invoices table
-export const invoices = pgTable("invoices", {
-  clientId: uuid("client_id")
-    .notNull()
-    .$type<CursorId>()
-    .references(() => clients.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  discount: real("discount").notNull().default(0),
-  dueDate: timestamp("due_date").notNull(),
-  id: uuid("id")
-    .$defaultFn(() => createId())
-    .$type<CursorId>()
-    .primaryKey(),
-  invoiceNumber: text("invoice_number").notNull(),
-  invoiceStatus: invoiceStatusEnum("invoice_status").default("draft"),
-  issueDate: timestamp("issue_date").notNull(),
-  notes: text("notes"),
-  notesHtml: text("notes_html").$type<SanitizedHTML>(),
-  subject: text("subject").notNull(),
-  terms: text("terms"),
-  termsHtml: text("terms_html").$type<SanitizedHTML>(),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => /* @__PURE__ */ new Date()),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-});
+export const invoices = pgTable(
+  "invoices",
+  {
+    clientId: uuid("client_id")
+      .notNull()
+      .$type<CursorId>()
+      .references(() => clients.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    discount: real("discount").notNull().default(0),
+    dueDate: timestamp("due_date").notNull(),
+    id: uuid("id")
+      .$defaultFn(() => createId())
+      .$type<CursorId>()
+      .primaryKey(),
+    invoiceNumber: text("invoice_number").notNull(),
+    invoiceStatus: invoiceStatusEnum("invoice_status").default("draft"),
+    issueDate: timestamp("issue_date").notNull(),
+    notes: text("notes"),
+    notesHtml: text("notes_html").$type<SanitizedHTML>(),
+    subject: text("subject").notNull(),
+    terms: text("terms"),
+    termsHtml: text("terms_html").$type<SanitizedHTML>(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (table) => [
+    index("invoices_userId_id_idx").on(table.userId, table.id),
+    index("invoices_userId_clientId_id_idx").on(
+      table.userId,
+      table.clientId,
+      table.id
+    ),
+  ]
+);
 
 // Line items table
-export const lineItems = pgTable("line_items", {
-  amount: real("amount").notNull(),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  description: text("description").notNull(),
-  id: uuid("id")
-    .$defaultFn(() => createId())
-    .$type<CursorId>()
-    .primaryKey(),
-  invoiceId: uuid("invoice_id")
-    .notNull()
-    .$type<CursorId>()
-    .references(() => invoices.id, { onDelete: "cascade" }),
-  quantity: integer("quantity").notNull().default(1),
-  updatedAt: timestamp("updated_at")
-    .defaultNow()
-    .notNull()
-    .$onUpdate(() => /* @__PURE__ */ new Date()),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => user.id, { onDelete: "cascade" }),
-});
+export const lineItems = pgTable(
+  "line_items",
+  {
+    amount: real("amount").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    description: text("description").notNull(),
+    id: uuid("id")
+      .$defaultFn(() => createId())
+      .$type<CursorId>()
+      .primaryKey(),
+    invoiceId: uuid("invoice_id")
+      .notNull()
+      .$type<CursorId>()
+      .references(() => invoices.id, { onDelete: "cascade" }),
+    quantity: integer("quantity").notNull().default(1),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .notNull()
+      .$onUpdate(() => /* @__PURE__ */ new Date()),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+  },
+  (table) => [index("line_items_invoiceId_idx").on(table.invoiceId)]
+);
 
 // Settings table
 export const settings = pgTable("settings", {

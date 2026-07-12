@@ -11,6 +11,12 @@
     },
     "Sentry": {
       "url": "https://mcp.sentry.dev/mcp/coinnich/javascript-sveltekit"
+    },
+    "svelte-devtools": {
+      "url": "http://localhost:5173/__svelte-devtools/mcp",
+      "headers": {
+        "x-svelte-devtools-token": "${env:SVELTE_DEVTOOLS_TOKEN}"
+      }
     }
   }
 }

@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.7-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.1-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon-PostgreSQL-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![pg](https://img.shields.io/badge/pg-8.22.0-336791?logo=postgresql&logoColor=white)](https://node-postgres.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.8-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.63.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.7-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.4-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.3-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=postgresql&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.1-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Neon](https://img.shields.io/badge/Neon-PostgreSQL-00e5ff?logo=neon&logoColor=white)](https://neon.tech/) [![pg](https://img.shields.io/badge/pg-8.22.0-336791?logo=postgresql&logoColor=white)](https://node-postgres.com/) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.8-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.64.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
@@ -39,8 +39,11 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
    # Generate migrations
    bun run db:generate
 
-   # Run migrations
+   # Run migrations (requires a synced Drizzle migrations journal on the target DB)
    bun run db:migrate
+
+   # Or push schema changes directly when the migrate journal is out of sync
+   bun run db:push
 
    # Seed the database with sample data
    bun run db:seed
@@ -98,7 +101,8 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **Deployment:** Vercel adapter (`@sveltejs/adapter-vercel` 7)
 - **Package manager:** Bun
 - **Validation:** ArkType for runtime-safe form validation
-- **Bundler:** Vite 8 for dev and production builds
+- **Bundler:** Vite 8.1 for dev and production builds (Rolldown)
+- **Devtools:** [`@vitejs/devtools`](https://devtools.vite.dev/) + [`vite-devtools-svelte`](https://www.npmjs.com/package/vite-devtools-svelte) in [`vite.config.ts`](./vite.config.ts) (Svelte panels + Rolldown build analysis); Chrome workspace mapping via `vite-plugin-devtools-json` (separate from Vite DevTools)
 - **UI components:** [Ark UI for Svelte](https://ark-ui.com/) (`@ark-ui/svelte`)
 - **Styling:** [Panda CSS](https://panda-css.com/) 2.0 (beta) with generated `styled-system` via `panda build` (see `panda.config.ts`, PostCSS, `prepare` script); [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
 - **Lint/format:** ESLint 10 with TypeScript ESLint and eslint-plugin-svelte ([`eslint.config.mjs`](./eslint.config.mjs)), Prettier 3 with prettier-plugin-svelte ([`prettier.config.mjs`](./prettier.config.mjs)), Stylelint 17 for CSS ([`stylelint.config.mjs`](./stylelint.config.mjs))
@@ -157,12 +161,12 @@ The application uses the following main tables:
 - `session` - User sessions
 - `account` - OAuth accounts
 - `verification` - Email verification tokens
-- `clients` - Client information (`client_status`: active, archive)
-- `invoices` - Invoice records (`invoice_status`: draft, sent, paid; optional discount; markdown `notes` / `terms` plus precomputed sanitized `notes_html` / `terms_html`)
-- `line_items` - Invoice line items
-- `settings` - User settings
+- `clients` - Client information (`client_status`: active, archive); index `(user_id, id)` for cursor lists
+- `invoices` - Invoice records (`invoice_status`: draft, sent, paid; optional discount; markdown `notes` / `terms` plus precomputed sanitized `notes_html` / `terms_html`); indexes `(user_id, id)` and `(user_id, client_id, id)`
+- `line_items` - Invoice line items; index `(invoice_id)` for list subtotal subqueries
+- `settings` - User settings (`user_id` primary key)
 
-Primary keys use PostgreSQL `uuid` columns; IDs are UUIDv7 strings from [`createId`](./src/lib/server/utils/create-id.ts) (uuidv7 package), including Better Auth `generateId` in [`src/lib/auth.server.ts`](./src/lib/auth.server.ts). Foreign keys use cascade deletes where appropriate.
+Primary keys use PostgreSQL `uuid` columns; IDs are UUIDv7 strings from [`createId`](./src/lib/server/utils/create-id.ts) (uuidv7 package), including Better Auth `generateId` in [`src/lib/auth.server.ts`](./src/lib/auth.server.ts). Domain list indexes match UUIDv7 cursor pagination (`user_id` + `id`). Foreign keys use cascade deletes where appropriate.
 
 The application uses Drizzle's relations v2 (`defineRelations`) to simplify nested queries (e.g., `db.query.invoices.findMany({ with: { client: true, lineItems: true } })`) and avoid manual joins in API routes.
 
@@ -190,7 +194,7 @@ The application is configured for Vercel deployment with the Vercel adapter. [`v
 
 ## Notes
 
-- Uses Vite 8 (`vite` in `package.json`) and Varlock 1.10 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (for example `dropConsole`). If issues arise with third-party plugins, see Vite's documentation for compatibility.
+- Uses Vite 8.1 (`vite` in `package.json`) and Varlock 1.10 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (`dropConsole`, `devtools: {}` for Rolldown analysis metadata). Dev: `svelteDevtools()` before `sveltekit()`, then `DevTools()` from `@vitejs/devtools`. Optional Cursor MCP for live Svelte metrics: [`.cursor/mcp.json`](./.cursor/mcp.json) points at `http://localhost:5173/__svelte-devtools/mcp` with `SVELTE_DEVTOOLS_TOKEN` from the token printed when `bun run dev` starts (rotates each restart). If the remote Drizzle migrations journal is out of sync, prefer `bun run db:push` over `bun run db:migrate` until the journal is baselined.
 - Lint and format run through ESLint, Prettier, and Stylelint (`bun run check`, `bun run fix`). ESLint ignores generated paths (`styled-system/`, `.svelte-kit/`) and defers CSS to Stylelint.
 - [Fallow](https://docs.fallow.tools) resolves `styled-system/*` imports from the generated Panda output and `$lib` path aliases (including `.svelte` → `.svelte.ts` modules). Custom `kit.alias` paths such as `$features/*` are ignored in [`.fallowrc.json`](./.fallowrc.json) because the SvelteKit plugin does not resolve them the same way Vite does. Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`.
 - Panda CSS 2.0 generates `styled-system/` via `panda build`; path aliases (`$lib`, `$features`, `styled-system`) live in `kit.alias` inside [`vite.config.ts`](./vite.config.ts). Root [`tsconfig.json`](./tsconfig.json) extends `.svelte-kit/tsconfig.json` only—do not duplicate `paths` there. The Kit TypeScript hook adds `panda.config.ts` and `drizzle.config.ts` to the generated include list and omits generated `styled-system` sources from typechecking. After dependency install, `prepare` runs `panda build`.

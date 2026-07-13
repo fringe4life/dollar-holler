@@ -21,11 +21,11 @@
 
   const navShell = vstack({
     backgroundColor: "daisyBush",
-    blockSize: { md: "100dvh" },
+    blockSize: "100dvh",
     inlineSize: "full",
     inset: 0,
     isolation: "isolate",
-    overflowY: "clip",
+    overflowY: { base: "auto", md: "clip" },
     position: { base: "fixed", md: "sticky" },
     textAlign: "center",
     transitionDuration: "normal",
@@ -115,7 +115,7 @@
       <a href={resolve("/")}>
         <img
           alt="Doller Holla company logo"
-          class={css({ marginInline: "auto" })}
+          class={css({ marginInline: "auto", zIndex: 0 })}
           src={asset("/images/logo.svg")}
         />
       </a>

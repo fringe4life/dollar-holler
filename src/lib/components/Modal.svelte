@@ -18,6 +18,7 @@
           _backdrop: {
             opacity: "1",
           },
+          pointerEvents: "auto",
         },
         _starting: {
           _open: {
@@ -31,6 +32,7 @@
         outlineStyle: "none",
         overflowY: "auto",
         padding: 0,
+        pointerEvents: "none",
         transitionBehavior: "allow-discrete",
         transitionDuration: "slow",
         transitionProperty: "scale, translate, opacity, overlay, display",
@@ -48,9 +50,10 @@
       variant: {
         modal: {
           content: {
-            alignContent: "space-between",
-            blockSize: "full",
-            display: "grid",
+            display: "flex",
+            flex: 1,
+            flexDirection: "column",
+            justifyContent: "space-between",
             paddingBlock: 7,
             paddingInline: 10,
           },
@@ -68,6 +71,8 @@
             backgroundColor: "white",
             borderRadius: "lg",
             boxShadow: "md",
+            display: "flex",
+            flexDirection: "column",
             inlineSize: "full",
             insetBlockStart: "50%",
             insetInlineStart: "50%",

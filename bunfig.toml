@@ -2,7 +2,16 @@
 minimumReleaseAge=259200
 minimumReleaseAgeExcludes = [
   "@sveltejs/adapter-vercel",
-  "@sveltejs/kit"
+  "@sveltejs/kit",
+  "@pandacss/dev",
+  "@pandacss/preset-base",
+  "@pandacss/preset-panda",
+  "@pandacss/types",
+  "@pandacss/cli",
+  "@pandacss/compiler",
+  "@pandacss/config",
+  "@pandacss/postcss",
+  "@pandacss/compiler-shared"
 ]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).

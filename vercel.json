@@ -1,10 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "buildCommand": "svelte-kit sync && panda build && bun --bun run build",
-  "installCommand": "bun install",
+  "buildCommand": "svelte-kit sync && panda build && bun run build",
+  "installCommand": "bun install --ignore-scripts",
   "framework": "sveltekit",
   "git": {
     "deploymentEnabled": false
-  },
-  "bunVersion": "1.x"
+  }
 }

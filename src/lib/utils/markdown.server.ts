@@ -1,23 +1,13 @@
 /**
  * Server-only markdown utility. Do not import this in client-side code.
  */
-
+import { sanitize, type Config } from "isomorphic-dompurify";
 import { marked } from "marked";
-import sanitizeHtml from "sanitize-html";
 import type { Maybe, SanitizedHTML } from "$lib/types";
 
-type SanitizeOptions = NonNullable<Parameters<typeof sanitizeHtml>[1]>;
-
-const MARKDOWN_SANITIZE_OPTIONS: SanitizeOptions = Object.freeze({
-  allowedAttributes: {
-    a: ["href"],
-    code: ["class"],
-  },
-  allowedClasses: {
-    code: ["language-*"],
-  },
-  allowedSchemes: ["http", "https", "mailto"],
-  allowedTags: [
+const MARKDOWN_PURIFY_CONFIG: Config = Object.freeze({
+  ALLOWED_ATTR: ["href", "class"],
+  ALLOWED_TAGS: [
     "p",
     "br",
     "hr",
@@ -41,8 +31,12 @@ const MARKDOWN_SANITIZE_OPTIONS: SanitizeOptions = Object.freeze({
     "del",
     "s",
   ],
-  allowProtocolRelative: false,
+  ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i,
+  ALLOW_UNKNOWN_PROTOCOLS: false,
 });
+
+const sanitizeMarkdownHtml = (html: string): SanitizedHTML =>
+  sanitize(html, MARKDOWN_PURIFY_CONFIG) as SanitizedHTML;
 
 export const markdownToHtml = (source: Maybe<string>): Maybe<SanitizedHTML> => {
   if (!source) {
@@ -51,9 +45,9 @@ export const markdownToHtml = (source: Maybe<string>): Maybe<SanitizedHTML> => {
 
   try {
     const html = marked(source, { async: false });
-    return sanitizeHtml(html, MARKDOWN_SANITIZE_OPTIONS) as SanitizedHTML;
+    return sanitizeMarkdownHtml(html);
   } catch (error) {
     console.error("Error parsing markdown with marked:", error);
-    return sanitizeHtml(source, MARKDOWN_SANITIZE_OPTIONS) as SanitizedHTML;
+    return sanitizeMarkdownHtml(source);
   }
 };

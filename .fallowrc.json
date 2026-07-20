@@ -6,7 +6,8 @@
     "@pandacss/plugin-svelte",
     "@fontsource-variable/source-sans-3",
     "styled-system",
-    "svelte-eslint-parser"
+    "svelte-eslint-parser",
+    "@typescript/native"
   ],
   "ignoreUnresolvedImports": [
     "styled-system",
@@ -15,7 +16,8 @@
   ],
   "rules": {
     "boundary-violation": "warn",
-    "unused-class-members": "off"
+    "unused-class-members": "off",
+    "dev-dependencies-in-production": "off"
   },
   "duplicates": {
     "ignore": ["src/lib/server/db/schema.ts"],

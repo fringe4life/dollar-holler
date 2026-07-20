@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "types": ["bun", "node", "ws"],
+    "types": ["node"],
     "exactOptionalPropertyTypes": false
   }
 }

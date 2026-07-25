@@ -57,3 +57,15 @@
     {@render revealed()}
   </div>
 </div>
+
+<style>
+  /* Kill row VT names during typed pagination transitions (!important overrides inline style). */
+  :global {
+    :active-view-transition-type(forward),
+    :active-view-transition-type(backward) {
+      & [data-swipeable] {
+        view-transition-name: none !important;
+      }
+    }
+  }
+</style>

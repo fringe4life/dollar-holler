@@ -102,3 +102,47 @@
     </div>
   {/if}
 </div>
+
+<style>
+  /*
+   * Typed pagination VT — viewTransition() has no types API.
+   * Keyframes from theme (removeUnusedKeyframes: false in panda.config).
+   */
+  :global {
+    :active-view-transition-type(forward) {
+      &::view-transition-old(paginated-list-rows) {
+        --slide-distance: -60px;
+
+        animation:
+          fade-out 250ms both,
+          slide-out 250ms both;
+      }
+
+      &::view-transition-new(paginated-list-rows) {
+        --slide-distance: calc(100vw + 60px);
+
+        animation:
+          fade-in 250ms both,
+          slide-in 250ms both;
+      }
+    }
+
+    :active-view-transition-type(backward) {
+      &::view-transition-old(paginated-list-rows) {
+        --slide-distance: calc(100vw + 60px);
+
+        animation:
+          fade-out 250ms both,
+          slide-out 250ms both;
+      }
+
+      &::view-transition-new(paginated-list-rows) {
+        --slide-distance: -60px;
+
+        animation:
+          fade-in 250ms both,
+          slide-in 250ms both;
+      }
+    }
+  }
+</style>

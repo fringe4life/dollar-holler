@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx, viewTransition } from "styled-system/css";
   import { circle, flex, grid, gridItem } from "styled-system/patterns";
   import type { KeyboardEventHandler } from "svelte/elements";
   /**
@@ -15,6 +15,15 @@
   import { buildListSearchString } from "$features/pagination/utils/url";
   import { Toggle } from "$lib/client/runes/Toggle.svelte";
   import Search from "$lib/components/icons/Search.svelte";
+
+  const searchIconVt = viewTransition({
+    group: {
+      animationDuration: "0.35s",
+      animationTimingFunction: "glide",
+    },
+    old: { mixBlendMode: "normal" },
+    new: { mixBlendMode: "normal" },
+  });
 
   export interface SearchProps {
     store: SearchableListStore;
@@ -75,12 +84,15 @@
 >
   <span
     aria-hidden="true"
-    class={gridItem({
-      color: "pastelPurple",
-      aspectRatio: "square",
-      alignSelf: "center",
-      contain: "strict",
-    })}
+    class={cx(
+      searchIconVt,
+      gridItem({
+        color: "pastelPurple",
+        aspectRatio: "square",
+        alignSelf: "center",
+        contain: "strict",
+      })
+    )}
     style:view-transition-name="search-icon-loader"
   >
     {#if loading.isOn}

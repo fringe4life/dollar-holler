@@ -1,4 +1,6 @@
 import { defineConfig } from "@pandacss/dev";
+import presetBase from "@pandacss/preset-base";
+import presetPanda from "@pandacss/preset-panda";
 
 export default defineConfig({
   conditions: {
@@ -48,9 +50,13 @@ export default defineConfig({
   include: ["./src/**/*.svelte", "./src/**/*.ts", "./src/**/*.js"],
   minify: true,
   optimize: {
-    removeUnusedKeyframes: true,
+    // Typed view-transition CSS (PaginatedList) names theme keyframes from raw
+    // <style> blocks. Panda extract never sees those refs, so tree-shake drops
+    // fade-in / fade-out / slide-in / slide-out and pagination anims no-op.
+    removeUnusedKeyframes: false,
     removeUnusedTokens: true,
     smartCompoundVariants: true,
+    treeshakeDesignSystem: true,
   },
   outdir: "styled-system",
   patterns: {
@@ -98,7 +104,7 @@ export default defineConfig({
     },
   },
   preflight: true,
-  presets: ["@pandacss/preset-base", "@pandacss/preset-panda"],
+  presets: [presetBase, presetPanda],
   // Useful for theme customization
   theme: {
     containerSizes: { xs: "20ch" },
@@ -112,6 +118,19 @@ export default defineConfig({
         "fade-out": {
           to: {
             opacity: "0",
+          },
+        },
+        "nav-solidify": {
+          from: {
+            backdropFilter: "blur(0)",
+            backgroundColor: "transparent",
+            boxShadow: "0 0 0 oklch(from var(--colors-black) l c h / 0%)",
+          },
+          to: {
+            backdropFilter: "blur(4px)",
+            backgroundColor:
+              "oklch(from var(--colors-whisper) l c h / 95%)",
+            boxShadow: "0 1px 3px oklch(from var(--colors-black) l c h / 10%)",
           },
         },
         "slide-down": {

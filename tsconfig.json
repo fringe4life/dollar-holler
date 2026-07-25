@@ -1,5 +1,5 @@
 {
-  "extends": "./.svelte-kit/tsconfig.json",
+  "extends": "$app/tsconfig",
   "compilerOptions": {
     "allowJs": true,
     "checkJs": true,
@@ -9,7 +9,22 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "types": ["node"],
-    "exactOptionalPropertyTypes": false
-  }
+    "types": ["node", "$app/types"],
+    "exactOptionalPropertyTypes": false,
+    "paths": {
+      "$features": ["./src/lib/features"],
+      "$features/*": ["./src/lib/features/*"],
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"],
+      "styled-system": ["./styled-system"],
+      "styled-system/*": ["./styled-system/*"]
+    }
+  },
+  "include": [
+    "src",
+    "panda.config.ts",
+    "drizzle.config.ts",
+    "vite.config.ts",
+    "scripts/**/*.ts"
+  ]
 }

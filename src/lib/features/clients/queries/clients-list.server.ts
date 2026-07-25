@@ -10,6 +10,11 @@ import { db } from "$lib/server/db";
 import { clients as clientsTable } from "$lib/server/db/schema";
 import type { Maybe } from "$lib/types";
 
+/**
+ * Substring search. Use RQB `like` (not `ilike`): SQLite/Turso have no `ILIKE`,
+ * and `LIKE` is already case-insensitive for ASCII (Turso docs / SQLite default).
+ * `lower(col) LIKE lower(?)` does not buy more — SQLite `lower()` is ASCII-only too.
+ */
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();
   if (!trimmed) {
@@ -18,17 +23,17 @@ const searchWhere = (q: Maybe<string>) => {
   const pattern = `%${trimmed}%`;
   return {
     OR: [
-      { name: { ilike: pattern } },
-      { email: { ilike: pattern } },
-      { street: { ilike: pattern } },
-      { city: { ilike: pattern } },
-      { state: { ilike: pattern } },
-      { zip: { ilike: pattern } },
-      /** Enum `client_status` cannot use ILIKE in Postgres without a cast (same as invoice list). */
+      { name: { like: pattern } },
+      { email: { like: pattern } },
+      { street: { like: pattern } },
+      { city: { like: pattern } },
+      { state: { like: pattern } },
+      { zip: { like: pattern } },
     ],
   };
 };
 
+/** Coerce driver extras to integer cents (`number`). See money note in `clientListHelpers`. */
 const mapRows = (rows: ClientListResponse[]): ClientListResponse[] =>
   rows.map((row): ClientListResponse => ({
     ...row,

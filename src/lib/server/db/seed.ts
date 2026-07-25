@@ -1,5 +1,5 @@
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import { ENV } from "varlock/env";
 import type { ClientInsert, ClientSelect } from "$features/clients/types";
 import type { LineItemInsert } from "$features/line-items/types";
@@ -11,12 +11,18 @@ import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
 
-const pool = new Pool({ connectionString: ENV.DATABASE_URL });
+const client = createClient({
+  authToken: ENV.TURSO_AUTH_TOKEN,
+  url: ENV.TURSO_DATABASE_URL,
+});
+
+await client.execute("PRAGMA foreign_keys = ON");
+
 const db = drizzle({
-  client: pool,
-  jit: true,
+  client,
   relations: tableRelations,
 });
+
 // Helper function to generate random date within last 6 months
 function randomDateWithinLast6Months(): Date {
   const now = new Date();
@@ -138,10 +144,10 @@ async function main() {
   > = [];
 
   const clientsByUserId = new Map<string, ClientSelect[]>();
-  for (const client of insertedClients) {
-    const list = clientsByUserId.get(client.userId) ?? [];
-    list.push(client);
-    clientsByUserId.set(client.userId, list);
+  for (const clientRow of insertedClients) {
+    const list = clientsByUserId.get(clientRow.userId) ?? [];
+    list.push(clientRow);
+    clientsByUserId.set(clientRow.userId, list);
   }
 
   const descriptions = [
@@ -166,7 +172,7 @@ async function main() {
     let invoiceSeq = 0;
     for (let n = 0; n < invoicesPerUser; n++) {
       // Spread across this user’s clients (one per other user), round-robin
-      const client = ownedClients[n % ownedClients.length];
+      const ownedClient = ownedClients[n % ownedClients.length];
       const invoiceId = createId();
       const issueDate = randomDateWithinLast6Months();
       const dueDate = randomDateWithinLast3Months();
@@ -177,7 +183,7 @@ async function main() {
         Math.random() > 0.6 ? "_Payment due within 30 days._" : null;
 
       invoicesData.push({
-        clientId: client.id,
+        clientId: ownedClient.id,
         discount: Math.random() > 0.7 ? Math.floor(Math.random() * 20) + 5 : 0,
         dueDate,
         id: invoiceId,
@@ -229,6 +235,6 @@ main()
     console.error("❌ Seeding failed:", err);
     process.exitCode = 1;
   })
-  .finally(async () => {
-    await pool.end();
+  .finally(() => {
+    client.close();
   });

@@ -1,4 +1,4 @@
-import type { clientStatusEnum, invoiceStatusEnum } from "./schema";
+import type { clientStatuses, invoiceStatuses } from "./schema";
 
-export type ClientStatus = (typeof clientStatusEnum.enumValues)[number];
-export type InvoiceStatus = (typeof invoiceStatusEnum.enumValues)[number];
+export type ClientStatus = (typeof clientStatuses)[number];
+export type InvoiceStatus = (typeof invoiceStatuses)[number];

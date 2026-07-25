@@ -1,22 +1,22 @@
-import { attachDatabasePool } from "@vercel/functions";
-import { drizzle } from "drizzle-orm/node-postgres";
-import { Pool } from "pg";
+import { createClient } from "@libsql/client";
+import { drizzle } from "drizzle-orm/libsql";
 import { ENV } from "varlock/env";
 import { tableRelations } from "./relations";
 
-/** Short idle timeout so unused TCP conns close under Fluid Compute. */
-const IDLE_TIMEOUT_MS = 30_000;
-
-const pool = new Pool({
-  connectionString: ENV.DATABASE_URL,
-  idleTimeoutMillis: IDLE_TIMEOUT_MS,
+const client = createClient({
+  authToken: ENV.TURSO_AUTH_TOKEN,
+  url: ENV.TURSO_DATABASE_URL,
 });
 
-// Close idle clients before Fluid suspends the instance (no-op off Vercel).
-attachDatabasePool(pool);
+/**
+ * Top-level await is fine for current deploy: Vercel + Node 24 (ESM) + SvelteKit SSR.
+ * Revisit if runtime/bundler drops TLA support, or if we leave Node ESM (e.g. CJS-only
+ * target). Also: `PRAGMA foreign_keys` is per-connection — if cascades look flaky under
+ * remote Turso, set it in the same pipeline as writes, not only here at import.
+ */
+await client.execute("PRAGMA foreign_keys = ON");
 
 export const db = drizzle({
-  client: pool,
-  jit: true,
+  client,
   relations: tableRelations,
 });

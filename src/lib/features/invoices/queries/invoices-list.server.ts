@@ -27,6 +27,11 @@ type InvoicesQueryColumnSelection = NonNullable<
   NonNullable<Parameters<typeof db.query.invoices.findMany>[0]>["columns"]
 >;
 
+/**
+ * Substring search. RQB `like` (not `ilike`): SQLite/Turso `LIKE` is ASCII
+ * case-insensitive by default — same practical UX as Postgres `ILIKE` for
+ * Latin text. See clients-list search note.
+ */
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();
   if (!trimmed) {
@@ -35,10 +40,9 @@ const searchWhere = (q: Maybe<string>) => {
   const pattern = `%${trimmed}%`;
   return {
     OR: [
-      { invoiceNumber: { ilike: pattern } },
-      { subject: { ilike: pattern } },
-      /** Enum `invoice_status` cannot use ILIKE in Postgres without a cast; RQB maps `ilike` to `~~*` on the enum and errors. */
-      { client: { name: { ilike: pattern } } },
+      { invoiceNumber: { like: pattern } },
+      { subject: { like: pattern } },
+      { client: { name: { like: pattern } } },
     ],
   };
 };

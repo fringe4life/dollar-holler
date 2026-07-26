@@ -39,6 +39,8 @@
     onSendInvoice(invoice);
 
   const id = $derived(invoice.id);
+  const optionsPopoverId = $derived(`invoice-options-${id}`);
+  const optionsAnchorName = $derived(`--${optionsPopoverId}-anchor`);
   const dueDate = $derived(invoice.dueDate);
   const invoiceNumber = $derived(invoice.invoiceNumber);
   const client = $derived(invoice.name);
@@ -153,11 +155,15 @@
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
-      {#snippet content(_additionalMenu)}
-        <AdditionalOptionsButton additionalMenu={_additionalMenu} />
+      {#snippet content()}
+        <AdditionalOptionsButton
+          anchorName={optionsAnchorName}
+          popoverId={optionsPopoverId}
+        />
         <AdditionalOptionsList
-          additionalMenu={_additionalMenu}
+          anchorName={optionsAnchorName}
           options={INVOICE_OPTIONS}
+          popoverId={optionsPopoverId}
         />
       {/snippet}
     </AdditionalOptions>

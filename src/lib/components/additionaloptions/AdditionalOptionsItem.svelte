@@ -19,6 +19,16 @@
 
   let { option }: Props = $props();
   const Icon = $derived(option.icon || View);
+
+  const handleClick: MouseEventHandler<HTMLButtonElement> = (event) => {
+    const currentTarget = event.currentTarget;
+
+    if (currentTarget instanceof HTMLElement) {
+      currentTarget.closest<HTMLElement>("[popover]")?.hidePopover();
+    }
+
+    option.onclick(event);
+  };
 </script>
 
 {#if !option.disabled}
@@ -41,7 +51,7 @@
         transitionDuration: "normal",
         transitionProperty: "colors",
       })}
-      onclick={option.onclick}
+      onclick={handleClick}
       type="button"
     >
       <Icon />

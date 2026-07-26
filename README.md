@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.12-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.7-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=sqlite&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.1-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Turso](https://img.shields.io/badge/Turso-libSQL-4FF8EB?logo=turso&logoColor=black)](https://turso.tech/) [![libSQL](https://img.shields.io/badge/%40libsql%2Fclient-0.17.4-336791?logo=sqlite&logoColor=white)](https://docs.turso.tech/sdk/ts/reference) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.11-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.67.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.12-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.7-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=sqlite&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.2-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Turso](https://img.shields.io/badge/Turso-libSQL-4FF8EB?logo=turso&logoColor=black)](https://turso.tech/) [![libSQL](https://img.shields.io/badge/%40libsql%2Fclient-0.17.4-336791?logo=sqlite&logoColor=white)](https://docs.turso.tech/sdk/ts/reference) [![Elysia](https://img.shields.io/badge/Elysia-1.4.29-pink?logo=bun&logoColor=white)](https://elysiajs.com/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.11-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.67.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
@@ -97,7 +97,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **API layer:** ElysiaJS in [`src/lib/server/app.ts`](./src/lib/server/app.ts) (OpenAPI/Scalar in dev via [`openapi-plugin.ts`](./src/lib/server/plugins/openapi-plugin.ts), auth macros in [`auth-plugin.ts`](./src/lib/server/plugins/auth-plugin.ts), list-query helpers in [`list-query-plugin.ts`](./src/lib/server/plugins/list-query-plugin.ts), domain routes), mounted at `/api` via [`src/routes/api/[...slugs]/+server.ts`](./src/routes/api/[...slugs]/+server.ts), Eden Treaty client [`apiClient`](./src/lib/api.ts) (`@elysiajs/eden/treaty2`); auth forms use Kit remote `form`s in [`auth.remote.ts`](./src/lib/features/auth/auth.remote.ts) (see [`docs/remote-functions-migration.md`](./docs/remote-functions-migration.md))
 - **Database:** [Turso](https://turso.tech/) (libSQL / SQLite)
 - **ORM:** Drizzle ORM 1.0 (rc.4) with `@libsql/client`; `PRAGMA foreign_keys = ON` at client init ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)); Drizzle Kit `dialect: "turso"`
-- **Authentication:** Better Auth 1.7 with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter `provider: "sqlite"`, `allowedHosts` for production and Vercel preview URLs, `@better-auth/drizzle-adapter` relations-v2, bearer + OpenAPI plugins); login/signup/forgot/reset/change-password via remote forms
+- **Authentication:** Better Auth 1.7 (`1.7.0-rc.2`) with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter `provider: "sqlite"`, `advanced.database.joins`, `allowedHosts` for production and Vercel preview URLs, `@better-auth/drizzle-adapter` relations-v2, bearer + OpenAPI plugins); login/signup/forgot/reset/change-password via remote forms
 - **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
 - **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`isomorphic-dompurify`](https://github.com/kkomelin/isomorphic-dompurify) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts). `package.json` pins `jsdom` to `25.0.1` so Vercel serverless avoids `ERR_REQUIRE_ESM` from newer jsdom dependencies.
 - **Deployment:** Vercel adapter (`@sveltejs/adapter-vercel` 7)
@@ -131,7 +131,7 @@ src/
 │   │   ├── schemas.ts       # Shared API response shapes
 │   │   ├── utils/           # create-id (UUIDv7), invoice-notes-terms-html, invoice-status-transitions, better-auth-openapi, api-error-body, errors
 │   │   └── routes/          # API modules (clients, invoices, settings)
-│   ├── client/            # Client-only: @attach helpers (dialogController, swipe), shared runes (ItemPanel, etc.)
+│   ├── client/            # Client-only: @attach helpers (dialogController, swipe), shared runes (ItemPanel, Toggle, etc.)
 │   ├── features/          # Domain features: components, stores, schemas, list helpers, remotes
 │   │   ├── auth/          # auth.remote.ts (Kit remote forms), ArkType schemas
 │   │   ├── clients/       # includes server queries (list, options, verify)
@@ -186,6 +186,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Auth Flows:** Forgot and reset password supported; reset token read from URL and validated
 - **Modern UI:** Ark UI components with Panda CSS
 - **Svelte 5 Runes:** Uses @attach directives and reactive patterns
+- **Row menus:** Invoice additional options use the native Popover API with CSS anchor positioning
 - **Responsive Design:** Mobile-first with swipe gestures
 
 ## Deployment

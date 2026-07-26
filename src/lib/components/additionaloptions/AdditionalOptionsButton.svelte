@@ -1,30 +1,30 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { clickOutside } from "$lib/client/attachments/clickOutside";
-  import type { Toggle } from "$lib/client/runes/Toggle.svelte";
   import ThreeDots from "$lib/components/icons/ThreeDots.svelte";
 
   interface Props {
-    additionalMenu: Toggle;
+    anchorName: string;
+    popoverId: string;
   }
 
-  let { additionalMenu }: Props = $props();
+  let { anchorName, popoverId }: Props = $props();
 </script>
 
 <button
+  aria-controls={popoverId}
+  aria-haspopup="menu"
   class={css({
     color: {
       _groupHover: "daisyBush/50",
       _hover: "daisyBush",
-      base: "pastelPurple",
     },
     cursor: "pointer",
     transitionDuration: "normal",
     transitionProperty: "colors",
   })}
-  onclick={additionalMenu.toggle}
+  popovertarget={popoverId}
+  style:anchor-name={anchorName}
   type="button"
-  {@attach additionalMenu.isOn && clickOutside(additionalMenu.off)}
 >
   <ThreeDots />
 </button>

@@ -6,7 +6,9 @@ import { normalizeListQueryFromUrl } from "./list-query";
  * Canonical string for comparing “same list request” as the server/API.
  * Omitted params match defaults: `limit` 10, `direction` forward, no `q`/`cursor`.
  */
-export const listUrlKey = (url: URL): string => {
+export const listUrlKey = (url: {
+  searchParams: Pick<URLSearchParams, "get">;
+}): string => {
   const { normalized } = normalizeListQueryFromUrl(url);
   return serializeNormalizedForKey(normalized);
 };

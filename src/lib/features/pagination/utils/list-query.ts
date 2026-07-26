@@ -79,11 +79,16 @@ export const normalizeListQuery = (raw: {
   };
 };
 
-export const normalizeListQueryFromUrl = (url: URL): NormalizeListQueryResult =>
+/** Read-only search params (incl. SvelteKit `page.url.searchParams`). */
+type SearchParamsReadable = Pick<URLSearchParams, "get">;
+
+export const normalizeListQueryFromUrl = (url: {
+  searchParams: SearchParamsReadable;
+}): NormalizeListQueryResult =>
   normalizeListQuery(parseSearchParamsToRaw(url.searchParams));
 
 const firstParam = (
-  searchParams: URLSearchParams,
+  searchParams: SearchParamsReadable,
   key: string
 ): string | undefined => {
   const v = searchParams.get(key);
@@ -92,7 +97,7 @@ const firstParam = (
 
 /** First `cursor` wins (matches `URLSearchParams.get`). */
 const parseSearchParamsToRaw = (
-  searchParams: URLSearchParams
+  searchParams: SearchParamsReadable
 ): PaginationSearchParamsRaw => ({
   cursor: firstParam(searchParams, "cursor"),
   direction: firstParam(searchParams, "direction"),

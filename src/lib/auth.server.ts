@@ -11,6 +11,7 @@ export const auth = betterAuth({
   advanced: {
     database: {
       generateId: createId,
+      joins: true,
     },
   },
   allowedHosts: [
@@ -29,7 +30,6 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
-  experimental: { joins: true },
   // Bearer: `Authorization: Bearer <token>` for APIs (OpenAPI "Try it", CLI, non-browser clients).
   // sveltekit must be the last plugin
   plugins: [openAPI(), bearer(), sveltekitCookies(getRequestEvent)],

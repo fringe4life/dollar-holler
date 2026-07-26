@@ -58,9 +58,9 @@
   {#snippet skeleton()}
     <InvoiceRowSkeleton />
   {/snippet}
-  {#snippet row(_invoice)}
+  {#snippet row(invoice)}
     <InvoiceRow
-      invoice={_invoice}
+      {invoice}
       onDelete={deleteModal.open}
       onEdit={(inv) => editPanel.open(inv.id)}
       onSendInvoice={async (inv) => {

@@ -1,16 +1,13 @@
 <script lang="ts">
   import { css, cx } from "styled-system/css";
   import type { Snippet } from "svelte";
-  import { Toggle } from "$lib/client/runes/Toggle.svelte";
 
   interface Props {
     classes?: string;
-    content: Snippet<[Toggle]>;
+    content: Snippet;
   }
 
   let { classes = "", content }: Props = $props();
-
-  const additionalMenu = new Toggle();
 </script>
 
 <div
@@ -23,5 +20,5 @@
     classes
   )}
 >
-  {@render content(additionalMenu)}
+  {@render content()}
 </div>

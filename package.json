@@ -10,6 +10,7 @@
     "better-auth": "1.7.0-rc.2",
     "drizzle-orm": "1.0.0-rc.4",
     "elysia": "^1.4.29",
+    "file-type": "^22.0.1",
     "isomorphic-dompurify": "^3.19.0",
     "marked": "^18.0.7",
     "uuidv7": "^1.2.1",
@@ -90,8 +91,12 @@
   "version": "0.9.0",
   "private": true,
   "overrides": {
+    "@hono/node-server": "2.0.12",
+    "brace-expansion": "5.0.8",
+    "fast-uri": "3.1.4",
     "jsdom": "25.0.1",
-    "jsdom>parse5": "7.3.0"
+    "jsdom>parse5": "7.3.0",
+    "tar": "7.5.22"
   },
   "trustedDependencies": []
 }

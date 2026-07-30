@@ -44,7 +44,7 @@ export interface SearchableListStore {
   ) => Promise<void>;
   readonly loading: boolean;
   /**
-   * Call immediately before `pushState` when changing list query from the client so
+   * Call immediately before shallow `goto` when changing list query from the client so
    * URL-sync effects do not refetch using a stale URL while `loadItems` is in flight.
    */
   presetClientListQueryKey?: (normalized: PaginationSearchParams) => void;

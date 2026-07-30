@@ -12,7 +12,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   const parsedId = cursorSchema(id);
   if (parsedId instanceof ArkErrors) {
-    throw error(400, { message: "Invalid invoice ID" });
+    throw error(400, "Invalid invoice ID");
   }
 
   const { data: invoice } = await tryCatch(() =>
@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
   );
 
   if (!invoice) {
-    throw error(404, { message: "Invoice not found" });
+    throw error(404, "Invoice not found");
   }
 
   const [{ data: client }, { data: lineItems }] = await Promise.all([

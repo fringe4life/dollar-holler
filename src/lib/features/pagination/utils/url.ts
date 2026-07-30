@@ -33,7 +33,18 @@ export const serializeNormalizedForKey = (
   return parts.join("&");
 };
 
-/** Build `?foo=bar` for pushState after a successful fetch. */
+/**
+ * Browser-visible list URL after shallow `goto`. Prefer over `page.url` when reading
+ * search/pagination query params on the client.
+ */
+export const visibleListUrl = <
+  T extends { pathname: string; searchParams: Pick<URLSearchParams, "get"> },
+>(page: {
+  url: T;
+  shallow: { url: T } | null;
+}): T => page.shallow?.url ?? page.url;
+
+/** Build `?foo=bar` for shallow `goto` after a successful fetch. */
 export const buildListSearchString = (n: PaginationSearchParams): string => {
   const s = serializeNormalizedForKey(n);
   return s === "" ? "" : `?${s}`;

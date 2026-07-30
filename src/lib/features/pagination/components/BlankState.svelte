@@ -23,8 +23,8 @@
     paddingInlineEnd: { base: 0, md: 28 },
     paddingBlockStart: 12,
   })}
-  style:--arrow-left={`url(${asset("/images/arrow-left-up.svg")})`}
-  style:--arrow-right={`url(${asset("/images/arrow-right-up.svg")})`}
+  style:--arrow-left={`url(${asset("images/arrow-left-up.svg")})`}
+  style:--arrow-right={`url(${asset("images/arrow-right-up.svg")})`}
 >
   <h2
     class={css({

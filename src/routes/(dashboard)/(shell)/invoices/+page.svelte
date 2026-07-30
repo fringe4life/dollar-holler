@@ -2,7 +2,7 @@
   import { css } from "styled-system/css";
   /**
    * List UI: SSR uses `data` from +page.server.ts (effects do not run on the server).
-   * After hydration, `invoicesStore` matches `listUrlKey(page.url)` and owns the rows.
+   * After hydration, `invoicesStore` matches `listUrlKey` of the visible list URL and owns the rows.
    */
   import { afterNavigate } from "$app/navigation";
   import { page } from "$app/state";
@@ -16,7 +16,7 @@
   import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$features/pagination/types";
-  import { listUrlKey } from "$features/pagination/utils/url";
+  import { listUrlKey, visibleListUrl } from "$features/pagination/utils/url";
   import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import Modal from "$lib/components/Modal.svelte";
@@ -33,9 +33,15 @@
     items: data.items,
     paginationMetadata: data.paginationMetadata,
   } satisfies CursorPaginatedList<InvoiceListResponse>);
-  /** Re-sync store when `page.url` / `data` change after navigation (e.g. browser back). */
-  afterNavigate(() => {
-    invoicesStore.hydrateFromLoad(currentData, listUrlKey(page.url));
+  /** Re-sync store when load data changes after full navigation (e.g. browser back). */
+  afterNavigate((navigation) => {
+    if (navigation.shallow) {
+      return;
+    }
+    invoicesStore.hydrateFromLoad(
+      currentData,
+      listUrlKey(visibleListUrl(page))
+    );
   });
 
   const createForm = new ItemPanel<undefined>();

@@ -10,6 +10,9 @@
   // value for determining where escape key or back link take you
   let previousPageLink: Maybe<string> = $state(undefined);
   afterNavigate((navigation) => {
+    if (navigation.shallow) {
+      return;
+    }
     previousPageLink = navigation?.from?.url?.pathname;
   });
   // actual derived url
@@ -18,13 +21,15 @@
   let resolveNavigation: (() => void) | undefined = $state(undefined);
 
   // used to run exit animation to slide the invoice down and out
-  onNavigate(
-    () =>
-      new Promise((resolve) => {
-        resolveNavigation = resolve;
-        isExiting = true;
-      })
-  );
+  onNavigate((navigation) => {
+    if (navigation.shallow) {
+      return;
+    }
+    return new Promise((resolve) => {
+      resolveNavigation = resolve;
+      isExiting = true;
+    });
+  });
 
   function handleAnimationEnd() {
     resolveNavigation?.();

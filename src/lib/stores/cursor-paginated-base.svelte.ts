@@ -50,9 +50,9 @@ export abstract class CursorPaginatedListStoreBase<T extends CursorRow>
   }
 
   /**
-   * Must run before client `pushState` when updating list URL (see {@link SearchableListStore}).
+   * Must run before client shallow `goto` when updating list URL (see {@link SearchableListStore}).
    * Sets `loading` so URL-sync effects do not refetch while `lastSuccessfulListKey` is ahead of
-   * `page.url` for one synchronous tick.
+   * the visible list URL for one synchronous tick.
    */
   presetClientListQueryKey(normalized: PaginationSearchParams): void {
     this.loading = true;

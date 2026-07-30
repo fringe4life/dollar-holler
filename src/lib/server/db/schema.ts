@@ -5,6 +5,7 @@ import {
   real,
   sqliteTable,
   text,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import type { CursorId, SanitizedHTML } from "../../types";
 import { createId } from "../utils/create-id";
@@ -63,11 +64,14 @@ export const account = sqliteTable(
     accessTokenExpiresAt: integer("access_token_expires_at", {
       mode: "timestamp_ms",
     }),
-    accountId: text("account_id").notNull(),
     createdAt: timestampMs("created_at"),
     id: text("id").primaryKey(),
     idToken: text("id_token"),
+    /** Synthetic issuer, e.g. `local:credential` for email/password. */
+    issuer: text("issuer").notNull(),
     password: text("password"),
+    /** Subject within issuer; credentials use the linked user id. */
+    providerAccountId: text("provider_account_id").notNull(),
     providerId: text("provider_id").notNull(),
     refreshToken: text("refresh_token"),
     refreshTokenExpiresAt: integer("refresh_token_expires_at", {
@@ -81,7 +85,13 @@ export const account = sqliteTable(
       .notNull()
       .references(() => user.id, { onDelete: "cascade" }),
   },
-  (table) => [index("account_userId_idx").on(table.userId)]
+  (table) => [
+    uniqueIndex("account_issuer_providerAccountId_uidx").on(
+      table.issuer,
+      table.providerAccountId
+    ),
+    index("account_userId_idx").on(table.userId),
+  ]
 );
 
 export const verification = sqliteTable(

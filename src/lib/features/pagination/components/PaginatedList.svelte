@@ -5,6 +5,7 @@
   import { page } from "$app/state";
   import { DEFAULT_LIMIT } from "../constants";
   import type { CursorRow, PaginatableItems } from "../types";
+  import { visibleListUrl } from "../utils/url";
   import Pagination from "./Pagination.svelte";
   import PaginationSkeleton from "./PaginationSkeleton.svelte";
 
@@ -32,7 +33,9 @@
     footer,
   }: Props = $props();
 
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
+  const searchQuery = $derived(
+    visibleListUrl(page).searchParams.get("q") ?? ""
+  );
   const isBlank = $derived(
     !store.loading && store.items.length === 0 && !searchQuery
   );

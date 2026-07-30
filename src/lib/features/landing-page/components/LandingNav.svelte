@@ -55,7 +55,7 @@
       <img
         alt="Dollar Holler"
         class={square({ size: 8 })}
-        src={asset("/images/logo.svg")}
+        src={asset("images/logo.svg")}
       />
       <span
         class={css({

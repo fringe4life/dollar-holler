@@ -6,7 +6,7 @@
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
-  import { pushState } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import type {
     CursorRow,
@@ -17,7 +17,10 @@
     parseLimitParam,
     toNormalizedListQuery,
   } from "$features/pagination/utils/list-query";
-  import { buildListSearchString } from "$features/pagination/utils/url";
+  import {
+    buildListSearchString,
+    visibleListUrl,
+  } from "$features/pagination/utils/url";
   import Button from "$lib/components/ui/button/button.svelte";
   import Select from "$lib/components/ui/select/Select.svelte";
   import { LIMITS } from "../constants";
@@ -29,9 +32,10 @@
 
   let { store }: Props = $props();
 
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
+  const listUrl = $derived(visibleListUrl(page));
+  const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
   const limitFromUrl = $derived(
-    parseLimitParam(page.url.searchParams.get("limit"))
+    parseLimitParam(listUrl.searchParams.get("limit"))
   );
 
   const rowItems = $derived(store.items);
@@ -43,7 +47,9 @@
 
   const navigateWithQuery = async (next: PaginationSearchParams) => {
     store.presetClientListQueryKey?.(next);
-    pushState(`${page.url.pathname}${buildListSearchString(next)}`, {});
+    await goto(`${listUrl.pathname}${buildListSearchString(next)}`, {
+      shallow: true,
+    });
     await store.loadItems(next);
   };
 

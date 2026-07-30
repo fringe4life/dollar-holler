@@ -116,7 +116,7 @@
         <img
           alt="Doller Holla company logo"
           class={css({ marginInline: "auto", zIndex: 0 })}
-          src={asset("/images/logo.svg")}
+          src={asset("images/logo.svg")}
         />
       </a>
     </div>
@@ -129,8 +129,8 @@
           fontWeight: { base: "medium", "@/xs": "semibold" },
         })
       )}
-      style:--active-nav-left={`url(${asset("/images/active-nav--left.svg")})`}
-      style:--active-nav-right={`url(${asset("/images/active-nav--right.svg")})`}
+      style:--active-nav-left={`url(${asset("images/active-nav--left.svg")})`}
+      style:--active-nav-right={`url(${asset("images/active-nav--right.svg")})`}
     >
       {#each navItems as { href, title } (title)}
         <NavbarItem {href} isActive={isActive(href, path)} {title} />

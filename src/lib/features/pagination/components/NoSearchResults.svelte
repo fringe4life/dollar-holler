@@ -24,7 +24,7 @@
     paddingInlineStart: 28,
     paddingBlockStart: 2,
   })}
-  style:--arrow-left={`url(${asset("/images/arrow-left-up.svg")})`}
+  style:--arrow-left={`url(${asset("images/arrow-left-up.svg")})`}
 >
   <h2
     class={css({

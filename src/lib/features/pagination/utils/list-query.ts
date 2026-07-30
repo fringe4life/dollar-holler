@@ -79,7 +79,7 @@ export const normalizeListQuery = (raw: {
   };
 };
 
-/** Read-only search params (incl. SvelteKit `page.url.searchParams`). */
+/** Read-only search params (incl. SvelteKit visible list URL searchParams). */
 type SearchParamsReadable = Pick<URLSearchParams, "get">;
 
 export const normalizeListQueryFromUrl = (url: {

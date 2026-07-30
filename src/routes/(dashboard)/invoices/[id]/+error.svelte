@@ -22,7 +22,7 @@
     minBlockSize: "calc(100dvh - var(--spacing-16))",
     backgroundImage: "var(--bg-error)",
   })}
-  style:--bg-error={`url('${asset("/images/bg-error.svg")}')`}
+  style:--bg-error={`url('${asset("images/bg-error.svg")}')`}
 >
   <div>
     <h1

@@ -21,7 +21,7 @@
     backgroundRepeat: "no-repeat",
     minBlockSize: "calc(100dvh - var(--spacing-16))",
   })}
-  style:--bg-error={`url(${asset("/images/bg-error.svg")})`}
+  style:--bg-error={`url(${asset("images/bg-error.svg")})`}
 >
   <div>
     <h1

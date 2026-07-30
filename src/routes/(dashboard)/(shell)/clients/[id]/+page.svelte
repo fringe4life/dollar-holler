@@ -18,7 +18,7 @@
   import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import { normalizeListQueryFromUrl } from "$features/pagination/utils/list-query";
-  import { listUrlKey } from "$features/pagination/utils/url";
+  import { listUrlKey, visibleListUrl } from "$features/pagination/utils/url";
   import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import CircledAmount from "$lib/components/CircledAmount.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
@@ -32,6 +32,7 @@
   let { data } = $props();
 
   const client = $derived(data.client);
+  const listUrl = $derived(visibleListUrl(page));
 
   // svelte-ignore state_referenced_locally
   let clientInvoicesStore = $state(new ClientInvoicesStore(data.client.id));
@@ -41,7 +42,7 @@
       items: data.items,
       paginationMetadata: data.paginationMetadata,
     },
-    listUrlKey(page.url),
+    listUrlKey(listUrl),
     data.summary
   );
 
@@ -81,7 +82,7 @@
   };
 
   const listQueryNormalized = $derived(
-    normalizeListQueryFromUrl(page.url).normalized
+    normalizeListQueryFromUrl(listUrl).normalized
   );
 </script>
 

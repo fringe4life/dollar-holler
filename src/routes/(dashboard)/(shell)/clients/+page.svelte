@@ -15,7 +15,7 @@
   import NoSearchResults from "$features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "$features/pagination/components/PaginatedList.svelte";
   import type { CursorPaginatedList } from "$features/pagination/types";
-  import { listUrlKey } from "$features/pagination/utils/url";
+  import { listUrlKey, visibleListUrl } from "$features/pagination/utils/url";
   import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
   import Modal from "$lib/components/Modal.svelte";
@@ -36,9 +36,12 @@
     items: data.items,
     paginationMetadata: data.paginationMetadata,
   } satisfies CursorPaginatedList<ClientListResponse>);
-  /** Re-sync store when `page.url` / `data` change after navigation (e.g. browser back). */
-  afterNavigate(() => {
-    clientsStore.hydrateFromLoad(currentData, listUrlKey(page.url));
+  /** Re-sync store when load data changes after full navigation (e.g. browser back). */
+  afterNavigate((navigation) => {
+    if (navigation.shallow) {
+      return;
+    }
+    clientsStore.hydrateFromLoad(currentData, listUrlKey(visibleListUrl(page)));
   });
 
   const handleActivate = async (clientId: CursorId) =>

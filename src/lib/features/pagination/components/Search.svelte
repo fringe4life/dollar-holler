@@ -3,16 +3,19 @@
   import { circle, flex, grid, gridItem } from "styled-system/patterns";
   import type { KeyboardEventHandler } from "svelte/elements";
   /**
-   * Search input: calls `store.loadItems` then shallow `pushState` (no full navigation).
+   * Search input: calls `store.loadItems` then shallow `goto` (no full navigation).
    */
-  import { pushState } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { page } from "$app/state";
   import type { SearchableListStore } from "$features/pagination/types";
   import {
     parseLimitParam,
     toNormalizedListQuery,
   } from "$features/pagination/utils/list-query";
-  import { buildListSearchString } from "$features/pagination/utils/url";
+  import {
+    buildListSearchString,
+    visibleListUrl,
+  } from "$features/pagination/utils/url";
   import { Toggle } from "$lib/client/runes/Toggle.svelte";
   import Search from "$lib/components/icons/Search.svelte";
 
@@ -31,7 +34,8 @@
 
   let { store }: SearchProps = $props();
 
-  const searchQuery = $derived(page.url.searchParams.get("q") ?? "");
+  const listUrl = $derived(visibleListUrl(page));
+  const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
 
   const loading = new Toggle();
 
@@ -42,18 +46,18 @@
 
   const runSearch = async () => {
     loading.toggle();
-    const limit = parseLimitParam(page.url.searchParams.get("limit"));
+    const limit = parseLimitParam(listUrl.searchParams.get("limit"));
     const n = toNormalizedListQuery(searchTerm || undefined, { limit });
-    const url = `${page.url.pathname}${buildListSearchString(n)}`;
+    const url = `${listUrl.pathname}${buildListSearchString(n)}`;
     try {
       store.presetClientListQueryKey?.(n);
       if (typeof document.startViewTransition === "function") {
         await document.startViewTransition(async () => {
-          pushState(url, {});
+          await goto(url, { shallow: true });
           await store.loadItems(n);
         }).finished;
       } else {
-        pushState(url, {});
+        await goto(url, { shallow: true });
         await store.loadItems(n);
       }
     } finally {

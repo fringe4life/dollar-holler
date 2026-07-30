@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css } from "styled-system/css";
   import { center, flex, grid, gridItem } from "styled-system/patterns";
-  import { goto, invalidateAll } from "$app/navigation";
+  import { goto, refreshAll } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
@@ -65,7 +65,7 @@
         apiClient.invoices({ id: invoice.id }).patch({ invoiceStatus: "sent" }),
         { fallbackMessage: fb }
       );
-      await invalidateAll();
+      await refreshAll();
       toast.success("Invoice sent");
     } catch (err) {
       toast.error(getErrorMessage(err, fb));
@@ -131,8 +131,8 @@
   <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
     <img
       alt="Compressed fm"
-      src={asset("/images/logo.png")}
-      srcset={`${asset("/images/logo@2x.png")} 2x, ${asset("/images/logo.png")} 1x`}
+      src={asset("images/logo.png")}
+      srcset={`${asset("images/logo@2x.png")} 2x, ${asset("images/logo.png")} 1x`}
     />
   </div>
 

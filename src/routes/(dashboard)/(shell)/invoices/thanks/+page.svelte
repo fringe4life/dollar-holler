@@ -13,7 +13,7 @@
     inlineSize: "full",
     backgroundImage: "var(--bg-thankYou)",
   })}
-  style:--bg-thankYou={`url(${asset("/images/bg-thankYou.svg")})`}
+  style:--bg-thankYou={`url(${asset("images/bg-thankYou.svg")})`}
 >
   <div>
     <h1

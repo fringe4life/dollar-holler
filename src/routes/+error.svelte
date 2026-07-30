@@ -15,7 +15,7 @@
     inlineSize: "full",
     minBlockSize: "100dvh",
   })}
-  style:--bg-error={`url(${asset("/images/bg-error.svg")})`}
+  style:--bg-error={`url(${asset("images/bg-error.svg")})`}
 >
   <div>
     <h1

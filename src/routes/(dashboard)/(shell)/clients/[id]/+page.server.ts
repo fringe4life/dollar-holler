@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
 
   const parsedId = cursorSchema(id);
   if (parsedId instanceof ArkErrors) {
-    throw error(400, { message: "Invalid client ID" });
+    throw error(400, "Invalid client ID");
   }
 
   if (!locals?.user) {
@@ -31,7 +31,7 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
   );
 
   if (!client) {
-    throw error(404, { message: "Client not found" });
+    throw error(404, "Client not found");
   }
 
   const { normalized, listCursorWasNormalized } =
@@ -51,6 +51,6 @@ export const load: PageServerLoad = async ({ params, locals, url }) => {
       summary,
     };
   } catch {
-    throw error(500, { message: "Failed to load client invoices" });
+    throw error(500, "Failed to load client invoices");
   }
 };

@@ -17,7 +17,7 @@
     minBlockSize: "100dvh",
     backgroundImage: { base: "none", md: "var(--bg-image)" },
   })}
-  style:--bg-image={`url(${asset("/images/bg-auth.svg")})`}
+  style:--bg-image={`url(${asset("images/bg-auth.svg")})`}
 >
   <!-- "grid auto-rows-min grid-cols-12 place-content-center px-4 min-block-dvh md:auto-rows-fr md:gap-5 xl:px-0" -->
   <div
@@ -42,7 +42,7 @@
       <img
         alt="The Doller Holla"
         class={css({ marginInline: "auto" })}
-        src={asset("/images/logo.svg")}
+        src={asset("images/logo.svg")}
       />
     </div>
     <!-- "col-span-full md:col-span-6 md:my-auto lg:col-span-4 xl:col-span-3" -->

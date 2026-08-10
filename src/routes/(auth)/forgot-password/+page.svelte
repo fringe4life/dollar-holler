@@ -27,7 +27,7 @@
   >
     <a
       class={css({ textDecoration: { base: "underline", _hover: "none" } })}
-      href={resolve("/login")}>Ready to login?</a
+      href={resolve("login")}>Ready to login?</a
     >
   </p>
 {:else}
@@ -65,7 +65,7 @@
     >
       <a
         class={css({ textDecoration: { base: "underline", _hover: "none" } })}
-        href={resolve("/login")}>Ready to login?</a
+        href={resolve("login")}>Ready to login?</a
       >
     </p>
   </form>

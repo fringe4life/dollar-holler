@@ -16,7 +16,7 @@
     previousPageLink = navigation?.from?.url?.pathname;
   });
   // actual derived url
-  const getBackUrl = $derived(previousPageLink ?? resolve("/invoices"));
+  const getBackUrl = $derived(previousPageLink ?? resolve("invoices"));
   let isExiting = $state(false);
   let resolveNavigation: (() => void) | undefined = $state(undefined);
 

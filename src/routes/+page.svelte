@@ -128,14 +128,12 @@
         </p>
         <div class={wrap({ align: "center", gap: 3 })}>
           {#if data?.user}
-            <Button href={resolve("/invoices")} size="lg">
+            <Button href={resolve("invoices")} size="lg">
               Go to Dashboard →
             </Button>
           {:else}
-            <Button href={resolve("/signup")} size="lg">
-              Start for Free →
-            </Button>
-            <Button href={resolve("/login")} size="lg">Log in</Button>
+            <Button href={resolve("signup")} size="lg">Start for Free →</Button>
+            <Button href={resolve("login")} size="lg">Log in</Button>
           {/if}
         </div>
         <p
@@ -663,7 +661,7 @@
       <div class={vstack({ gap: 4 })}>
         <Button
           class={css({ fontSize: "lg", minInlineSize: 56 })}
-          href={resolve("/signup")}
+          href={resolve("signup")}
           size="lg"
           variant="auth"
         >
@@ -678,7 +676,7 @@
             transitionProperty: "colors",
             transitionDuration: "normal",
           })}
-          href={resolve("/login")}
+          href={resolve("login")}
         >
           Already have an account? Log in
         </a>
@@ -719,7 +717,7 @@
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/invoices")}>Invoices</a
+        href={resolve("invoices")}>Invoices</a
       >
       <a
         class={css({
@@ -727,7 +725,7 @@
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/clients")}>Clients</a
+        href={resolve("clients")}>Clients</a
       >
       <a
         class={css({
@@ -735,7 +733,7 @@
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/login")}>Login</a
+        href={resolve("login")}>Login</a
       >
       <a
         class={css({
@@ -744,7 +742,7 @@
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolve("/signup")}>Sign Up</a
+        href={resolve("signup")}>Sign Up</a
       >
     </nav>
   </div>

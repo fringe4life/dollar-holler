@@ -35,7 +35,7 @@
           fontSize: "sm",
           textDecoration: { base: "underline", _hover: "none" },
         })}
-        href={resolve("/forgot-password")}>Forgot Password</a
+        href={resolve("forgot-password")}>Forgot Password</a
       >
     </div>
     <Input
@@ -59,7 +59,7 @@
     >
       <a
         class={css({ textDecoration: { base: "underline", _hover: "none" } })}
-        href={resolve("/signup")}>Don't have an account yet?</a
+        href={resolve("signup")}>Don't have an account yet?</a
       >
     </p>
   {/snippet}

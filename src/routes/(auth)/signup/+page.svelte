@@ -64,7 +64,7 @@
       <a
         class={css({ textDecoration: { base: "underline", _hover: "none" } })}
         data-sveltekit-preload-data="hover"
-        href={resolve("/login")}>Already have an account?</a
+        href={resolve("login")}>Already have an account?</a
       >
     </p>
   {/snippet}

@@ -47,6 +47,8 @@
   const resolved = $derived(
     resolve("/(dashboard)/(shell)/clients/[id]", { id: client.id })
   );
+  const optionsPopoverId = $derived(`client-options-${client.id}`);
+  const optionsAnchorName = $derived(`--${optionsPopoverId}-anchor`);
 
   // ADDITIONAL OPTIONS
   const CLIENT_OPTIONS = $derived([
@@ -162,11 +164,15 @@
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
-      {#snippet content(_additionalMenu)}
-        <AdditionalOptionsButton additionalMenu={_additionalMenu} />
+      {#snippet content()}
+        <AdditionalOptionsButton
+          anchorName={optionsAnchorName}
+          popoverId={optionsPopoverId}
+        />
         <AdditionalOptionsList
-          additionalMenu={_additionalMenu}
+          anchorName={optionsAnchorName}
           options={CLIENT_OPTIONS}
+          popoverId={optionsPopoverId}
         />
       {/snippet}
     </AdditionalOptions>

@@ -28,7 +28,7 @@ export const login = form(loginSchema, async (data) => {
     invalid("Login failed");
   }
 
-  redirect(303, resolve("/invoices"));
+  redirect(303, resolve("invoices"));
 });
 
 export const signup = form(signupSchema, async (data) => {
@@ -53,7 +53,7 @@ export const signup = form(signupSchema, async (data) => {
     invalid("Something went wrong please try again later");
   }
 
-  redirect(303, resolve("/login"));
+  redirect(303, resolve("login"));
 });
 
 export const forgotPassword = form(forgotPasswordSchema, async (data) => {
@@ -90,7 +90,7 @@ export const resetPassword = form(resetPasswordSchema, async (data) => {
     invalid("Failed to reset password");
   }
 
-  redirect(303, resolve("/invoices"));
+  redirect(303, resolve("invoices"));
 });
 
 export const changePassword = form(changePasswordSchema, async (data) => {

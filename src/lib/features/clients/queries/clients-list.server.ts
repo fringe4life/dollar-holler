@@ -1,4 +1,4 @@
-import { clientReceivedBalanceExtras } from "$features/clients/queries/clientListHelpers";
+import { fetchClientReceivedBalanceForIds } from "$features/clients/queries/clientListHelpers";
 import type { ClientListResponse } from "$features/clients/types";
 import type {
   CursorPaginatedList,
@@ -33,20 +33,10 @@ const searchWhere = (q: Maybe<string>) => {
   };
 };
 
-/** Coerce driver extras to integer cents (`number`). See money note in `clientListHelpers`. */
-const mapRows = (rows: ClientListResponse[]): ClientListResponse[] =>
-  rows.map((row): ClientListResponse => ({
-    ...row,
-    balance: Math.round(Number(row.balance ?? 0)),
-    clientStatus: row.clientStatus,
-    received: Math.round(Number(row.received ?? 0)),
-  }));
-
 /**
  * Paginated clients list (one row per client). Used by Elysia GET and +page.server.ts load.
+ * Money columns come from a batch CTE after the page of clients is known (A+B).
  */
-
-// biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
 export const fetchPaginatedClients = async (
   userId: string,
   input: PaginationSearchParams
@@ -54,15 +44,30 @@ export const fetchPaginatedClients = async (
   const ws = withUserAndSearch(userId, searchWhere(input.q));
   return fetchCursorPaginatedList({
     baseWhere: ws,
-    fetchPage: ({ where, orderBy, limit }) =>
-      db.query.clients.findMany({
-        extras: clientReceivedBalanceExtras,
+    fetchPage: async ({ where, orderBy, limit }) => {
+      const rows = await db.query.clients.findMany({
         limit,
         orderBy,
         where,
-      }),
+      });
+      const moneyByClient = await fetchClientReceivedBalanceForIds(
+        rows.map((row) => row.id)
+      );
+      return rows.map((row): ClientListResponse => {
+        const money = moneyByClient.get(row.id) ?? {
+          balance: 0,
+          received: 0,
+        };
+        const { userId: _userId, ...client } = row;
+        return {
+          ...client,
+          balance: money.balance,
+          received: money.received,
+        };
+      });
+    },
     idColumn: clientsTable.id,
     input,
-    map: mapRows,
+    map: (rows) => rows,
   });
 };

@@ -1,4 +1,4 @@
-// import { sentrySvelteKit } from "@sentry/sveltekit";
+import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-vercel";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
@@ -48,6 +48,11 @@ export default defineConfig({
     devToolsJson(),
     varlockVitePlugin({
       ssrInjectMode: "resolved-env",
+    }),
+    sentrySvelteKit({
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+      org: "coinnich",
+      project: "javascript-sveltekit",
     }),
     sveltekit({
       adapter: adapter(),

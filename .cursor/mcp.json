@@ -15,7 +15,7 @@
     "svelte-devtools": {
       "url": "http://localhost:5173/__svelte-devtools/mcp",
       "headers": {
-        "x-svelte-devtools-token": "${env:SVELTE_DEVTOOLS_TOKEN}"
+        "x-svelte-devtools-token": "cefa5c3a-6b93-47fc-bb4e-012e1cbef082"
       }
     }
   }

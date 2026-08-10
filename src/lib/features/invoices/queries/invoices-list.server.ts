@@ -1,14 +1,12 @@
-import type { sql } from "drizzle-orm";
+import { and, eq, like, or, type SQL, sql } from "drizzle-orm";
 import {
+  invoiceTotalFromSubtotalSql,
   lineItemsSubtotalSqlForInvoiceId,
   mapRowsWithTotal,
   type RowWithSubtotal,
 } from "$features/invoices/queries/invoiceListHelpers";
 import type { InvoiceListResponse } from "$features/invoices/types";
-import {
-  aggregateClientInvoiceBuckets,
-  type ClientInvoiceSummaryCents,
-} from "$features/invoices/utils/client-invoice-summary";
+import type { ClientInvoiceSummaryCents } from "$features/invoices/utils/client-invoice-summary";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
@@ -19,7 +17,10 @@ import {
   fetchCursorPaginatedList,
 } from "$features/pagination/utils/cursor-paginated-fetch.server";
 import { db } from "$lib/server/db";
-import { invoices as invoicesTable } from "$lib/server/db/schema";
+import {
+  invoices as invoicesTable,
+  lineItems as lineItemsTable,
+} from "$lib/server/db/schema";
 import type { CursorId, Maybe } from "$lib/types";
 
 /** Keys allowed in RQB `columns` for `invoices` (matches Drizzle’s `findMany` config). */
@@ -144,29 +145,82 @@ export const fetchPaginatedInvoicesForClient = async (
   });
 };
 
+/**
+ * Client invoice money buckets in one SQL round-trip (B).
+ * Inner CTE: one `SUM(line_items)` per invoice + discount algebra (A).
+ * Outer: CASE/SUM into draft / paid / overdue / outstanding.
+ * Search `q` matches invoice number/subject only (client already scoped).
+ */
 export const fetchClientInvoiceSummary = async (
   userId: string,
   clientId: CursorId,
   q: Maybe<string>
 ): Promise<ClientInvoiceSummaryCents> => {
-  const where = clientInvoiceListWhere(userId, clientId, q);
-  const raw = await db.query.invoices.findMany({
-    columns: {
-      discount: true,
-      dueDate: true,
-      invoiceStatus: true,
-    },
-    extras: invoiceSubtotalExtras,
-    orderBy: { id: "asc" },
-    where,
-  });
+  const filters: SQL[] = [
+    eq(invoicesTable.userId, userId),
+    eq(invoicesTable.clientId, clientId),
+  ];
+  const trimmed = q?.trim();
+  if (trimmed) {
+    const pattern = `%${trimmed}%`;
+    const search = or(
+      like(invoicesTable.invoiceNumber, pattern),
+      like(invoicesTable.subject, pattern)
+    );
+    if (search) {
+      filters.push(search);
+    }
+  }
 
-  const withTotal = mapRowsWithTotal(raw);
-  return aggregateClientInvoiceBuckets(
-    withTotal.map((row) => ({
-      dueDate: row.dueDate,
-      invoiceStatus: row.invoiceStatus,
-      total: row.total,
-    }))
+  const nowMs = Date.now();
+  const invoiceTotals = db.$with("invoice_totals").as(
+    db
+      .select({
+        dueDate: invoicesTable.dueDate,
+        id: invoicesTable.id,
+        invoiceStatus: invoicesTable.invoiceStatus,
+        total: invoiceTotalFromSubtotalSql(
+          sql`SUM(${lineItemsTable.amount})`,
+          invoicesTable.discount
+        ).as("total"),
+      })
+      .from(invoicesTable)
+      .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
+      .where(and(...filters))
+      .groupBy(invoicesTable.id)
   );
+
+  const [row] = await db
+    .with(invoiceTotals)
+    .select({
+      draft:
+        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'draft' THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
+          "draft"
+        ),
+      outstanding:
+        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'sent' AND ${invoiceTotals.dueDate} >= ${nowMs} THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
+          "outstanding"
+        ),
+      overdue:
+        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'sent' AND ${invoiceTotals.dueDate} < ${nowMs} THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
+          "overdue"
+        ),
+      paid: sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'paid' THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
+        "paid"
+      ),
+    })
+    .from(invoiceTotals);
+
+  const draft = Math.round(Number(row?.draft ?? 0));
+  const outstanding = Math.round(Number(row?.outstanding ?? 0));
+  const overdue = Math.round(Number(row?.overdue ?? 0));
+  const paid = Math.round(Number(row?.paid ?? 0));
+
+  return {
+    draft,
+    grandTotal: draft + outstanding + overdue + paid,
+    outstanding,
+    overdue,
+    paid,
+  };
 };

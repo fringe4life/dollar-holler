@@ -2,8 +2,8 @@
  * List-query contract (clients list + received/balance aggregates)
  *
  * Paginated list handlers use `ORDER BY` + `LIMIT` on `clients.id`.
- * Financial totals are **scalar correlated subqueries** in RQB `extras` so there
- * is at most one SQL row per client before `LIMIT`.
+ * Financial totals are loaded in a **second batch query** for the page’s client
+ * ids (CTE: one `SUM(line_items)` per invoice, then paid/unpaid rolls).
  *
  * Do not join raw `line_items` or unaggregated invoice rows into the outer
  * clients list query in a way that multiplies rows per client.
@@ -11,52 +11,87 @@
  * ## Money typing (SQLite / Turso)
  *
  * `line_items.amount` and `invoices.discount` are `real`, so `SUM` / `ROUND` here
- * typically yield a floating value from libSQL (Postgres used to coerce with
- * `::bigint`). That is fine: `fetchPaginatedClients` normalizes with
- * `Math.round(Number(...))` so API / UI always see integer **cents** as `number`
- * (see `ClientListResponse`, `centsToDollars`).
+ * typically yield a floating value from libSQL. List mapper coerces with
+ * `Math.round(Number(...))` so API / UI always see integer **cents** as `number`.
  *
  * Long term: store money as integer cents in the schema (`integer` columns, no
  * `real`), compute discounts in integer math, and drop the JS `Number`/`round`
- * band-aid. Until then, keep SQL `ROUND` + the list `mapRows` coercion as the
- * contract — do not reintroduce dialect-only casts (`::bigint`).
+ * band-aid.
  *
- * @see ../../invoices/queries/invoiceListHelpers.ts for `lineItemsSubtotalSqlForInvoiceId`.
+ * @see ../../invoices/queries/invoiceListHelpers.ts for single-SUM total algebra.
  */
 
-import type { sql } from "drizzle-orm";
-import type { clients as clientsTable } from "$lib/server/db/schema";
+import { eq, inArray, sql } from "drizzle-orm";
+import { invoiceTotalFromSubtotalSql } from "$features/invoices/queries/invoiceListHelpers";
+import { db } from "$lib/server/db";
+import {
+  invoices as invoicesTable,
+  lineItems as lineItemsTable,
+} from "$lib/server/db/schema";
+import type { CursorId } from "$lib/types";
+
+export interface ClientReceivedBalance {
+  balance: number;
+  received: number;
+}
+
+const emptyMoney = (): ClientReceivedBalance => ({ balance: 0, received: 0 });
 
 /**
- * RQB `extras`: received (paid) and balance (unpaid) per client, matching the
- * previous `GROUP BY clientId` CASE/SUM semantics over per-invoice totals.
- * Driver may return float/string; list mapper coerces to integer cents.
+ * One pass over invoices + line_items for the given client ids.
+ * Invoice total = `ROUND(SUM(amount) * (1 - discount/100))` (single SUM).
+ * Then roll into received (paid) vs balance (not paid).
  */
-export const clientReceivedBalanceExtras = {
-  balance: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
-    sq<number>`(
-      SELECT COALESCE(SUM(
-        CASE WHEN i.invoice_status IS NULL OR i.invoice_status <> 'paid'
-        THEN ROUND(
-          COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0)
-          - COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0) * COALESCE(i.discount, 0) / 100
-        )
-        ELSE 0 END
-      ), 0)
-      FROM invoices i
-      WHERE i.client_id = ${clients.id}
-    )`,
-  received: (clients: typeof clientsTable, { sql: sq }: { sql: typeof sql }) =>
-    sq<number>`(
-      SELECT COALESCE(SUM(
-        CASE WHEN i.invoice_status = 'paid'
-        THEN ROUND(
-          COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0)
-          - COALESCE((SELECT SUM(li.amount) FROM line_items li WHERE li.invoice_id = i.id), 0) * COALESCE(i.discount, 0) / 100
-        )
-        ELSE 0 END
-      ), 0)
-      FROM invoices i
-      WHERE i.client_id = ${clients.id}
-    )`,
+export const fetchClientReceivedBalanceForIds = async (
+  clientIds: readonly CursorId[]
+): Promise<Map<CursorId, ClientReceivedBalance>> => {
+  const result = new Map<CursorId, ClientReceivedBalance>();
+  for (const id of clientIds) {
+    result.set(id, emptyMoney());
+  }
+  if (clientIds.length === 0) {
+    return result;
+  }
+
+  const invoiceTotals = db.$with("invoice_totals").as(
+    db
+      .select({
+        clientId: invoicesTable.clientId,
+        id: invoicesTable.id,
+        invoiceStatus: invoicesTable.invoiceStatus,
+        total: invoiceTotalFromSubtotalSql(
+          sql`SUM(${lineItemsTable.amount})`,
+          invoicesTable.discount
+        ).as("total"),
+      })
+      .from(invoicesTable)
+      .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
+      .where(inArray(invoicesTable.clientId, [...clientIds]))
+      .groupBy(invoicesTable.id)
+  );
+
+  const rows = await db
+    .with(invoiceTotals)
+    .select({
+      balance:
+        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} IS NULL OR ${invoiceTotals.invoiceStatus} <> 'paid' THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
+          "balance"
+        ),
+      clientId: invoiceTotals.clientId,
+      received:
+        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'paid' THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
+          "received"
+        ),
+    })
+    .from(invoiceTotals)
+    .groupBy(invoiceTotals.clientId);
+
+  for (const row of rows) {
+    result.set(row.clientId, {
+      balance: Math.round(Number(row.balance ?? 0)),
+      received: Math.round(Number(row.received ?? 0)),
+    });
+  }
+
+  return result;
 };

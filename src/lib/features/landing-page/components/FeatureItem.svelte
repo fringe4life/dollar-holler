@@ -2,8 +2,8 @@
   import { css, cx } from "styled-system/css";
   import { center, hoverShadow, square, stack } from "styled-system/patterns";
   import type { Component } from "svelte";
-  import type { features } from "$features/landing-page/constants/features.js";
-  import type { IconProps } from "$lib/components/Icon.svelte";
+  import type { features } from "#features/landing-page/constants/features.js";
+  import type { IconProps } from "#lib/components/Icon.svelte";
 
   export interface Feature {
     icon: Component<IconProps>;

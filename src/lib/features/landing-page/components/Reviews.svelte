@@ -1,6 +1,6 @@
 <script lang="ts">
   import { grid } from "styled-system/patterns";
-  import { reviews } from "$features/landing-page/constants/reviews.js";
+  import { reviews } from "#features/landing-page/constants/reviews.js";
   import ReviewItem from "./ReviewItem.svelte";
 </script>
 

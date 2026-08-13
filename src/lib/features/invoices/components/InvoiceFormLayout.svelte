@@ -4,29 +4,33 @@
   import type { Snippet } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
   import { slide } from "svelte/transition";
-  import type { ClientInsert } from "$features/clients/types";
-  import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
-  import LineItemSkeleton from "$features/line-items/components/LineItemSkeleton.svelte";
+  import type {
+    ClientInsert,
+    ClientPickerOption,
+  } from "#features/clients/types";
+  import LineItemRows from "#features/line-items/components/LineItemRows.svelte";
+  import LineItemSkeleton from "#features/line-items/components/LineItemSkeleton.svelte";
   import type {
     Key,
     LineItemEditRow,
     LineItemUpdate,
     NewLineItemWithId,
-  } from "$features/line-items/types";
-  import FormField from "$lib/components/FormField.svelte";
-  import States from "$lib/components/States.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import Input from "$lib/components/ui/input/Input.svelte";
-  import Label from "$lib/components/ui/label/Label.svelte";
-  import Textarea from "$lib/components/ui/textarea/Textarea.svelte";
-  import type { BitsButton } from "$lib/types";
-  import { today } from "$lib/utils/dateHelpers";
+  } from "#features/line-items/types";
+  import FormField from "#lib/components/FormField.svelte";
+  import States from "#lib/components/States.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import Input from "#lib/components/ui/input/Input.svelte";
+  import Label from "#lib/components/ui/label/Label.svelte";
+  import Textarea from "#lib/components/ui/textarea/Textarea.svelte";
+  import type { BitsButton } from "#lib/types";
+  import { today } from "#lib/utils/dateHelpers";
   import type { NewInvoice } from "../types";
   import ClientField from "./ClientField.svelte";
 
   interface InvoiceFormLayoutProps {
     addLineItem: BitsButton;
     buttons?: Snippet;
+    clientOptions: ClientPickerOption[];
     closePanel: () => void;
     invoice: NewInvoice;
     isNewClient: boolean;
@@ -48,6 +52,7 @@
     closePanel,
     addLineItem,
     buttons,
+    clientOptions,
   }: InvoiceFormLayoutProps = $props();
 
   const removeLineItem = (id: Key) => {
@@ -71,7 +76,7 @@
 
 <form class={grid({ columns: 6, columnGap: { base: 2, md: 5 } })} {onsubmit}>
   <!-- client -->
-  <ClientField bind:invoice bind:isNewClient bind:newClient />
+  <ClientField {clientOptions} bind:invoice bind:isNewClient bind:newClient />
 
   <!-- invoice number -->
   <FormField
@@ -139,7 +144,7 @@
 
   <!-- due date -->
   <FormField
-    class={gridItem({ colSpan: { base: 3, sm: 2 } })}
+    class={gridItem({ colSpan: { base: 6, sm: 2 } })}
     forId="dueDate"
     label="Due Date"
   >
@@ -156,7 +161,7 @@
   <!-- issue date -->
   <FormField
     class={gridItem({
-      colSpan: { base: 3, sm: 2 },
+      colSpan: { base: 6, sm: 2 },
       colStart: { sm: 5 },
       colEnd: { sm: 7 },
     })}

@@ -4,8 +4,7 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import { paginationSchema } from "$features/pagination/schemas.server";
-import { invoices } from "$lib/server/db/schema";
+import { invoices } from "#lib/server/db/schema";
 
 /**
  * JSON bodies encode dates as ISO strings; Drizzle arktype expects `Date`.
@@ -42,15 +41,3 @@ export const invoiceListRowSchema = invoiceSelectSchema
     name: "string",
     total: "number",
   });
-
-export const invoicePaginatedListSchema =
-  paginationSchema(invoiceListRowSchema);
-
-/** Integer cents per bucket (matches `InvoiceListResponse.total`). */
-export const clientInvoiceSummarySchema = type({
-  draft: "number",
-  grandTotal: "number",
-  outstanding: "number",
-  overdue: "number",
-  paid: "number",
-});

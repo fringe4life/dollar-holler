@@ -1,6 +1,6 @@
 <script lang="ts">
-  import type { Maybe } from "$lib/types";
-  import { states } from "$lib/utils/states";
+  import type { Maybe } from "#lib/types";
+  import { states } from "#lib/utils/states";
   import Select from "./ui/select/Select.svelte";
 
   interface Props {

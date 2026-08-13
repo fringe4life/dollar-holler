@@ -1,11 +1,11 @@
 import { createClient } from "@libsql/client";
 import { drizzle } from "drizzle-orm/libsql";
 import { ENV } from "varlock/env";
-import type { ClientInsert, ClientSelect } from "$features/clients/types";
-import type { LineItemInsert } from "$features/line-items/types";
-import type { SettingsInsert } from "$features/settings/types";
-import { appendInvoiceNotesTermsHtmlForInsert } from "$lib/server/utils/invoice-notes-terms-html.server";
-import type { CursorId } from "$lib/types";
+import type { ClientInsert, ClientSelect } from "#features/clients/types";
+import type { LineItemInsert } from "#features/line-items/types";
+import type { SettingsInsert } from "#features/settings/types";
+import { appendInvoiceNotesTermsHtmlForInsert } from "#lib/server/utils/invoice-notes-terms-html.server";
+import type { CursorId } from "#lib/types";
 import { createId } from "../utils/create-id";
 import { tableRelations } from "./relations";
 import { clients, invoices, lineItems, settings } from "./schema";

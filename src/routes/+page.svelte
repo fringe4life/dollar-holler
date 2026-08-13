@@ -13,11 +13,11 @@
     wrap,
   } from "styled-system/patterns";
   import { resolve } from "$app/paths";
-  import AuroraBlob from "$features/landing-page/components/AuroraBlob.svelte";
-  import Features from "$features/landing-page/components/Features.svelte";
-  import LandingNav from "$features/landing-page/components/LandingNav.svelte";
-  import Reviews from "$features/landing-page/components/Reviews.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import AuroraBlob from "#features/landing-page/components/AuroraBlob.svelte";
+  import Features from "#features/landing-page/components/Features.svelte";
+  import LandingNav from "#features/landing-page/components/LandingNav.svelte";
+  import Reviews from "#features/landing-page/components/Reviews.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
 
   let { data } = $props();
 </script>

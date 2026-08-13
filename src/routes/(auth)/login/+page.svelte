@@ -2,12 +2,12 @@
   import { css } from "styled-system/css";
   import { between } from "styled-system/patterns";
   import { resolve } from "$app/paths";
-  import { login } from "$features/auth/auth.remote";
-  import { authHeading } from "$features/auth/styles";
-  import Form from "$lib/components/Form.svelte";
-  import FormField from "$lib/components/FormField.svelte";
-  import Input from "$lib/components/ui/input/Input.svelte";
-  import Label from "$lib/components/ui/label/Label.svelte";
+  import { login } from "#features/auth/auth.remote";
+  import { authHeading } from "#features/auth/styles";
+  import Form from "#lib/components/Form.svelte";
+  import FormField from "#lib/components/FormField.svelte";
+  import Input from "#lib/components/ui/input/Input.svelte";
+  import Label from "#lib/components/ui/label/Label.svelte";
 </script>
 
 <h1 class={authHeading}>Login</h1>

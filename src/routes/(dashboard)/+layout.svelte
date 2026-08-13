@@ -1,26 +1,33 @@
 <script lang="ts">
-  import { onDestroy } from "svelte";
-  import { ClientsStore } from "$features/clients/stores/clientsStore.svelte";
-  import { InvoicesStore } from "$features/invoices/stores/invoicesStore.svelte";
-  import { LineItemsStore } from "$features/line-items/stores/lineItemsStore.svelte";
-  import { SettingsStore } from "$features/settings/stores/settingsStore.svelte";
-  import { setDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
+  import { grid, gridItem } from "styled-system/patterns";
+  import Navbar from "#lib/components/navbar/Navbar.svelte";
 
   let { children } = $props();
-
-  const clients = new ClientsStore();
-  const invoices = new InvoicesStore();
-  const lineItems = new LineItemsStore();
-  const settings = new SettingsStore();
-
-  setDashboardStores({ clients, invoices, lineItems, settings });
-
-  onDestroy(() => {
-    clients.resetList();
-    invoices.resetList();
-    lineItems.resetLineItems();
-    settings.reset();
-  });
 </script>
 
-{@render children()}
+<div
+  class={grid({
+    backgroundColor: "whisper",
+    columns: 12,
+    overflowX: "clip",
+    minBlockSize: "100dvh",
+    columnGap: { base: 0, md: 16 },
+    position: "relative",
+  })}
+>
+  <Navbar />
+  <main
+    class={gridItem({
+      display: "flex",
+      flexDirection: "column",
+      paddingInline: 4,
+      minBlockSize: "100dvh",
+      colSpan: { base: 12, md: 8 },
+      paddingBlockStart: { base: 4, md: 10 },
+    })}
+  >
+    <svelte:boundary>
+      {@render children()}
+    </svelte:boundary>
+  </main>
+</div>

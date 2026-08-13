@@ -1,7 +1,7 @@
-import { db } from "$lib/server/db";
-import type { InvoiceStatus } from "$lib/server/db/types";
-import type { CursorId, Maybe } from "$lib/types";
-import { tryCatch } from "$lib/utils/try-catch";
+import { db } from "#lib/server/db";
+import type { InvoiceStatus } from "#lib/server/db/types";
+import type { CursorId, Maybe } from "#lib/types";
+import { tryCatch } from "#lib/utils/try-catch";
 export const verifyInvoice = async (
   userId: string,
   invoiceId: CursorId

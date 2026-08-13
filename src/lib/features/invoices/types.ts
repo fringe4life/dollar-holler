@@ -1,4 +1,4 @@
-import type { CursorId } from "$lib/types";
+import type { CursorId } from "#lib/types";
 import type {
   invoiceInsertSchema,
   invoiceListRowSchema,

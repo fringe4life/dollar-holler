@@ -1,10 +1,10 @@
 <script generics="T extends CursorRow" lang="ts">
   import { cx } from "styled-system/css";
-  import { flex, grid, gridItem, stack } from "styled-system/patterns";
+  import { flex, grid, stack } from "styled-system/patterns";
   import type { Snippet } from "svelte";
   import { page } from "$app/state";
   import { DEFAULT_LIMIT } from "../constants";
-  import type { CursorRow, PaginatableItems } from "../types";
+  import type { CursorRow, PaginationMetadata } from "../types";
   import { visibleListUrl } from "../utils/url";
   import Pagination from "./Pagination.svelte";
   import PaginationSkeleton from "./PaginationSkeleton.svelte";
@@ -14,15 +14,19 @@
     class?: string;
     footer?: Snippet;
     header: Snippet;
+    items: T[];
     noResults?: Snippet;
+    paginationMetadata: PaginationMetadata;
+    pending?: boolean;
     row: Snippet<[T]>;
     skeleton: Snippet;
     skeletonCount?: number;
-    store: PaginatableItems<T>;
   }
 
   let {
-    store,
+    items,
+    paginationMetadata,
+    pending = false,
     skeletonCount = DEFAULT_LIMIT,
     class: extraClass,
     header,
@@ -36,28 +40,14 @@
   const searchQuery = $derived(
     visibleListUrl(page).searchParams.get("q") ?? ""
   );
-  const isBlank = $derived(
-    !store.loading && store.items.length === 0 && !searchQuery
-  );
+  const isBlank = $derived(!pending && items.length === 0 && !searchQuery);
   const isNoResults = $derived(
-    !store.loading && store.items.length === 0 && Boolean(searchQuery)
+    !pending && items.length === 0 && Boolean(searchQuery)
   );
 </script>
 
 <div class={stack({ flexGrow: 1 })}>
-  {#if store.error}
-    <div
-      class={grid({
-        placeContent: "center",
-        paddingBlock: 8,
-        blockSize: "full",
-      })}
-    >
-      <div class={gridItem({ color: "scarlet", fontSize: "lg" })}>
-        Error: {store.error}
-      </div>
-    </div>
-  {:else if isBlank}
+  {#if isBlank}
     {@render blankState?.()}
   {:else if isNoResults}
     {@render noResults?.()}
@@ -86,20 +76,20 @@
         })}
         style:view-transition-name="paginated-list-rows"
       >
-        {#if store.loading}
+        {#if pending}
           {#each { length: skeletonCount } as _, i (i)}
             {@render skeleton()}
           {/each}
         {:else}
-          {#each store.items as item (item.id)}
+          {#each items as item (item.id)}
             {@render row(item)}
           {/each}
         {/if}
       </div>
-      {#if store.loading}
+      {#if pending}
         <PaginationSkeleton />
       {:else}
-        <Pagination {store} />
+        <Pagination {items} {paginationMetadata} {pending} />
         {@render footer?.()}
       {/if}
     </div>

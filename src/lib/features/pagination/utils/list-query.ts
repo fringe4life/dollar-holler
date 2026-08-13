@@ -1,5 +1,6 @@
-import type { CursorId, Maybe } from "$lib/types";
-import { DEFAULT_LIMIT, LIMITS } from "../constants";
+import type { CursorId, Maybe } from "#lib/types";
+import { pickDefined } from "#lib/utils/strip-nullish-entries";
+import { DEFAULT_LIMIT, LIMITS, type ListLimit } from "../constants";
 import type {
   ListDirection,
   NormalizeListQueryResult,
@@ -13,7 +14,7 @@ import { tryParseCursorId } from "./parse-cursor-id";
  * @param raw - The raw limit parameter.
  * @returns The parsed limit parameter.
  */
-const parseLimit = (raw: Maybe<string>): number => parseLimitParam(raw);
+const parseLimit = (raw: Maybe<string>): ListLimit => parseLimitParam(raw);
 
 /**
  * @description Parses a direction parameter from a string.
@@ -32,20 +33,20 @@ const effectiveDirection = (
   return resolved === "backward" && !cursor ? "forward" : resolved;
 };
 
-const coerceLimit = (limit?: number): number =>
-  limit !== undefined && LIMITS.includes(limit as (typeof LIMITS)[number])
-    ? limit
-    : DEFAULT_LIMIT;
+const isListLimit = (limit: number): limit is ListLimit =>
+  (LIMITS as readonly number[]).includes(limit);
+
+const coerceLimit = (limit?: number): ListLimit =>
+  limit !== undefined && isListLimit(limit) ? limit : DEFAULT_LIMIT;
 
 /**
- * Shared list-query normalization for SSR, Elysia GET handlers, and client.
+ * Shared list-query normalization for remotes and URL search params.
  * Invalid UUIDv7 `cursor` values are dropped (first-page semantics); sets `listCursorWasNormalized`.
  */
-export const normalizeListQuery = (raw: {
+const normalizeListQuery = (raw: {
   q?: string;
   cursor?: string;
   direction?: string;
-  /** Elysia/ArkType wire may narrow `limit` to numeric literals. */
   limit?: string | number;
 }): NormalizeListQueryResult => {
   let listCursorWasNormalized = false;
@@ -70,12 +71,13 @@ export const normalizeListQuery = (raw: {
 
   return {
     listCursorWasNormalized,
-    normalized: {
+    // ArkType `"cursor?"` / `"q?"` reject present-but-undefined keys.
+    normalized: pickDefined({
       cursor,
       direction: effectiveDirection(direction, cursor),
       limit,
       q,
-    },
+    }) as PaginationSearchParams,
   };
 };
 
@@ -110,21 +112,16 @@ const parseSearchParamsToRaw = (
  * @param raw - The raw limit parameter.
  * @returns The parsed limit parameter.
  */
-export const parseLimitParam = (raw: Maybe<string>): number => {
+export const parseLimitParam = (raw: Maybe<string>): ListLimit => {
   if (!raw) {
     return DEFAULT_LIMIT;
   }
   const n = Number(raw);
-  return LIMITS.includes(
-    // @ts-expect-error LIMITS is a readonly tuple; n is narrowed by includes()
-    n
-  )
-    ? n
-    : DEFAULT_LIMIT;
+  return isListLimit(n) ? n : DEFAULT_LIMIT;
 };
 
 /**
- * @description Builds a normalized query from store/API args (defaults match URL + server).
+ * @description Builds a normalized query from URL/search args (defaults match remotes).
  * @param q - The query parameter.
  * @param options - The options parameter.
  * @returns The normalized query.
@@ -132,9 +129,10 @@ export const parseLimitParam = (raw: Maybe<string>): number => {
 export const toNormalizedListQuery = (
   q: Maybe<string>,
   options?: Partial<PaginationSearchParams>
-): PaginationSearchParams => ({
-  cursor: options?.cursor,
-  direction: effectiveDirection(options?.direction, options?.cursor),
-  limit: coerceLimit(options?.limit),
-  q: q?.trim() || undefined,
-});
+): PaginationSearchParams =>
+  pickDefined({
+    cursor: options?.cursor,
+    direction: effectiveDirection(options?.direction, options?.cursor),
+    limit: coerceLimit(options?.limit),
+    q: q?.trim() || undefined,
+  }) as PaginationSearchParams;

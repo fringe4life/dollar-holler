@@ -5,9 +5,9 @@
   import { css } from "styled-system/css";
   import { between, hstack, square } from "styled-system/patterns";
   import { asset, resolve } from "$app/paths";
-  import { Toggle } from "$lib/client/runes/Toggle.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import type { Maybe } from "$lib/types";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import type { Maybe } from "#lib/types";
 
   interface Props {
     user: Maybe<User>;

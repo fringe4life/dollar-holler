@@ -16,5 +16,5 @@ export type ClientListResponse = typeof clientListRowSchema.infer;
 export type ClientPickerOptionsResponse =
   typeof clientPickerOptionsResponseSchema.infer;
 
-/** Invoice client `<select>`: id + name only (GET /api/clients/options). */
+/** Invoice client `<select>`: id + name only (`clientPickerOptions` query). */
 export type ClientPickerOption = typeof clientPickerOptionSchema.infer;

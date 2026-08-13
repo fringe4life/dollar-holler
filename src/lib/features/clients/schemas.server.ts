@@ -4,11 +4,8 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import {
-  cursorSchema,
-  paginationSchema,
-} from "$features/pagination/schemas.server";
-import { clients } from "$lib/server/db/schema";
+import { cursorSchema } from "#features/pagination/schemas.server";
+import { clients } from "#lib/server/db/schema";
 
 export const clientInsertSchema = createInsertSchema(clients).omit(
   "createdAt",
@@ -41,12 +38,6 @@ export const clientPickerOptionSchema = type({
   name: "string",
 });
 
-export const clientPaginatedListSchema = paginationSchema(clientListRowSchema);
 export const clientPickerOptionsResponseSchema = type({
   options: clientPickerOptionSchema.array(),
 });
-/** PATCH /clients/:id status-only response shape. */
-export const clientStatusPatchResponseSchema = type({
-  id: cursorSchema,
-  updatedAt: "Date",
-}).merge(clientStatusSchema);

@@ -2,7 +2,7 @@
   import { css } from "styled-system/css";
   import type { Snippet } from "svelte";
   import { asset } from "$app/paths";
-  import BlankRow from "$features/pagination/components/BlankRow.svelte";
+  import BlankRow from "#features/pagination/components/BlankRow.svelte";
 
   interface Props {
     header: Snippet;

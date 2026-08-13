@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import ThreeDots from "$lib/components/icons/ThreeDots.svelte";
+  import ThreeDots from "#lib/components/icons/ThreeDots.svelte";
 
   interface Props {
     anchorName: string;

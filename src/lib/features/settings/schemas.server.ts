@@ -3,7 +3,7 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import { settings } from "$lib/server/db/schema";
+import { settings } from "#lib/server/db/schema";
 
 export const settingsInsertSchema = createInsertSchema(settings).omit(
   "createdAt",

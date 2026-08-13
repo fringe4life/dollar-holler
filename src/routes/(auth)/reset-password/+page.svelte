@@ -2,11 +2,11 @@
   import { css } from "styled-system/css";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { resetPassword } from "$features/auth/auth.remote";
-  import { authHeading } from "$features/auth/styles";
-  import Form from "$lib/components/Form.svelte";
-  import FormField from "$lib/components/FormField.svelte";
-  import Input from "$lib/components/ui/input/Input.svelte";
+  import { resetPassword } from "#features/auth/auth.remote";
+  import { authHeading } from "#features/auth/styles";
+  import Form from "#lib/components/Form.svelte";
+  import FormField from "#lib/components/FormField.svelte";
+  import Input from "#lib/components/ui/input/Input.svelte";
 
   const token = $derived(page.url.searchParams.get("token") ?? "");
 </script>

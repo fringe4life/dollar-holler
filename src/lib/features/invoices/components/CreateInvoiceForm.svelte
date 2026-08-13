@@ -1,101 +1,101 @@
 <script lang="ts">
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
-  import type { ClientInsert } from "$features/clients/types";
+  import {
+    clientPickerOptions,
+    createClient,
+  } from "#features/clients/clients.remote";
+  import type { ClientInsert } from "#features/clients/types";
+  import { newClient } from "#features/clients/utils/new-client";
+  import {
+    createInvoice,
+    listInvoices,
+  } from "#features/invoices/invoices.remote";
+  import { createLineItems } from "#features/line-items/line-items.remote";
   import type {
     LineItemEditRow,
     NewLineItemWithId,
-  } from "$features/line-items/types";
-  import { toNormalizedListQuery } from "$features/pagination/utils/list-query";
-  import { Counter } from "$lib/client/runes/Counter.svelte";
-  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton } from "$lib/types";
-  import { isAbortError } from "$lib/utils/error-message";
-  import { toast } from "$lib/utils/toast.svelte";
-  import type { NewInvoice } from "../types";
+  } from "#features/line-items/types";
+  import {
+    newLineItem,
+    normalizeLineItems,
+  } from "#features/line-items/utils/line-item-form";
+  import { toNormalizedListQuery } from "#features/pagination/utils/list-query";
+  import { Counter } from "#lib/client/runes/Counter.svelte";
+  import type { BitsButton } from "#lib/types";
+  import { getErrorMessage } from "#lib/utils/error-message";
+  import { toast } from "#lib/utils/toast.svelte";
+  import { newInvoice } from "../utils/new-invoice";
   import { resolveClientId } from "../utils/resolve-client-id";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
   let { closePanel }: { closePanel: () => void } = $props();
 
-  const {
-    clients: clientsStore,
-    invoices: invoicesStore,
-    lineItems: lineItemsStore,
-  } = getDashboardStores();
+  const picker = $derived(await clientPickerOptions());
 
-  let invoice: NewInvoice = $state(invoicesStore.newInvoice());
+  let invoice = $state(newInvoice());
 
   const counter = new Counter();
 
   let lineItems: Array<NewLineItemWithId | LineItemEditRow> = $state([
-    lineItemsStore.newLineItem(counter.increment()),
+    newLineItem(counter.increment()),
   ]);
 
   let isNewClient = $state(false);
-  let newClient: ClientInsert = $state(clientsStore.newClient());
-
-  let abortController: AbortController | null = null;
-
-  onMount(async () => {
-    abortController = new AbortController();
-    try {
-      await clientsStore.loadClientPickerOptions(abortController.signal);
-    } catch (err) {
-      if (!isAbortError(err)) {
-        toast.error("Failed to load clients");
-      }
-    }
-  });
+  let newClientState: ClientInsert = $state(newClient());
 
   onDestroy(() => {
-    abortController?.abort();
     counter.reset();
   });
 
   const addLineItem: BitsButton = () => {
-    lineItems.push(lineItemsStore.newLineItem(counter.increment()));
+    lineItems.push(newLineItem(counter.increment()));
   };
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    const client = await resolveClientId({
-      createClient: (clientData) => clientsStore.createClient(clientData),
-      existingClientId: invoice.clientId,
-      isNewClient,
-      newClient,
-    });
-    if (!client.ok) {
-      toast.error(client.message);
-      return;
+    try {
+      const client = await resolveClientId({
+        createClient: async (clientData) => {
+          const created = await createClient(clientData);
+          return created.id;
+        },
+        existingClientId: invoice.clientId,
+        isNewClient,
+        newClient: newClientState,
+      });
+      if (!client.ok) {
+        toast.error(client.message);
+        return;
+      }
+
+      const invoiceData = {
+        ...invoice,
+        clientId: client.clientId,
+        dueDate: new Date(invoice.dueDate),
+        issueDate: new Date(invoice.issueDate),
+      };
+
+      const { id: invoiceId } = await createInvoice(invoiceData);
+
+      const normalized = normalizeLineItems(lineItems);
+      if (normalized.length > 0) {
+        await createLineItems({ invoiceId, lineItems: normalized });
+      }
+
+      await listInvoices(toNormalizedListQuery(undefined, {})).refresh();
+      closePanel();
+      toast.success("Invoice created successfully");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to create invoice"));
     }
-
-    const invoiceData = {
-      ...invoice,
-      clientId: client.clientId,
-      dueDate: new Date(invoice.dueDate),
-      issueDate: new Date(invoice.issueDate),
-    };
-
-    const invoiceId = await invoicesStore.createInvoice(invoiceData);
-    if (!invoiceId) {
-      toast.error("Failed to create invoice");
-      return;
-    }
-
-    const normalizedLineItems = lineItemsStore.normalizeLineItems(lineItems);
-    if (normalizedLineItems.length > 0) {
-      await lineItemsStore.createLineItems(invoiceId, normalizedLineItems);
-    }
-
-    await invoicesStore.loadItems(toNormalizedListQuery(undefined, {}));
-    closePanel();
   };
 </script>
 
 <InvoiceFormLayout
   {addLineItem}
+  clientOptions={picker.options}
   {closePanel}
   lineItemsLoaded={true}
   mode="create"
@@ -103,5 +103,5 @@
   bind:invoice
   bind:isNewClient
   bind:lineItems
-  bind:newClient
+  bind:newClient={newClientState}
 />

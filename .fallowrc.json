@@ -12,11 +12,10 @@
   "ignoreUnresolvedImports": [
     "styled-system",
     "styled-system/*",
-    "$features/*"
+    "#features/*"
   ],
   "rules": {
     "boundary-violation": "warn",
-    "unused-class-members": "off",
     "dev-dependencies-in-production": "off",
     "unused-dependency-overrides": "off"
   },
@@ -48,7 +47,6 @@
         "name": "shared",
         "patterns": [
           "src/lib/runes/**",
-          "src/lib/stores/**",
           "src/lib/utils/**"
         ]
       },

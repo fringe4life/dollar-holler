@@ -3,21 +3,20 @@
   import { circle, flex, grid, gridItem } from "styled-system/patterns";
   import type { KeyboardEventHandler } from "svelte/elements";
   /**
-   * Search input: calls `store.loadItems` then shallow `goto` (no full navigation).
+   * Search input: shallow `goto` only. List pages re-query from the URL.
    */
   import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import type { SearchableListStore } from "$features/pagination/types";
   import {
     parseLimitParam,
     toNormalizedListQuery,
-  } from "$features/pagination/utils/list-query";
+  } from "#features/pagination/utils/list-query";
   import {
     buildListSearchString,
     visibleListUrl,
-  } from "$features/pagination/utils/url";
-  import { Toggle } from "$lib/client/runes/Toggle.svelte";
-  import Search from "$lib/components/icons/Search.svelte";
+  } from "#features/pagination/utils/url";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  import Search from "#lib/components/icons/Search.svelte";
 
   const searchIconVt = viewTransition({
     group: {
@@ -28,13 +27,8 @@
     new: { mixBlendMode: "normal" },
   });
 
-  export interface SearchProps {
-    store: SearchableListStore;
-  }
-
-  let { store }: SearchProps = $props();
-
   const listUrl = $derived(visibleListUrl(page));
+
   const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
 
   const loading = new Toggle();
@@ -50,15 +44,12 @@
     const n = toNormalizedListQuery(searchTerm || undefined, { limit });
     const url = `${listUrl.pathname}${buildListSearchString(n)}`;
     try {
-      store.presetClientListQueryKey?.(n);
       if (typeof document.startViewTransition === "function") {
         await document.startViewTransition(async () => {
           await goto(url, { shallow: true });
-          await store.loadItems(n);
         }).finished;
       } else {
         await goto(url, { shallow: true });
-        await store.loadItems(n);
       }
     } finally {
       loading.off();

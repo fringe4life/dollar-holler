@@ -2,10 +2,10 @@ import type {
   LineItemEditRow,
   LineItemInsert,
   NewLineItemWithId,
-} from "$features/line-items/types";
-import type { CursorId, Maybe } from "$lib/types";
-import { err, ok, type Result } from "$lib/utils/result";
-import { stripNullishEntries } from "$lib/utils/strip-nullish-entries";
+} from "#features/line-items/types";
+import type { CursorId, Maybe } from "#lib/types";
+import { err, ok, type Result } from "#lib/utils/result";
+import { stripNullishEntries } from "#lib/utils/strip-nullish-entries";
 import type {
   InvoiceInsert,
   InvoiceSelect,

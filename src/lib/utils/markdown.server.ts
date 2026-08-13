@@ -3,7 +3,7 @@
  */
 import { sanitize, type Config } from "isomorphic-dompurify";
 import { marked } from "marked";
-import type { Maybe, SanitizedHTML } from "$lib/types";
+import type { Maybe, SanitizedHTML } from "#lib/types";
 
 const MARKDOWN_PURIFY_CONFIG: Config = Object.freeze({
   ALLOWED_ATTR: ["href", "class"],

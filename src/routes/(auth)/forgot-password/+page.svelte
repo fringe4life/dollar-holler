@@ -1,13 +1,13 @@
 <script lang="ts">
   import { css } from "styled-system/css";
   import { resolve } from "$app/paths";
-  import { forgotPassword } from "$features/auth/auth.remote";
-  import { authHeading } from "$features/auth/styles";
-  import Alert from "$lib/components/Alert.svelte";
-  import FormField from "$lib/components/FormField.svelte";
-  import Loader from "$lib/components/Loader.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import Input from "$lib/components/ui/input/Input.svelte";
+  import { forgotPassword } from "#features/auth/auth.remote";
+  import { authHeading } from "#features/auth/styles";
+  import Alert from "#lib/components/Alert.svelte";
+  import FormField from "#lib/components/FormField.svelte";
+  import Loader from "#lib/components/Loader.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import Input from "#lib/components/ui/input/Input.svelte";
 
   const issues = $derived(forgotPassword.fields.allIssues() ?? []);
   const isLoading = $derived(forgotPassword.pending > 0);

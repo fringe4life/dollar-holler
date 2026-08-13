@@ -2,8 +2,8 @@
   import { css } from "styled-system/css";
   import { flex } from "styled-system/patterns";
   import type { Snippet } from "svelte";
-  import Modal from "$lib/components/Modal.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
+  import Modal from "#lib/components/Modal.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
 
   interface Props<T> {
     descriptionSnippet?: Snippet<[item: T]>;

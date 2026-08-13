@@ -1,10 +1,14 @@
 // biome-ignore lint/performance/noNamespaceImport: way to use sentry
 import * as Sentry from "@sentry/sveltekit";
-import { type Handle, redirect } from "@sveltejs/kit";
-import { sequence } from "@sveltejs/kit/hooks";
+import { redirect } from "@sveltejs/kit";
+import {
+  type Handle,
+  type HandleServerError,
+  sequence,
+} from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/env";
-import { auth } from "$lib/auth.server";
+import { auth } from "#lib/auth.server";
 
 // get session from better auth and populate locals
 const localsHandler: Handle = async ({ event, resolve }) => {
@@ -63,4 +67,41 @@ export const handle: Handle = sequence(
   authGuard,
   fontPreloadHandler
 );
-export const handleError = Sentry.handleErrorWithSentry();
+
+/**
+ * Kit 3 moved status onto `error` / kind payloads. Sentry's stock
+ * `handleErrorWithSentry` still reads deprecated top-level `input.status`.
+ */
+const statusFromCaught = (input: Parameters<HandleServerError>[0]): number => {
+  const { kind, error } = input;
+  if (
+    (kind === "app" || kind === "framework" || kind === "validation") &&
+    error &&
+    typeof error === "object" &&
+    "status" in error &&
+    typeof error.status === "number"
+  ) {
+    return error.status;
+  }
+  return 500;
+};
+
+export const handleError: HandleServerError = async (input) => {
+  const status = statusFromCaught(input);
+  if (status >= 400 && status < 500) {
+    return;
+  }
+
+  Sentry.captureException(input.error, {
+    mechanism: {
+      handled: false,
+      type: "auto.function.sveltekit.handle_error",
+    },
+  });
+
+  const platform = input.event.platform as
+    { context?: { waitUntil?: (p: Promise<void>) => void } } | undefined;
+  if (typeof platform?.context?.waitUntil === "function") {
+    await Sentry.flush(2000);
+  }
+};

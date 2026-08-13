@@ -10,27 +10,29 @@
   import { page } from "$app/state";
   import type {
     CursorRow,
-    PaginatableItems,
+    PaginationMetadata,
     PaginationSearchParams,
-  } from "$features/pagination/types";
+  } from "#features/pagination/types";
   import {
     parseLimitParam,
     toNormalizedListQuery,
-  } from "$features/pagination/utils/list-query";
+  } from "#features/pagination/utils/list-query";
   import {
     buildListSearchString,
     visibleListUrl,
-  } from "$features/pagination/utils/url";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import Select from "$lib/components/ui/select/Select.svelte";
-  import { LIMITS } from "../constants";
+  } from "#features/pagination/utils/url";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import Select from "#lib/components/ui/select/Select.svelte";
+  import { LIMITS, type ListLimit } from "../constants";
   import type { ListDirection } from "../types";
 
   interface Props {
-    store: PaginatableItems<T>;
+    items: T[];
+    paginationMetadata: PaginationMetadata;
+    pending?: boolean;
   }
 
-  let { store }: Props = $props();
+  let { items, paginationMetadata, pending = false }: Props = $props();
 
   const listUrl = $derived(visibleListUrl(page));
   const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
@@ -38,19 +40,14 @@
     parseLimitParam(listUrl.searchParams.get("limit"))
   );
 
-  const rowItems = $derived(store.items);
-  const pageMeta = $derived(store.paginationMetadata);
-
   const canNavigate = $derived(
-    pageMeta.hasNextPage || pageMeta.hasPreviousPage
+    paginationMetadata.hasNextPage || paginationMetadata.hasPreviousPage
   );
 
   const navigateWithQuery = async (next: PaginationSearchParams) => {
-    store.presetClientListQueryKey?.(next);
     await goto(`${listUrl.pathname}${buildListSearchString(next)}`, {
       shallow: true,
     });
-    await store.loadItems(next);
   };
 
   const navigateWithTransition = async (
@@ -67,7 +64,6 @@
         types: [direction],
         update: async () => {
           await navigateWithQuery(next);
-          // await tick();
         },
       }).finished;
     } catch {
@@ -75,7 +71,7 @@
     }
   };
   const handleForward = async () => {
-    const last = rowItems.at(-1);
+    const last = items.at(-1);
     if (!last) {
       return;
     }
@@ -89,7 +85,7 @@
   };
 
   const handleBackward = async () => {
-    const first = rowItems.at(0);
+    const first = items.at(0);
     if (!first) {
       return;
     }
@@ -102,13 +98,13 @@
     await navigateWithTransition(next, "backward");
   };
 
-  const handleLimitChange = async (newLimit: number) => {
+  const handleLimitChange = async (newLimit: ListLimit) => {
     const q = searchQuery || undefined;
     await navigateWithQuery(toNormalizedListQuery(q, { limit: newLimit }));
   };
 </script>
 
-{#if rowItems.length === 0 && !store.loading}
+{#if items.length === 0 && !pending}
   <p
     class={css({
       paddingInlineEnd: 1,
@@ -129,9 +125,10 @@
   >
     <Select
       class={css({ aspectRatio: "2/1", maxInlineSize: "fit-content" })}
-      disabled={!canNavigate || store.loading}
+      disabled={!canNavigate || pending}
       name="limit"
-      onchange={(e) => handleLimitChange(Number(e.currentTarget.value))}
+      onchange={(e) =>
+        handleLimitChange(parseLimitParam(e.currentTarget.value))}
     >
       {#each LIMITS as limitOption (limitOption)}
         <option
@@ -145,7 +142,7 @@
     <div class={hstack({ gap: 2 })}>
       <Button
         aria-label="Previous page"
-        disabled={!pageMeta.hasPreviousPage || store.loading}
+        disabled={!paginationMetadata.hasPreviousPage || pending}
         onclick={handleBackward}
         size="default"
         type="button"
@@ -155,7 +152,7 @@
       </Button>
       <Button
         aria-label="Next page"
-        disabled={!pageMeta.hasNextPage || store.loading}
+        disabled={!paginationMetadata.hasNextPage || pending}
         onclick={handleForward}
         size="default"
         type="button"

@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css } from "styled-system/css";
   import { between, hstack, square } from "styled-system/patterns";
-  import Skeleton from "$lib/components/ui/skeleton/skeleton.svelte";
+  import Skeleton from "#lib/components/ui/skeleton/skeleton.svelte";
 </script>
 
 <div class={between({ marginBlockEnd: 6, gap: 4 })}>

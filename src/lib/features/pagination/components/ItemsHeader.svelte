@@ -2,21 +2,15 @@
   import { css } from "styled-system/css";
   import { flex } from "styled-system/patterns";
   import type { Snippet } from "svelte";
-  import Search, {
-    type SearchProps,
-  } from "$features/pagination/components/Search.svelte";
-  import type { Toggle } from "$lib/client/runes/Toggle.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  /** Same signature as `new Toggle().toggle`. */
-  export type ItemsHeaderToggle = InstanceType<typeof Toggle>["toggle"];
+  import Search from "#features/pagination/components/Search.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
 
   interface ItemsHeaderProps {
     button: Snippet;
     open: () => void;
-    store: SearchProps["store"];
   }
 
-  let { store, open, button }: ItemsHeaderProps = $props();
+  let { open, button }: ItemsHeaderProps = $props();
 </script>
 
 <div
@@ -30,7 +24,7 @@
     fontSize: "lg",
   })}
 >
-  <Search {store} />
+  <Search />
   <div
     class={css({
       position: "relative",

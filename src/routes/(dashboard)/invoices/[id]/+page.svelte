@@ -1,28 +1,30 @@
 <script lang="ts">
   import { css } from "styled-system/css";
   import { center, flex, grid, gridItem } from "styled-system/patterns";
-  import { goto, refreshAll } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
-  import LineItemRows from "$features/line-items/components/LineItemRows.svelte";
-  import { apiClient } from "$lib/api";
-  import HtmlContent from "$lib/components/HtmlContent.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton } from "$lib/types";
-  import { convertDate } from "$lib/utils/dateHelpers";
-  import { getErrorMessage } from "$lib/utils/error-message";
-  import { toast } from "$lib/utils/toast.svelte";
-  import { tryCatch } from "$lib/utils/try-catch";
-  import { unwrapTreaty } from "$lib/utils/unwrap";
-  import type { PageProps } from "./$types";
+  import {
+    getInvoiceDetail,
+    updateInvoiceStatus,
+  } from "#features/invoices/invoices.remote";
+  import LineItemRows from "#features/line-items/components/LineItemRows.svelte";
+  import { getSettings } from "#features/settings/settings.remote";
+  import HtmlContent from "#lib/components/HtmlContent.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import type { BitsButton, CursorId } from "#lib/types";
+  import { convertDate } from "#lib/utils/dateHelpers";
+  import { getErrorMessage } from "#lib/utils/error-message";
+  import { toast } from "#lib/utils/toast.svelte";
+  import { tryCatch } from "#lib/utils/try-catch";
 
-  let { data }: PageProps = $props();
+  const invoiceId = $derived(page.params.id as CursorId);
+  const detail = $derived(await getInvoiceDetail(invoiceId));
+  const settings = $derived(await getSettings());
 
-  const { settings: settingsStore } = getDashboardStores();
-
-  const invoice = $derived(data.invoice);
-  const lineItems = $derived(data.lineItems ?? []);
+  const invoice = $derived(detail.invoice);
+  const lineItems = $derived(detail.lineItems ?? []);
+  const client = $derived(detail.client);
   const settingsLink = $derived(resolve("settings"));
 
   const canSendInvoice = $derived(invoice.invoiceStatus === "draft");
@@ -48,10 +50,10 @@
   const payInvoice: BitsButton = async () => {
     const fb = "Failed to record payment";
     try {
-      await unwrapTreaty(
-        apiClient.invoices({ id: invoice.id }).patch({ invoiceStatus: "paid" }),
-        { fallbackMessage: fb }
-      );
+      await updateInvoiceStatus({
+        id: invoice.id,
+        invoiceStatus: "paid",
+      });
       await goto(resolve("invoices/thanks"));
     } catch (err) {
       toast.error(getErrorMessage(err, fb));
@@ -61,11 +63,10 @@
   const sendInvoice: BitsButton = async () => {
     const fb = "Failed to send invoice";
     try {
-      await unwrapTreaty(
-        apiClient.invoices({ id: invoice.id }).patch({ invoiceStatus: "sent" }),
-        { fallbackMessage: fb }
-      );
-      await refreshAll();
+      await updateInvoiceStatus({
+        id: invoice.id,
+        invoiceStatus: "sent",
+      }).updates(getInvoiceDetail(invoiceId));
       toast.success("Invoice sent");
     } catch (err) {
       toast.error(getErrorMessage(err, fb));
@@ -73,183 +74,200 @@
   };
 </script>
 
-<div
-  class={grid({
-    gridAutoFlow: { base: "row", md: "column" },
-    justifyContent: "space-between",
-    rowGap: 5,
-    inlineSize: "full",
-    maxInlineSize: "5xl",
-    paddingInline: { base: 4, lg: 0 },
-    position: "fixed",
-    zIndex: 0,
-    marginBlockEnd: 16,
-    _print: { display: "none" },
-  })}
->
-  <h1
-    class={gridItem({
-      color: "daisyBush",
-      fontSize: "3xl",
-      fontWeight: "bold",
-    })}
-  >
-    Invoice
-  </h1>
-  <div
-    class={flex({
-      align: "center",
-      gap: 2,
-      wrap: { base: "wrap", sm: "nowrap" },
-    })}
-  >
-    <Button onclick={printInvoice} size="short" variant="outline">Print</Button>
-    <Button onclick={copyLink} size="short">Copy Link</Button>
-    {#if canPayInvoice}
-      <Button onclick={payInvoice} size="short">Pay Invoice</Button>
-    {/if}
-    {#if canSendInvoice}
-      <Button onclick={sendInvoice} size="short">Send Invoice</Button>
-    {/if}
-  </div>
-</div>
-
-<section
-  class={grid({
-    columns: 6,
-    columnGap: 5,
-    rowGap: 8,
-    paddingInline: { base: 5, md: 32 },
-    paddingBlock: { base: 8, md: 16 },
-    position: "relative",
-    insetBlockStart: { base: 36, _print: 0 },
-    zIndex: 10,
-    shadow: { base: "addInvoice", _print: "none" },
-    backgroundColor: "white",
-  })}
->
-  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
-    <img
-      alt="Compressed fm"
-      src={asset("images/logo.png")}
-      srcset={`${asset("images/logo@2x.png")} 2x, ${asset("images/logo.png")} 1x`}
-    />
-  </div>
+<svelte:boundary>
+  {#snippet pending()}
+    <p>Loading invoice…</p>
+  {/snippet}
+  {#snippet failed(err, reset)}
+    <p class={css({ color: "scarlet" })}>
+      {err instanceof Error ? err.message : "Failed to load invoice"}
+    </p>
+    <button onclick={reset} type="button">Retry</button>
+  {/snippet}
 
   <div
-    class={gridItem({
-      gridColumnStart: { sm: 5 },
-      colSpan: { base: 6, sm: 2, _print: 3 },
-      paddingBlockStart: 4,
+    class={grid({
+      gridAutoFlow: { base: "row", md: "column" },
+      justifyContent: "space-between",
+      rowGap: 5,
+      inlineSize: "full",
+      maxInlineSize: "5xl",
+      paddingInline: { base: 4, lg: 0 },
+      position: "fixed",
+      zIndex: 0,
+      marginBlockEnd: 16,
+      _print: { display: "none" },
     })}
   >
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
-    {#if settingsStore.settings?.myName}
+    <h1
+      class={gridItem({
+        color: "daisyBush",
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
+    >
+      Invoice
+    </h1>
+    <div
+      class={flex({
+        align: "center",
+        gap: 2,
+        wrap: { base: "wrap", sm: "nowrap" },
+      })}
+    >
+      <Button onclick={printInvoice} size="short" variant="outline"
+        >Print</Button
+      >
+      <Button onclick={copyLink} size="short">Copy Link</Button>
+      {#if canPayInvoice}
+        <Button onclick={payInvoice} size="short">Pay Invoice</Button>
+      {/if}
+      {#if canSendInvoice}
+        <Button onclick={sendInvoice} size="short">Send Invoice</Button>
+      {/if}
+    </div>
+  </div>
+
+  <section
+    class={grid({
+      columns: 6,
+      columnGap: 5,
+      rowGap: 8,
+      paddingInline: { base: 5, md: 32 },
+      paddingBlock: { base: 8, md: 16 },
+      position: "relative",
+      insetBlockStart: { base: 36, _print: 0 },
+      zIndex: 10,
+      shadow: { base: "addInvoice", _print: "none" },
+      backgroundColor: "white",
+    })}
+  >
+    <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
+      <img
+        alt="Compressed fm"
+        src={asset("images/logo.png")}
+        srcset={`${asset("images/logo@2x.png")} 2x, ${asset("images/logo.png")} 1x`}
+      />
+    </div>
+
+    <div
+      class={gridItem({
+        gridColumnStart: { sm: 5 },
+        colSpan: { base: 6, sm: 2, _print: 3 },
+        paddingBlockStart: 4,
+      })}
+    >
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
+      {#if settings?.myName}
+        <p>
+          {#if settings.myName}
+            {settings.myName}<br />
+          {/if}
+          {#if settings.city && settings.street && settings.state && settings.zip}
+            {settings.street}<br />
+            {settings.city}
+            {settings.state}
+            {settings.zip}
+          {/if}
+        </p>
+      {:else}
+        <div
+          class={center({
+            backgroundColor: "gallery",
+            borderRadius: "md",
+            minBlockSize: 17,
+          })}
+        >
+          <a
+            class={css({
+              color: "stone.600",
+              textDecoration: { base: "underline", _hover: "none" },
+            })}
+            href={settingsLink}>Add your contact information.</a
+          >
+        </div>
+      {/if}
+    </div>
+    <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
       <p>
-        {#if settingsStore.settings.myName}
-          {settingsStore.settings.myName}<br />
-        {/if}
-        {#if settingsStore.settings.city && settingsStore.settings.street && settingsStore.settings.state && settingsStore.settings.zip}
-          {settingsStore.settings.street}<br />
-          {settingsStore.settings.city}
-          {settingsStore.settings.state}
-          {settingsStore.settings.zip}
+        {#if client}
+          {#if client.name}
+            <strong>{client.name}</strong><br />
+          {/if}
+          {#if client.email}
+            {client.email}<br />
+          {/if}
+          {#if client.street}
+            {client.street}<br />
+          {/if}
+          {#if client.state}
+            {client.state}
+          {/if}
+          {#if client.zip}
+            {client.zip}
+          {/if}
+        {:else}
+          No client found
         {/if}
       </p>
-    {:else}
-      <div
-        class={center({
-          backgroundColor: "gallery",
-          borderRadius: "md",
-          minBlockSize: 17,
-        })}
-      >
-        <a
-          class={css({
-            color: "stone.600",
-            textDecoration: { base: "underline", _hover: "none" },
-          })}
-          href={settingsLink}>Add your contact information.</a
-        >
+    </div>
+    <div
+      class={gridItem({
+        colSpan: { base: 6, sm: 2, _print: 3 },
+        gridColumnStart: { sm: 5 },
+      })}
+    >
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>
+        Invoice Id:
+      </div>
+      <p>{invoice.invoiceNumber}</p>
+    </div>
+    <div class={gridItem({ colSpan: 3 })}>
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Due Date:</div>
+      <p>
+        {convertDate(invoice.dueDate === null ? null : String(invoice.dueDate))}
+      </p>
+    </div>
+
+    <div
+      class={gridItem({
+        colSpan: { base: 3, sm: 2, _print: 3 },
+        gridColumnStart: { sm: 5 },
+      })}
+    >
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>
+        Issue Date:
+      </div>
+      <p>
+        {convertDate(
+          invoice.issueDate === null ? null : String(invoice.issueDate)
+        )}
+      </p>
+    </div>
+
+    <div class={gridItem({ colSpan: 6 })}>
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Subject:</div>
+      <p>{invoice.subject}</p>
+    </div>
+
+    <div class={gridItem({ colSpan: 6 })}>
+      <LineItemRows discount={invoice.discount || 0} {lineItems} mode="view" />
+    </div>
+
+    {#if invoice.notesHtml}
+      <div class={gridItem({ colSpan: 6 })}>
+        <div class={css({ color: "monsoon", fontWeight: "bold" })}>Notes:</div>
+        <HtmlContent html={invoice.notesHtml} />
       </div>
     {/if}
-  </div>
-  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
-    <p>
-      {#if data.client}
-        {#if data.client.name}
-          <strong>{data.client.name}</strong><br />
-        {/if}
-        {#if data.client.email}
-          {data.client.email}<br />
-        {/if}
-        {#if data.client.street}
-          {data.client.street}<br />
-        {/if}
-        {#if data.client.state}
-          {data.client.state}
-        {/if}
-        {#if data.client.zip}
-          {data.client.zip}
-        {/if}
-      {:else}
-        No client found
-      {/if}
-    </p>
-  </div>
-  <div
-    class={gridItem({
-      colSpan: { base: 6, sm: 2, _print: 3 },
-      gridColumnStart: { sm: 5 },
-    })}
-  >
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Invoice Id:</div>
-    <p>{invoice.invoiceNumber}</p>
-  </div>
-  <div class={gridItem({ colSpan: 3 })}>
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Due Date:</div>
-    <p>
-      {convertDate(invoice.dueDate === null ? null : String(invoice.dueDate))}
-    </p>
-  </div>
-
-  <div
-    class={gridItem({
-      colSpan: { base: 3, sm: 2, _print: 3 },
-      gridColumnStart: { sm: 5 },
-    })}
-  >
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Issue Date:</div>
-    <p>
-      {convertDate(
-        invoice.issueDate === null ? null : String(invoice.issueDate)
-      )}
-    </p>
-  </div>
-
-  <div class={gridItem({ colSpan: 6 })}>
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Subject:</div>
-    <p>{invoice.subject}</p>
-  </div>
-
-  <!-- line items div wrapper -->
-  <div class={gridItem({ colSpan: 6 })}>
-    <LineItemRows discount={invoice.discount || 0} {lineItems} mode="view" />
-  </div>
-
-  {#if invoice.notesHtml}
-    <div class={gridItem({ colSpan: 6 })}>
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Notes:</div>
-      <HtmlContent html={invoice.notesHtml} />
-    </div>
-  {/if}
-  {#if invoice.termsHtml}
-    <div class={gridItem({ colSpan: 6 })}>
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>
-        Terms and Conditions:
+    {#if invoice.termsHtml}
+      <div class={gridItem({ colSpan: 6 })}>
+        <div class={css({ color: "monsoon", fontWeight: "bold" })}>
+          Terms and Conditions:
+        </div>
+        <HtmlContent html={invoice.termsHtml} />
       </div>
-      <HtmlContent html={invoice.termsHtml} />
-    </div>
-  {/if}
-</section>
+    {/if}
+  </section>
+</svelte:boundary>

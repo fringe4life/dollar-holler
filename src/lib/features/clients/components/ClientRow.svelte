@@ -3,20 +3,20 @@
   import { gridItem } from "styled-system/patterns";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
-  import AdditionalOptions from "$lib/components/additionaloptions/AdditionalOptions.svelte";
-  import AdditionalOptionsButton from "$lib/components/additionaloptions/AdditionalOptionsButton.svelte";
-  import type { Option } from "$lib/components/additionaloptions/AdditionalOptionsItem.svelte";
-  import AdditionalOptionsList from "$lib/components/additionaloptions/AdditionalOptionsList.svelte";
-  import Activate from "$lib/components/icons/Activate.svelte";
-  import Archive from "$lib/components/icons/Archive.svelte";
-  import Edit from "$lib/components/icons/Edit.svelte";
-  import Trash from "$lib/components/icons/Trash.svelte";
-  import View from "$lib/components/icons/View.svelte";
-  import Swipeable from "$lib/components/Swipeable.svelte";
-  import Badge from "$lib/components/ui/badge/badge.svelte";
-  import { actionButton, tableRowBase, tableRowHover } from "$lib/styles";
-  import type { CursorId } from "$lib/types";
-  import { centsToDollars } from "$lib/utils/moneyHelpers";
+  import AdditionalOptions from "#lib/components/additionaloptions/AdditionalOptions.svelte";
+  import AdditionalOptionsButton from "#lib/components/additionaloptions/AdditionalOptionsButton.svelte";
+  import type { Option } from "#lib/components/additionaloptions/AdditionalOptionsItem.svelte";
+  import AdditionalOptionsList from "#lib/components/additionaloptions/AdditionalOptionsList.svelte";
+  import Activate from "#lib/components/icons/Activate.svelte";
+  import Archive from "#lib/components/icons/Archive.svelte";
+  import Edit from "#lib/components/icons/Edit.svelte";
+  import Trash from "#lib/components/icons/Trash.svelte";
+  import View from "#lib/components/icons/View.svelte";
+  import Swipeable from "#lib/components/Swipeable.svelte";
+  import Badge from "#lib/components/ui/badge/badge.svelte";
+  import { actionButton, tableRowBase, tableRowHover } from "#lib/styles";
+  import type { CursorId } from "#lib/types";
+  import { centsToDollars } from "#lib/utils/moneyHelpers";
   import { clientRow, clientTable } from "../styles";
   import type { ClientListResponse } from "../types";
 
@@ -45,7 +45,7 @@
   const receivedDisplay = $derived(centsToDollars(client.received));
   const balanceDisplay = $derived(centsToDollars(client.balance));
   const resolved = $derived(
-    resolve("/(dashboard)/(shell)/clients/[id]", { id: client.id })
+    resolve("/(dashboard)/clients/[id]", { id: client.id })
   );
   const optionsPopoverId = $derived(`client-options-${client.id}`);
   const optionsAnchorName = $derived(`--${optionsPopoverId}-anchor`);

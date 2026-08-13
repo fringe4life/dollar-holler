@@ -17,15 +17,6 @@ const root = (relative: string) =>
   fileURLToPath(new URL(relative, import.meta.url));
 
 export default defineConfig({
-  // const shouldUseSentry = mode !== "development";
-
-  // const sentryPlugin = shouldUseSentry
-  //   ? sentrySvelteKit({
-  //       authToken: process.env.SENTRY_AUTH_TOKEN,
-  //       org: "coinnich",
-  //       project: "javascript-sveltekit",
-  //     })
-  //   : [];
 
   build: {
     rolldownOptions: {
@@ -35,7 +26,6 @@ export default defineConfig({
     },
   },
   plugins: [
-    // sentryPlugin,
     visualizer({
       brotliSize: true,
       filename: "stats.html", // written next to project root by default
@@ -77,13 +67,8 @@ export default defineConfig({
   preview: {
     port: 5173,
   },
-  // kit.alias deprecated → prefer tsconfig paths / package.json # imports.
-  // resolve.tsconfigPaths alone still fails for some .svelte virtual-module
-  // importers under Rolldown (Vite #21889); keep explicit aliases for app paths.
   resolve: {
     alias: {
-      $features: root("./src/lib/features"),
-      $lib: root("./src/lib"),
       "styled-system": root("./styled-system"),
     },
     tsconfigPaths: true,

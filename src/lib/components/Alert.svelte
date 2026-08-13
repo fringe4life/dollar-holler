@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import type { Maybe } from "$lib/types";
+  import type { Maybe } from "#lib/types";
 
   interface Props {
     message: Maybe<string>;

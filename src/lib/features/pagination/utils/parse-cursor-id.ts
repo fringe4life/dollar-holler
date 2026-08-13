@@ -1,4 +1,4 @@
-import type { CursorId } from "$lib/types";
+import type { CursorId } from "#lib/types";
 
 /**
  * RFC 9562 UUIDv7 in canonical 8-4-4-4-12 hex form (syntax only).

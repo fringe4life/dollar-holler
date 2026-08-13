@@ -2,8 +2,8 @@ import type { Attachment } from "svelte/attachments";
 import {
   type DialogApi,
   dialogController,
-} from "$lib/client/attachments/dialogController";
-import type { Maybe } from "$lib/types";
+} from "#lib/client/attachments/dialogController";
+import type { Maybe } from "#lib/types";
 
 /**
  * Generic panel/modal state for a single selected item.

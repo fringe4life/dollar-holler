@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css, cx, sva } from "styled-system/css";
   import type { Snippet } from "svelte";
-  import Cancel from "$lib/components/icons/Cancel.svelte";
+  import Cancel from "#lib/components/icons/Cancel.svelte";
   import Button from "./ui/button/button.svelte";
 
   const modalRecipe = sva({

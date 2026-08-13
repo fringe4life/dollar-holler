@@ -1,4 +1,4 @@
-import type { Maybe } from "$lib/types";
+import type { Maybe } from "#lib/types";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat();
 /**

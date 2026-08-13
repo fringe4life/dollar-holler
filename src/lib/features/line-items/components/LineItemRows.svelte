@@ -2,10 +2,10 @@
   import { css, cx } from "styled-system/css";
   import { gridItem } from "styled-system/patterns";
   import type { FormEventHandler } from "svelte/elements";
-  import type { LineItemRowsProps } from "$features/line-items/types";
-  import CircledAmount from "$lib/components/CircledAmount.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import { centsToDollars, sumLineItems } from "$lib/utils/moneyHelpers";
+  import type { LineItemRowsProps } from "#features/line-items/types";
+  import CircledAmount from "#lib/components/CircledAmount.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import { centsToDollars, sumLineItems } from "#lib/utils/moneyHelpers";
   import { invoiceLineItem } from "../styles";
   import { lineItemFieldRecipe } from "./LineItemRecipe";
   import LineItemRow from "./LineItemRow.svelte";

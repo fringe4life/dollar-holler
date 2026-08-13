@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css, cx } from "styled-system/css";
   import type { Snippet } from "svelte";
-  import Label from "$lib/components/ui/label/Label.svelte";
+  import Label from "#lib/components/ui/label/Label.svelte";
 
   interface FormFieldProps {
     children: Snippet;

@@ -1,5 +1,5 @@
 import { resolve } from "$app/paths";
-import { form, getRequestEvent } from "$app/server";
+import { command, form, getRequestEvent } from "$app/server";
 import { invalid, redirect } from "@sveltejs/kit";
 import {
   changePasswordSchema,
@@ -7,9 +7,9 @@ import {
   loginSchema,
   resetPasswordSchema,
   signupSchema,
-} from "$features/auth/schemas.server";
-import { auth } from "$lib/auth.server";
-import { tryCatch } from "$lib/utils/try-catch";
+} from "#features/auth/schemas.server";
+import { auth } from "#lib/auth.server";
+import { tryCatch } from "#lib/utils/try-catch";
 
 export const login = form(loginSchema, async (data) => {
   const { request } = getRequestEvent();
@@ -91,6 +91,14 @@ export const resetPassword = form(resetPasswordSchema, async (data) => {
   }
 
   redirect(303, resolve("invoices"));
+});
+
+export const logout = command(async () => {
+  const { request } = getRequestEvent();
+  await auth.api.signOut({
+    headers: request.headers,
+  });
+  redirect(303, resolve("login"));
 });
 
 export const changePassword = form(changePasswordSchema, async (data) => {

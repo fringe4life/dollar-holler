@@ -1,7 +1,5 @@
 import { type } from "arktype";
-import type { CursorId } from "$lib/types";
-import { LIMITS } from "./constants";
-import type { CursorRow } from "./types";
+import type { CursorId } from "#lib/types";
 /** Pagination metadata for cursor-paginated lists. */
 export const paginationMetadataSchema = type({
   hasNextPage: "boolean",
@@ -12,26 +10,14 @@ export const cursorSchema = type("(string.uuid.v7)").as<CursorId>();
 
 export const listDirectionSchema = type("'forward' | 'backward'");
 
-// Concept: join into one TS-style union string, then pass to type(...)
-const limitUnion = LIMITS.map((n) => `'${n}'`).join(
-  " | "
-) as unknown as `'${(typeof LIMITS)[number]}'`;
-const limitSchema = type(limitUnion);
-
-export const querySchema = type({
-  "q?": "string",
-});
-
-/** Loose wire shape for Elysia query (all string | undefined). */
-export const listQueryWireSchema = type({
+/** Normalized list query for remote `query` arguments (numeric `limit`). */
+export const listQuerySchema = type({
   "cursor?": cursorSchema,
   "direction?": listDirectionSchema,
-  "limit?": limitSchema,
+  limit: type("10 | 25 | 50"),
   "q?": "string",
 });
 
-export const paginationSchema = <t extends CursorRow>(of: type.Any<t>) =>
-  type({
-    items: of.array(),
-    paginationMetadata: paginationMetadataSchema,
-  });
+export const idSchema = type({
+  id: cursorSchema,
+});

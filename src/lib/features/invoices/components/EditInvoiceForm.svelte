@@ -1,24 +1,42 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { onDestroy, onMount } from "svelte";
+  import { onDestroy } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
-  import type { ClientInsert } from "$features/clients/types";
+  import {
+    clientPickerOptions,
+    createClient,
+  } from "#features/clients/clients.remote";
+  import type { ClientInsert } from "#features/clients/types";
+  import { newClient } from "#features/clients/utils/new-client";
+  import {
+    deleteInvoice,
+    getInvoice,
+    listInvoices,
+    updateInvoice,
+  } from "#features/invoices/invoices.remote";
+  import {
+    listLineItemsForEdit,
+    replaceLineItems,
+  } from "#features/line-items/line-items.remote";
   import type {
     LineItemEditRow,
     NewLineItemWithId,
-  } from "$features/line-items/types";
-  import { toNormalizedListQuery } from "$features/pagination/utils/list-query";
-  import { Counter } from "$lib/client/runes/Counter.svelte";
-  import { ItemPanel } from "$lib/client/runes/ItemPanel.svelte";
-  import ConfirmDelete from "$lib/components/ConfirmDelete.svelte";
-  import Trash from "$lib/components/icons/Trash.svelte";
-  import Button from "$lib/components/ui/button/button.svelte";
-  import { getDashboardStores } from "$lib/stores/dashboard-stores-context.svelte";
-  import type { BitsButton, CursorId } from "$lib/types";
-  import { toDateInputValue } from "$lib/utils/dateHelpers";
-  import { isAbortError } from "$lib/utils/error-message";
-  import { formatTotal, sumLineItems } from "$lib/utils/moneyHelpers";
-  import { toast } from "$lib/utils/toast.svelte";
+  } from "#features/line-items/types";
+  import {
+    newLineItem,
+    normalizeLineItems,
+  } from "#features/line-items/utils/line-item-form";
+  import { toNormalizedListQuery } from "#features/pagination/utils/list-query";
+  import { Counter } from "#lib/client/runes/Counter.svelte";
+  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
+  import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
+  import Trash from "#lib/components/icons/Trash.svelte";
+  import Button from "#lib/components/ui/button/button.svelte";
+  import type { BitsButton, CursorId } from "#lib/types";
+  import { toDateInputValue } from "#lib/utils/dateHelpers";
+  import { getErrorMessage } from "#lib/utils/error-message";
+  import { formatTotal, sumLineItems } from "#lib/utils/moneyHelpers";
+  import { toast } from "#lib/utils/toast.svelte";
   import type {
     InvoiceDeleteConfirmItem,
     InvoiceSelect,
@@ -42,11 +60,11 @@
 
   let { closePanel, invoiceId }: EditInvoiceFormProps = $props();
 
-  const {
-    clients: clientsStore,
-    invoices: invoicesStore,
-    lineItems: lineItemsStore,
-  } = getDashboardStores();
+  const picker = await clientPickerOptions();
+  // svelte-ignore state_referenced_locally -- parent remounts via {#key invoiceId}
+  const loadedInvoice = await getInvoice(invoiceId);
+  // svelte-ignore state_referenced_locally -- parent remounts via {#key invoiceId}
+  const loadedLineItems = await listLineItemsForEdit(invoiceId);
 
   type EditableInvoice = NewInvoice & Pick<InvoiceSelect, "id">;
 
@@ -63,91 +81,38 @@
     terms: full.terms ?? null,
   });
 
-  // svelte-ignore state_referenced_locally
-  let invoice: EditableInvoice = $state({
-    ...invoicesStore.newInvoice(),
-    id: invoiceId,
-  });
+  let invoice: EditableInvoice = $state(toEditableInvoice(loadedInvoice));
 
   const counter = new Counter();
 
-  let lineItems: Array<NewLineItemWithId | LineItemEditRow> = $state([
-    lineItemsStore.newLineItem(counter.increment()),
-  ]);
-  let invoiceLoaded = $state(false);
-  let lineItemsLoaded = $state(false);
-  const formReady = $derived(invoiceLoaded && lineItemsLoaded);
+  let lineItems: Array<NewLineItemWithId | LineItemEditRow> = $state(
+    loadedLineItems.length > 0
+      ? loadedLineItems
+      : [newLineItem(counter.increment())]
+  );
+  const baselinesReady = true;
 
   let isNewClient = $state(false);
-  let newClient: ClientInsert = $state(clientsStore.newClient());
+  let newClientState: ClientInsert = $state(newClient());
 
-  let baselineInvoiceSnapshot: InvoicePatchSnapshot | null = null;
-  let baselineLineItemsSnapshot: string | null = null;
-
-  let abortController: AbortController | null = null;
-  let isMounted = true;
-
-  onMount(async () => {
-    abortController = new AbortController();
-    const { signal } = abortController;
-
-    try {
-      const [fullInvoice, items] = await Promise.all([
-        invoicesStore.loadInvoiceById(invoiceId, { signal }),
-        lineItemsStore.loadLineItemsByInvoiceId(invoiceId, { signal }),
-        clientsStore.loadClientPickerOptions(signal),
-      ]);
-
-      if (!isMounted) {
-        return;
-      }
-
-      if (!fullInvoice) {
-        closePanel();
-        return;
-      }
-
-      invoice = toEditableInvoice(fullInvoice);
-      invoiceLoaded = true;
-
-      if (!items) {
-        return;
-      }
-
-      lineItems =
-        items.length > 0
-          ? items
-          : [lineItemsStore.newLineItem(counter.increment())];
-
-      baselineInvoiceSnapshot = pickInvoicePatchSnapshot(fullInvoice);
-      baselineLineItemsSnapshot = serializedNormalizedLineItemsForCompare(
-        lineItemsStore.normalizeLineItems(lineItems)
-      );
-      lineItemsLoaded = true;
-    } catch (err) {
-      abortController?.abort();
-      if (!isAbortError(err)) {
-        toast.error("Failed to load invoice form");
-        closePanel();
-      }
-    }
-  });
+  let baselineInvoiceSnapshot: InvoicePatchSnapshot | null =
+    pickInvoicePatchSnapshot(loadedInvoice);
+  // svelte-ignore state_referenced_locally -- seed baseline from initial line items
+  let baselineLineItemsSnapshot: string | null =
+    serializedNormalizedLineItemsForCompare(normalizeLineItems(lineItems));
 
   onDestroy(() => {
-    isMounted = false;
-    abortController?.abort();
     counter.reset();
     baselineInvoiceSnapshot = null;
     baselineLineItemsSnapshot = null;
   });
 
   const addLineItem: BitsButton = () => {
-    lineItems.push(lineItemsStore.newLineItem(counter.increment()));
+    lineItems.push(newLineItem(counter.increment()));
   };
 
   const clientName = $derived(
-    clientsStore.clientPickerOptions.find((c) => c.id === invoice.clientId)
-      ?.name ?? "Unknown"
+    picker.options.find((c) => c.id === invoice.clientId)?.name ?? "Unknown"
   );
   const totalDisplay = $derived(
     formatTotal(sumLineItems(lineItems), invoice.discount)
@@ -158,73 +123,86 @@
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
 
-    const client = await resolveClientId({
-      createClient: (clientData) => clientsStore.createClient(clientData),
-      existingClientId: invoice.clientId,
-      isNewClient,
-      newClient,
-    });
-    if (!client.ok) {
-      toast.error(client.message);
-      return;
-    }
-
-    const ready = assertEditReady({
-      baselineInvoiceSnapshot,
-      baselineLineItemsSnapshot,
-      formReady,
-      invoiceId: invoice.id,
-    });
-    if (!ready.ok) {
-      toast.error(ready.message);
-      return;
-    }
-
-    const patch = buildEditPatch({
-      baselineInvoiceSnapshot: ready.baselineInvoiceSnapshot,
-      baselineLineItemsSnapshot: ready.baselineLineItemsSnapshot,
-      clientId: client.clientId,
-      invoice,
-      lineItems,
-      normalizeLineItems: (items) => lineItemsStore.normalizeLineItems(items),
-    });
-
-    if (patch.unchanged) {
-      toast.info("No changes to save");
-      return;
-    }
-
-    const saved = await persistInvoiceEdits({
-      delta: patch.delta,
-      invoiceId: ready.invoiceId,
-      invoiceUnchanged: patch.invoiceUnchanged,
-      lineItemsUnchanged: patch.lineItemsUnchanged,
-      normalizedLineItems: patch.normalizedLineItems,
-      updateInvoice: (id, delta) => invoicesStore.updateInvoice(id, delta),
-      updateLineItems: (id, items) => lineItemsStore.updateLineItems(id, items),
-    });
-    if (!saved.ok) {
-      if (saved.message) {
-        toast.error(saved.message);
+    try {
+      const client = await resolveClientId({
+        createClient: async (clientData) => {
+          const created = await createClient(clientData);
+          return created.id;
+        },
+        existingClientId: invoice.clientId,
+        isNewClient,
+        newClient: newClientState,
+      });
+      if (!client.ok) {
+        toast.error(client.message);
+        return;
       }
-      return;
-    }
 
-    await invoicesStore.loadItems(toNormalizedListQuery(undefined, {}));
-    closePanel();
+      const ready = assertEditReady({
+        baselineInvoiceSnapshot,
+        baselineLineItemsSnapshot,
+        formReady: baselinesReady,
+        invoiceId: invoice.id,
+      });
+      if (!ready.ok) {
+        toast.error(ready.message);
+        return;
+      }
+
+      const patch = buildEditPatch({
+        baselineInvoiceSnapshot: ready.baselineInvoiceSnapshot,
+        baselineLineItemsSnapshot: ready.baselineLineItemsSnapshot,
+        clientId: client.clientId,
+        invoice,
+        lineItems,
+        normalizeLineItems,
+      });
+
+      if (patch.unchanged) {
+        toast.info("No changes to save");
+        return;
+      }
+
+      const saved = await persistInvoiceEdits({
+        delta: patch.delta,
+        invoiceId: ready.invoiceId,
+        invoiceUnchanged: patch.invoiceUnchanged,
+        lineItemsUnchanged: patch.lineItemsUnchanged,
+        normalizedLineItems: patch.normalizedLineItems,
+        updateInvoice: async (id, delta) => {
+          const result = await updateInvoice({ id, patch: delta });
+          return result.id;
+        },
+        updateLineItems: async (id, items) =>
+          replaceLineItems({ invoiceId: id, lineItems: items }),
+      });
+      if (!saved.ok) {
+        if (saved.message) {
+          toast.error(saved.message);
+        }
+        return;
+      }
+
+      await listInvoices(toNormalizedListQuery(undefined, {})).refresh();
+      closePanel();
+      toast.success("Invoice updated successfully");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update invoice"));
+    }
   };
 </script>
 
 <InvoiceFormLayout
   {addLineItem}
+  clientOptions={picker.options}
   {closePanel}
-  lineItemsLoaded={formReady}
+  lineItemsLoaded={baselinesReady}
   mode="edit"
   onsubmit={handleSubmit}
   bind:invoice
   bind:isNewClient
   bind:lineItems
-  bind:newClient
+  bind:newClient={newClientState}
 >
   {#snippet buttons()}
     <Button
@@ -251,9 +229,14 @@
     if (!deleteModal.item?.id) {
       return;
     }
-    await invoicesStore.deleteInvoice(deleteModal.item.id);
-    deleteModal.close();
-    closePanel();
+    try {
+      await deleteInvoice({ id: deleteModal.item.id });
+      toast.success("Invoice deleted successfully");
+      deleteModal.close();
+      closePanel();
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to delete invoice"));
+    }
   }}
   titleText="Are you sure you want to delete this invoice?"
 >

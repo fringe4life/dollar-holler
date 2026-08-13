@@ -4,8 +4,8 @@
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { Toggle } from "$lib/client/runes/Toggle.svelte";
-  import { isActive } from "$lib/utils/is-active";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  import { isActive } from "#lib/utils/is-active";
   import NavbarItem from "./NavbarItem.svelte";
 
   const navItems = [

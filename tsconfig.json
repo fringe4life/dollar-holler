@@ -9,13 +9,13 @@
     "skipLibCheck": true,
     "sourceMap": true,
     "strict": true,
-    "types": ["node", "$app/types"],
+    "types": ["node", "$app/types", "bun"],
     "exactOptionalPropertyTypes": false,
     "paths": {
-      "$features": ["./src/lib/features"],
-      "$features/*": ["./src/lib/features/*"],
-      "$lib": ["./src/lib"],
-      "$lib/*": ["./src/lib/*"],
+      "#lib": ["./src/lib"],
+      "#lib/*": ["./src/lib/*"],
+      "#features": ["./src/lib/features"],
+      "#features/*": ["./src/lib/features/*"],
       "styled-system": ["./styled-system"],
       "styled-system/*": ["./styled-system/*"]
     }

@@ -1,11 +1,10 @@
 import { drizzleAdapter } from "@better-auth/drizzle-adapter/relations-v2";
 import { betterAuth } from "better-auth/minimal";
-import { bearer, openAPI } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { ENV } from "varlock/env";
 import { getRequestEvent } from "$app/server";
-import { db } from "$lib/server/db/index";
-import { schemaTables } from "$lib/server/db/schema";
+import { db } from "#lib/server/db/index";
+import { schemaTables } from "#lib/server/db/schema";
 import { createId } from "./server/utils/create-id";
 export const auth = betterAuth({
   advanced: {
@@ -30,9 +29,8 @@ export const auth = betterAuth({
     enabled: true,
     requireEmailVerification: false,
   },
-  // Bearer: `Authorization: Bearer <token>` for APIs (OpenAPI "Try it", CLI, non-browser clients).
   // sveltekit must be the last plugin
-  plugins: [openAPI(), bearer(), sveltekitCookies(getRequestEvent)],
+  plugins: [sveltekitCookies(getRequestEvent)],
   secret: ENV.BETTER_AUTH_SECRET,
   session: {
     cookieCache: {

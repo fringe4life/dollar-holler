@@ -1,4 +1,4 @@
-import type { BitsButton, CursorId, List } from "$lib/types";
+import type { BitsButton, CursorId, List } from "#lib/types";
 import type {
   lineItemEditRowSchema,
   lineItemInsertSchema,

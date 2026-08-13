@@ -3,7 +3,7 @@ export class Counter {
 
   increment = () => (this.count += 1);
 
-  decrement = () => (this.count -= 1);
+  // decrement = () => (this.count -= 1);
 
   reset = () => {
     this.count = 0;

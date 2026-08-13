@@ -2,7 +2,7 @@
   import { StarIcon } from "@lucide/svelte";
   import { css, cx } from "styled-system/css";
   import { circle, flex, hstack, stack } from "styled-system/patterns";
-  import type { reviews } from "$features/landing-page/constants/reviews.js";
+  import type { reviews } from "#features/landing-page/constants/reviews.js";
 
   interface Props {
     review: (typeof reviews)[number];

@@ -2,10 +2,10 @@
   import { css, cx } from "styled-system/css";
   import { flex } from "styled-system/patterns";
   import type { Snippet } from "svelte";
-  import { swipe } from "$lib/client/attachments/swipe.svelte";
-  import { Toggle } from "$lib/client/runes/Toggle.svelte";
-  import Cancel from "$lib/components/icons/Cancel.svelte";
-  import { actionButton } from "$lib/styles";
+  import { swipe } from "#lib/client/attachments/swipe.svelte";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  import Cancel from "#lib/components/icons/Cancel.svelte";
+  import { actionButton } from "#lib/styles";
 
   interface Props {
     content: Snippet;

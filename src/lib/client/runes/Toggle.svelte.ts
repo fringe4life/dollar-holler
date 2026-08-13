@@ -14,9 +14,9 @@ export class Toggle {
     this.isOn = !this.isOn;
   };
 
-  on = () => {
-    this.isOn = true;
-  };
+  // on = () => {
+  //   this.isOn = true;
+  // };
 
   off = () => {
     this.isOn = false;

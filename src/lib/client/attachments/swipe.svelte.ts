@@ -17,6 +17,7 @@ const transformElement = (
   element: HTMLElement,
   isTypedOm: boolean
 ) => {
+  // support has landed in firefox 156 nightly
   // Use CSS Typed OM where available (Chrome, Safari 16.4+, Edge); fallback for Firefox etc.
   if (isTypedOm) {
     // CSS Typed OM is supported

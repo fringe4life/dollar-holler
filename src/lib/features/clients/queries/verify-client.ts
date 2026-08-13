@@ -1,5 +1,5 @@
-import { db } from "$lib/server/db";
-import type { CursorId, Maybe } from "$lib/types";
+import { db } from "#lib/server/db";
+import type { CursorId, Maybe } from "#lib/types";
 
 export const verifyClient = async (
   userId: string,

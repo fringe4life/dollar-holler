@@ -3,8 +3,8 @@
  * Call only after auth and (for PATCH) ownership checks succeed.
  */
 
-import type { InvoiceInsert } from "$features/invoices/types";
-import { markdownToHtml } from "$lib/utils/markdown.server";
+import type { InvoiceInsert } from "#features/invoices/types";
+import { markdownToHtml } from "#lib/utils/markdown.server";
 
 type InvoiceNotesTermsMarkdown = Pick<InvoiceInsert, "notes" | "terms">;
 

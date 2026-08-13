@@ -1,8 +1,9 @@
 <script lang="ts">
   import { Portal } from "@ark-ui/svelte/portal";
   import { Toaster as ArkToaster, Toast } from "@ark-ui/svelte/toast";
+  import { browser } from "$app/env";
   import { sva } from "styled-system/css";
-  import { toaster } from "$lib/utils/toast.svelte";
+  import { toaster } from "#lib/utils/toast.svelte";
 
   const toastRootRecipe = sva({
     base: {
@@ -77,35 +78,42 @@
       : "info";
 </script>
 
-<Portal>
-  <ArkToaster {toaster}>
-    {#snippet children(_toastValue)}
-      <Toast.Root
-        class={toastRootRecipe({ type: getToastVariant(_toastValue().type) })
-          .root}
-      >
-        <Toast.Title
+<!--
+  Ark Portal calls getAllContexts() then mount(snippet). On SSR (esp. with
+  experimental.async) that throws lifecycle_outside_component; client-only.
+-->
+{#if browser}
+  <Portal>
+    <ArkToaster {toaster}>
+      {#snippet children(_toastValue)}
+        <Toast.Root
           class={toastRootRecipe({ type: getToastVariant(_toastValue().type) })
-            .title}>{_toastValue().title}</Toast.Title
+            .root}
         >
-        <Toast.CloseTrigger
-          aria-label="Close notification"
-          class={toastRootRecipe({
-            type: getToastVariant(_toastValue().type),
-          }).closeTrigger}
-        >
-          x
-        </Toast.CloseTrigger>
-        {#if _toastValue().description}
-          <Toast.Description
+          <Toast.Title
             class={toastRootRecipe({
               type: getToastVariant(_toastValue().type),
-            }).description}
+            }).title}>{_toastValue().title}</Toast.Title
           >
-            {_toastValue().description}
-          </Toast.Description>
-        {/if}
-      </Toast.Root>
-    {/snippet}
-  </ArkToaster>
-</Portal>
+          <Toast.CloseTrigger
+            aria-label="Close notification"
+            class={toastRootRecipe({
+              type: getToastVariant(_toastValue().type),
+            }).closeTrigger}
+          >
+            x
+          </Toast.CloseTrigger>
+          {#if _toastValue().description}
+            <Toast.Description
+              class={toastRootRecipe({
+                type: getToastVariant(_toastValue().type),
+              }).description}
+            >
+              {_toastValue().description}
+            </Toast.Description>
+          {/if}
+        </Toast.Root>
+      {/snippet}
+    </ArkToaster>
+  </Portal>
+{/if}

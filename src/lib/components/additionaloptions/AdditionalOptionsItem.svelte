@@ -3,7 +3,7 @@
   import { flex } from "styled-system/patterns";
   import type { Component } from "svelte";
   import type { MouseEventHandler } from "svelte/elements";
-  import View from "$lib/components/icons/View.svelte";
+  import View from "#lib/components/icons/View.svelte";
   import type { IconProps } from "../Icon.svelte";
 
   export interface Option {

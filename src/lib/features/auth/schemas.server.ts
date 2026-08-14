@@ -1,5 +1,6 @@
 // Auth form validation schemas using ArkType directly
 // fallow-ignore-file
+import "#lib/utils/arktype.config";
 import { type } from "arktype";
 
 const passwordSchema = type("string >= 6");

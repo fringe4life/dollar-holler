@@ -1,3 +1,4 @@
+import "#lib/utils/arktype.config";
 import { type } from "arktype";
 import type { CursorId } from "#lib/types";
 /** Pagination metadata for cursor-paginated lists. */

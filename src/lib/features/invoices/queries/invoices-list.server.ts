@@ -29,7 +29,7 @@ type InvoicesQueryColumnSelection = NonNullable<
 >;
 
 /**
- * Substring search. RQB `like` (not `ilike`): SQLite/Turso `LIKE` is ASCII
+ * Substring search. RQB `like` (not `ilike`): SQLite/D1 `LIKE` is ASCII
  * case-insensitive by default — same practical UX as Postgres `ILIKE` for
  * Latin text. See clients-list search note.
  */

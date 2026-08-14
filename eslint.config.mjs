@@ -11,6 +11,8 @@ export default defineConfig(
       ".svelte-kit/**",
       "build/**",
       ".vercel/**",
+      ".wrangler/**",
+      "src/worker-configuration.d.ts",
       "dist/**",
       "node_modules/**",
       "styled-system/**",

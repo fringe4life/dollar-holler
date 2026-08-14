@@ -11,8 +11,8 @@ import { clients as clientsTable } from "#lib/server/db/schema";
 import type { Maybe } from "#lib/types";
 
 /**
- * Substring search. Use RQB `like` (not `ilike`): SQLite/Turso have no `ILIKE`,
- * and `LIKE` is already case-insensitive for ASCII (Turso docs / SQLite default).
+ * Substring search. Use RQB `like` (not `ilike`): SQLite/D1 have no `ILIKE`,
+ * and `LIKE` is already case-insensitive for ASCII (SQLite default).
  * `lower(col) LIKE lower(?)` does not buy more — SQLite `lower()` is ASCII-only too.
  */
 const searchWhere = (q: Maybe<string>) => {

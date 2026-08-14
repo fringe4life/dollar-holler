@@ -1,12 +1,12 @@
 import { sentrySvelteKit } from "@sentry/sveltekit";
-import adapter from "@sveltejs/adapter-vercel";
+import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
 import { DevTools } from "@vitejs/devtools";
 import { fileURLToPath } from "node:url";
 import { visualizer } from "rollup-plugin-visualizer";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
 import { svelteDevtools } from "vite-devtools-svelte";
 // Chrome DevTools workspace (com.chrome.devtools.json) — separate from @vitejs/devtools
 // (Vite/Rolldown UI + vite-devtools-svelte panels). See https://devtools.vite.dev/guide
@@ -15,6 +15,30 @@ import devToolsJson from "vite-plugin-devtools-json";
 const FILE_REGEX = /[/\\]/;
 const root = (relative: string) =>
   fileURLToPath(new URL(relative, import.meta.url));
+
+const ARKTYPE_CONFIG_IMPORT = 'import "#lib/utils/arktype.config";\n';
+const ARKTYPE_FROM = /from\s*["'](?:arktype|drizzle-orm\/arktype)["']/;
+
+/** ESM: configure() must run before any `arktype` module evaluates (workerd has no JIT). */
+const arktypeJitless = (): Plugin => ({
+  enforce: "pre",
+  name: "arktype-jitless",
+  transform(code, id, options) {
+    if (!options?.ssr) {
+      return;
+    }
+    if (id.includes("node_modules") || id.includes("arktype.config")) {
+      return;
+    }
+    if (code.includes("#lib/utils/arktype.config")) {
+      return;
+    }
+    if (!ARKTYPE_FROM.test(code)) {
+      return;
+    }
+    return { code: `${ARKTYPE_CONFIG_IMPORT}${code}`, map: null };
+  },
+});
 
 export default defineConfig({
 
@@ -26,6 +50,7 @@ export default defineConfig({
     },
   },
   plugins: [
+    arktypeJitless(),
     visualizer({
       brotliSize: true,
       filename: "stats.html", // written next to project root by default
@@ -45,7 +70,11 @@ export default defineConfig({
       project: "javascript-sveltekit",
     }),
     sveltekit({
-      adapter: adapter(),
+      adapter: adapter({
+        platformProxy: {
+          persist: true,
+        },
+      }),
       compilerOptions: {
         experimental: {
           async: true,

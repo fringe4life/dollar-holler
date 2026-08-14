@@ -8,10 +8,10 @@
  * Do not join raw `line_items` or unaggregated invoice rows into the outer
  * clients list query in a way that multiplies rows per client.
  *
- * ## Money typing (SQLite / Turso)
+ * ## Money typing (SQLite / D1)
  *
  * `line_items.amount` and `invoices.discount` are `real`, so `SUM` / `ROUND` here
- * typically yield a floating value from libSQL. List mapper coerces with
+ * typically yield a floating value from D1. List mapper coerces with
  * `Math.round(Number(...))` so API / UI always see integer **cents** as `number`.
  *
  * Long term: store money as integer cents in the schema (`integer` columns, no

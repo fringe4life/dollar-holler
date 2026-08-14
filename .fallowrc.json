@@ -7,7 +7,9 @@
     "@fontsource-variable/source-sans-3",
     "styled-system",
     "svelte-eslint-parser",
-    "@typescript/native"
+    "@typescript/native",
+    "wrangler",
+    "@cloudflare/workers-types"
   ],
   "ignoreUnresolvedImports": [
     "styled-system",

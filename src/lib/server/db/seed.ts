@@ -1,27 +1,108 @@
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import { ENV } from "varlock/env";
+import { mkdir, writeFile } from "node:fs/promises";
+import { join } from "node:path";
+import type { D1Database } from "@cloudflare/workers-types";
+import { getColumns, type Table } from "drizzle-orm";
+import { getPlatformProxy, unstable_readConfig } from "wrangler";
 import type { ClientInsert, ClientSelect } from "#features/clients/types";
 import type { LineItemInsert } from "#features/line-items/types";
 import type { SettingsInsert } from "#features/settings/types";
 import { appendInvoiceNotesTermsHtmlForInsert } from "#lib/server/utils/invoice-notes-terms-html.server";
 import type { CursorId } from "#lib/types";
 import { createId } from "../utils/create-id";
-import { tableRelations } from "./relations";
+import { createDb } from "./create-db";
 import { clients, invoices, lineItems, settings } from "./schema";
 import type { ClientStatus, InvoiceStatus } from "./types";
 
-const client = createClient({
-  authToken: ENV.TURSO_AUTH_TOKEN,
-  url: ENV.TURSO_DATABASE_URL,
-});
+const useRemote = process.argv.includes("--remote");
 
-await client.execute("PRAGMA foreign_keys = ON");
+/** D1 SQLITE_MAX_VARIABLE_NUMBER is 100 (Turso/libSQL is typically 999). */
+const D1_MAX_SQL_VARIABLES = 100;
 
-const db = drizzle({
-  client,
-  relations: tableRelations,
-});
+function chunk<T>(items: T[], size: number): T[][] {
+  const chunks: T[][] = [];
+  for (let i = 0; i < items.length; i += size) {
+    chunks.push(items.slice(i, i + size));
+  }
+  return chunks;
+}
+
+function d1InsertChunkSize(table: Table): number {
+  const columnCount = Object.keys(getColumns(table)).length;
+  return Math.max(
+    1,
+    Math.floor(D1_MAX_SQL_VARIABLES / Math.max(columnCount, 1))
+  );
+}
+
+async function createSeedProxy() {
+  if (!useRemote) {
+    console.log("Seeding local D1 (Miniflare persist under .wrangler)");
+    return getPlatformProxy<{ DB: D1Database }>({
+      persist: true,
+      remoteBindings: false,
+    });
+  }
+
+  const wranglerConfig = unstable_readConfig({});
+  const d1Binding = wranglerConfig.d1_databases[0];
+  if (!d1Binding?.database_id) {
+    throw new Error(
+      "wrangler D1 database_id missing; cannot seed remote. Set it in wrangler.jsonc."
+    );
+  }
+
+  const dir = join(process.cwd(), ".wrangler");
+  await mkdir(dir, { recursive: true });
+  const stubMain = join(dir, "seed-remote-stub.js");
+  await writeFile(
+    stubMain,
+    "export default { fetch() { return new Response(''); } };\n"
+  );
+  const configPath = join(dir, "seed-remote.json");
+  await writeFile(
+    configPath,
+    `${JSON.stringify(
+      {
+        compatibility_date: wranglerConfig.compatibility_date,
+        compatibility_flags: wranglerConfig.compatibility_flags,
+        d1_databases: [
+          {
+            binding: d1Binding.binding,
+            database_id: d1Binding.database_id,
+            database_name: d1Binding.database_name,
+            remote: true,
+          },
+        ],
+        main: "./seed-remote-stub.js",
+        name: `${wranglerConfig.name}-seed-remote`,
+      },
+      null,
+      2
+    )}\n`
+  );
+
+  console.warn(
+    "Seeding REMOTE Cloudflare D1. Wipes clients, invoices, line_items, and settings. Auth users are kept."
+  );
+  // getPlatformProxy remote session hangs forever under Bun (workerd/miniflare).
+  // db:seed:remote must run via Node (tsx). @see https://github.com/cloudflare/workers-sdk/issues/7718
+  console.log(
+    "Starting wrangler remote proxy (needs Node + wrangler login)..."
+  );
+
+  return getPlatformProxy<{ DB: D1Database }>({
+    configPath,
+    persist: false,
+    remoteBindings: true,
+  });
+}
+
+const proxy = await createSeedProxy();
+const d1 = proxy.env.DB;
+if (!d1) {
+  throw new Error("D1 binding DB missing from wrangler platform proxy");
+}
+const db = createDb(d1);
 
 // Helper function to generate random date within last 6 months
 function randomDateWithinLast6Months(): Date {
@@ -85,7 +166,11 @@ async function main() {
     })
   );
 
-  await db.insert(settings).values(settingsData);
+  await Promise.all(
+    chunk(settingsData, d1InsertChunkSize(settings)).map((rows) =>
+      db.insert(settings).values(rows)
+    )
+  );
   console.log(`✅ Created settings for ${settingsData.length} users`);
 
   // 4) Each user gets one client per *other* user (contact = that user’s settings)
@@ -113,10 +198,13 @@ async function main() {
     }
   }
 
-  const insertedClients = await db
-    .insert(clients)
-    .values(clientsData)
-    .returning();
+  const insertedClients = (
+    await Promise.all(
+      chunk(clientsData, d1InsertChunkSize(clients)).map((rows) =>
+        db.insert(clients).values(rows).returning()
+      )
+    )
+  ).flat();
   console.log(`✅ Created ${insertedClients.length} clients`);
 
   // 5) At least 15 invoices per user (pagination / list density)
@@ -215,10 +303,18 @@ async function main() {
     }
   }
 
-  await db.insert(invoices).values(invoicesData);
+  await Promise.all(
+    chunk(invoicesData, d1InsertChunkSize(invoices)).map((rows) =>
+      db.insert(invoices).values(rows)
+    )
+  );
   console.log(`✅ Created ${invoicesData.length} invoices`);
 
-  await db.insert(lineItems).values(lineItemsData);
+  await Promise.all(
+    chunk(lineItemsData, d1InsertChunkSize(lineItems)).map((rows) =>
+      db.insert(lineItems).values(rows)
+    )
+  );
   console.log(`✅ Created ${lineItemsData.length} line items`);
 
   console.log("🎉 Seeding complete!");
@@ -235,6 +331,4 @@ main()
     console.error("❌ Seeding failed:", err);
     process.exitCode = 1;
   })
-  .finally(() => {
-    client.close();
-  });
+  .finally(() => proxy.dispose());

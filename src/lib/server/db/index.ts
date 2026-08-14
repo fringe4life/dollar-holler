@@ -1,22 +1,29 @@
-import { createClient } from "@libsql/client";
-import { drizzle } from "drizzle-orm/libsql";
-import { ENV } from "varlock/env";
-import { tableRelations } from "./relations";
+import type { D1Database } from "@cloudflare/workers-types";
+import { getRequestEvent } from "$app/server";
+import { createDb, type AppDatabase } from "./create-db";
 
-const client = createClient({
-  authToken: ENV.TURSO_AUTH_TOKEN,
-  url: ENV.TURSO_DATABASE_URL,
-});
+const cache = new WeakMap<D1Database, AppDatabase>();
 
-/**
- * Top-level await is fine for current deploy: Vercel + Node 24 (ESM) + SvelteKit SSR.
- * Revisit if runtime/bundler drops TLA support, or if we leave Node ESM (e.g. CJS-only
- * target). Also: `PRAGMA foreign_keys` is per-connection — if cascades look flaky under
- * remote Turso, set it in the same pipeline as writes, not only here at import.
- */
-await client.execute("PRAGMA foreign_keys = ON");
+export const getDb = (): AppDatabase => {
+  const d1 = getRequestEvent().platform?.env.DB;
+  if (!d1) {
+    throw new Error("D1 binding DB missing from event.platform.env");
+  }
+  const cached = cache.get(d1);
+  if (cached) {
+    return cached;
+  }
+  const instance = createDb(d1);
+  cache.set(d1, instance);
+  return instance;
+};
 
-export const db = drizzle({
-  client,
-  relations: tableRelations,
+export const db: AppDatabase = new Proxy({} as AppDatabase, {
+  get(_target, property, receiver) {
+    const instance = getDb();
+    const value = Reflect.get(instance, property, receiver);
+    return typeof value === "function"
+      ? (value as (...args: never[]) => unknown).bind(instance)
+      : value;
+  },
 });

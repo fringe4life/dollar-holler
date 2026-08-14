@@ -1,3 +1,4 @@
+import "#lib/utils/arktype.config";
 import { type } from "arktype";
 import { command, query, requested } from "$app/server";
 import { error } from "@sveltejs/kit";

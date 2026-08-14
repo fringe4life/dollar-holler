@@ -97,8 +97,10 @@ export const logout = command(async () => {
   const { request } = getRequestEvent();
   await auth.api.signOut({
     headers: request.headers,
+    body: {
+      callbackURL: resolve("login"),
+    },
   });
-  redirect(303, resolve("login"));
 });
 
 export const changePassword = form(changePasswordSchema, async (data) => {

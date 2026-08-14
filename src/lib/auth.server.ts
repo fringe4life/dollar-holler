@@ -14,9 +14,10 @@ export const auth = betterAuth({
     },
   },
   allowedHosts: [
-    "dollar-holler.vercel.app",
-    "dollar-holler-*.vercel.app", // team preview pattern
     "localhost:*",
+    "*.workers.dev",
+    "*.pages.dev",
+    "dolla-holla.org",
   ],
   appName: "Dollar Holler",
   basePath: "/api/auth",

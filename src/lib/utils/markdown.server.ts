@@ -1,13 +1,18 @@
 /**
  * Server-only markdown utility. Do not import this in client-side code.
  */
-import { sanitize, type Config } from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 import { marked } from "marked";
 import type { Maybe, SanitizedHTML } from "#lib/types";
 
-const MARKDOWN_PURIFY_CONFIG: Config = Object.freeze({
-  ALLOWED_ATTR: ["href", "class"],
-  ALLOWED_TAGS: [
+const MARKDOWN_SANITIZE_OPTIONS: sanitizeHtml.IOptions = Object.freeze({
+  allowProtocolRelative: false,
+  allowedAttributes: {
+    a: ["href", "class"],
+    "*": ["class"],
+  },
+  allowedSchemes: ["http", "https", "mailto"],
+  allowedTags: [
     "p",
     "br",
     "hr",
@@ -31,12 +36,10 @@ const MARKDOWN_PURIFY_CONFIG: Config = Object.freeze({
     "del",
     "s",
   ],
-  ALLOWED_URI_REGEXP: /^(?:https?|mailto):/i,
-  ALLOW_UNKNOWN_PROTOCOLS: false,
 });
 
 const sanitizeMarkdownHtml = (html: string): SanitizedHTML =>
-  sanitize(html, MARKDOWN_PURIFY_CONFIG) as SanitizedHTML;
+  sanitizeHtml(html, MARKDOWN_SANITIZE_OPTIONS) as SanitizedHTML;
 
 export const markdownToHtml = (source: Maybe<string>): Maybe<SanitizedHTML> => {
   if (!source) {

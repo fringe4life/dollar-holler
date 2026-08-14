@@ -51,7 +51,7 @@ export const replaceLineItems = async (
   lineItems: LineItemInsert[]
 ) => {
   await assertInvoiceOwned(userId, invoiceId);
-  await db
+  const deleteExisting = db
     .delete(lineItemsTable)
     .where(
       and(
@@ -59,16 +59,24 @@ export const replaceLineItems = async (
         eq(lineItemsTable.userId, userId)
       )
     );
-  return db
-    .insert(lineItemsTable)
-    .values(
-      lineItems.map((item) => ({
-        ...item,
-        invoiceId,
-        userId,
-      }))
-    )
-    .returning();
+  if (lineItems.length === 0) {
+    await deleteExisting;
+    return [];
+  }
+  const [_deleted, inserted] = await db.batch([
+    deleteExisting,
+    db
+      .insert(lineItemsTable)
+      .values(
+        lineItems.map((item) => ({
+          ...item,
+          invoiceId,
+          userId,
+        }))
+      )
+      .returning(),
+  ]);
+  return inserted;
 };
 
 export const deleteLineItemRow = async (userId: string, id: CursorId) => {

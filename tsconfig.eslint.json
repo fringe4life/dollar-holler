@@ -13,7 +13,8 @@
     "eslint.config.mjs",
     "prettier.config.mjs",
     "stylelint.config.mjs",
-    "postcss.config.cjs"
+    "postcss.config.cjs",
+    "scripts/**/*.ts"
   ],
   "compilerOptions": {
     "allowJs": true,

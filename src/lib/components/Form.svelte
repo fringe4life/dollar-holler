@@ -1,6 +1,6 @@
 <script lang="ts" generics="Input extends RemoteFormInput, Output = unknown">
   import type { Snippet } from "svelte";
-  import type { RemoteForm, RemoteFormInput } from "@sveltejs/kit/remote";
+  import type { RemoteForm, RemoteFormInput } from "$app/server";
   import Alert from "#lib/components/Alert.svelte";
   import Loader from "#lib/components/Loader.svelte";
   import Button from "#lib/components/ui/button/button.svelte";

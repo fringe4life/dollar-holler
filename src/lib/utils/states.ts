@@ -1,3 +1,28 @@
+const FLAG_CDN_BASE = "https://flagcdn.com";
+
+/** flagcdn.com covers the 50 states but has no District of Columbia flag. */
+const STATES_WITHOUT_FLAGS = new Set(["DC"]);
+
+export interface StateFlag {
+  src: string;
+  srcset: string;
+}
+
+/**
+ * flagcdn.com US state flag urls (`us-<code>` naming, e.g. `us-ca`).
+ * Returns `null` when no flag is available so callers can render a fallback.
+ */
+export const stateFlag = (value: string): StateFlag | null => {
+  if (STATES_WITHOUT_FLAGS.has(value)) {
+    return null;
+  }
+  const code = `us-${value.toLowerCase()}`;
+  return {
+    src: `${FLAG_CDN_BASE}/24x18/${code}.png`,
+    srcset: `${FLAG_CDN_BASE}/48x36/${code}.png 2x, ${FLAG_CDN_BASE}/72x54/${code}.png 3x`,
+  };
+};
+
 export const states = [
   {
     name: "Alaska",

@@ -5,7 +5,9 @@
     ClientInsert,
     ClientPickerOption,
   } from "#features/clients/types";
+  import { supportsBaseSelect } from "#lib/client/supports";
   import FormField from "#lib/components/FormField.svelte";
+  import InitialsAvatar from "#lib/components/ui/avatar/InitialsAvatar.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
   import Label from "#lib/components/ui/label/Label.svelte";
@@ -46,7 +48,18 @@
         bind:value={invoice.clientId}
       >
         {#each clientOptions as { id, name } (id)}
-          <option value={id}>{name}</option>
+          <option
+            onclick={() => {
+              invoice.clientId = id;
+            }}
+            value={id}
+          >
+            {#if supportsBaseSelect}
+              <!-- Clients have no photos yet; default to an initials avatar -->
+              <InitialsAvatar {name} />
+            {/if}
+            {name}
+          </option>
         {/each}
       </Select>
       <p

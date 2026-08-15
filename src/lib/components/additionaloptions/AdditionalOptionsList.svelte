@@ -29,7 +29,7 @@
     translate: "0 -0.25rem",
     transitionBehavior: "allow-discrete",
     transitionDuration: "normal",
-    transitionProperty: "opacity, translate, scale, display, overlay",
+    transitionProperty: "opacity, translate, scale, display",
     transitionTimingFunction: "ease-in",
 
     _open: {

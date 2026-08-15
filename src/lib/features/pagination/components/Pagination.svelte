@@ -1,7 +1,10 @@
 <script generics="T extends CursorRow" lang="ts">
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-  import { css } from "styled-system/css";
+  import Rows2Icon from "@lucide/svelte/icons/rows-2";
+  import Rows3Icon from "@lucide/svelte/icons/rows-3";
+  import Rows4Icon from "@lucide/svelte/icons/rows-4";
+  import { css, cx } from "styled-system/css";
   import { between, hstack, square } from "styled-system/patterns";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
@@ -21,10 +24,24 @@
     buildListSearchString,
     visibleListUrl,
   } from "#features/pagination/utils/url";
+  import { supportsBaseSelect } from "#lib/client/supports";
   import Button from "#lib/components/ui/button/button.svelte";
   import Select from "#lib/components/ui/select/Select.svelte";
   import { LIMITS, type ListLimit } from "../constants";
   import type { ListDirection } from "../types";
+
+  /** Row-density icon per page-size option (enhanced select only). */
+  const LIMIT_ICONS: Record<ListLimit, typeof Rows2Icon> = {
+    10: Rows2Icon,
+    25: Rows3Icon,
+    50: Rows4Icon,
+  };
+
+  // Lucide icons are stroke-based; undo the global `svg { fill }` rule.
+  const limitIconClass = cx(
+    square({ size: 4 }),
+    css({ color: "monsoon", fill: "none", flexShrink: 0 })
+  );
 
   interface Props {
     items: T[];
@@ -39,10 +56,9 @@
   const limitFromUrl = $derived(
     parseLimitParam(listUrl.searchParams.get("limit"))
   );
-
-  const canNavigate = $derived(
-    paginationMetadata.hasNextPage || paginationMetadata.hasPreviousPage
-  );
+  // Base-select `change` reports the old value; keep a local binding for display.
+  // svelte-ignore state_referenced_locally
+  let limitSelectValue = $state(String(limitFromUrl));
 
   const navigateWithQuery = async (next: PaginationSearchParams) => {
     await goto(`${listUrl.pathname}${buildListSearchString(next)}`, {
@@ -99,6 +115,10 @@
   };
 
   const handleLimitChange = async (newLimit: ListLimit) => {
+    if (newLimit === limitFromUrl) {
+      return;
+    }
+    limitSelectValue = String(newLimit);
     const q = searchQuery || undefined;
     await navigateWithQuery(toNormalizedListQuery(q, { limit: newLimit }));
   };
@@ -124,17 +144,26 @@
     })}
   >
     <Select
-      class={css({ aspectRatio: "2/1", maxInlineSize: "fit-content" })}
-      disabled={!canNavigate || pending}
+      class={css({
+        _supportsBaseSelect: { aspectRatio: "auto" },
+        aspectRatio: "2/1",
+        maxInlineSize: "fit-content",
+      })}
+      bind:value={limitSelectValue}
+      disabled={pending}
       name="limit"
       onchange={(e) =>
         handleLimitChange(parseLimitParam(e.currentTarget.value))}
     >
       {#each LIMITS as limitOption (limitOption)}
+        {const LimitIcon = LIMIT_ICONS[limitOption]}
         <option
-          selected={limitOption === limitFromUrl}
+          onclick={() => handleLimitChange(limitOption)}
           value={String(limitOption)}
         >
+          {#if supportsBaseSelect}
+            <LimitIcon aria-hidden="true" class={limitIconClass} />
+          {/if}
           {limitOption}
         </option>
       {/each}

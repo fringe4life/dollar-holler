@@ -1,5 +1,5 @@
 import { resolve } from "$app/paths";
-import { command, form, getRequestEvent } from "$app/server";
+import { form, getRequestEvent } from "$app/server";
 import { invalid, redirect } from "@sveltejs/kit";
 import {
   changePasswordSchema,
@@ -93,14 +93,15 @@ export const resetPassword = form(resetPasswordSchema, async (data) => {
   redirect(303, resolve("invoices"));
 });
 
-export const logout = command(async () => {
+export const logout = form(async () => {
   const { request } = getRequestEvent();
-  await auth.api.signOut({
-    headers: request.headers,
-    body: {
-      callbackURL: resolve("login"),
-    },
-  });
+  const { error } = await tryCatch(() =>
+    auth.api.signOut({ headers: request.headers })
+  );
+  if (error) {
+    invalid("Logout failed");
+  }
+  redirect(303, resolve("login"));
 });
 
 export const changePassword = form(changePasswordSchema, async (data) => {

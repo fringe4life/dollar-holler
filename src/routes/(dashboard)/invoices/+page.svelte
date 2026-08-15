@@ -17,6 +17,7 @@
   import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
   import { DEFAULT_PAGINATION_METADATA } from "#features/pagination/constants";
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query";
+  import { omitListItem } from "#features/pagination/utils/omit-list-item";
   import { visibleListUrl } from "#features/pagination/utils/url";
   import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
@@ -34,6 +35,27 @@
   const createForm = new ItemPanel<undefined>();
   const editPanel = new ItemPanel<CursorId>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
+
+  const handleSendInvoice = async (inv: InvoiceListResponse) => {
+    try {
+      await updateInvoiceStatus({
+        id: inv.id,
+        invoiceStatus: "sent",
+      }).updates(
+        listInvoices(listArg).withOverride((current) => ({
+          ...current,
+          items: current.items.map((invoice) =>
+            invoice.id === inv.id
+              ? { ...invoice, invoiceStatus: "sent" as const }
+              : invoice
+          ),
+        }))
+      );
+      toast.success("Invoice updated successfully");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update invoice status"));
+    }
+  };
 </script>
 
 <svelte:head><title>Invoices | Dollar Holler</title></svelte:head>
@@ -83,19 +105,7 @@
         {invoice}
         onDelete={deleteModal.open}
         onEdit={(inv) => editPanel.open(inv.id)}
-        onSendInvoice={async (inv) => {
-          try {
-            await updateInvoiceStatus({
-              id: inv.id,
-              invoiceStatus: "sent",
-            }).updates(listInvoices(listArg));
-            toast.success("Invoice updated successfully");
-          } catch (error) {
-            toast.error(
-              getErrorMessage(error, "Failed to update invoice status")
-            );
-          }
-        }}
+        onSendInvoice={handleSendInvoice}
       />
     {/snippet}
     {#snippet blankState()}
@@ -168,12 +178,15 @@
   item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
-    if (!deleteModal?.item?.id) {
+    const item = deleteModal.item;
+    if (!item?.id) {
       return;
     }
     try {
-      await deleteInvoice({ id: deleteModal.item.id }).updates(
-        listInvoices(listArg)
+      await deleteInvoice({ id: item.id }).updates(
+        listInvoices(listArg).withOverride((current) =>
+          omitListItem(current, item.id)
+        )
       );
       toast.success("Invoice deleted successfully");
       deleteModal.close();

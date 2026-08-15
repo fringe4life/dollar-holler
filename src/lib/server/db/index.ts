@@ -4,7 +4,7 @@ import { createDb, type AppDatabase } from "./create-db";
 
 const cache = new WeakMap<D1Database, AppDatabase>();
 
-export const getDb = (): AppDatabase => {
+const getDb = (): AppDatabase => {
   const d1 = getRequestEvent().platform?.env.DB;
   if (!d1) {
     throw new Error("D1 binding DB missing from event.platform.env");

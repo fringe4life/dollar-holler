@@ -21,10 +21,15 @@
     updateInvoiceStatus,
   } from "#features/invoices/invoices.remote";
   import type { InvoiceListResponse } from "#features/invoices/types";
+  import {
+    applyDeletedInvoiceToSummary,
+    applySentInvoiceToSummary,
+  } from "#features/invoices/utils/client-invoice-summary";
   import ItemsHeader from "#features/pagination/components/ItemsHeader.svelte";
   import NoSearchResults from "#features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query";
+  import { omitListItem } from "#features/pagination/utils/omit-list-item";
   import { visibleListUrl } from "#features/pagination/utils/url";
   import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
   import CircledAmount from "#lib/components/CircledAmount.svelte";
@@ -65,6 +70,32 @@
   const handleEdit: BitsButton = () => {
     isEditing = "edit";
     formPanel.open(undefined);
+  };
+
+  const handleSendInvoice = async (inv: InvoiceListResponse) => {
+    try {
+      await updateInvoiceStatus({
+        id: inv.id,
+        invoiceStatus: "sent",
+      }).updates(
+        listClientInvoices({ clientId, listQuery: listArg }).withOverride(
+          (current) => ({
+            ...current,
+            items: current.items.map((invoice) =>
+              invoice.id === inv.id
+                ? { ...invoice, invoiceStatus: "sent" as const }
+                : invoice
+            ),
+          })
+        ),
+        clientInvoiceSummary(summaryArg).withOverride((current) =>
+          applySentInvoiceToSummary(current, inv)
+        )
+      );
+      toast.success("Invoice updated successfully");
+    } catch (error) {
+      toast.error(getErrorMessage(error, "Failed to update invoice status"));
+    }
   };
 </script>
 
@@ -138,22 +169,7 @@
         invoice={item}
         onDelete={deleteModal.open}
         onEdit={(inv) => editPanel.open(inv.id)}
-        onSendInvoice={async (inv) => {
-          try {
-            await updateInvoiceStatus({
-              id: inv.id,
-              invoiceStatus: "sent",
-            }).updates(
-              listClientInvoices({ clientId, listQuery: listArg }),
-              clientInvoiceSummary(summaryArg)
-            );
-            toast.success("Invoice updated successfully");
-          } catch (error) {
-            toast.error(
-              getErrorMessage(error, "Failed to update invoice status")
-            );
-          }
-        }}
+        onSendInvoice={handleSendInvoice}
       />
     {/snippet}
     {#snippet blankState()}
@@ -237,13 +253,18 @@
   item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
-    if (!deleteModal?.item?.id) {
+    const item = deleteModal.item;
+    if (!item?.id) {
       return;
     }
     try {
-      await deleteInvoice({ id: deleteModal.item.id }).updates(
-        listClientInvoices({ clientId, listQuery: listArg }),
-        clientInvoiceSummary(summaryArg)
+      await deleteInvoice({ id: item.id }).updates(
+        listClientInvoices({ clientId, listQuery: listArg }).withOverride(
+          (current) => omitListItem(current, item.id)
+        ),
+        clientInvoiceSummary(summaryArg).withOverride((current) =>
+          applyDeletedInvoiceToSummary(current, item)
+        )
       );
       toast.success("Invoice deleted successfully");
       deleteModal.close();
@@ -254,12 +275,12 @@
   titleText="Are you sure you want to delete this invoice?"
   {@attach deleteModal.attach}
 >
-  {#snippet descriptionSnippet(_item)}
+  {#snippet descriptionSnippet(item)}
     This will delete the invoice to
-    <span class={css({ color: "scarlet" })}>{_item?.name ?? "Unknown"}</span>
+    <span class={css({ color: "scarlet" })}>{item?.name ?? "Unknown"}</span>
     for
     <span class={css({ color: "scarlet" })}
-      >{formatTotal(_item?.total ?? 0)}</span
+      >{formatTotal(item?.total ?? 0)}</span
     >
   {/snippet}
 </ConfirmDelete>

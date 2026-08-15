@@ -39,7 +39,7 @@
 <svelte:window
   onkeydown={(e) => {
     if (e.key === "Escape") {
-      goto(getBackUrl);
+      goto(getBackUrl, { replaceState: true });
     }
   }}
 />
@@ -55,6 +55,7 @@
     maxInlineSize: "full",
     _print: { display: "none" },
   })}
+  data-sveltekit-replacestate
   href={getBackUrl}><Arrow /></a
 >
 <div

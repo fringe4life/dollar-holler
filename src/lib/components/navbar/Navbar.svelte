@@ -4,15 +4,17 @@
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { logout } from "#features/auth/auth.remote";
   import { Toggle } from "#lib/client/runes/Toggle.svelte";
   import { isActive } from "#lib/utils/is-active";
   import NavbarItem from "./NavbarItem.svelte";
+  import { navItemControlClass, navItemLiClass } from "./nav-item-styles";
+  import { toast } from "#lib/utils/toast.svelte.ts";
 
   const navItems = [
     { href: resolve("invoices"), title: "Invoices" },
     { href: resolve("clients"), title: "Clients" },
     { href: resolve("settings"), title: "Settings" },
-    { href: resolve("logout"), title: "Logout" },
   ];
   const path = $derived(page.url.pathname);
 
@@ -135,6 +137,24 @@
       {#each navItems as { href, title } (title)}
         <NavbarItem {href} isActive={isActive(href, path)} {title} />
       {/each}
+      <li class={navItemLiClass}>
+        <form
+          {...logout.enhance(async (form) => {
+            if (!(await form.submit())) {
+              toast.error("Logout failed");
+            }
+          })}
+          data-sveltekit-replacestate
+        >
+          <button
+            class={navItemControlClass}
+            disabled={logout.pending > 0}
+            type="submit"
+          >
+            Logout
+          </button>
+        </form>
+      </li>
     </ul>
   </nav>
 </header>

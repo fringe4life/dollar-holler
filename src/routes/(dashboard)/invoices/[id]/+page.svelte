@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "styled-system/css";
-  import { center, flex, grid, gridItem } from "styled-system/patterns";
+  import { center, grid, gridItem, wrap } from "styled-system/patterns";
   import { goto } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
@@ -109,10 +109,9 @@
       Invoice
     </h1>
     <div
-      class={flex({
+      class={wrap({
         align: "center",
         gap: 2,
-        wrap: { base: "wrap", sm: "nowrap" },
       })}
     >
       <Button onclick={printInvoice} size="short" variant="outline"

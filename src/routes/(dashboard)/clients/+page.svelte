@@ -20,6 +20,7 @@
   import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
   import { DEFAULT_PAGINATION_METADATA } from "#features/pagination/constants";
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query";
+  import { omitListItem } from "#features/pagination/utils/omit-list-item";
   import { visibleListUrl } from "#features/pagination/utils/url";
   import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
@@ -37,29 +38,33 @@
   const editPanel = new ItemPanel<ClientSelect>();
   const deleteModal = new ItemPanel<ClientListResponse>();
 
-  const handleActivate = async (clientId: CursorId) => {
+  const setClientStatus = async (
+    clientId: CursorId,
+    clientStatus: ClientListResponse["clientStatus"]
+  ) => {
     try {
       await updateClientStatus({
-        clientStatus: "active",
+        clientStatus,
         id: clientId,
-      }).updates(listClients(listArg));
+      }).updates(
+        listClients(listArg).withOverride((current) => ({
+          ...current,
+          items: current.items.map((client) =>
+            client.id === clientId ? { ...client, clientStatus } : client
+          ),
+        }))
+      );
       toast.success("Client updated successfully");
     } catch (error) {
       toast.error(getErrorMessage(error, "Failed to update client status"));
     }
   };
 
-  const handleArchive = async (clientId: CursorId) => {
-    try {
-      await updateClientStatus({
-        clientStatus: "archive",
-        id: clientId,
-      }).updates(listClients(listArg));
-      toast.success("Client updated successfully");
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to update client status"));
-    }
-  };
+  const handleActivate = (clientId: CursorId) =>
+    setClientStatus(clientId, "active");
+
+  const handleArchive = (clientId: CursorId) =>
+    setClientStatus(clientId, "archive");
 </script>
 
 <svelte:head><title>Clients | Dollar Holler</title></svelte:head>
@@ -154,44 +159,47 @@
     formState="create"
   />
 </Modal>
-{#if editPanel.item}
-  <Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
-    {#snippet title()}
-      <h2
-        class={css({
-          fontFamily: "sansserif",
-          color: "daisyBush",
-          marginBlockEnd: 7,
-          fontSize: "3xl",
-          fontWeight: "bold",
-        })}
-      >
-        Edit a Client
-      </h2>
-    {/snippet}
 
-    {#snippet description()}
-      <h2 class={css({ display: "none" })}>Edit a client</h2>
-    {/snippet}
+<Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
+  {#snippet title()}
+    <h2
+      class={css({
+        fontFamily: "sansserif",
+        color: "daisyBush",
+        marginBlockEnd: 7,
+        fontSize: "3xl",
+        fontWeight: "bold",
+      })}
+    >
+      Edit a Client
+    </h2>
+  {/snippet}
 
+  {#snippet description()}
+    <h2 class={css({ display: "none" })}>Edit a client</h2>
+  {/snippet}
+  {#if editPanel.item}
     <ClientForm
       closePanel={editPanel.close}
       edit={editPanel.item}
       formState="edit"
     />
-  </Modal>
-{/if}
+  {/if}
+</Modal>
 
 <ConfirmDelete
   item={deleteModal.item}
   onCancel={deleteModal.close}
   onDelete={async () => {
-    if (!deleteModal?.item?.id) {
+    const item = deleteModal.item;
+    if (!item?.id) {
       return;
     }
     try {
-      await deleteClient({ id: deleteModal.item.id }).updates(
-        listClients(listArg)
+      await deleteClient({ id: item.id }).updates(
+        listClients(listArg).withOverride((current) =>
+          omitListItem(current, item.id)
+        )
       );
       toast.success("Client deleted successfully");
       deleteModal.close();

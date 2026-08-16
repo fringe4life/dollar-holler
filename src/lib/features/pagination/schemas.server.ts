@@ -1,6 +1,6 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import { type } from "arktype";
-import type { CursorId } from "#lib/types";
+import type { CursorId } from "#lib/types.ts";
 /** Pagination metadata for cursor-paginated lists. */
 export const paginationMetadataSchema = type({
   hasNextPage: "boolean",

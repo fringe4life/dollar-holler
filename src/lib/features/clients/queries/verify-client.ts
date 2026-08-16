@@ -1,5 +1,5 @@
-import { db } from "#lib/server/db";
-import type { CursorId, Maybe } from "#lib/types";
+import { db } from "#lib/server/db/index.ts";
+import type { CursorId, Maybe } from "#lib/types.ts";
 
 export const verifyClient = async (
   userId: string,

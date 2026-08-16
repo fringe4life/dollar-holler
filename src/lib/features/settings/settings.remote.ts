@@ -2,16 +2,16 @@ import { command, query } from "$app/server";
 import {
   requireUser,
   requireUserMutation,
-} from "#features/auth/require-user.server";
+} from "#features/auth/require-user.server.ts";
 import {
   fetchSettings,
   insertSettings,
   patchSettings,
-} from "#features/settings/queries/settings.server";
+} from "#features/settings/queries/settings.server.ts";
 import {
   settingsInsertSchema,
   settingsUpdateSchema,
-} from "#features/settings/schemas.server";
+} from "#features/settings/schemas.server.ts";
 
 export const getSettings = query(async () => {
   const user = requireUser();

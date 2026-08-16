@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { circle, gridItem } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { circle, gridItem } from "#styled-system/patterns/index.js";
   import Skeleton from "#lib/components/ui/skeleton/skeleton.svelte";
-  import { tableRowBase } from "#lib/styles";
+  import { tableRowBase } from "#lib/styles.ts";
   import { clientRow, clientTable } from "../styles";
 </script>
 

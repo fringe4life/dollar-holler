@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /invoices
+Disallow: /clients
+Disallow: /settings
+Disallow: /login
+Disallow: /signup
+Disallow: /forgot-password
+Disallow: /reset-password
+
+Sitemap: https://dolla-holla.org/sitemap.xml

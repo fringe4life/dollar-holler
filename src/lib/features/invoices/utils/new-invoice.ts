@@ -1,4 +1,4 @@
-import { today } from "#lib/utils/dateHelpers";
+import { today } from "#lib/utils/dateHelpers.ts";
 import type { NewInvoice } from "../types";
 
 export const newInvoice = (): NewInvoice => ({

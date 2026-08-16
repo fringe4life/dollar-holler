@@ -2,10 +2,10 @@ import type {
   LineItemEditRow,
   LineItemInsert,
   NewLineItemWithId,
-} from "#features/line-items/types";
-import type { CursorId, Maybe } from "#lib/types";
-import { err, ok, type Result } from "#lib/utils/result";
-import { stripNullishEntries } from "#lib/utils/strip-nullish-entries";
+} from "#features/line-items/types.ts";
+import type { CursorId, Maybe } from "#lib/types.ts";
+import { err, ok, type Result } from "#lib/utils/result.ts";
+import { stripNullishEntries } from "#lib/utils/strip-nullish-entries.ts";
 import type {
   InvoiceInsert,
   InvoiceSelect,

@@ -1,9 +1,9 @@
 import { error } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
-import { db } from "#lib/server/db";
-import { clients as clientsTable } from "#lib/server/db/schema";
-import type { ClientStatus } from "#lib/server/db/types";
-import type { CursorId } from "#lib/types";
+import { db } from "#lib/server/db/index.ts";
+import { clients as clientsTable } from "#lib/server/db/schema.ts";
+import type { ClientStatus } from "#lib/server/db/types.ts";
+import type { CursorId } from "#lib/types.ts";
 import type { ClientInsert, ClientSelect, ClientUpdate } from "../types";
 
 export const fetchClientById = async (

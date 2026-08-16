@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { gridItem } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { gridItem } from "#styled-system/patterns/index.js";
   import type { FocusEventHandler, FormEventHandler } from "svelte/elements";
   import type {
     LineItemRowProps,
     LineItemUpdate,
-  } from "#features/line-items/types";
+  } from "#features/line-items/types.ts";
   import Trash from "#lib/components/icons/Trash.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import { invoiceLineItem } from "../styles";

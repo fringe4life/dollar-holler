@@ -1,11 +1,11 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import { type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import { invoices } from "#lib/server/db/schema";
+import { invoices } from "#lib/server/db/schema.ts";
 
 /**
  * JSON bodies encode dates as ISO strings; Drizzle arktype expects `Date`.

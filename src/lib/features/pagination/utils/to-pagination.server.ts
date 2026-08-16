@@ -1,8 +1,8 @@
 import type {
   CursorPaginatedList,
   CursorRow,
-} from "#features/pagination/types";
-import type { CursorId } from "#lib/types";
+} from "#features/pagination/types.ts";
+import type { CursorId } from "#lib/types.ts";
 import { DEFAULT_PAGINATION_METADATA } from "../constants";
 import type { ListDirection } from "../types";
 

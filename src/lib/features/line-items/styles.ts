@@ -1,4 +1,4 @@
-import { grid } from "styled-system/patterns";
+import { grid } from "#styled-system/patterns/index.js";
 
 export const invoiceLineItem = grid({
   columnGap: { base: 2, md: 5 },

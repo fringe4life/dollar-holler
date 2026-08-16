@@ -1,10 +1,10 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import { settings } from "#lib/server/db/schema";
+import { settings } from "#lib/server/db/schema.ts";
 
 export const settingsInsertSchema = createInsertSchema(settings).omit(
   "createdAt",

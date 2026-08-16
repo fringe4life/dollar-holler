@@ -17,8 +17,8 @@
 
 import type { AnyColumn, SQL } from "drizzle-orm";
 import { sql } from "drizzle-orm";
-import { lineItems as lineItemsTable } from "#lib/server/db/schema";
-import type { Maybe, Total } from "#lib/types";
+import { lineItems as lineItemsTable } from "#lib/server/db/schema.ts";
+import type { Maybe, Total } from "#lib/types.ts";
 
 /**
  * Scalar subquery: sum of line item amounts for one invoice (for RQB `extras`).

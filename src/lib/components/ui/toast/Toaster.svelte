@@ -2,8 +2,8 @@
   import { Portal } from "@ark-ui/svelte/portal";
   import { Toaster as ArkToaster, Toast } from "@ark-ui/svelte/toast";
   import { browser } from "$app/env";
-  import { sva } from "styled-system/css";
-  import { toaster } from "#lib/utils/toast.svelte";
+  import { sva } from "#styled-system/css/index.js";
+  import { toaster } from "#lib/utils/toast.svelte.ts";
 
   const toastRootRecipe = sva({
     base: {

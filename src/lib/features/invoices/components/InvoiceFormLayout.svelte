@@ -1,13 +1,13 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { grid, gridItem } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { grid, gridItem } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
   import { slide } from "svelte/transition";
   import type {
     ClientInsert,
     ClientPickerOption,
-  } from "#features/clients/types";
+  } from "#features/clients/types.ts";
   import LineItemRows from "#features/line-items/components/LineItemRows.svelte";
   import LineItemSkeleton from "#features/line-items/components/LineItemSkeleton.svelte";
   import type {
@@ -15,15 +15,15 @@
     LineItemEditRow,
     LineItemUpdate,
     NewLineItemWithId,
-  } from "#features/line-items/types";
+  } from "#features/line-items/types.ts";
   import FormField from "#lib/components/FormField.svelte";
   import States from "#lib/components/States.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
   import Label from "#lib/components/ui/label/Label.svelte";
   import Textarea from "#lib/components/ui/textarea/Textarea.svelte";
-  import type { BitsButton } from "#lib/types";
-  import { today } from "#lib/utils/dateHelpers";
+  import type { BitsButton } from "#lib/types.ts";
+  import { today } from "#lib/utils/dateHelpers.ts";
   import type { NewInvoice } from "../types";
   import ClientField from "./ClientField.svelte";
 

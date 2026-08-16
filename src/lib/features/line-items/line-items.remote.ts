@@ -1,26 +1,26 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import { type } from "arktype";
 import { command, query, requested } from "$app/server";
 import {
   requireUser,
   requireUserMutation,
-} from "#features/auth/require-user.server";
+} from "#features/auth/require-user.server.ts";
 import {
   getInvoiceDetail,
   listInvoices,
-} from "#features/invoices/invoices.remote";
+} from "#features/invoices/invoices.remote.ts";
 import {
   clientInvoiceSummary,
   listClientInvoices,
-} from "#features/clients/clients.remote";
-import { lineItemInsertSchema } from "#features/line-items/schemas.server";
+} from "#features/clients/clients.remote.ts";
+import { lineItemInsertSchema } from "#features/line-items/schemas.server.ts";
 import {
   deleteLineItemRow,
   fetchLineItemsForEdit,
   insertLineItems,
   replaceLineItems as replaceLineItemRows,
-} from "#features/line-items/queries/line-items.server";
-import { cursorSchema, idSchema } from "#features/pagination/schemas.server";
+} from "#features/line-items/queries/line-items.server.ts";
+import { cursorSchema, idSchema } from "#features/pagination/schemas.server.ts";
 
 const lineItemsBodySchema = type({
   invoiceId: cursorSchema,

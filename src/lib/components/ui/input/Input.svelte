@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
   import type { HTMLInputAttributes } from "svelte/elements";
 
   const inputClass = css({

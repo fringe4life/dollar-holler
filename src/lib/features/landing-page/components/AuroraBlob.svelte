@@ -1,6 +1,6 @@
 <!-- src/lib/components/AuroraBlob.svelte -->
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
 
   interface Props {
     className: string;
@@ -15,6 +15,7 @@
       position: "absolute",
       blur: "3xl",
       filter: "auto",
+      overflow: "hidden",
     }),
     className
   )}

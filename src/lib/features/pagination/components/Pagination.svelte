@@ -4,8 +4,13 @@
   import Rows2Icon from "@lucide/svelte/icons/rows-2";
   import Rows3Icon from "@lucide/svelte/icons/rows-3";
   import Rows4Icon from "@lucide/svelte/icons/rows-4";
-  import { css, cx } from "styled-system/css";
-  import { between, hstack, square } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import {
+    between,
+    hstack,
+    square,
+    visuallyHidden,
+  } from "#styled-system/patterns/index.js";
   /**
    * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
    */
@@ -15,18 +20,19 @@
     CursorRow,
     PaginationMetadata,
     PaginationSearchParams,
-  } from "#features/pagination/types";
+  } from "#features/pagination/types.ts";
   import {
     parseLimitParam,
     toNormalizedListQuery,
-  } from "#features/pagination/utils/list-query";
+  } from "#features/pagination/utils/list-query.ts";
   import {
     buildListSearchString,
     visibleListUrl,
-  } from "#features/pagination/utils/url";
-  import { supportsBaseSelect } from "#lib/client/supports";
+  } from "#features/pagination/utils/url.ts";
+  import { supportsBaseSelect } from "#lib/client/supports.ts";
   import Button from "#lib/components/ui/button/button.svelte";
   import Select from "#lib/components/ui/select/Select.svelte";
+  import { directionalArrow } from "#lib/styles.ts";
   import { LIMITS, type ListLimit } from "../constants";
   import type { ListDirection } from "../types";
 
@@ -46,10 +52,11 @@
   interface Props {
     items: T[];
     paginationMetadata: PaginationMetadata;
-    pending?: boolean;
   }
 
-  let { items, paginationMetadata, pending = false }: Props = $props();
+  let { items, paginationMetadata }: Props = $props();
+
+  const pending = $derived($effect.pending() > 0);
 
   const listUrl = $derived(visibleListUrl(page));
   const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
@@ -156,7 +163,7 @@
         handleLimitChange(parseLimitParam(e.currentTarget.value))}
     >
       {#each LIMITS as limitOption (limitOption)}
-        {const LimitIcon = LIMIT_ICONS[limitOption]}
+        {@const LimitIcon = LIMIT_ICONS[limitOption]}
         <option
           onclick={() => handleLimitChange(limitOption)}
           value={String(limitOption)}
@@ -168,27 +175,38 @@
         </option>
       {/each}
     </Select>
-    <div class={hstack({ gap: 2 })}>
+    <nav aria-busy={pending} aria-label="Pagination" class={hstack({ gap: 2 })}>
+      <span aria-atomic="true" aria-live="polite" class={visuallyHidden()}>
+        {#if pending}Loading page…{/if}
+      </span>
       <Button
-        aria-label="Previous page"
+        aria-label="Go to previous page"
+        class="group"
         disabled={!paginationMetadata.hasPreviousPage || pending}
         onclick={handleBackward}
         size="default"
         type="button"
         variant="outline"
       >
-        <ChevronLeftIcon class={square({ size: 4 })} />
+        <ChevronLeftIcon
+          aria-hidden="true"
+          class={cx(square({ size: 4 }), directionalArrow("backward"))}
+        />
       </Button>
       <Button
-        aria-label="Next page"
+        aria-label="Go to next page"
+        class="group"
         disabled={!paginationMetadata.hasNextPage || pending}
         onclick={handleForward}
         size="default"
         type="button"
         variant="outline"
       >
-        <ChevronRightIcon class={square({ size: 4 })} />
+        <ChevronRightIcon
+          aria-hidden="true"
+          class={cx(square({ size: 4 }), directionalArrow("forward"))}
+        />
       </Button>
-    </div>
+    </nav>
   </div>
 {/if}

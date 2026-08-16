@@ -1,4 +1,4 @@
-import { stripNullishEntries } from "#lib/utils/strip-nullish-entries";
+import { stripNullishEntries } from "#lib/utils/strip-nullish-entries.ts";
 import {
   SETTINGS_EDITABLE_KEYS,
   type SettingsEditableSnapshot,

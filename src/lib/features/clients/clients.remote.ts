@@ -1,35 +1,35 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import { type } from "arktype";
 import { command, query, requested } from "$app/server";
 import { error } from "@sveltejs/kit";
 import {
   requireUser,
   requireUserMutation,
-} from "#features/auth/require-user.server";
-import { fetchClientPickerOptions } from "#features/clients/queries/clients-options.server";
-import { fetchPaginatedClients } from "#features/clients/queries/clients-list.server";
+} from "#features/auth/require-user.server.ts";
+import { fetchClientPickerOptions } from "#features/clients/queries/clients-options.server.ts";
+import { fetchPaginatedClients } from "#features/clients/queries/clients-list.server.ts";
 import {
   deleteClientRow,
   fetchClientById,
   insertClient,
   patchClient,
   patchClientStatus,
-} from "#features/clients/queries/clients-write.server";
-import { verifyClient } from "#features/clients/queries/verify-client";
+} from "#features/clients/queries/clients-write.server.ts";
+import { verifyClient } from "#features/clients/queries/verify-client.ts";
 import {
   clientInsertSchema,
   clientStatusSchema,
   clientUpdateSchema,
-} from "#features/clients/schemas.server";
+} from "#features/clients/schemas.server.ts";
 import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
-} from "#features/invoices/queries/invoices-list.server";
+} from "#features/invoices/queries/invoices-list.server.ts";
 import {
   cursorSchema,
   idSchema,
   listQuerySchema,
-} from "#features/pagination/schemas.server";
+} from "#features/pagination/schemas.server.ts";
 
 export const listClients = query(listQuerySchema, async (normalized) => {
   const user = requireUser();

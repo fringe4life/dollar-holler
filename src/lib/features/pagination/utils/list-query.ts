@@ -1,5 +1,5 @@
-import type { CursorId, Maybe } from "#lib/types";
-import { pickDefined } from "#lib/utils/strip-nullish-entries";
+import type { CursorId, Maybe } from "#lib/types.ts";
+import { pickDefined } from "#lib/utils/strip-nullish-entries.ts";
 import { DEFAULT_LIMIT, LIMITS, type ListLimit } from "../constants";
 import type {
   ListDirection,

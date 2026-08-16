@@ -1,4 +1,4 @@
-import type { CursorId } from "#lib/types";
+import type { CursorId } from "#lib/types.ts";
 import type { ListDirection } from "../types";
 
 type CursorListQueryResolved =

@@ -11,14 +11,6 @@
     "strict": true,
     "types": ["node", "$app/types", "bun"],
     "exactOptionalPropertyTypes": false,
-    "paths": {
-      "#lib": ["./src/lib"],
-      "#lib/*": ["./src/lib/*"],
-      "#features": ["./src/lib/features"],
-      "#features/*": ["./src/lib/features/*"],
-      "styled-system": ["./styled-system"],
-      "styled-system/*": ["./styled-system/*"]
-    }
   },
   "include": [
     "src",

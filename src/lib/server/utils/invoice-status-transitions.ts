@@ -1,5 +1,5 @@
-import type { InvoiceStatus } from "#lib/server/db/types";
-import { BadRequestError } from "#lib/server/utils/errors";
+import type { InvoiceStatus } from "#lib/server/db/types.ts";
+import { BadRequestError } from "#lib/server/utils/errors.ts";
 
 /** Allowed when changing status; same-value updates are no-ops. */
 export function assertAllowedInvoiceStatusTransition(

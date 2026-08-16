@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/css.js";
   import { resolve } from "$app/paths";
-  import { forgotPassword } from "#features/auth/auth.remote";
-  import { authHeading } from "#features/auth/styles";
+  import { forgotPassword } from "#features/auth/auth.remote.ts";
+  import { authHeading } from "#features/auth/styles.ts";
   import Alert from "#lib/components/Alert.svelte";
   import FormField from "#lib/components/FormField.svelte";
   import Loader from "#lib/components/Loader.svelte";
@@ -12,6 +12,14 @@
   const issues = $derived(forgotPassword.fields.allIssues() ?? []);
   const isLoading = $derived(forgotPassword.pending > 0);
 </script>
+
+<svelte:head>
+  <title>Reset Dollar Holler account password</title>
+  <meta
+    content="Request a password reset email for your Dollar Holler invoice account."
+    name="description"
+  />
+</svelte:head>
 
 <h1 class={authHeading}>Forgot Password</h1>
 

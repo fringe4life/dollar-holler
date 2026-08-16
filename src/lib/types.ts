@@ -13,3 +13,7 @@ export type CursorId = Brand<string, "CursorId">;
 export interface Total {
   total: number;
 }
+
+export type Prettify<T> = {
+  [K in keyof T]: T[K];
+} & {};

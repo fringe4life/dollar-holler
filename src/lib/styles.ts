@@ -1,5 +1,36 @@
-import { css, cx } from "styled-system/css";
-import { grid, hoverShadow } from "styled-system/patterns";
+import { css, cx } from "#styled-system/css/index.js";
+import { grid, hoverShadow } from "#styled-system/patterns/index.js";
+
+export type ArrowDirection = "backward" | "forward";
+
+const arrowMotion = {
+  fill: "none",
+  flexShrink: 0,
+  paddingInline: 0,
+  transitionDuration: "normal",
+  transitionProperty: "translate",
+  transitionTimingFunction: {
+    base: "anticipate",
+    _supportsLinear: "glide",
+  },
+} as const;
+
+const backwardArrow = css({
+  ...arrowMotion,
+  _groupActive: { translate: "-0.25rem 0" },
+  _groupDisabled: { translate: "0 0" },
+  _groupHover: { translate: "-0.25rem 0" },
+});
+
+const forwardArrow = css({
+  ...arrowMotion,
+  _groupActive: { translate: "0.25rem 0" },
+  _groupDisabled: { translate: "0 0" },
+  _groupHover: { translate: "0.25rem 0" },
+});
+
+export const directionalArrow = (direction: ArrowDirection) =>
+  direction === "backward" ? backwardArrow : forwardArrow;
 
 export const actionButton = grid({
   color: "daisyBush",

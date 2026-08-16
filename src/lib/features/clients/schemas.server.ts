@@ -1,12 +1,12 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import { type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import { cursorSchema } from "#features/pagination/schemas.server";
-import { clients } from "#lib/server/db/schema";
+import { cursorSchema } from "#features/pagination/schemas.server.ts";
+import { clients } from "#lib/server/db/schema.ts";
 
 export const clientInsertSchema = createInsertSchema(clients).omit(
   "createdAt",

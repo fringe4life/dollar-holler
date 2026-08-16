@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
   import Search from "#features/pagination/components/Search.svelte";
   import Button from "#lib/components/ui/button/button.svelte";

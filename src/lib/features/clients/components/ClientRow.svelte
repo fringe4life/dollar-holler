@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { gridItem } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { gridItem } from "#styled-system/patterns/index.js";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import AdditionalOptions from "#lib/components/additionaloptions/AdditionalOptions.svelte";
@@ -14,9 +14,9 @@
   import View from "#lib/components/icons/View.svelte";
   import Swipeable from "#lib/components/Swipeable.svelte";
   import Badge from "#lib/components/ui/badge/badge.svelte";
-  import { actionButton, tableRowBase, tableRowHover } from "#lib/styles";
-  import type { CursorId } from "#lib/types";
-  import { centsToDollars } from "#lib/utils/moneyHelpers";
+  import { actionButton, tableRowBase, tableRowHover } from "#lib/styles.ts";
+  import type { CursorId } from "#lib/types.ts";
+  import { centsToDollars } from "#lib/utils/moneyHelpers.ts";
   import { clientRow, clientTable } from "../styles";
   import type { ClientListResponse } from "../types";
 

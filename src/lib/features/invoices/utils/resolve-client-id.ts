@@ -1,6 +1,6 @@
-import type { ClientInsert } from "#features/clients/types";
-import type { CursorId, Maybe } from "#lib/types";
-import { err, ok, type Result } from "#lib/utils/result";
+import type { ClientInsert } from "#features/clients/types.ts";
+import type { CursorId, Maybe } from "#lib/types.ts";
+import { err, ok, type Result } from "#lib/utils/result.ts";
 
 interface ResolveClientIdInput {
   createClient: (client: ClientInsert) => Promise<Maybe<CursorId>>;

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx, sva } from "styled-system/css";
+  import { css, cx, sva } from "#styled-system/css/index.js";
   import type { Snippet } from "svelte";
   import Cancel from "#lib/components/icons/Cancel.svelte";
   import Button from "./ui/button/button.svelte";

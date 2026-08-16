@@ -1,8 +1,13 @@
 <script lang="ts">
   import { StarIcon } from "@lucide/svelte";
-  import { css, cx } from "styled-system/css";
-  import { circle, flex, hstack, stack } from "styled-system/patterns";
-  import type { reviews } from "#features/landing-page/constants/reviews.js";
+  import { css, cx } from "#styled-system/css/index.js";
+  import {
+    circle,
+    flex,
+    hstack,
+    stack,
+  } from "#styled-system/patterns/index.js";
+  import type { reviews } from "#features/landing-page/constants/reviews.ts";
 
   interface Props {
     review: (typeof reviews)[number];

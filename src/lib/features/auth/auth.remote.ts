@@ -7,9 +7,9 @@ import {
   loginSchema,
   resetPasswordSchema,
   signupSchema,
-} from "#features/auth/schemas.server";
-import { auth } from "#lib/auth.server";
-import { tryCatch } from "#lib/utils/try-catch";
+} from "#features/auth/schemas.server.ts";
+import { auth } from "#lib/auth.server.ts";
+import { tryCatch } from "#lib/utils/try-catch.ts";
 
 export const login = form(loginSchema, async (data) => {
   const { request } = getRequestEvent();

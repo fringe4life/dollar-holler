@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { gridItem } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { gridItem } from "#styled-system/patterns/index.js";
   import type { FormEventHandler } from "svelte/elements";
-  import type { LineItemRowsProps } from "#features/line-items/types";
+  import type { LineItemRowsProps } from "#features/line-items/types.ts";
   import CircledAmount from "#lib/components/CircledAmount.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import { centsToDollars, sumLineItems } from "#lib/utils/moneyHelpers";
+  import { centsToDollars, sumLineItems } from "#lib/utils/moneyHelpers.ts";
   import { invoiceLineItem } from "../styles";
   import { lineItemFieldRecipe } from "./LineItemRecipe";
   import LineItemRow from "./LineItemRow.svelte";

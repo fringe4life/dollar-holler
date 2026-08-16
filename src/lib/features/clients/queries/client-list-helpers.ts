@@ -22,13 +22,13 @@
  */
 
 import { eq, inArray, sql } from "drizzle-orm";
-import { invoiceTotalFromSubtotalSql } from "#features/invoices/queries/invoice-list-helpers";
-import { db } from "#lib/server/db";
+import { invoiceTotalFromSubtotalSql } from "#features/invoices/queries/invoice-list-helpers.ts";
+import { db } from "#lib/server/db/index.ts";
 import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
-} from "#lib/server/db/schema";
-import type { CursorId } from "#lib/types";
+} from "#lib/server/db/schema.ts";
+import type { CursorId } from "#lib/types.ts";
 
 export interface ClientReceivedBalance {
   balance: number;

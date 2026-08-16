@@ -1,18 +1,18 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { flex, gridItem } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { flex, gridItem } from "#styled-system/patterns/index.js";
   import type {
     ClientInsert,
     ClientPickerOption,
-  } from "#features/clients/types";
-  import { supportsBaseSelect } from "#lib/client/supports";
+  } from "#features/clients/types.ts";
+  import { supportsBaseSelect } from "#lib/client/supports.ts";
   import FormField from "#lib/components/FormField.svelte";
   import InitialsAvatar from "#lib/components/ui/avatar/InitialsAvatar.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
   import Label from "#lib/components/ui/label/Label.svelte";
   import Select from "#lib/components/ui/select/Select.svelte";
-  import { newClient as blankClient } from "#features/clients/utils/new-client";
+  import { newClient as blankClient } from "#features/clients/utils/new-client.ts";
   import type { NewInvoice } from "../types";
 
   interface ClientFieldProps {

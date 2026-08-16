@@ -1,12 +1,18 @@
 import type { InvoiceListResponse } from "../types";
+import type { Prettify } from "#lib/types.ts";
 
-export interface ClientInvoiceSummaryCents {
+export interface ClientInvoiceSummaryInitial {
   draft: number;
-  grandTotal: number;
   outstanding: number;
   overdue: number;
   paid: number;
 }
+
+export type ClientInvoiceSummaryFinal = Prettify<
+  ClientInvoiceSummaryInitial & {
+    grandTotal: number;
+  }
+>;
 
 // interface SummaryInvoice {
 //   dueDate: Date;
@@ -23,9 +29,9 @@ const isInvoiceOverdue = (dueDate: Date) => dueDate.getTime() < Date.now();
 
 /** Optimistic draft → sent: move invoice total from draft into outstanding or overdue. */
 export const applySentInvoiceToSummary = (
-  summary: ClientInvoiceSummaryCents,
+  summary: ClientInvoiceSummaryFinal,
   invoice: Pick<SummaryInvoice, "dueDate" | "total">
-): ClientInvoiceSummaryCents => {
+): ClientInvoiceSummaryFinal => {
   const { total } = invoice;
   const isOverdue = isInvoiceOverdue(invoice.dueDate);
   return {
@@ -39,9 +45,9 @@ export const applySentInvoiceToSummary = (
 
 /** Optimistic delete: subtract invoice total from its current summary bucket. */
 export const applyDeletedInvoiceToSummary = (
-  summary: ClientInvoiceSummaryCents,
+  summary: ClientInvoiceSummaryFinal,
   invoice: SummaryInvoice
-): ClientInvoiceSummaryCents => {
+): ClientInvoiceSummaryFinal => {
   const { total } = invoice;
   const status = invoice.invoiceStatus ?? "draft";
   const isOverdue = isInvoiceOverdue(invoice.dueDate);

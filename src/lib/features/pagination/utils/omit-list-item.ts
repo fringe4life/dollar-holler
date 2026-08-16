@@ -1,4 +1,4 @@
-import type { CursorId } from "#lib/types";
+import type { CursorId } from "#lib/types.ts";
 import type { CursorPaginatedList, CursorRow } from "../types";
 
 export const omitListItem = <T extends CursorRow>(

@@ -1,9 +1,9 @@
 import { error } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
-import { verifyInvoice } from "#features/invoices/queries/verify-invoice";
-import { db } from "#lib/server/db";
-import { lineItems as lineItemsTable } from "#lib/server/db/schema";
-import type { CursorId } from "#lib/types";
+import { verifyInvoice } from "#features/invoices/queries/verify-invoice.ts";
+import { db } from "#lib/server/db/index.ts";
+import { lineItems as lineItemsTable } from "#lib/server/db/schema.ts";
+import type { CursorId } from "#lib/types.ts";
 import type { LineItemEditRow, LineItemInsert } from "../types";
 
 const assertInvoiceOwned = async (userId: string, invoiceId: CursorId) => {

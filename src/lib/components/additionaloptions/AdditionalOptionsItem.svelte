@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { flex } from "#styled-system/patterns/index.js";
   import type { Component } from "svelte";
   import type { MouseEventHandler } from "svelte/elements";
   import View from "#lib/components/icons/View.svelte";

@@ -1,4 +1,4 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 // biome-ignore lint/performance/noNamespaceImport: way to use sentry
 import * as Sentry from "@sentry/sveltekit";
 import { redirect } from "@sveltejs/kit";
@@ -9,7 +9,7 @@ import {
 } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/env";
-import { auth } from "#lib/auth.server";
+import { auth } from "#lib/auth.server.ts";
 
 const SENTRY_DSN =
   "https://09af8526419b32d328f0c046d2ee5d09@o4511356309536768.ingest.us.sentry.io/4511356313010176";

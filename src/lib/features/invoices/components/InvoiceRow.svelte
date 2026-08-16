@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { gridItem } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { gridItem } from "#styled-system/patterns/index.js";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
-  import { getLabel } from "#features/invoices/utils/labelHelpers";
+  import { getLabel } from "#features/invoices/utils/labelHelpers.ts";
   import AdditionalOptions from "#lib/components/additionaloptions/AdditionalOptions.svelte";
   import AdditionalOptionsButton from "#lib/components/additionaloptions/AdditionalOptionsButton.svelte";
   import type { Option } from "#lib/components/additionaloptions/AdditionalOptionsItem.svelte";
@@ -14,9 +14,9 @@
   import View from "#lib/components/icons/View.svelte";
   import Swipeable from "#lib/components/Swipeable.svelte";
   import Badge from "#lib/components/ui/badge/badge.svelte";
-  import { actionButton, tableRowBase, tableRowHover } from "#lib/styles";
-  import { convertDate } from "#lib/utils/dateHelpers";
-  import { formatTotal } from "#lib/utils/moneyHelpers";
+  import { actionButton, tableRowBase, tableRowHover } from "#lib/styles.ts";
+  import { convertDate } from "#lib/utils/dateHelpers.ts";
+  import { formatTotal } from "#lib/utils/moneyHelpers.ts";
   import { invoiceRow, invoiceTable } from "../styles";
   import type { InvoiceListResponse } from "../types";
 

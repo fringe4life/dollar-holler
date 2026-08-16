@@ -1,10 +1,10 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-orm/arktype";
-import { lineItems } from "#lib/server/db/schema";
+import { lineItems } from "#lib/server/db/schema.ts";
 
 export const lineItemInsertSchema = createInsertSchema(lineItems).omit(
   "invoiceId",

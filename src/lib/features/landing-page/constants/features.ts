@@ -4,7 +4,7 @@ import {
   UsersIcon,
   ZapIcon,
 } from "@lucide/svelte";
-import { css } from "styled-system/css";
+import { css } from "#styled-system/css/index.js";
 export const features = [
   {
     accent: css({ backgroundColor: "goldenFizz/15" }),

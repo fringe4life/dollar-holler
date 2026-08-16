@@ -2,9 +2,9 @@ import type {
   CursorPaginatedList,
   CursorRow,
   PaginationSearchParams,
-} from "#features/pagination/types";
-import { resolveCursorListQuery } from "#features/pagination/utils/cursor-list-query.server";
-import { toPagination } from "#features/pagination/utils/to-pagination.server";
+} from "#features/pagination/types.ts";
+import { resolveCursorListQuery } from "#features/pagination/utils/cursor-list-query.server.ts";
+import { toPagination } from "#features/pagination/utils/to-pagination.server.ts";
 
 export interface FetchPageArgs {
   limit: number;

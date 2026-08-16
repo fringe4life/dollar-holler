@@ -1,6 +1,6 @@
 import type { BadgeVariant } from "#lib/components/ui/badge/badge.svelte";
-import type { Maybe } from "#lib/types";
-import { isLate } from "#lib/utils/dateHelpers";
+import type { Maybe } from "#lib/types.ts";
+import { isLate } from "#lib/utils/dateHelpers.ts";
 
 // Pure: only returns the label, no mutations
 export const getLabel = (

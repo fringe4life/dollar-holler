@@ -1,29 +1,29 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { grid, gridItem } from "styled-system/patterns";
-  import { changePassword } from "#features/auth/auth.remote";
+  import { css } from "#styled-system/css/index.js";
+  import { grid, gridItem } from "#styled-system/patterns/index.js";
+  import { changePassword } from "#features/auth/auth.remote.ts";
   import {
     computeSettingsEditableDelta,
     pickSettingsEditableSnapshot,
-  } from "#features/settings/settings-diff";
+  } from "#features/settings/settings-diff.ts";
   import {
     createSettings,
     getSettings,
     updateSettings,
-  } from "#features/settings/settings.remote";
+  } from "#features/settings/settings.remote.ts";
   import type {
     SettingsEditableSnapshot,
     SettingsSelect,
-  } from "#features/settings/types";
-  import { newSettings } from "#features/settings/utils/new-settings";
+  } from "#features/settings/types.ts";
+  import { newSettings } from "#features/settings/utils/new-settings.ts";
   import Form from "#lib/components/Form.svelte";
   import FormField from "#lib/components/FormField.svelte";
   import Check from "#lib/components/icons/Check.svelte";
   import States from "#lib/components/States.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { toast } from "#lib/utils/toast.svelte.js";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
 
   const loaded = await getSettings();
 
@@ -73,6 +73,14 @@
     toast.success("Password changed successfully");
   }
 </script>
+
+<svelte:head>
+  <title>Invoice settings | Dollar Holler</title>
+  <meta
+    content="Update your business details, invoice defaults, and password in Dollar Holler."
+    name="description"
+  />
+</svelte:head>
 
 <svelte:boundary>
   {#snippet pending()}

@@ -1,9 +1,9 @@
 import type {
   LineItemEditRow,
   LineItemInsert,
-} from "#features/line-items/types";
-import type { CursorId, List, Maybe } from "#lib/types";
-import { err, ok, type Result } from "#lib/utils/result";
+} from "#features/line-items/types.ts";
+import type { CursorId, List, Maybe } from "#lib/types.ts";
+import { err, ok, type Result } from "#lib/utils/result.ts";
 import type { InvoiceUpdate } from "../types";
 
 interface PersistInvoiceEditsInput {

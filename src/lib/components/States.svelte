@@ -1,9 +1,9 @@
 <script lang="ts">
   import FlagIcon from "@lucide/svelte/icons/flag";
-  import { css } from "styled-system/css";
-  import { supportsBaseSelect } from "#lib/client/supports";
-  import type { Maybe } from "#lib/types";
-  import { stateFlag, states } from "#lib/utils/states";
+  import { css } from "#styled-system/css/index.js";
+  import { supportsBaseSelect } from "#lib/client/supports.ts";
+  import type { Maybe } from "#lib/types.ts";
+  import { stateFlag, states } from "#lib/utils/states.ts";
   import Select from "./ui/select/Select.svelte";
 
   interface Props {
@@ -29,7 +29,7 @@
 
 <Select id="state" name="state" bind:value>
   {#each states as { value: stateValue, name } (name)}
-    {const flag = stateFlag(stateValue)}
+    {@const flag = stateFlag(stateValue)}
     <option
       onclick={() => {
         value = stateValue;

@@ -1,14 +1,14 @@
 import { fetchClientReceivedBalanceForIds } from "#lib/features/clients/queries/client-list-helpers.ts";
-import type { ClientListResponse } from "#features/clients/types";
+import type { ClientListResponse } from "#features/clients/types.ts";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
-} from "#features/pagination/types";
-import { withUserAndSearch } from "#features/pagination/utils/base-filter";
-import { fetchCursorPaginatedList } from "#features/pagination/utils/cursor-paginated-fetch.server";
-import { db } from "#lib/server/db";
-import { clients as clientsTable } from "#lib/server/db/schema";
-import type { Maybe } from "#lib/types";
+} from "#features/pagination/types.ts";
+import { withUserAndSearch } from "#features/pagination/utils/base-filter.ts";
+import { fetchCursorPaginatedList } from "#features/pagination/utils/cursor-paginated-fetch.server.ts";
+import { db } from "#lib/server/db/index.ts";
+import { clients as clientsTable } from "#lib/server/db/schema.ts";
+import type { Maybe } from "#lib/types.ts";
 
 /**
  * Substring search. Use RQB `like` (not `ilike`): SQLite/D1 have no `ILIKE`,

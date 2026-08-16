@@ -1,6 +1,7 @@
 import type { D1Database } from "@cloudflare/workers-types";
+import "@sveltejs/enhanced-img";
 import type { User } from "better-auth";
-import type { Maybe } from "#lib/types";
+import type { Maybe } from "#lib/types.ts";
 
 declare global {
   // biome-ignore lint/style/noNamespace: svelte-kit

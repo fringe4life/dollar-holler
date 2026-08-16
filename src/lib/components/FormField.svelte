@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
   import type { Snippet } from "svelte";
   import Label from "#lib/components/ui/label/Label.svelte";
 

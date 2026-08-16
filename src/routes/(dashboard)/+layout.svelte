@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { grid, gridItem } from "styled-system/patterns";
+  import { grid, gridItem } from "#styled-system/patterns/index.js";
   import Navbar from "#lib/components/navbar/Navbar.svelte";
 
   let { children } = $props();

@@ -1,10 +1,16 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { center } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { center } from "#styled-system/patterns/index.js";
   import { asset } from "$app/paths";
 </script>
 
-<svelte:head><title>Thank You! | Doller Holla</title></svelte:head>
+<svelte:head>
+  <title>Thank You! | Doller Holla</title>
+  <meta
+    content="Payment received. Thank you for using Dollar Holler invoices."
+    name="description"
+  />
+</svelte:head>
 
 <div
   class={center({

@@ -4,27 +4,27 @@
   import {
     clientPickerOptions,
     createClient,
-  } from "#features/clients/clients.remote";
-  import type { ClientInsert } from "#features/clients/types";
-  import { newClient } from "#features/clients/utils/new-client";
+  } from "#features/clients/clients.remote.ts";
+  import type { ClientInsert } from "#features/clients/types.ts";
+  import { newClient } from "#features/clients/utils/new-client.ts";
   import {
     createInvoice,
     listInvoices,
-  } from "#features/invoices/invoices.remote";
-  import { createLineItems } from "#features/line-items/line-items.remote";
+  } from "#features/invoices/invoices.remote.ts";
+  import { createLineItems } from "#features/line-items/line-items.remote.ts";
   import type {
     LineItemEditRow,
     NewLineItemWithId,
-  } from "#features/line-items/types";
+  } from "#features/line-items/types.ts";
   import {
     newLineItem,
     normalizeLineItems,
-  } from "#features/line-items/utils/line-item-form";
-  import { toNormalizedListQuery } from "#features/pagination/utils/list-query";
-  import { Counter } from "#lib/client/runes/Counter.svelte";
-  import type { BitsButton } from "#lib/types";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { toast } from "#lib/utils/toast.svelte";
+  } from "#features/line-items/utils/line-item-form.ts";
+  import { toNormalizedListQuery } from "#features/pagination/utils/list-query.ts";
+  import { Counter } from "#lib/client/runes/Counter.svelte.ts";
+  import type { BitsButton } from "#lib/types.ts";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
   import { newInvoice } from "../utils/new-invoice";
   import { resolveClientId } from "../utils/resolve-client-id";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";

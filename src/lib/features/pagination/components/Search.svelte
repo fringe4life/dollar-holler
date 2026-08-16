@@ -1,6 +1,11 @@
 <script lang="ts">
-  import { css, cx, viewTransition } from "styled-system/css";
-  import { circle, flex, grid, gridItem } from "styled-system/patterns";
+  import { css, cx, viewTransition } from "#styled-system/css/index.js";
+  import {
+    circle,
+    flex,
+    grid,
+    gridItem,
+  } from "#styled-system/patterns/index.js";
   import type { KeyboardEventHandler } from "svelte/elements";
   /**
    * Search input: shallow `goto` only. List pages re-query from the URL.
@@ -10,12 +15,12 @@
   import {
     parseLimitParam,
     toNormalizedListQuery,
-  } from "#features/pagination/utils/list-query";
+  } from "#features/pagination/utils/list-query.ts";
   import {
     buildListSearchString,
     visibleListUrl,
-  } from "#features/pagination/utils/url";
-  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  } from "#features/pagination/utils/url.ts";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import Search from "#lib/components/icons/Search.svelte";
 
   const searchIconVt = viewTransition({

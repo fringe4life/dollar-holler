@@ -1,32 +1,32 @@
-import "#lib/utils/arktype.config";
+import "#lib/utils/arktype.config.ts";
 import { type } from "arktype";
 import { command, query, requested } from "$app/server";
 import {
   requireUser,
   requireUserMutation,
-} from "#features/auth/require-user.server";
+} from "#features/auth/require-user.server.ts";
 import {
   clientInvoiceSummary,
   listClientInvoices,
-} from "#features/clients/clients.remote";
-import { fetchInvoiceDetail } from "#features/invoices/queries/invoice-detail.server";
-import { fetchPaginatedInvoices } from "#features/invoices/queries/invoices-list.server";
+} from "#features/clients/clients.remote.ts";
+import { fetchInvoiceDetail } from "#features/invoices/queries/invoice-detail.server.ts";
+import { fetchPaginatedInvoices } from "#features/invoices/queries/invoices-list.server.ts";
 import {
   deleteInvoiceRow,
   fetchInvoiceById,
   insertInvoice,
   patchInvoice,
   patchInvoiceStatus,
-} from "#features/invoices/queries/invoices-write.server";
+} from "#features/invoices/queries/invoices-write.server.ts";
 import {
   invoiceInsertSchema,
   invoiceUpdateSchema,
-} from "#features/invoices/schemas.server";
+} from "#features/invoices/schemas.server.ts";
 import {
   cursorSchema,
   idSchema,
   listQuerySchema,
-} from "#features/pagination/schemas.server";
+} from "#features/pagination/schemas.server.ts";
 
 export const listInvoices = query(listQuerySchema, async (normalized) => {
   const user = requireUser();

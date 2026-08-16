@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { circle } from "styled-system/patterns";
+  import { circle } from "#styled-system/patterns/index.js";
 </script>
 
 <div

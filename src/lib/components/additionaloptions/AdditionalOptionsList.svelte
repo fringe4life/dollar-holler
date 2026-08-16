@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/index.js";
   import type { Option } from "./AdditionalOptionsItem.svelte";
   import AdditionalOptionsItem from "./AdditionalOptionsItem.svelte";
 

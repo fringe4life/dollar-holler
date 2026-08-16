@@ -1,6 +1,6 @@
-import type { ClientPickerOptionsResponse } from "#features/clients/types";
-import { db } from "#lib/server/db";
-import { tryCatch } from "#lib/utils/try-catch";
+import type { ClientPickerOptionsResponse } from "#features/clients/types.ts";
+import { db } from "#lib/server/db/index.ts";
+import { tryCatch } from "#lib/utils/try-catch.ts";
 
 /**
  * All clients for the user as id + name only (invoice client picker).

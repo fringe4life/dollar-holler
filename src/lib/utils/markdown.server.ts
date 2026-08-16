@@ -3,7 +3,7 @@
  */
 import sanitizeHtml from "sanitize-html";
 import { marked } from "marked";
-import type { Maybe, SanitizedHTML } from "#lib/types";
+import type { Maybe, SanitizedHTML } from "#lib/types.ts";
 
 const MARKDOWN_SANITIZE_OPTIONS: sanitizeHtml.IOptions = Object.freeze({
   allowProtocolRelative: false,

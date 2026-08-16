@@ -1,21 +1,21 @@
 <script lang="ts">
-  import { cx } from "styled-system/css";
-  import { flex, grid, gridItem } from "styled-system/patterns";
+  import { cx } from "#styled-system/css/index.js";
+  import { flex, grid, gridItem } from "#styled-system/patterns/index.js";
   import type { FormEventHandler } from "svelte/elements";
   import {
     createClient,
     deleteClient,
     updateClient,
-  } from "#features/clients/clients.remote";
+  } from "#features/clients/clients.remote.ts";
   import FormField from "#lib/components/FormField.svelte";
   import Check from "#lib/components/icons/Check.svelte";
   import Trash from "#lib/components/icons/Trash.svelte";
   import States from "#lib/components/States.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
-  import type { BitsButton } from "#lib/types";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { toast } from "#lib/utils/toast.svelte";
+  import type { BitsButton } from "#lib/types.ts";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
   import type { ClientInsert, ClientSelect } from "../types";
   import { newClient } from "../utils/new-client";
 

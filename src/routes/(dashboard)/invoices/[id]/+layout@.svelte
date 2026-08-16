@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
   import { afterNavigate, goto, onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
   import Arrow from "#lib/components/icons/Arrow.svelte";
-  import type { Maybe } from "#lib/types";
+  import type { Maybe } from "#lib/types.ts";
 
   let { children } = $props();
 

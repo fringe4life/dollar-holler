@@ -1,4 +1,4 @@
-import { grid } from "styled-system/patterns";
+import { grid } from "#styled-system/patterns/index.js";
 
 export const clientTable = grid({
   columnGap: 4,

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
   import type { HeaderProps } from "#lib/components/TableHeader.svelte";
   import TableHeader from "#lib/components/TableHeader.svelte";
   import { clientTable } from "../styles";

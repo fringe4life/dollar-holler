@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { cq, gridItem, vstack } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { cq, gridItem, vstack } from "#styled-system/patterns/index.js";
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { logout } from "#features/auth/auth.remote";
-  import { Toggle } from "#lib/client/runes/Toggle.svelte";
-  import { isActive } from "#lib/utils/is-active";
+  import { logout } from "#features/auth/auth.remote.ts";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
+  import { isActive } from "#lib/utils/is-active.ts";
   import NavbarItem from "./NavbarItem.svelte";
   import { navItemControlClass, navItemLiClass } from "./nav-item-styles";
   import { toast } from "#lib/utils/toast.svelte.ts";

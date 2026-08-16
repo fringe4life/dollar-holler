@@ -1,42 +1,42 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/index.js";
   import { onDestroy } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
   import {
     clientPickerOptions,
     createClient,
-  } from "#features/clients/clients.remote";
-  import type { ClientInsert } from "#features/clients/types";
-  import { newClient } from "#features/clients/utils/new-client";
+  } from "#features/clients/clients.remote.ts";
+  import type { ClientInsert } from "#features/clients/types.ts";
+  import { newClient } from "#features/clients/utils/new-client.ts";
   import {
     deleteInvoice,
     getInvoice,
     listInvoices,
     updateInvoice,
-  } from "#features/invoices/invoices.remote";
+  } from "#features/invoices/invoices.remote.ts";
   import {
     listLineItemsForEdit,
     replaceLineItems,
-  } from "#features/line-items/line-items.remote";
+  } from "#features/line-items/line-items.remote.ts";
   import type {
     LineItemEditRow,
     NewLineItemWithId,
-  } from "#features/line-items/types";
+  } from "#features/line-items/types.ts";
   import {
     newLineItem,
     normalizeLineItems,
-  } from "#features/line-items/utils/line-item-form";
-  import { toNormalizedListQuery } from "#features/pagination/utils/list-query";
-  import { Counter } from "#lib/client/runes/Counter.svelte";
-  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
+  } from "#features/line-items/utils/line-item-form.ts";
+  import { toNormalizedListQuery } from "#features/pagination/utils/list-query.ts";
+  import { Counter } from "#lib/client/runes/Counter.svelte.ts";
+  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
   import Trash from "#lib/components/icons/Trash.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, CursorId } from "#lib/types";
-  import { toDateInputValue } from "#lib/utils/dateHelpers";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { formatTotal, sumLineItems } from "#lib/utils/moneyHelpers";
-  import { toast } from "#lib/utils/toast.svelte";
+  import type { BitsButton, CursorId } from "#lib/types.ts";
+  import { toDateInputValue } from "#lib/utils/dateHelpers.ts";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { formatTotal, sumLineItems } from "#lib/utils/moneyHelpers.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
   import type {
     InvoiceDeleteConfirmItem,
     InvoiceSelect,

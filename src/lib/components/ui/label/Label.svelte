@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
   import type { HTMLLabelAttributes } from "svelte/elements";
 
   //  font-sansserif text-monsoon block text-base font-bold

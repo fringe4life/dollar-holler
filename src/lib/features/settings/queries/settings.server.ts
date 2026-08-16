@@ -1,7 +1,7 @@
 import { error } from "@sveltejs/kit";
 import { eq } from "drizzle-orm";
-import { db } from "#lib/server/db";
-import { settings as settingsTable } from "#lib/server/db/schema";
+import { db } from "#lib/server/db/index.ts";
+import { settings as settingsTable } from "#lib/server/db/schema.ts";
 import type { SettingsInsert, SettingsSelect, SettingsUpdate } from "../types";
 
 const omitMeta = (row: typeof settingsTable.$inferSelect): SettingsSelect => {

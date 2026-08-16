@@ -1,66 +1,51 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { between, grid } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { between } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
-  import BlankState from "#features/clients/components/BlankState.svelte";
   import ClientForm, {
     type ClientFormProps,
   } from "#features/clients/components/ClientForm.svelte";
+  import ClientInvoiceList from "#features/clients/components/ClientInvoiceList.svelte";
+  import ClientInvoiceSummary from "#features/clients/components/ClientInvoiceSummary.svelte";
   import {
     clientInvoiceSummary,
     getClient,
     listClientInvoices,
-  } from "#features/clients/clients.remote";
+  } from "#features/clients/clients.remote.ts";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
-  import InvoiceRow from "#features/invoices/components/InvoiceRow.svelte";
-  import InvoiceRowHeader from "#features/invoices/components/InvoiceRowHeader.svelte";
-  import InvoiceRowSkeleton from "#features/invoices/components/InvoiceRowSkeleton.svelte";
-  import InvoiceSummaryItem from "#features/invoices/components/InvoiceSummaryItem.svelte";
   import {
     deleteInvoice,
     updateInvoiceStatus,
-  } from "#features/invoices/invoices.remote";
-  import type { InvoiceListResponse } from "#features/invoices/types";
+  } from "#features/invoices/invoices.remote.ts";
+  import type { InvoiceListResponse } from "#features/invoices/types.ts";
   import {
     applyDeletedInvoiceToSummary,
     applySentInvoiceToSummary,
-  } from "#features/invoices/utils/client-invoice-summary";
+  } from "#features/invoices/utils/client-invoice-summary.ts";
   import ItemsHeader from "#features/pagination/components/ItemsHeader.svelte";
-  import NoSearchResults from "#features/pagination/components/NoSearchResults.svelte";
-  import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
-  import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query";
-  import { omitListItem } from "#features/pagination/utils/omit-list-item";
-  import { visibleListUrl } from "#features/pagination/utils/url";
-  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
-  import CircledAmount from "#lib/components/CircledAmount.svelte";
+  import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
+  import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
+  import { visibleListUrl } from "#features/pagination/utils/url.ts";
+  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte.ts";
+  import BoundaryError from "#lib/components/BoundaryError.svelte";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
   import Edit from "#lib/components/icons/Edit.svelte";
   import Modal from "#lib/components/Modal.svelte";
+  import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, CursorId } from "#lib/types";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { centsToDollars, formatTotal } from "#lib/utils/moneyHelpers";
-  import { toast } from "#lib/utils/toast.svelte";
+  import type { BitsButton, CursorId } from "#lib/types.ts";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { formatTotal } from "#lib/utils/moneyHelpers.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
 
-  const listUrl = $derived(visibleListUrl(page));
-  const listArg = $derived(normalizeListQueryFromUrl(listUrl).normalized);
-  const clientId = $derived(page.params.id as CursorId);
-  const client = $derived(await getClient(clientId));
-  const invoices = $derived(
-    await listClientInvoices({ clientId, listQuery: listArg })
+  const listArg = $derived(
+    normalizeListQueryFromUrl(visibleListUrl(page)).normalized
   );
+  const clientId = $derived(page.params.id as CursorId);
   const summaryArg = $derived(
     listArg.q === undefined ? { clientId } : { clientId, q: listArg.q }
   );
-  const summary = $derived(await clientInvoiceSummary(summaryArg));
-
-  const invoiceSummaryTotals = $derived({
-    draft: centsToDollars(summary.draft),
-    grandTotal: centsToDollars(summary.grandTotal),
-    outstanding: centsToDollars(summary.outstanding),
-    overdue: centsToDollars(summary.overdue),
-    paid: centsToDollars(summary.paid),
-  });
+  const client = $derived(await getClient(clientId));
 
   const formPanel = new ItemPanel<undefined>();
   const editPanel = new ItemPanel<CursorId>();
@@ -99,7 +84,13 @@
   };
 </script>
 
-<svelte:head><title>{client.name} | Doller Holla</title></svelte:head>
+<svelte:head>
+  <title>{client.name} | Doller Holla</title>
+  <meta
+    content="Client profile and invoices for {client.name} in Dollar Holler."
+    name="description"
+  />
+</svelte:head>
 <ItemsHeader open={formPanel.open.bind(null, undefined)}>
   {#snippet button()}
     + Client
@@ -108,13 +99,15 @@
 
 <svelte:boundary>
   {#snippet pending()}
-    <InvoiceRowSkeleton />
+    <Spinner label="Loading client" size="lg" />
   {/snippet}
   {#snippet failed(err, reset)}
-    <p class={css({ color: "scarlet", fontSize: "lg" })}>
-      Error: {err instanceof Error ? err.message : "Failed to load client"}
-    </p>
-    <button onclick={reset} type="button">Retry</button>
+    <BoundaryError
+      error={err}
+      fallbackMessage="Failed to load client"
+      onRetry={reset}
+      title="We couldn’t load this client"
+    />
   {/snippet}
 
   <div class={between({ marginBlockEnd: 7, inlineSize: "full" })}>
@@ -125,68 +118,16 @@
     </h1>
     <Button onclick={handleEdit} variant="textOnly"><Edit /> Edit</Button>
   </div>
-
-  <div
-    class={grid({
-      columns: { base: 1, sm: 2, lg: 4 },
-      gap: 4,
-      marginBlockEnd: 10,
-      backgroundColor: "gallery",
-      borderRadius: "lg",
-      paddingInline: { base: 6, md: 8, lg: 10 },
-      paddingBlock: { base: 4, md: 6, lg: 8 },
-    })}
-  >
-    <InvoiceSummaryItem
-      amount={invoiceSummaryTotals.overdue}
-      title="Total Overdue"
-    />
-
-    <InvoiceSummaryItem
-      amount={invoiceSummaryTotals.outstanding}
-      title="Total Outstanding"
-    />
-    <InvoiceSummaryItem
-      amount={invoiceSummaryTotals.draft}
-      title="Total Draft"
-    />
-    <InvoiceSummaryItem amount={invoiceSummaryTotals.paid} title="Total Paid" />
-  </div>
-
-  <PaginatedList
-    items={invoices.items}
-    paginationMetadata={invoices.paginationMetadata}
-    pending={$effect.pending() > 0}
-  >
-    {#snippet header()}
-      <InvoiceRowHeader />
-    {/snippet}
-    {#snippet skeleton()}
-      <InvoiceRowSkeleton />
-    {/snippet}
-    {#snippet row(item)}
-      <InvoiceRow
-        invoice={item}
-        onDelete={deleteModal.open}
-        onEdit={(inv) => editPanel.open(inv.id)}
-        onSendInvoice={handleSendInvoice}
-      />
-    {/snippet}
-    {#snippet blankState()}
-      <BlankState />
-    {/snippet}
-    {#snippet noResults()}
-      <NoSearchResults>
-        {#snippet header()}
-          <InvoiceRowHeader emptyState={true} />
-        {/snippet}
-      </NoSearchResults>
-    {/snippet}
-    {#snippet footer()}
-      <CircledAmount amount={invoiceSummaryTotals.grandTotal} label="Total" />
-    {/snippet}
-  </PaginatedList>
 </svelte:boundary>
+
+<ClientInvoiceSummary {clientId} q={listArg.q} />
+<ClientInvoiceList
+  {clientId}
+  listQuery={listArg}
+  onDelete={deleteModal.open}
+  onEdit={(inv) => editPanel.open(inv.id)}
+  onSendInvoice={handleSendInvoice}
+/>
 
 <Modal onClose={formPanel.close} variant="panel" {@attach formPanel.attach}>
   {#snippet title()}

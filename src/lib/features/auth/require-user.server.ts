@@ -1,6 +1,6 @@
 import { error } from "@sveltejs/kit";
 import { getRequestEvent } from "$app/server";
-import { auth } from "#lib/auth.server";
+import { auth } from "#lib/auth.server.ts";
 
 /** Session from hooks (`locals.user`). Use for `query`. */
 export const requireUser = () => {

@@ -3,8 +3,8 @@ import { betterAuth } from "better-auth/minimal";
 import { sveltekitCookies } from "better-auth/svelte-kit";
 import { ENV } from "varlock/env";
 import { getRequestEvent } from "$app/server";
-import { db } from "#lib/server/db/index";
-import { schemaTables } from "#lib/server/db/schema";
+import { db } from "#lib/server/db/index.ts";
+import { schemaTables } from "#lib/server/db/schema.ts";
 import { createId } from "./server/utils/create-id";
 export const auth = betterAuth({
   advanced: {

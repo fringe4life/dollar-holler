@@ -5,23 +5,26 @@ import {
   mapRowsWithTotal,
   type RowWithSubtotal,
 } from "#lib/features/invoices/queries/invoice-list-helpers.ts";
-import type { InvoiceListResponse } from "#features/invoices/types";
-import type { ClientInvoiceSummaryCents } from "#features/invoices/utils/client-invoice-summary";
+import type { InvoiceListResponse } from "#features/invoices/types.ts";
+import type {
+  ClientInvoiceSummaryFinal,
+  ClientInvoiceSummaryInitial,
+} from "#features/invoices/utils/client-invoice-summary.ts";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
-} from "#features/pagination/types";
-import { withUserAndSearch } from "#features/pagination/utils/base-filter";
+} from "#features/pagination/types.ts";
+import { withUserAndSearch } from "#features/pagination/utils/base-filter.ts";
 import {
   type FetchPageArgs,
   fetchCursorPaginatedList,
-} from "#features/pagination/utils/cursor-paginated-fetch.server";
-import { db } from "#lib/server/db";
+} from "#features/pagination/utils/cursor-paginated-fetch.server.ts";
+import { db } from "#lib/server/db/index.ts";
 import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
-} from "#lib/server/db/schema";
-import type { CursorId, Maybe } from "#lib/types";
+} from "#lib/server/db/schema.ts";
+import type { CursorId, Maybe } from "#lib/types.ts";
 
 /** Keys allowed in RQB `columns` for `invoices` (matches Drizzle’s `findMany` config). */
 type InvoicesQueryColumnSelection = NonNullable<
@@ -155,7 +158,7 @@ export const fetchClientInvoiceSummary = async (
   userId: string,
   clientId: CursorId,
   q: Maybe<string>
-): Promise<ClientInvoiceSummaryCents> => {
+): Promise<ClientInvoiceSummaryFinal> => {
   const filters: SQL[] = [
     eq(invoicesTable.userId, userId),
     eq(invoicesTable.clientId, clientId),
@@ -211,16 +214,25 @@ export const fetchClientInvoiceSummary = async (
     })
     .from(invoiceTotals);
 
-  const draft = Math.round(Number(row?.draft ?? 0));
-  const outstanding = Math.round(Number(row?.outstanding ?? 0));
-  const overdue = Math.round(Number(row?.overdue ?? 0));
-  const paid = Math.round(Number(row?.paid ?? 0));
+  return createSummary(row);
+};
 
+const createSummary = (
+  row: Partial<ClientInvoiceSummaryInitial>
+): ClientInvoiceSummaryFinal => {
+  const calculateDraft = handleSummary(row.draft);
+  const calculateOutstanding = handleSummary(row.outstanding);
+  const calculateOverdue = handleSummary(row.overdue);
+  const calculatePaid = handleSummary(row.paid);
+  const calculateGrandTotal =
+    calculateDraft + calculateOutstanding + calculateOverdue + calculatePaid;
   return {
-    draft,
-    grandTotal: draft + outstanding + overdue + paid,
-    outstanding,
-    overdue,
-    paid,
+    draft: calculateDraft,
+    grandTotal: calculateGrandTotal,
+    outstanding: calculateOutstanding,
+    overdue: calculateOverdue,
+    paid: calculatePaid,
   };
 };
+
+const handleSummary = (invoice?: number) => Math.round(Number(invoice ?? 0));

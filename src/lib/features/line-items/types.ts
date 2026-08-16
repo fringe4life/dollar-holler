@@ -1,4 +1,4 @@
-import type { BitsButton, CursorId, List } from "#lib/types";
+import type { BitsButton, CursorId, List } from "#lib/types.ts";
 import type {
   lineItemEditRowSchema,
   lineItemInsertSchema,

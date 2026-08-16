@@ -1,8 +1,13 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { center, hoverShadow, square, stack } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import {
+    center,
+    hoverShadow,
+    square,
+    stack,
+  } from "#styled-system/patterns/index.js";
   import type { Component } from "svelte";
-  import type { features } from "#features/landing-page/constants/features.js";
+  import type { features } from "#features/landing-page/constants/features.ts";
   import type { IconProps } from "#lib/components/Icon.svelte";
 
   export interface Feature {

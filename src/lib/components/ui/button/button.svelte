@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { cva, cx, type RecipeVariant } from "styled-system/css";
+  import { cva, cx, type RecipeVariant } from "#styled-system/css/index.js";
   import type {
     HTMLAnchorAttributes,
     HTMLButtonAttributes,
@@ -7,6 +7,12 @@
 
   export const buttonVariants = cva({
     base: {
+      _focusVisible: {
+        outlineColor: "lavenderIndigo",
+        outlineOffset: "2px",
+        outlineStyle: "solid",
+        outlineWidth: "2px",
+      },
       alignItems: "center",
       cursor: "pointer",
       display: "inline-flex",

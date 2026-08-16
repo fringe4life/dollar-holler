@@ -1,15 +1,23 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/index.js";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { resetPassword } from "#features/auth/auth.remote";
-  import { authHeading } from "#features/auth/styles";
+  import { resetPassword } from "#features/auth/auth.remote.ts";
+  import { authHeading } from "#features/auth/styles.ts";
   import Form from "#lib/components/Form.svelte";
   import FormField from "#lib/components/FormField.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
 
   const token = $derived(page.url.searchParams.get("token") ?? "");
 </script>
+
+<svelte:head>
+  <title>Choose a new Dollar Holler password</title>
+  <meta
+    content="Set a new password for your Dollar Holler account using the reset link from your email."
+    name="description"
+  />
+</svelte:head>
 
 <h1 class={authHeading}>Reset my Password</h1>
 

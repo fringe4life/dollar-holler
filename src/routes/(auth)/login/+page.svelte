@@ -1,14 +1,22 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { between } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { between } from "#styled-system/patterns/index.js";
   import { resolve } from "$app/paths";
-  import { login } from "#features/auth/auth.remote";
-  import { authHeading } from "#features/auth/styles";
+  import { login } from "#features/auth/auth.remote.ts";
+  import { authHeading } from "#features/auth/styles.ts";
   import Form from "#lib/components/Form.svelte";
   import FormField from "#lib/components/FormField.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
   import Label from "#lib/components/ui/label/Label.svelte";
 </script>
+
+<svelte:head>
+  <title>Log in to Dollar Holler invoices</title>
+  <meta
+    content="Sign in to Dollar Holler to create invoices, track payments, and manage your clients."
+    name="description"
+  />
+</svelte:head>
 
 <h1 class={authHeading}>Login</h1>
 

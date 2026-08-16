@@ -1,6 +1,7 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/index.js";
   import { page } from "$app/state";
+  import BoundaryError from "#lib/components/BoundaryError.svelte";
   import BlankState from "#features/invoices/components/BlankState.svelte";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
   import InvoiceRow from "#features/invoices/components/InvoiceRow.svelte";
@@ -10,22 +11,22 @@
     deleteInvoice,
     listInvoices,
     updateInvoiceStatus,
-  } from "#features/invoices/invoices.remote";
-  import type { InvoiceListResponse } from "#features/invoices/types";
+  } from "#features/invoices/invoices.remote.ts";
+  import type { InvoiceListResponse } from "#features/invoices/types.ts";
   import ItemsHeader from "#features/pagination/components/ItemsHeader.svelte";
   import NoSearchResults from "#features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
-  import { DEFAULT_PAGINATION_METADATA } from "#features/pagination/constants";
-  import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query";
-  import { omitListItem } from "#features/pagination/utils/omit-list-item";
-  import { visibleListUrl } from "#features/pagination/utils/url";
-  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte";
+  import PaginatedListSkeleton from "#features/pagination/components/PaginatedListSkeleton.svelte";
+  import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
+  import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
+  import { visibleListUrl } from "#features/pagination/utils/url.ts";
+  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
   import Modal from "#lib/components/Modal.svelte";
-  import type { CursorId } from "#lib/types";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { formatTotal } from "#lib/utils/moneyHelpers";
-  import { toast } from "#lib/utils/toast.svelte";
+  import type { CursorId } from "#lib/types.ts";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { formatTotal } from "#lib/utils/moneyHelpers.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
 
   const listArg = $derived(
     normalizeListQueryFromUrl(visibleListUrl(page)).normalized
@@ -58,7 +59,13 @@
   };
 </script>
 
-<svelte:head><title>Invoices | Dollar Holler</title></svelte:head>
+<svelte:head>
+  <title>Invoices | Dollar Holler</title>
+  <meta
+    content="Create, send, and track invoices for your clients in Dollar Holler."
+    name="description"
+  />
+</svelte:head>
 
 <ItemsHeader open={createForm.open.bind(null, undefined)}>
   {#snippet button()}
@@ -68,37 +75,30 @@
 
 <svelte:boundary>
   {#snippet pending()}
-    <PaginatedList
-      items={[]}
-      paginationMetadata={DEFAULT_PAGINATION_METADATA}
-      pending={true}
-    >
+    <PaginatedListSkeleton>
       {#snippet header()}
         <InvoiceRowHeader />
       {/snippet}
       {#snippet skeleton()}
         <InvoiceRowSkeleton />
       {/snippet}
-      {#snippet row(_invoice)}{/snippet}
-    </PaginatedList>
+    </PaginatedListSkeleton>
   {/snippet}
   {#snippet failed(err, reset)}
-    <p class={css({ color: "scarlet", fontSize: "lg" })}>
-      Error: {err instanceof Error ? err.message : "Failed to load invoices"}
-    </p>
-    <button onclick={reset} type="button">Retry</button>
+    <BoundaryError
+      error={err}
+      fallbackMessage="Failed to load invoices"
+      onRetry={reset}
+      title="We couldn’t load your invoices"
+    />
   {/snippet}
 
   <PaginatedList
     items={list.items}
     paginationMetadata={list.paginationMetadata}
-    pending={$effect.pending() > 0}
   >
     {#snippet header()}
       <InvoiceRowHeader />
-    {/snippet}
-    {#snippet skeleton()}
-      <InvoiceRowSkeleton />
     {/snippet}
     {#snippet row(invoice)}
       <InvoiceRow

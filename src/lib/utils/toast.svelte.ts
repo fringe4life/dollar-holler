@@ -1,5 +1,5 @@
 import { createToaster } from "@ark-ui/svelte/toast";
-import { pickDefined } from "#lib/utils/strip-nullish-entries";
+import { pickDefined } from "#lib/utils/strip-nullish-entries.ts";
 
 interface ToastOptions {
   closable?: boolean;

@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { cva, cx, type RecipeVariant } from "styled-system/css";
+  import { cva, cx, type RecipeVariant } from "#styled-system/css/index.js";
   import type { HTMLAnchorAttributes } from "svelte/elements";
 
   const badgeVariants = cva({

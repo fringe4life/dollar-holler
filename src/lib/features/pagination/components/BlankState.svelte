@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/index.js";
   import type { Snippet } from "svelte";
   import { asset } from "$app/paths";
   import BlankRow from "#features/pagination/components/BlankRow.svelte";

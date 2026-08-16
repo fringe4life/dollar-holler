@@ -1,26 +1,34 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { center, grid, gridItem, wrap } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import {
+    center,
+    grid,
+    gridItem,
+    wrap,
+  } from "#styled-system/patterns/index.js";
   import { goto } from "$app/navigation";
-  import { asset, resolve } from "$app/paths";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import {
     getInvoiceDetail,
     updateInvoiceStatus,
-  } from "#features/invoices/invoices.remote";
+  } from "#features/invoices/invoices.remote.ts";
   import LineItemRows from "#features/line-items/components/LineItemRows.svelte";
-  import { getSettings } from "#features/settings/settings.remote";
+  import { getSettings } from "#features/settings/settings.remote.ts";
+  import BoundaryError from "#lib/components/BoundaryError.svelte";
   import HtmlContent from "#lib/components/HtmlContent.svelte";
+  import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, CursorId } from "#lib/types";
-  import { convertDate } from "#lib/utils/dateHelpers";
-  import { getErrorMessage } from "#lib/utils/error-message";
-  import { toast } from "#lib/utils/toast.svelte";
-  import { tryCatch } from "#lib/utils/try-catch";
+  import type { BitsButton, CursorId } from "#lib/types.ts";
+  import { convertDate } from "#lib/utils/dateHelpers.ts";
+  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { toast } from "#lib/utils/toast.svelte.ts";
+  import { tryCatch } from "#lib/utils/try-catch.ts";
 
   const invoiceId = $derived(page.params.id as CursorId);
-  const detail = $derived(await getInvoiceDetail(invoiceId));
-  const settings = $derived(await getSettings());
+  const [detail, settings] = $derived(
+    await Promise.all([getInvoiceDetail(invoiceId), getSettings()])
+  );
 
   const invoice = $derived(detail.invoice);
   const lineItems = $derived(detail.lineItems ?? []);
@@ -74,15 +82,27 @@
   };
 </script>
 
+<svelte:head>
+  <title>Invoice {invoice.invoiceNumber} | Dollar Holler</title>
+  <meta
+    content={client
+      ? `View invoice ${invoice.invoiceNumber} for ${client.name} and record payment in Dollar Holler.`
+      : `View invoice ${invoice.invoiceNumber} and record payment in Dollar Holler.`}
+    name="description"
+  />
+</svelte:head>
+
 <svelte:boundary>
   {#snippet pending()}
-    <p>Loading invoice…</p>
+    <Spinner label="Loading invoice" size="lg" />
   {/snippet}
   {#snippet failed(err, reset)}
-    <p class={css({ color: "scarlet" })}>
-      {err instanceof Error ? err.message : "Failed to load invoice"}
-    </p>
-    <button onclick={reset} type="button">Retry</button>
+    <BoundaryError
+      error={err}
+      fallbackMessage="Failed to load invoice"
+      onRetry={reset}
+      title="We couldn’t load this invoice"
+    />
   {/snippet}
 
   <div
@@ -142,10 +162,10 @@
     })}
   >
     <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
-      <img
+      <enhanced:img
         alt="Compressed fm"
-        src={asset("images/logo.png")}
-        srcset={`${asset("images/logo@2x.png")} 2x, ${asset("images/logo.png")} 1x`}
+        class={css({ inlineSize: "316px", blockSize: "auto" })}
+        src="#lib/assets/logo.png"
       />
     </div>
 

@@ -1,12 +1,20 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
+  import { css } from "#styled-system/css/index.js";
   import { resolve } from "$app/paths";
-  import { signup } from "#features/auth/auth.remote";
-  import { authHeading } from "#features/auth/styles";
+  import { signup } from "#features/auth/auth.remote.ts";
+  import { authHeading } from "#features/auth/styles.ts";
   import Form from "#lib/components/Form.svelte";
   import FormField from "#lib/components/FormField.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
 </script>
+
+<svelte:head>
+  <title>Create your Dollar Holler account</title>
+  <meta
+    content="Sign up for Dollar Holler to send professional invoices and manage clients from one dashboard."
+    name="description"
+  />
+</svelte:head>
 
 <h1 class={authHeading}>Sign up</h1>
 <Form remote={signup}>

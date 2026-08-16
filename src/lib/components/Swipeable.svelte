@@ -1,11 +1,11 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
-  import { flex } from "styled-system/patterns";
+  import { css, cx } from "#styled-system/css/index.js";
+  import { flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
-  import { swipe } from "#lib/client/attachments/swipe.svelte";
-  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  import { swipe } from "#lib/client/attachments/swipe.svelte.ts";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import Cancel from "#lib/components/icons/Cancel.svelte";
-  import { actionButton } from "#lib/styles";
+  import { actionButton } from "#lib/styles.ts";
 
   interface Props {
     content: Snippet;

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { between } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { between } from "#styled-system/patterns/index.js";
   import Skeleton from "#lib/components/ui/skeleton/skeleton.svelte";
 </script>
 

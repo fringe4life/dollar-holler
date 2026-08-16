@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { InvoiceFormProps } from "#features/line-items/types";
+  import type { InvoiceFormProps } from "#features/line-items/types.ts";
   import LineItemSkeleton from "#features/line-items/components/LineItemSkeleton.svelte";
   import CreateInvoiceForm from "./CreateInvoiceForm.svelte";
   import EditInvoiceForm from "./EditInvoiceForm.svelte";

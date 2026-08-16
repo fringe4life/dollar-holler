@@ -1,4 +1,4 @@
-import { css } from "styled-system/css";
+import { css } from "#styled-system/css/index.js";
 
 export const navItemLiClass = css({
   "&:not(:last-child)": { marginBlockEnd: 6 },

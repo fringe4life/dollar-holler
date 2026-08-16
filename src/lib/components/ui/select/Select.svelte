@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { css, cx } from "styled-system/css";
+  import { css, cx } from "#styled-system/css/index.js";
   import type { HTMLSelectAttributes } from "svelte/elements";
-  import { supportsBaseSelect } from "#lib/client/supports";
+  import { supportsBaseSelect } from "#lib/client/supports.ts";
 
   const selectClass = css({
     "&::picker(select)": {

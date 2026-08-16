@@ -2,12 +2,12 @@
   import MenuIcon from "@lucide/svelte/icons/menu";
   import XIcon from "@lucide/svelte/icons/x";
   import type { User } from "better-auth";
-  import { css } from "styled-system/css";
-  import { between, hstack, square } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { between, hstack, square } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";
-  import { Toggle } from "#lib/client/runes/Toggle.svelte";
+  import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { Maybe } from "#lib/types";
+  import type { Maybe } from "#lib/types.ts";
 
   interface Props {
     user: Maybe<User>;

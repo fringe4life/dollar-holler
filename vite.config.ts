@@ -1,5 +1,6 @@
 import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-cloudflare";
+import { enhancedImages } from "@sveltejs/enhanced-img";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
@@ -16,7 +17,7 @@ const FILE_REGEX = /[/\\]/;
 const root = (relative: string) =>
   fileURLToPath(new URL(relative, import.meta.url));
 
-const ARKTYPE_CONFIG_IMPORT = 'import "#lib/utils/arktype.config";\n';
+const ARKTYPE_CONFIG_IMPORT = 'import "#lib/utils/arktype.config.ts";\n';
 const ARKTYPE_FROM = /from\s*["'](?:arktype|drizzle-orm\/arktype)["']/;
 
 /** ESM: configure() must run before any `arktype` module evaluates (workerd has no JIT). */
@@ -30,7 +31,7 @@ const arktypeJitless = (): Plugin => ({
     if (id.includes("node_modules") || id.includes("arktype.config")) {
       return;
     }
-    if (code.includes("#lib/utils/arktype.config")) {
+    if (code.includes("#lib/utils/arktype.config.ts")) {
       return;
     }
     if (!ARKTYPE_FROM.test(code)) {
@@ -69,6 +70,7 @@ export default defineConfig({
       org: "coinnich",
       project: "javascript-sveltekit",
     }),
+    enhancedImages(),
     sveltekit({
       adapter: adapter({
         platformProxy: {

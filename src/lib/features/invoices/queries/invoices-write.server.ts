@@ -1,16 +1,16 @@
 import { error } from "@sveltejs/kit";
 import { and, eq } from "drizzle-orm";
-import { db } from "#lib/server/db";
-import { invoices as invoicesTable } from "#lib/server/db/schema";
-import type { InvoiceStatus } from "#lib/server/db/types";
-import { BadRequestError } from "#lib/server/utils/errors";
+import { db } from "#lib/server/db/index.ts";
+import { invoices as invoicesTable } from "#lib/server/db/schema.ts";
+import type { InvoiceStatus } from "#lib/server/db/types.ts";
+import { BadRequestError } from "#lib/server/utils/errors.ts";
 import {
   appendInvoiceNotesTermsHtmlForInsert,
   appendInvoiceNotesTermsHtmlForPatch,
-} from "#lib/server/utils/invoice-notes-terms-html.server";
-import { assertAllowedInvoiceStatusTransition } from "#lib/server/utils/invoice-status-transitions";
-import type { CursorId } from "#lib/types";
-import { stripNullishEntries } from "#lib/utils/strip-nullish-entries";
+} from "#lib/server/utils/invoice-notes-terms-html.server.ts";
+import { assertAllowedInvoiceStatusTransition } from "#lib/server/utils/invoice-status-transitions.ts";
+import type { CursorId } from "#lib/types.ts";
+import { stripNullishEntries } from "#lib/utils/strip-nullish-entries.ts";
 import type { InvoiceInsert, InvoiceSelect, InvoiceUpdate } from "../types";
 import { verifyInvoiceStatus } from "./verify-invoice";
 

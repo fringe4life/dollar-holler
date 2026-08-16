@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { css } from "styled-system/css";
-  import { center } from "styled-system/patterns";
+  import { css } from "#styled-system/css/index.js";
+  import { center } from "#styled-system/patterns/index.js";
   import { asset } from "$app/paths";
 
   interface Props {

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { StarIcon } from "@lucide/svelte";
-  import { css, cx } from "styled-system/css";
+  import { ArrowRightIcon, StarIcon } from "@lucide/svelte";
+  import { css, cx } from "#styled-system/css/index.js";
   import {
     between,
     center,
@@ -8,16 +8,23 @@
     flex,
     grid,
     hstack,
+    square,
     stack,
     vstack,
     wrap,
-  } from "styled-system/patterns";
+  } from "#styled-system/patterns/index.js";
   import { resolve } from "$app/paths";
   import AuroraBlob from "#features/landing-page/components/AuroraBlob.svelte";
   import Features from "#features/landing-page/components/Features.svelte";
   import LandingNav from "#features/landing-page/components/LandingNav.svelte";
   import Reviews from "#features/landing-page/components/Reviews.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
+  import { directionalArrow } from "#lib/styles.ts";
+
+  const forwardArrowClass = cx(
+    square({ size: 4 }),
+    directionalArrow("forward")
+  );
 
   let { data } = $props();
 </script>
@@ -54,7 +61,7 @@
           opacity: "0.1",
           backgroundColor: "lavenderIndigo",
         }),
-        circle({ size: 600 })
+        circle({ size: { base: 200, sm: 400, md: 500, lg: 600 } })
       )}
     />
     <AuroraBlob
@@ -66,7 +73,7 @@
           opacity: "0.1",
           backgroundColor: "daisyBush",
         }),
-        circle({ size: 400 })
+        circle({ size: { base: 200, sm: 300, md: 400 } })
       )}
     />
     <div
@@ -128,11 +135,15 @@
         </p>
         <div class={wrap({ align: "center", gap: 3 })}>
           {#if data?.user}
-            <Button href={resolve("invoices")} size="lg">
-              Go to Dashboard →
+            <Button class="group" href={resolve("invoices")} size="lg">
+              Go to Dashboard
+              <ArrowRightIcon aria-hidden="true" class={forwardArrowClass} />
             </Button>
           {:else}
-            <Button href={resolve("signup")} size="lg">Start for Free →</Button>
+            <Button class="group" href={resolve("signup")} size="lg">
+              Start for Free
+              <ArrowRightIcon aria-hidden="true" class={forwardArrowClass} />
+            </Button>
             <Button href={resolve("login")} size="lg">Log in</Button>
           {/if}
         </div>
@@ -695,7 +706,7 @@
 >
   <div
     class={between({
-      direction: { base: "column", sm: "row" },
+      flexDirection: { base: "column", sm: "row" },
       gap: 4,
       maxInlineSize: "6xl",
       paddingInline: 6,

@@ -1,8 +1,8 @@
 import type {
   LineItemEditRow,
   NewLineItemWithId,
-} from "#features/line-items/types";
-import type { List, Maybe } from "#lib/types";
+} from "#features/line-items/types.ts";
+import type { List, Maybe } from "#lib/types.ts";
 
 /**
  * @abstract calculates the cost of a part of the invoice

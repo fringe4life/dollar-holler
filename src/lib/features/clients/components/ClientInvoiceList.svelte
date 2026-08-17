@@ -42,7 +42,7 @@
       error={err}
       fallbackMessage="Failed to load invoices"
       onRetry={reset}
-      title="We couldn’t load this client’s invoices"
+      title="We couldn't load this client's invoices"
     />
   {/snippet}
 

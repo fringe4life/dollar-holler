@@ -50,7 +50,7 @@
 
   const label = $derived(getLabel(invoiceStatus, dueDate.toISOString()));
   const isOptionsDisabled = $derived(label !== "draft");
-  const resolved = $derived(resolve("/(dashboard)/invoices/[id]", { id }));
+  const resolved = $derived(resolve("/(dashboard)/invoices/[id=uuid]", { id }));
 
   const INVOICE_OPTIONS = $derived([
     {

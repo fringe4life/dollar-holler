@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.23-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.8-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=sqlite&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.5-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers/) [![D1](https://img.shields.io/badge/D1-SQLite-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.13-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.70.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.23-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.9-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=sqlite&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.6-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers/) [![D1](https://img.shields.io/badge/D1-SQLite-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.13-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.70.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
@@ -81,6 +81,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
 - `bun run tsc` - Type-check with native TypeScript 7 preview (`@typescript/native`)
 - `bun run tsc6` - Type-check with TypeScript 6
+- `bun run test` - Run Bun unit tests (`*.test.ts`)
 - `bun run fix` - `lint:fix`, `format`, and Stylelint with `--fix`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations and flatten into Wrangler D1 SQL
@@ -107,7 +108,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **Data layer:** SvelteKit remote functions (`query` / `command` / `form`) in [`src/lib/features/*/*.remote.ts`](./src/lib/features); pages `await` queries inside `<svelte:boundary>` (see [`docs/remote-functions-migration.md`](./docs/remote-functions-migration.md)). List/detail mutations use `.updates()` for optimistic cache (clients/invoices). Auth forms including logout in [`auth.remote.ts`](./src/lib/features/auth/auth.remote.ts). Better Auth HTTP remains at `/api/auth` via `svelteKitHandler` in [`src/hooks.server.ts`](./src/hooks.server.ts).
 - **Database:** [Cloudflare D1](https://developers.cloudflare.com/d1/) (SQLite at the edge)
 - **ORM:** Drizzle ORM 1.0 (rc.4) with `drizzle-orm/d1`; per-request client from `event.platform.env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)); Drizzle Kit `dialect: "sqlite"` + optional `d1-http`
-- **Authentication:** Better Auth 1.7 (`1.7.0-rc.5`) with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter `provider: "sqlite"`, `advanced.database.joins`, `allowedHosts` for `localhost`, `*.workers.dev`, and `*.pages.dev`, `@better-auth/drizzle-adapter` relations-v2); login/signup/forgot/reset/change-password/logout via remote forms (logout `redirect`s to login); account rows keyed by `(issuer, account_id)` (credentials use `local:credential`)
+- **Authentication:** Better Auth 1.7 (`1.7.0-rc.6`) with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts), Drizzle adapter `provider: "sqlite"`, `advanced.database.joins`, `allowedHosts` for `localhost`, `*.workers.dev`, and `*.pages.dev`, `@better-auth/drizzle-adapter` relations-v2); login/signup/forgot/reset/change-password/logout via remote forms (logout `redirect`s to login); account rows keyed by `(issuer, account_id)` (credentials use `local:credential`)
 - **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
 - **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
 - **Deployment:** Cloudflare Workers + static assets (`@sveltejs/adapter-cloudflare` 8); [`wrangler.jsonc`](./wrangler.jsonc) sets `nodejs_compat`, D1 binding `DB`, and `ASSETS`
@@ -126,6 +127,7 @@ src/
 ├── hooks.server.ts          # Sentry handle, Better Auth session, route guards, font preload
 ├── hooks.client.ts          # Sentry client init and handleError
 ├── instrumentation.server.ts # Sentry server init (Kit experimental instrumentation)
+├── params/                # Kit 3 matchers (`uuid` via `defineParams` in index.ts)
 ├── lib/
 │   ├── auth.server.ts       # Centralized Better Auth configuration (Drizzle adapter, UUIDv7 IDs)
 │   ├── server/
@@ -139,7 +141,7 @@ src/
 │   │   │   ├── migrations/  # Drizzle Kit folder migrations
 │   │   │   └── d1/          # Flattened SQL for `wrangler d1 migrations apply`
 │   │   └── utils/           # create-id (UUIDv7), invoice-notes-terms-html, invoice-status-transitions, errors
-│   ├── client/            # Client-only: @attach helpers (dialogController, swipe), CSS.supports (base-select), shared runes (ItemPanel, Toggle, etc.)
+│   ├── client/            # Client-only: @attach helpers (dialogController, swipe), CSS.supports (base-select), shared runes (ItemPanel upsert/create-edit, Toggle, etc.)
 │   ├── features/          # Domain features: components, remotes, schemas, Drizzle helpers
 │   │   ├── auth/          # auth.remote.ts (Kit remote forms including logout), require-user.server.ts
 │   │   ├── clients/       # clients.remote.ts, list/write/options queries
@@ -148,15 +150,16 @@ src/
 │   │   ├── line-items/    # line-items.remote.ts
 │   │   ├── pagination/    # PaginatedList, search, blank states, cursor list-query helpers
 │   │   └── settings/      # settings.remote.ts
-│   ├── components/        # Shared UI (Form remote binding, Modal, navbar/, icons, ui/)
+│   ├── components/        # Shared UI (FormPanel, RouteError, Form remote binding, Modal, navbar/, icons, ui/)
 │   ├── styles.ts          # Shared class names / style recipes
 │   └── utils/
 ├── routes/
 │   ├── (auth)/            # Login, signup, forgot/reset password (remote forms; logout is navbar form)
 │   ├── (dashboard)/       # Navbar layout; invoice detail uses +layout@.svelte to skip it
-│   │   ├── clients/
-│   │   ├── invoices/      # List, thanks, [id] detail (layout reset to root)
+│   │   ├── clients/       # List, [id=uuid] detail
+│   │   ├── invoices/      # List, thanks, [id=uuid] detail (layout reset to root)
 │   │   └── settings/
+│   ├── +error.svelte      # Shared RouteError (status heading)
 │   ├── +layout.svelte
 │   └── +page.svelte       # Landing page
 └── app.html
@@ -193,7 +196,9 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Auth Flows:** Forgot and reset password supported; reset token read from URL and validated; logout remote form redirects to login (no empty `/logout` page)
 - **Customizable selects:** Native `<select>` with CSS `appearance: base-select` when supported ([`Select.svelte`](./src/lib/components/ui/select/Select.svelte)); fallback is a plain select
 - **Modern UI:** Ark UI components with Panda CSS
-- **Svelte 5 Runes:** Uses @attach directives and reactive patterns
+- **Svelte 5 Runes:** Uses `@attach` directives and reactive patterns; create/edit forms share `FormPanel` + `ItemPanel` (`attach` prop forwarded as `{@attach}` onto `Modal`)
+- **Route matchers:** Client and invoice detail params use `[id=uuid]` (`src/params/uuid.ts`); non-UUIDv7 ids 404 before load
+- **Shared route errors:** `RouteError` used by root and detail `+error.svelte` pages
 - **Row menus:** Invoice additional options use the native Popover API with CSS anchor positioning
 - **Responsive Design:** Mobile-first with swipe gestures
 
@@ -211,9 +216,9 @@ bun run deploy
 
 - Uses Vite 8.2.1 (`vite` in `package.json`) and Varlock 1.16 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (`dropConsole`, `devtools: {}` for Rolldown analysis metadata). Dev: `svelteDevtools()` before `sveltekit()`, then `DevTools()` from `@vitejs/devtools`. Optional Cursor MCP for live Svelte metrics: [`.cursor/mcp.json`](./.cursor/mcp.json) points at `http://localhost:5173/__svelte-devtools/mcp` with `SVELTE_DEVTOOLS_TOKEN` from the token printed when `bun run dev` starts (rotates each restart). Local D1 persist lives under `.wrangler/` (gitignored).
 - Lint and format run through ESLint, Prettier, and Stylelint (`bun run check`, `bun run fix`). ESLint ignores generated paths (`styled-system/`, `.svelte-kit/`) and defers CSS to Stylelint.
-- [Fallow](https://docs.fallow.tools) resolves `styled-system/*` imports from the generated Panda output and `#lib` path aliases (including `.svelte` → `.svelte.ts` modules). `#features/*` is listed in `ignoreUnresolvedImports` in [`.fallowrc.json`](./.fallowrc.json). Feature `*.server.ts` files live in a `features-server` zone so remotes can import `require-user.server.ts` without crossing into `src/lib/server/**`. Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`.
+- [Fallow](https://docs.fallow.tools) 3.16 resolves `styled-system/*` and `#features/*` via package.json `imports` / tsconfig paths (no `ignoreUnresolvedImports`). Feature `*.server.ts` files live in a `features-server` zone so remotes can import `require-user.server.ts` without crossing into `src/lib/server/**`. Health ignores [`error-message.ts`](./src/lib/utils/error-message.ts). Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`.
 - Panda CSS 2.0 (`2.0.0-beta.13`) generates `styled-system/` via `panda build`. Root [`tsconfig.json`](./tsconfig.json) extends `$app/tsconfig` and declares `paths` for `#lib`, `#features`, and `styled-system` (also in `package.json` `imports`). [`vite.config.ts`](./vite.config.ts) sets `resolve.tsconfigPaths: true` and a `styled-system` `resolve.alias` because Rolldown can miss tsconfig paths for some `.svelte` virtual-module importers. After `panda build`, [`scripts/fix-panda-view-transition-esm.ts`](./scripts/fix-panda-view-transition-esm.ts) ensures `viewTransition` exports are available (beta codegen gap). Typed pagination view-transition CSS lives in `PaginatedList.svelte`; `removeUnusedKeyframes` is off in `panda.config.ts` so theme keyframes named only from raw CSS are retained. Run `panda build` explicitly (via `bun run build`, `bun run panda:build`, or Fallow prepare) when `styled-system/` is missing.
-- SvelteKit 3 uses `$app/env` (not `$app/environment`) for `building` / `dev` in server code. Typed routes use filesystem route IDs with `resolve()` (for example `/(dashboard)/invoices/[id]`). `kit.alias` is deprecated in favor of tsconfig paths / package.json `#` imports. Static assets use `$app/paths` `asset("images/...")` without a leading slash. Shallow list navigations use `goto(url, { shallow: true })` (not deprecated `pushState`).
+- SvelteKit 3 uses `$app/env` (not `$app/environment`) for `building` / `dev` in server code. Typed routes use filesystem route IDs with `resolve()` (for example `/(dashboard)/invoices/[id=uuid]`). Matchers live in [`src/params/`](./src/params/) (`defineParams`). `kit.alias` is deprecated in favor of tsconfig paths / package.json `#` imports. Static assets use `$app/paths` `asset("images/...")` without a leading slash. Shallow list navigations use `goto(url, { shallow: true })` (not deprecated `pushState`).
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` to use UUIDv7 (uuidv7 package) for user ID generation and includes session caching for performance. After upgrading to 1.7 rc.4+, run the account identity migration under `src/lib/server/db/d1/` (rc.4 restores `account_id`; unique key remains `(issuer, account_id)`) before signing in against an existing database.
 - Invoice `notes` and `terms` accept Markdown; create/update remotes derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks.

@@ -23,9 +23,13 @@
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
   import { visibleListUrl } from "#features/pagination/utils/url.ts";
-  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte.ts";
+  import {
+    ItemPanel,
+    upsertKey,
+    type UpsertTarget,
+  } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import Modal from "#lib/components/Modal.svelte";
+  import FormPanel from "#lib/components/FormPanel.svelte";
   import type { CursorId } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { toast } from "#lib/utils/toast.svelte.ts";
@@ -35,9 +39,10 @@
   );
   const list = $derived(await listClients(listArg));
 
-  const createForm = new ItemPanel<undefined>();
-  const editPanel = new ItemPanel<ClientSelect>();
+  const formPanel = new ItemPanel<UpsertTarget<ClientSelect>>();
   const deleteModal = new ItemPanel<ClientListResponse>();
+  const formTarget = $derived(formPanel.item);
+  const isEdit = $derived(formTarget?.kind === "edit");
 
   const setClientStatus = async (
     clientId: CursorId,
@@ -76,7 +81,7 @@
   />
 </svelte:head>
 
-<ItemsHeader open={createForm.open.bind(null, undefined)}>
+<ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
     + Client
   {/snippet}
@@ -98,7 +103,7 @@
       error={err}
       fallbackMessage="Failed to load clients"
       onRetry={reset}
-      title="We couldn’t load your clients"
+      title="We couldn't load your clients"
     />
   {/snippet}
 
@@ -115,7 +120,7 @@
         onActivate={handleActivate}
         onArchive={handleArchive}
         onDelete={deleteModal.open}
-        onEdit={editPanel.open}
+        onEdit={(client) => formPanel.open({ kind: "edit", item: client })}
       />
     {/snippet}
     {#snippet blankState()}
@@ -131,59 +136,30 @@
   </PaginatedList>
 </svelte:boundary>
 
-<Modal onClose={createForm.close} variant="panel" {@attach createForm.attach}>
-  {#snippet title()}
-    <h2
-      class={css({
-        fontFamily: "sansserif",
-        color: "daisyBush",
-        marginBlockStart: { base: 9, lg: 0 },
-        marginBlockEnd: 7,
-        fontSize: "3xl",
-        fontWeight: "bold",
-      })}
-    >
-      Add a Client
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class={css({ srOnly: true })}>Create a new client</h2>
-  {/snippet}
-
-  <ClientForm
-    closePanel={createForm.close}
-    edit={undefined}
-    formState="create"
-  />
-</Modal>
-
-<Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
-  {#snippet title()}
-    <h2
-      class={css({
-        fontFamily: "sansserif",
-        color: "daisyBush",
-        marginBlockEnd: 7,
-        fontSize: "3xl",
-        fontWeight: "bold",
-      })}
-    >
-      Edit a Client
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class={css({ display: "none" })}>Edit a client</h2>
-  {/snippet}
-  {#if editPanel.item}
-    <ClientForm
-      closePanel={editPanel.close}
-      edit={editPanel.item}
-      formState="edit"
-    />
+<FormPanel
+  attach={formPanel.attach}
+  descriptionText={isEdit ? "Edit a client" : "Create a new client"}
+  onClose={formPanel.close}
+  titleText={isEdit ? "Edit a Client" : "Add a Client"}
+>
+  {#if formTarget}
+    {#key upsertKey(formTarget, (client) => client.id)}
+      {#if formTarget.kind === "edit"}
+        <ClientForm
+          closePanel={formPanel.close}
+          edit={formTarget.item}
+          formState="edit"
+        />
+      {:else}
+        <ClientForm
+          closePanel={formPanel.close}
+          edit={undefined}
+          formState="create"
+        />
+      {/if}
+    {/key}
   {/if}
-</Modal>
+</FormPanel>
 
 <ConfirmDelete
   item={deleteModal.item}

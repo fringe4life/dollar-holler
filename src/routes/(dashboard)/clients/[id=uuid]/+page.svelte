@@ -2,9 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { between } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
-  import ClientForm, {
-    type ClientFormProps,
-  } from "#features/clients/components/ClientForm.svelte";
+  import ClientForm from "#features/clients/components/ClientForm.svelte";
   import ClientInvoiceList from "#features/clients/components/ClientInvoiceList.svelte";
   import ClientInvoiceSummary from "#features/clients/components/ClientInvoiceSummary.svelte";
   import {
@@ -12,6 +10,7 @@
     getClient,
     listClientInvoices,
   } from "#features/clients/clients.remote.ts";
+  import type { ClientSelect } from "#features/clients/types.ts";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
   import {
     deleteInvoice,
@@ -26,11 +25,15 @@
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
   import { visibleListUrl } from "#features/pagination/utils/url.ts";
-  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte.ts";
+  import {
+    ItemPanel,
+    upsertKey,
+    type UpsertTarget,
+  } from "#lib/client/runes/ItemPanel.svelte.ts";
   import BoundaryError from "#lib/components/BoundaryError.svelte";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
+  import FormPanel from "#lib/components/FormPanel.svelte";
   import Edit from "#lib/components/icons/Edit.svelte";
-  import Modal from "#lib/components/Modal.svelte";
   import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
   import type { BitsButton, CursorId } from "#lib/types.ts";
@@ -47,14 +50,14 @@
   );
   const client = $derived(await getClient(clientId));
 
-  const formPanel = new ItemPanel<undefined>();
-  const editPanel = new ItemPanel<CursorId>();
+  const formPanel = new ItemPanel<UpsertTarget<ClientSelect>>();
+  const invoicePanel = new ItemPanel<CursorId>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
-  let isEditing = $state<ClientFormProps["formState"]>("create");
+  const formTarget = $derived(formPanel.item);
+  const isEdit = $derived(formTarget?.kind === "edit");
 
   const handleEdit: BitsButton = () => {
-    isEditing = "edit";
-    formPanel.open(undefined);
+    formPanel.open({ kind: "edit", item: client });
   };
 
   const handleSendInvoice = async (inv: InvoiceListResponse) => {
@@ -91,7 +94,7 @@
     name="description"
   />
 </svelte:head>
-<ItemsHeader open={formPanel.open.bind(null, undefined)}>
+<ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
     + Client
   {/snippet}
@@ -106,7 +109,7 @@
       error={err}
       fallbackMessage="Failed to load client"
       onRetry={reset}
-      title="We couldn’t load this client"
+      title="We couldn't load this client"
     />
   {/snippet}
 
@@ -125,70 +128,51 @@
   {clientId}
   listQuery={listArg}
   onDelete={deleteModal.open}
-  onEdit={(inv) => editPanel.open(inv.id)}
+  onEdit={(inv) => invoicePanel.open(inv.id)}
   onSendInvoice={handleSendInvoice}
 />
 
-<Modal onClose={formPanel.close} variant="panel" {@attach formPanel.attach}>
-  {#snippet title()}
-    <h2
-      class={css({
-        fontFamily: "sansserif",
-        color: "daisyBush",
-        marginBlockStart: { base: 9, lg: 0 },
-        marginBlockEnd: 7,
-        fontSize: "3xl",
-        fontWeight: "bold",
-      })}
-    >
-      Add a Client
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class={css({ display: "none" })}>""</h2>
-  {/snippet}
-
-  {#if isEditing === "edit"}
-    <ClientForm closePanel={formPanel.close} edit={client} formState="edit" />
-  {:else}
-    <ClientForm
-      closePanel={formPanel.close}
-      edit={undefined}
-      formState="create"
-    />
+<FormPanel
+  attach={formPanel.attach}
+  descriptionText={isEdit ? "Edit a client" : "Create a new client"}
+  onClose={formPanel.close}
+  titleText={isEdit ? "Edit a Client" : "Add a Client"}
+>
+  {#if formTarget}
+    {#key upsertKey(formTarget, (selected) => selected.id)}
+      {#if formTarget.kind === "edit"}
+        <ClientForm
+          closePanel={formPanel.close}
+          edit={formTarget.item}
+          formState="edit"
+        />
+      {:else}
+        <ClientForm
+          closePanel={formPanel.close}
+          edit={undefined}
+          formState="create"
+        />
+      {/if}
+    {/key}
   {/if}
-</Modal>
+</FormPanel>
 
-<Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
-  {#snippet title()}
-    <h2
-      class={css({
-        fontFamily: "sansserif",
-        color: "daisyBush",
-        marginBlockEnd: 7,
-        fontSize: "3xl",
-        fontWeight: "bold",
-      })}
-    >
-      Edit an Invoice
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class={css({ display: "none" })}>Edit an invoice</h2>
-  {/snippet}
-
-  {#if editPanel.item}
-    {#key editPanel.item}
+<FormPanel
+  attach={invoicePanel.attach}
+  descriptionText="Edit an invoice"
+  onClose={invoicePanel.close}
+  titleText="Edit an Invoice"
+>
+  {#if invoicePanel.item}
+    {#key invoicePanel.item}
       <InvoiceForm
-        closePanel={editPanel.close}
-        invoiceId={editPanel.item}
+        closePanel={invoicePanel.close}
+        invoiceId={invoicePanel.item}
         mode="edit"
       />
     {/key}
   {/if}
-</Modal>
+</FormPanel>
 
 <ConfirmDelete
   item={deleteModal.item}

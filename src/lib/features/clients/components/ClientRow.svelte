@@ -45,7 +45,7 @@
   const receivedDisplay = $derived(centsToDollars(client.received));
   const balanceDisplay = $derived(centsToDollars(client.balance));
   const resolved = $derived(
-    resolve("/(dashboard)/clients/[id]", { id: client.id })
+    resolve("/(dashboard)/clients/[id=uuid]", { id: client.id })
   );
   const optionsPopoverId = $derived(`client-options-${client.id}`);
   const optionsAnchorName = $derived(`--${optionsPopoverId}-anchor`);

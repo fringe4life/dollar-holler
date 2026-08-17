@@ -3,18 +3,9 @@
   "ignoreDependencies": [
     "@varlock/bitwarden-plugin",
     "@sveltejs/mcp",
-    "@pandacss/plugin-svelte",
     "@fontsource-variable/source-sans-3",
-    "styled-system",
     "svelte-eslint-parser",
-    "@typescript/native",
-    "wrangler",
-    "@cloudflare/workers-types"
-  ],
-  "ignoreUnresolvedImports": [
-    "styled-system",
-    "styled-system/*",
-    "#features/*"
+    "@typescript/native"
   ],
   "rules": {
     "boundary-violation": "warn",
@@ -102,6 +93,8 @@
   "health": {
     "maxCyclomatic": 25,
     "maxCognitive": 25,
-    "maxCrap": 75
+    "maxCrap": 75,
+    "suggestInlineSuppression": true,
+    "ignore": ["src/lib/utils/error-message.ts"]
   }
 }

@@ -50,7 +50,7 @@
       error={err}
       fallbackMessage="Failed to load summary"
       onRetry={reset}
-      title="We couldn’t load the invoice summary"
+      title="We couldn't load the invoice summary"
     />
   {/snippet}
 

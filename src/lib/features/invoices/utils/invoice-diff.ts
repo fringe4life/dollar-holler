@@ -52,7 +52,7 @@ export const pickInvoicePatchSnapshot = (
   terms: invoice.terms ?? null,
 });
 
-const computeInvoicePatchDelta = (
+export const computeInvoicePatchDelta = (
   baseline: InvoicePatchSnapshot,
   current: InvoicePatchSnapshot
 ): InvoiceUpdate => {

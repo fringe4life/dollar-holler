@@ -20,9 +20,13 @@
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
   import { visibleListUrl } from "#features/pagination/utils/url.ts";
-  import { ItemPanel } from "#lib/client/runes/ItemPanel.svelte.ts";
+  import {
+    ItemPanel,
+    upsertKey,
+    type UpsertTarget,
+  } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import Modal from "#lib/components/Modal.svelte";
+  import FormPanel from "#lib/components/FormPanel.svelte";
   import type { CursorId } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
@@ -33,9 +37,10 @@
   );
   const list = $derived(await listInvoices(listArg));
 
-  const createForm = new ItemPanel<undefined>();
-  const editPanel = new ItemPanel<CursorId>();
+  const formPanel = new ItemPanel<UpsertTarget<CursorId>>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
+  const formTarget = $derived(formPanel.item);
+  const isEdit = $derived(formTarget?.kind === "edit");
 
   const handleSendInvoice = async (inv: InvoiceListResponse) => {
     try {
@@ -67,7 +72,7 @@
   />
 </svelte:head>
 
-<ItemsHeader open={createForm.open.bind(null, undefined)}>
+<ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
     + Invoice
   {/snippet}
@@ -89,7 +94,7 @@
       error={err}
       fallbackMessage="Failed to load invoices"
       onRetry={reset}
-      title="We couldn’t load your invoices"
+      title="We couldn't load your invoices"
     />
   {/snippet}
 
@@ -104,7 +109,7 @@
       <InvoiceRow
         {invoice}
         onDelete={deleteModal.open}
-        onEdit={(inv) => editPanel.open(inv.id)}
+        onEdit={(inv) => formPanel.open({ kind: "edit", item: inv.id })}
         onSendInvoice={handleSendInvoice}
       />
     {/snippet}
@@ -121,58 +126,26 @@
   </PaginatedList>
 </svelte:boundary>
 
-<Modal onClose={createForm.close} variant="panel" {@attach createForm.attach}>
-  {#snippet title()}
-    <h2
-      class={css({
-        fontFamily: "sansserif",
-        color: "daisyBush",
-        marginBlockStart: { base: 9, lg: 0 },
-        marginBlockEnd: 7,
-        fontSize: "3xl",
-        fontWeight: "bold",
-      })}
-    >
-      Add an Invoice
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class={css({ display: "none" })}>""</h2>
-  {/snippet}
-
-  <InvoiceForm closePanel={createForm.close} mode="create" />
-</Modal>
-
-<Modal onClose={editPanel.close} variant="panel" {@attach editPanel.attach}>
-  {#snippet title()}
-    <h2
-      class={css({
-        fontFamily: "sansserif",
-        color: "daisyBush",
-        marginBlockEnd: 7,
-        fontSize: "3xl",
-        fontWeight: "bold",
-      })}
-    >
-      Edit an Invoice
-    </h2>
-  {/snippet}
-
-  {#snippet description()}
-    <h2 class={css({ display: "none" })}>Add an invoice</h2>
-  {/snippet}
-
-  {#if editPanel.item}
-    {#key editPanel.item}
-      <InvoiceForm
-        closePanel={editPanel.close}
-        invoiceId={editPanel.item}
-        mode="edit"
-      />
+<FormPanel
+  attach={formPanel.attach}
+  descriptionText={isEdit ? "Edit an invoice" : "Create a new invoice"}
+  onClose={formPanel.close}
+  titleText={isEdit ? "Edit an Invoice" : "Add an Invoice"}
+>
+  {#if formTarget}
+    {#key upsertKey(formTarget, (invoiceId) => String(invoiceId))}
+      {#if formTarget.kind === "edit"}
+        <InvoiceForm
+          closePanel={formPanel.close}
+          invoiceId={formTarget.item}
+          mode="edit"
+        />
+      {:else}
+        <InvoiceForm closePanel={formPanel.close} mode="create" />
+      {/if}
     {/key}
   {/if}
-</Modal>
+</FormPanel>
 
 <ConfirmDelete
   item={deleteModal.item}

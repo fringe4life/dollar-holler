@@ -19,7 +19,12 @@
   import HtmlContent from "#lib/components/HtmlContent.svelte";
   import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, CursorId } from "#lib/types.ts";
+  import type {
+    BitsButton,
+    CursorId,
+    Maybe,
+    SanitizedHTML,
+  } from "#lib/types.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { toast } from "#lib/utils/toast.svelte.ts";
@@ -37,6 +42,12 @@
 
   const canSendInvoice = $derived(invoice.invoiceStatus === "draft");
   const canPayInvoice = $derived(invoice.invoiceStatus === "sent");
+  const hasFromName = $derived(Boolean(settings?.myName));
+  const hasFullFromAddress = $derived(
+    Boolean(
+      settings?.city && settings?.street && settings?.state && settings?.zip
+    )
+  );
 
   const printInvoice: BitsButton = () => {
     window.print();
@@ -92,6 +103,90 @@
   />
 </svelte:head>
 
+{#snippet statusActions()}
+  {#if canPayInvoice}
+    <Button onclick={payInvoice} size="short">Pay Invoice</Button>
+  {/if}
+  {#if canSendInvoice}
+    <Button onclick={sendInvoice} size="short">Send Invoice</Button>
+  {/if}
+{/snippet}
+
+{#snippet fromAddress()}
+  <div
+    class={gridItem({
+      colSpan: { base: 6, sm: 2, _print: 3 },
+      gridColumnStart: { sm: 5 },
+      paddingBlockStart: 4,
+    })}
+  >
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
+    {#if hasFromName}
+      <p>
+        {settings?.myName}<br />
+        {#if hasFullFromAddress}
+          {settings?.street}<br />
+          {settings?.city}
+          {settings?.state}
+          {settings?.zip}
+        {/if}
+      </p>
+    {:else}
+      <div
+        class={center({
+          backgroundColor: "gallery",
+          borderRadius: "md",
+          minBlockSize: 17,
+        })}
+      >
+        <a
+          class={css({
+            color: "stone.600",
+            textDecoration: { base: "underline", _hover: "none" },
+          })}
+          href={settingsLink}>Add your contact information.</a
+        >
+      </div>
+    {/if}
+  </div>
+{/snippet}
+
+{#snippet billTo()}
+  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
+    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
+    <p>
+      {#if client}
+        {#if client.name}
+          <strong>{client.name}</strong><br />
+        {/if}
+        {#if client.email}
+          {client.email}<br />
+        {/if}
+        {#if client.street}
+          {client.street}<br />
+        {/if}
+        {#if client.state}
+          {client.state}
+        {/if}
+        {#if client.zip}
+          {client.zip}
+        {/if}
+      {:else}
+        No client found
+      {/if}
+    </p>
+  </div>
+{/snippet}
+
+{#snippet htmlBlock(title: string, html: Maybe<SanitizedHTML>)}
+  {#if html}
+    <div class={gridItem({ colSpan: 6 })}>
+      <div class={css({ color: "monsoon", fontWeight: "bold" })}>{title}</div>
+      <HtmlContent {html} />
+    </div>
+  {/if}
+{/snippet}
+
 <svelte:boundary>
   {#snippet pending()}
     <Spinner label="Loading invoice" size="lg" />
@@ -101,7 +196,7 @@
       error={err}
       fallbackMessage="Failed to load invoice"
       onRetry={reset}
-      title="We couldn’t load this invoice"
+      title="We couldn't load this invoice"
     />
   {/snippet}
 
@@ -138,12 +233,7 @@
         >Print</Button
       >
       <Button onclick={copyLink} size="short">Copy Link</Button>
-      {#if canPayInvoice}
-        <Button onclick={payInvoice} size="short">Pay Invoice</Button>
-      {/if}
-      {#if canSendInvoice}
-        <Button onclick={sendInvoice} size="short">Send Invoice</Button>
-      {/if}
+      {@render statusActions()}
     </div>
   </div>
 
@@ -164,73 +254,13 @@
     <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
       <enhanced:img
         alt="Compressed fm"
-        class={css({ inlineSize: "316px", blockSize: "auto" })}
+        class={css({ inlineSize: "316px", blockSize: "134px" })}
         src="#lib/assets/logo.png"
       />
     </div>
 
-    <div
-      class={gridItem({
-        gridColumnStart: { sm: 5 },
-        colSpan: { base: 6, sm: 2, _print: 3 },
-        paddingBlockStart: 4,
-      })}
-    >
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
-      {#if settings?.myName}
-        <p>
-          {#if settings.myName}
-            {settings.myName}<br />
-          {/if}
-          {#if settings.city && settings.street && settings.state && settings.zip}
-            {settings.street}<br />
-            {settings.city}
-            {settings.state}
-            {settings.zip}
-          {/if}
-        </p>
-      {:else}
-        <div
-          class={center({
-            backgroundColor: "gallery",
-            borderRadius: "md",
-            minBlockSize: 17,
-          })}
-        >
-          <a
-            class={css({
-              color: "stone.600",
-              textDecoration: { base: "underline", _hover: "none" },
-            })}
-            href={settingsLink}>Add your contact information.</a
-          >
-        </div>
-      {/if}
-    </div>
-    <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
-      <p>
-        {#if client}
-          {#if client.name}
-            <strong>{client.name}</strong><br />
-          {/if}
-          {#if client.email}
-            {client.email}<br />
-          {/if}
-          {#if client.street}
-            {client.street}<br />
-          {/if}
-          {#if client.state}
-            {client.state}
-          {/if}
-          {#if client.zip}
-            {client.zip}
-          {/if}
-        {:else}
-          No client found
-        {/if}
-      </p>
-    </div>
+    {@render fromAddress()}
+    {@render billTo()}
     <div
       class={gridItem({
         colSpan: { base: 6, sm: 2, _print: 3 },
@@ -274,19 +304,7 @@
       <LineItemRows discount={invoice.discount || 0} {lineItems} mode="view" />
     </div>
 
-    {#if invoice.notesHtml}
-      <div class={gridItem({ colSpan: 6 })}>
-        <div class={css({ color: "monsoon", fontWeight: "bold" })}>Notes:</div>
-        <HtmlContent html={invoice.notesHtml} />
-      </div>
-    {/if}
-    {#if invoice.termsHtml}
-      <div class={gridItem({ colSpan: 6 })}>
-        <div class={css({ color: "monsoon", fontWeight: "bold" })}>
-          Terms and Conditions:
-        </div>
-        <HtmlContent html={invoice.termsHtml} />
-      </div>
-    {/if}
+    {@render htmlBlock("Notes:", invoice.notesHtml)}
+    {@render htmlBlock("Terms and Conditions:", invoice.termsHtml)}
   </section>
 </svelte:boundary>

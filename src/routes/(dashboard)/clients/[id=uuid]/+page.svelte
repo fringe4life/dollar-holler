@@ -2,6 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { between } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
+  import { toast } from "svelte-sonner";
   import ClientForm from "#features/clients/components/ClientForm.svelte";
   import ClientInvoiceList from "#features/clients/components/ClientInvoiceList.svelte";
   import ClientInvoiceSummary from "#features/clients/components/ClientInvoiceSummary.svelte";
@@ -39,7 +40,6 @@
   import type { BitsButton, CursorId } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
-  import { toast } from "#lib/utils/toast.svelte.ts";
 
   const listArg = $derived(
     normalizeListQueryFromUrl(visibleListUrl(page)).normalized

@@ -155,17 +155,15 @@
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
-      {#snippet content()}
-        <AdditionalOptionsButton
-          anchorName={optionsAnchorName}
-          popoverId={optionsPopoverId}
-        />
-        <AdditionalOptionsList
-          anchorName={optionsAnchorName}
-          options={INVOICE_OPTIONS}
-          popoverId={optionsPopoverId}
-        />
-      {/snippet}
+      <AdditionalOptionsButton
+        anchorName={optionsAnchorName}
+        commandFor={optionsPopoverId}
+      />
+      <AdditionalOptionsList
+        anchorName={optionsAnchorName}
+        options={INVOICE_OPTIONS}
+        id={optionsPopoverId}
+      />
     </AdditionalOptions>
   {/snippet}
   {#snippet revealed()}

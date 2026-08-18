@@ -2,6 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { onDestroy } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
+  import { toast } from "svelte-sonner";
   import {
     clientPickerOptions,
     createClient,
@@ -36,7 +37,6 @@
   import { toDateInputValue } from "#lib/utils/dateHelpers.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal, sumLineItems } from "#lib/utils/moneyHelpers.ts";
-  import { toast } from "#lib/utils/toast.svelte.ts";
   import type {
     InvoiceDeleteConfirmItem,
     InvoiceSelect,

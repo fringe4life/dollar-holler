@@ -4,15 +4,13 @@
 
   interface Props {
     anchorName: string;
-    popoverId: string;
+    commandFor: string;
   }
 
-  let { anchorName, popoverId }: Props = $props();
+  let { anchorName, commandFor }: Props = $props();
 </script>
 
 <button
-  aria-controls={popoverId}
-  aria-haspopup="menu"
   class={css({
     color: {
       _groupHover: "daisyBush/50",
@@ -22,9 +20,11 @@
     transitionDuration: "normal",
     transitionProperty: "colors",
   })}
-  popovertarget={popoverId}
   style:anchor-name={anchorName}
   type="button"
+  command="toggle-popover"
+  commandfor={commandFor}
+  aria-label="additional options"
 >
   <ThreeDots />
 </button>

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import type { FormEventHandler } from "svelte/elements";
+  import { toast } from "svelte-sonner";
   import {
     clientPickerOptions,
     createClient,
@@ -24,7 +25,6 @@
   import { Counter } from "#lib/client/runes/Counter.svelte.ts";
   import type { BitsButton } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
-  import { toast } from "#lib/utils/toast.svelte.ts";
   import { newInvoice } from "../utils/new-invoice";
   import { resolveClientId } from "../utils/resolve-client-id";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";

@@ -144,7 +144,7 @@
 
   <!-- due date -->
   <FormField
-    class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+    class={gridItem({ colSpan: { base: 6, md: 2 } })}
     forId="dueDate"
     label="Due Date"
   >
@@ -161,9 +161,9 @@
   <!-- issue date -->
   <FormField
     class={gridItem({
-      colSpan: { base: 6, sm: 2 },
-      colStart: { sm: 5 },
-      colEnd: { sm: 7 },
+      colSpan: { base: 6, md: 2 },
+      colStart: { md: 5 },
+      colEnd: { md: 7 },
     })}
     forId="issueDate"
     label="Issue Date"

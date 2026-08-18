@@ -6,10 +6,10 @@
   interface Props {
     anchorName: string;
     options: Option[];
-    popoverId: string;
+    id: string;
   }
 
-  let { anchorName, options, popoverId }: Props = $props();
+  let { anchorName, options, id }: Props = $props();
 </script>
 
 <ul
@@ -31,6 +31,7 @@
     transitionDuration: "normal",
     transitionProperty: "opacity, translate, scale, display",
     transitionTimingFunction: "ease-in",
+    positionTryFallbacks: "flip-block flip-inline",
 
     _open: {
       opacity: 1,
@@ -46,7 +47,7 @@
       },
     },
   })}
-  id={popoverId}
+  {id}
   popover="auto"
   style:position-anchor={anchorName}
 >

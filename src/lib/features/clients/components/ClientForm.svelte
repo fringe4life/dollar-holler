@@ -2,6 +2,7 @@
   import { cx } from "#styled-system/css/index.js";
   import { flex, grid, gridItem } from "#styled-system/patterns/index.js";
   import type { FormEventHandler } from "svelte/elements";
+  import { toast } from "svelte-sonner";
   import {
     createClient,
     deleteClient,
@@ -15,7 +16,6 @@
   import Input from "#lib/components/ui/input/Input.svelte";
   import type { BitsButton } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
-  import { toast } from "#lib/utils/toast.svelte.ts";
   import type { ClientInsert, ClientSelect } from "../types";
   import { newClient } from "../utils/new-client";
 

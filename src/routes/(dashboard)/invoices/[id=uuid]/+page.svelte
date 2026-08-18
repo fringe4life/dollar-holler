@@ -9,6 +9,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { toast } from "svelte-sonner";
   import {
     getInvoiceDetail,
     updateInvoiceStatus,
@@ -27,7 +28,6 @@
   } from "#lib/types.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
-  import { toast } from "#lib/utils/toast.svelte.ts";
   import { tryCatch } from "#lib/utils/try-catch.ts";
 
   const invoiceId = $derived(page.params.id as CursorId);

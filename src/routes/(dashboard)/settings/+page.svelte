@@ -1,6 +1,7 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
+  import { toast } from "svelte-sonner";
   import { changePassword } from "#features/auth/auth.remote.ts";
   import {
     computeSettingsEditableDelta,
@@ -23,7 +24,6 @@
   import Button from "#lib/components/ui/button/button.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
-  import { toast } from "#lib/utils/toast.svelte.ts";
 
   const loaded = await getSettings();
 

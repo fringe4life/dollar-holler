@@ -4,10 +4,10 @@
 
   interface Props {
     classes?: string;
-    content: Snippet;
+    children: Snippet;
   }
 
-  let { classes = "", content }: Props = $props();
+  let { classes = "", children }: Props = $props();
 </script>
 
 <div
@@ -20,5 +20,5 @@
     classes
   )}
 >
-  {@render content()}
+  {@render children()}
 </div>

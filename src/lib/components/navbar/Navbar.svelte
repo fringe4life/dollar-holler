@@ -1,15 +1,20 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
-  import { cq, gridItem, vstack } from "#styled-system/patterns/index.js";
+  import {
+    cq,
+    gridItem,
+    vstack,
+    visuallyHidden,
+  } from "#styled-system/patterns/index.js";
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { toast } from "svelte-sonner";
   import { logout } from "#features/auth/auth.remote.ts";
   import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import { isActive } from "#lib/utils/is-active.ts";
   import NavbarItem from "./NavbarItem.svelte";
   import { navItemControlClass, navItemLiClass } from "./nav-item-styles";
-  import { toast } from "#lib/utils/toast.svelte.ts";
 
   const navItems = [
     { href: resolve("invoices"), title: "Invoices" },
@@ -82,7 +87,7 @@
     onclick={nav.toggle}
     type="button"
   >
-    <span class={css({ srOnly: true })}>Menu</span>
+    <span class={visuallyHidden()}>Menu</span>
     <div
       class={css({
         "&::after,&::before,&": {

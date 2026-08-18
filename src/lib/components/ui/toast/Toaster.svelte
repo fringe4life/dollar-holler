@@ -1,119 +1,112 @@
 <script lang="ts">
-  import { Portal } from "@ark-ui/svelte/portal";
-  import { Toaster as ArkToaster, Toast } from "@ark-ui/svelte/toast";
-  import { browser } from "$app/env";
-  import { sva } from "#styled-system/css/index.js";
-  import { toaster } from "#lib/utils/toast.svelte.ts";
+  import { Toaster as Sonner } from "svelte-sonner";
+  import { css } from "#styled-system/css/index.js";
+  import Cancel from "#lib/components/icons/Cancel.svelte";
+  import { between } from "#styled-system/patterns/between.js";
 
-  const toastRootRecipe = sva({
-    base: {
-      closeTrigger: {
-        _hover: { backgroundColor: "black/5" },
-        alignItems: "center",
-        blockSize: 6,
-        borderRadius: "sm",
-        color: "currentColor",
-        display: "inline-flex",
-        inlineSize: 6,
-        justifyContent: "center",
-      },
-      description: {
-        color: "monsoon",
-        fontSize: "sm",
-        gridColumn: "1 / -1",
-      },
-      root: {
-        _closed: {
-          transitionDuration: "400ms, 400ms, 200ms, 400ms, 200ms",
-          transitionTimingFunction: "cubic-bezier(0.06, 0.71, 0.55, 1)",
-        },
-        alignItems: "start",
-        backgroundColor: "white",
-        borderRadius: "md",
-        borderWidth: "1px",
-        boxShadow: "md",
-        columnGap: 3,
-        display: "grid",
-        gridTemplateColumns: "1fr auto",
-        height: "var(--height)",
-        inlineSize: "sm",
-        opacity: "var(--opacity)",
-        paddingBlock: 3,
-        paddingInline: 4,
-        rowGap: 1,
-        scale: "var(--scale)",
-        transitionDuration: "400ms, 400ms, 400ms, 400ms, 200ms",
-        transitionProperty: "translate, scale, opacity, height, box-shadow",
-        transitionTimingFunction: "cubic-bezier(0.21, 1.02, 0.73, 1)",
-        translate: "var(--x) var(--y)",
-        willChange: "translate, opacity, scale",
-        zIndex: "var(--z-index)",
-      },
-      title: {
-        fontWeight: "bold",
-        lineHeight: "short",
-      },
-    },
-    defaultVariants: {
-      type: "info",
-    },
-    slots: ["root", "title", "description", "closeTrigger"],
-    variants: {
-      type: {
-        error: { root: { borderColor: "scarlet", color: "scarlet" } },
-        info: { root: { borderColor: "lavenderIndigo", color: "daisyBush" } },
-        success: {
-          root: { borderColor: "caribbeanGreen", color: "daisyBush" },
-        },
-        warning: { root: { borderColor: "goldenFizz", color: "daisyBush" } },
-      },
-    },
+  const toastClass = between({
+    borderRadius: "lg",
+    borderStyle: "solid",
+    borderWidth: "2px",
+    boxShadow: "md",
+    columnGap: 4,
+    fontFamily: "sansserif",
+    fontSize: { base: "md", md: "lg" },
+    fontWeight: "bold",
+    minBlockSize: 12,
+    inlineSize: "100%",
+    maxInlineSize: "min(100%, 26rem)",
+    paddingBlock: 3,
+    paddingInline: 5,
   });
 
-  const toastVariants = ["success", "error", "warning", "info"] as const;
-  type ToastVariant = (typeof toastVariants)[number];
-  const getToastVariant = (type: string | undefined): ToastVariant =>
-    toastVariants.includes(type as ToastVariant)
-      ? (type as ToastVariant)
-      : "info";
+  const titleClass = css({
+    fontWeight: "bold",
+    lineHeight: "short",
+  });
+
+  const descriptionClass = css({
+    color: "monsoon",
+    fontSize: "sm",
+    fontWeight: "normal",
+  });
+
+  const contentClass = css({
+    flex: 1,
+    minInlineSize: 0,
+  });
+
+  const closeButtonClass = css({
+    _focusVisible: {
+      outlineColor: "currentColor",
+      outlineOffset: "2px",
+      outlineStyle: "solid",
+      outlineWidth: "2px",
+    },
+    alignItems: "center",
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    color: "currentColor",
+    cursor: "pointer",
+    display: "inline-flex",
+    flexShrink: 0,
+    padding: 0,
+  });
+
+  const successClass = css({
+    backgroundColor: "white",
+    borderColor: "caribbeanGreen",
+    color: "daisyBush",
+  });
+
+  const errorClass = css({
+    "& [data-description]": { color: "goldenFizz" },
+    backgroundColor: "scarlet",
+    borderColor: "scarlet",
+    color: "goldenFizz",
+  });
+
+  const warningClass = css({
+    backgroundColor: "white",
+    borderColor: "goldenFizz",
+    color: "daisyBush",
+  });
+
+  const infoClass = css({
+    backgroundColor: "fog",
+    borderColor: "fog",
+    color: "daisyBush",
+  });
 </script>
 
-<!--
-  Ark Portal calls getAllContexts() then mount(snippet). On SSR (esp. with
-  experimental.async) that throws lifecycle_outside_component; client-only.
--->
-{#if browser}
-  <Portal>
-    <ArkToaster {toaster}>
-      {#snippet children(_toastValue)}
-        <Toast.Root
-          class={toastRootRecipe({ type: getToastVariant(_toastValue().type) })
-            .root}
-        >
-          <Toast.Title
-            class={toastRootRecipe({
-              type: getToastVariant(_toastValue().type),
-            }).title}>{_toastValue().title}</Toast.Title
-          >
-          <Toast.CloseTrigger
-            aria-label="Close notification"
-            class={toastRootRecipe({
-              type: getToastVariant(_toastValue().type),
-            }).closeTrigger}
-          >
-            x
-          </Toast.CloseTrigger>
-          {#if _toastValue().description}
-            <Toast.Description
-              class={toastRootRecipe({
-                type: getToastVariant(_toastValue().type),
-              }).description}
-            >
-              {_toastValue().description}
-            </Toast.Description>
-          {/if}
-        </Toast.Root>
-      {/snippet}
-    </ArkToaster>
-  </Portal>
-{/if}
+<Sonner
+  closeButton
+  closeButtonAriaLabel="Close notification"
+  offset="1rem"
+  successIcon={null}
+  errorIcon={null}
+  infoIcon={null}
+  warningIcon={null}
+  pauseWhenPageIsHidden
+  position="top-center"
+  toastOptions={{
+    classes: {
+      closeButton: closeButtonClass,
+      content: contentClass,
+      description: descriptionClass,
+      error: errorClass,
+      info: infoClass,
+      success: successClass,
+      title: titleClass,
+      toast: toastClass,
+      warning: warningClass,
+    },
+    unstyled: true,
+  }}
+  visibleToasts={4}
+  duration={3000}
+>
+  {#snippet closeIcon()}
+    <Cancel height={24} width={24} />
+  {/snippet}
+</Sonner>

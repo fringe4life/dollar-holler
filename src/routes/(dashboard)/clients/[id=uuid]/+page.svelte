@@ -38,7 +38,8 @@
   import Edit from "#lib/components/icons/Edit.svelte";
   import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, CursorId } from "#lib/types.ts";
+  import type { BitsButton } from "#lib/types.ts";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
 

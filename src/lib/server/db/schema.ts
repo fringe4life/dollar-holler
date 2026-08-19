@@ -7,7 +7,8 @@ import {
   text,
   uniqueIndex,
 } from "drizzle-orm/sqlite-core";
-import type { CursorId, SanitizedHTML } from "../../types";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
+import type { SanitizedHTML } from "#lib/schemas/sanitized-html.server.ts";
 import { createId } from "../utils/create-id";
 
 export const clientStatuses = ["active", "archive"] as const;

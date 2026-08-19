@@ -10,7 +10,7 @@
   import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
   import PaginatedListSkeleton from "#features/pagination/components/PaginatedListSkeleton.svelte";
   import type { PaginationSearchParams } from "#features/pagination/types.ts";
-  import type { CursorId } from "#lib/types.ts";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
 
   interface Props {
     clientId: CursorId;

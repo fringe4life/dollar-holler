@@ -9,7 +9,7 @@ import {
   appendInvoiceNotesTermsHtmlForPatch,
 } from "#lib/server/utils/invoice-notes-terms-html.server.ts";
 import { assertAllowedInvoiceStatusTransition } from "#lib/server/utils/invoice-status-transitions.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import { stripNullishEntries } from "#lib/utils/strip-nullish-entries.ts";
 import type { InvoiceInsert, InvoiceSelect, InvoiceUpdate } from "../types";
 import { verifyInvoiceStatus } from "./verify-invoice";

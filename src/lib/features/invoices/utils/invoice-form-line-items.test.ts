@@ -7,7 +7,8 @@ import {
   lineItemHiddenIdAttrs,
   newClientFromInvoiceForm,
 } from "./invoice-form-line-items";
-import type { CursorId } from "#lib/types.ts";
+import { parse } from "valibot";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 
 const form = (patch: Partial<InvoiceFormData>): InvoiceFormData => ({
   discount: 0,
@@ -75,7 +76,10 @@ describe("newClientFromInvoiceForm", () => {
   });
 });
 
-const PERSISTED_ID = "018f0000-0000-7000-8000-000000000001" as CursorId;
+const PERSISTED_ID = parse(
+  cursorSchema,
+  "018f0000-0000-7000-8000-000000000001"
+);
 
 describe("lineItemFormFieldValues", () => {
   it("defaults missing row", () => {

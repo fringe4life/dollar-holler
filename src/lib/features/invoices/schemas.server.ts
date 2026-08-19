@@ -6,7 +6,6 @@ import {
 import {
   check,
   date,
-  nullable,
   number,
   object,
   omit,
@@ -16,14 +15,9 @@ import {
   transform,
   union,
 } from "valibot";
-import { cursorSchema } from "#features/pagination/schemas.ts";
-import type { SanitizedHTML } from "#lib/types.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
+import { nullableSanitizedHtmlSchema } from "#lib/schemas/sanitized-html.server.ts";
 import { invoices } from "#lib/server/db/schema.ts";
-
-const sanitizedHtml = pipe(
-  string(),
-  transform((value): SanitizedHTML => value as SanitizedHTML)
-);
 
 /**
  * JSON bodies encode dates as ISO strings; Drizzle valibot expects `Date`.
@@ -48,8 +42,8 @@ const invoiceInsertRefine = {
 const invoiceSelectRefine = {
   clientId: () => cursorSchema,
   id: () => cursorSchema,
-  notesHtml: () => nullable(sanitizedHtml),
-  termsHtml: () => nullable(sanitizedHtml),
+  notesHtml: () => nullableSanitizedHtmlSchema,
+  termsHtml: () => nullableSanitizedHtmlSchema,
 };
 
 export const invoiceInsertSchema = omit(

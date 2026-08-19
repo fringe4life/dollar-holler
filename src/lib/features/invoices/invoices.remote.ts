@@ -18,11 +18,8 @@ import {
 } from "#features/invoices/queries/invoices-write.server.ts";
 import { persistInvoice } from "#features/invoices/queries/persist-invoice.server.ts";
 import { invoiceFormSchema } from "#features/invoices/schemas.ts";
-import {
-  cursorSchema,
-  idSchema,
-  listQuerySchema,
-} from "#features/pagination/schemas.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
+import { idSchema, listQuerySchema } from "#features/pagination/schemas.ts";
 
 export const listInvoices = query(listQuerySchema, async (normalized) => {
   const user = requireUser();

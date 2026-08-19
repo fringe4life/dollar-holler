@@ -1,5 +1,5 @@
 import type { InferOutput } from "valibot";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type {
   invoiceInsertSchema,
   invoiceListRowSchema,

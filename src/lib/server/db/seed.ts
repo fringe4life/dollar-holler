@@ -7,7 +7,7 @@ import type { ClientInsert, ClientSelect } from "#features/clients/types.ts";
 import type { LineItemInsert } from "#features/line-items/types.ts";
 import type { SettingsInsert } from "#features/settings/types.ts";
 import { appendInvoiceNotesTermsHtmlForInsert } from "#lib/server/utils/invoice-notes-terms-html.server.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import { createId } from "../utils/create-id";
 import { createDb } from "./create-db";
 import { clients, invoices, lineItems, settings } from "./schema";

@@ -7,7 +7,7 @@ import {
   pipe,
   string,
 } from "valibot";
-import { cursorSchema } from "#features/pagination/schemas.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 import { zipSchema } from "#lib/utils/zip.ts";
 
 /** HTML `form()` payload for the client panel (strings only). */

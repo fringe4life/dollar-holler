@@ -32,7 +32,7 @@
   } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
   import FormPanel from "#lib/components/form/FormPanel.svelte";
-  import type { CursorId } from "#lib/types.ts";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
 
   const listArg = $derived(

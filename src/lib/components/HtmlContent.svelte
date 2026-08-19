@@ -1,6 +1,7 @@
 <script lang="ts">
   /* eslint-disable svelte/no-at-html-tags -- server-sanitized HTML only */
-  import type { Maybe, SanitizedHTML } from "#lib/types.ts";
+  import type { Maybe } from "#lib/types.ts";
+  import type { SanitizedHTML } from "#lib/schemas/sanitized-html.server.ts";
 
   interface HtmlContentProps {
     html: Maybe<SanitizedHTML>;

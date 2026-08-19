@@ -4,7 +4,7 @@ import {
   createUpdateSchema,
 } from "drizzle-orm/valibot";
 import { omit, optional } from "valibot";
-import { cursorSchema } from "#features/pagination/schemas.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 import { lineItems } from "#lib/server/db/schema.ts";
 
 export const lineItemInsertSchema = omit(

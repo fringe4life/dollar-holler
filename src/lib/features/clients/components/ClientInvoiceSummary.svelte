@@ -4,7 +4,7 @@
   import { clientInvoiceSummary } from "#features/clients/clients.remote.ts";
   import InvoiceSummaryItem from "#features/invoices/components/InvoiceSummaryItem.svelte";
   import InvoiceSummarySkeleton from "#features/invoices/components/InvoiceSummarySkeleton.svelte";
-  import type { CursorId } from "#lib/types.ts";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { centsToDollars } from "#lib/utils/moneyHelpers.ts";
 
   interface Props {

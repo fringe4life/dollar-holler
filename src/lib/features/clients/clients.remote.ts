@@ -23,11 +23,8 @@ import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
 } from "#features/invoices/queries/invoices-list.server.ts";
-import {
-  cursorSchema,
-  idSchema,
-  listQuerySchema,
-} from "#features/pagination/schemas.ts";
+import { idSchema, listQuerySchema } from "#features/pagination/schemas.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 
 export const listClients = query(listQuerySchema, async (normalized) => {
   const user = requireUser();

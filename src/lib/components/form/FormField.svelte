@@ -3,6 +3,7 @@
   import type { Snippet } from "svelte";
   import Label from "#lib/components/ui/label/Label.svelte";
   import FieldErrors from "./FieldErrors.svelte";
+  import type { FormIssue } from "./form-issue.ts";
 
   interface FormFieldSlot {
     errorId: string | undefined;
@@ -14,7 +15,7 @@
     class?: string;
     forId?: string;
     hint?: Snippet;
-    issues?: ReadonlyArray<{ message: string }> | undefined;
+    issues?: ReadonlyArray<FormIssue> | undefined;
     label?: string;
     labelClass?: string;
   }

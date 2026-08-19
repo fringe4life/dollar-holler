@@ -20,7 +20,8 @@
   import HtmlContent from "#lib/components/HtmlContent.svelte";
   import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, Maybe, SanitizedHTML } from "#lib/types.ts";
+  import type { BitsButton, Maybe } from "#lib/types.ts";
+  import type { SanitizedHTML } from "#lib/schemas/sanitized-html.server.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { tryCatch } from "#lib/utils/try-catch.ts";

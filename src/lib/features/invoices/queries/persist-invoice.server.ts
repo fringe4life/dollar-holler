@@ -10,7 +10,7 @@ import {
   insertLineItems,
   replaceLineItems,
 } from "#features/line-items/queries/line-items.server.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import {
   emptyToNull,
   filterInvoiceFormLineItems,

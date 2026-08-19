@@ -1,6 +1,7 @@
 import type { InferOutput } from "valibot";
 import type { HTMLInputAttributes } from "svelte/elements";
-import type { BitsButton, CursorId, List } from "#lib/types.ts";
+import type { BitsButton, List } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type {
   lineItemEditRowSchema,
   lineItemInsertSchema,

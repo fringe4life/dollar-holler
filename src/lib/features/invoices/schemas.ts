@@ -13,7 +13,7 @@ import {
   pipe,
   string,
 } from "valibot";
-import { cursorSchema } from "#features/pagination/schemas.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 import { optionalZipSchema } from "#lib/utils/zip.ts";
 
 /** One invoice line in the HTML `form()` payload. */

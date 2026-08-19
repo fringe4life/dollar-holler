@@ -5,8 +5,10 @@ import type {
   LineItemInsert,
   NewLineItemWithId,
 } from "#features/line-items/types.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type { InvoiceFormData, invoiceFormLineItemSchema } from "../schemas";
+import { parse } from "valibot";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 
 type InvoiceFormLineItem = InferOutput<typeof invoiceFormLineItemSchema>;
 
@@ -72,7 +74,7 @@ export const lineItemFormFieldValues = (
   return {
     amount: item?.amount ?? 0,
     description: item?.description ?? "",
-    persistedId: typeof id === "string" ? id : undefined,
+    persistedId: typeof id === "string" ? parse(cursorSchema, id) : undefined,
     quantity: item?.quantity ?? 0,
   };
 };

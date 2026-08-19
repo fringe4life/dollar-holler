@@ -2,6 +2,7 @@
   import type { Snippet } from "svelte";
   import type { RemoteForm, RemoteFormInput } from "$app/server";
   import Alert from "#lib/components/Alert.svelte";
+  import { formIssueKey } from "#lib/components/form/form-issue.ts";
 
   interface SubmitSlot {
     pending: boolean;
@@ -35,7 +36,7 @@
 </script>
 
 <form {...formProps} {...rest}>
-  {#each issues as issue, index (index)}
+  {#each issues as issue (formIssueKey(issue))}
     <Alert message={issue.message} />
   {/each}
   <fieldset disabled={pending}>

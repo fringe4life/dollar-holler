@@ -9,8 +9,8 @@ jobs:
   boundaries:
     runs-on: ubuntu-latest
     env:
-      # Machine account token — resolves bitwarden() entries in .env.schema
-      BITWARDEN_ACCESS_TOKEN: ${{ secrets.BITWARDEN_ACCESS_TOKEN }}
+      # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
+      VARLOCK_ENV: test
     steps:
       - uses: actions/checkout@v7
 

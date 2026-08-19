@@ -21,13 +21,14 @@
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
   import { visibleListUrl } from "#features/pagination/utils/url.ts";
+  import { buttonIcon } from "#lib/styles.ts";
   import {
     ItemPanel,
     upsertKey,
     type UpsertTarget,
   } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import FormPanel from "#lib/components/FormPanel.svelte";
+  import FormPanel from "#lib/components/form/FormPanel.svelte";
   import type { CursorId } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
@@ -74,7 +75,8 @@
 
 <ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
-    + Invoice
+    <span aria-hidden="true" class={buttonIcon("plus")}>+</span>
+    Invoice
   {/snippet}
 </ItemsHeader>
 
@@ -170,12 +172,12 @@
   titleText="Are you sure you want to delete this invoice?"
   {@attach deleteModal.attach}
 >
-  {#snippet descriptionSnippet(_invoice)}
+  {#snippet descriptionSnippet(invoice)}
     This will delete the invoice to
-    <span class={css({ color: "scarlet" })}>{_invoice?.name ?? "Unknown"}</span>
+    <span class={css({ color: "scarlet" })}>{invoice?.name ?? "Unknown"}</span>
     for
     <span class={css({ color: "scarlet" })}
-      >{formatTotal(_invoice?.total ?? 0)}</span
+      >{formatTotal(invoice?.total ?? 0)}</span
     >
   {/snippet}
 </ConfirmDelete>

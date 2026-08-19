@@ -4,13 +4,10 @@
   import { forgotPassword } from "#features/auth/auth.remote.ts";
   import { authHeading } from "#features/auth/styles.ts";
   import Alert from "#lib/components/Alert.svelte";
-  import FormField from "#lib/components/FormField.svelte";
-  import Loader from "#lib/components/Loader.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import Form from "#lib/components/form/Form.svelte";
+  import FormField from "#lib/components/form/FormField.svelte";
+  import LoaderButton from "#lib/components/ui/button/LoaderButton.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
-
-  const issues = $derived(forgotPassword.fields.allIssues() ?? []);
-  const isLoading = $derived(forgotPassword.pending > 0);
 </script>
 
 <svelte:head>
@@ -39,42 +36,42 @@
     >
   </p>
 {:else}
-  <form {...forgotPassword}>
-    {#each issues as issue, index (index)}
-      <Alert message={issue.message} />
-    {/each}
+  <Form remote={forgotPassword}>
     <FormField
       forId="email"
+      issues={forgotPassword.fields.email.issues()}
       label="Email Address"
       labelClass={css({ color: "goldenFizz" })}
     >
-      <Input
-        id="email"
-        placeholder="john@email.com"
-        required
-        {...forgotPassword.fields.email.as("email")}
-      />
+      {#snippet children({ errorId })}
+        <Input
+          id="email"
+          placeholder="john@email.com"
+          required
+          aria-describedby={errorId}
+          {...forgotPassword.fields.email.as("email")}
+        />
+      {/snippet}
     </FormField>
-
-    <Button disabled={isLoading} type="submit" variant="auth">
-      {#if isLoading}
-        <Loader />
-      {:else}
-        Send me a reset email!
-      {/if}
-    </Button>
-    <p
-      class={css({
-        marginBlockStart: 4,
-        textAlign: "center",
-        fontSize: "sm",
-        color: "white",
-      })}
-    >
-      <a
-        class={css({ textDecoration: { base: "underline", _hover: "none" } })}
-        href={resolve("login")}>Ready to login?</a
+    {#snippet submit({ pending })}
+      <LoaderButton {pending} variant="auth"
+        >Send me a reset email!</LoaderButton
       >
-    </p>
-  </form>
+    {/snippet}
+    {#snippet footer()}
+      <p
+        class={css({
+          marginBlockStart: 4,
+          textAlign: "center",
+          fontSize: "sm",
+          color: "white",
+        })}
+      >
+        <a
+          class={css({ textDecoration: { base: "underline", _hover: "none" } })}
+          href={resolve("login")}>Ready to login?</a
+        >
+      </p>
+    {/snippet}
+  </Form>
 {/if}

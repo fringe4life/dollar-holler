@@ -24,8 +24,6 @@
     quantity > 0 ? (props?.lineItem?.amount / quantity).toFixed(2) : "0.00"
   );
 
-  const amount = $derived((quantity * Number(unitPrice)).toFixed(2));
-
   function patch(update: LineItemUpdate) {
     if (props.mode === "view") {
       return;
@@ -87,6 +85,9 @@
     })
   )}
 >
+  {#if props.mode !== "view" && props.fieldAttrs.id}
+    <input {...props.fieldAttrs.id} />
+  {/if}
   <div class={gridItem({ gridArea: "description", position: "relative" })}>
     <label class={lineItemLabel} for="description-{props.lineItem.id}"
       >Description</label
@@ -95,11 +96,15 @@
       class="line-item"
       disabled={!isEditable}
       id="description-{props.lineItem.id}"
-      name="description"
       oninput={isEditable ? onDescriptionInput : undefined}
       required={props.isRequired}
-      type="text"
-      value={props.lineItem.description}
+      {...props.mode === "view"
+        ? {
+            name: "description",
+            type: "text",
+            value: props.lineItem.description,
+          }
+        : props.fieldAttrs.description}
     />
     <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
@@ -113,7 +118,6 @@
       disabled={!isEditable}
       id="unitPrice-{props.lineItem.id}"
       min={isEditable ? "0" : undefined}
-      name="unitPrice"
       onblur={isEditable ? formatUnitPrice : undefined}
       oninput={isEditable ? onUnitPriceInput : undefined}
       required={props.isRequired}
@@ -121,7 +125,6 @@
       type={isEditable ? "number" : "text"}
       value={isEditable ? unitPrice : displayUnitPrice}
     />
-    <!-- "border-lavenderIndigo ease-anticipate pointer-events-none absolute inset-x-0 inset-be-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200" -->
     <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "quantity", position: "relative" })}>
@@ -132,11 +135,15 @@
       disabled={!isEditable}
       id="quantity-{props.lineItem.id}"
       min="0"
-      name="quantity"
       oninput={isEditable ? onQuantityInput : undefined}
       required={props.isRequired}
-      type="number"
-      value={props.lineItem.quantity}
+      {...props.mode === "view"
+        ? {
+            name: "quantity",
+            type: "number",
+            value: props.lineItem.quantity,
+          }
+        : props.fieldAttrs.quantity}
     />
     <span aria-hidden="true" class={qtyStyles.border}></span>
   </div>
@@ -146,11 +153,16 @@
     >
     <input
       class={amountStyles.input}
-      disabled
+      disabled={props.mode === "view"}
       id="amount-{props.lineItem.id}"
-      name="amount"
-      type="text"
-      value={isEditable ? amount : props.lineItem.amount.toFixed(2)}
+      readonly={isEditable}
+      {...props.mode === "view"
+        ? {
+            name: "amount",
+            type: "text",
+            value: props.lineItem.amount.toFixed(2),
+          }
+        : props.fieldAttrs.amount}
     />
   </div>
 

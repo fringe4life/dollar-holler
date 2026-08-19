@@ -14,18 +14,18 @@
   {emptyState}
   headers={clientHeaders}
 >
-  {#snippet headerSnippet(_title, _emptyState)}
+  {#snippet headerSnippet(title, emptyState)}
     <h3
       class={css({
         fontSize: "xl",
         lineHeight: "snug",
         fontWeight: "bolder",
         textAlign:
-          _title === "Received" || _title === "Balanced" ? "right" : undefined,
-        color: _emptyState ? "pastelPurple" : "daisyBush",
+          title === "Received" || title === "Balanced" ? "right" : undefined,
+        color: emptyState ? "pastelPurple" : "daisyBush",
       })}
     >
-      {_title}
+      {title}
     </h3>
   {/snippet}
 </TableHeader>

@@ -18,8 +18,10 @@ export const lineItemFieldRecipe = sva({
       transitionTimingFunction: "anticipate",
     },
     input: {
+      _ariaInvalid: { borderColor: "scarlet" },
       _disabled: { bg: "transparent", borderBottomWidth: 0 },
       _focus: { outline: "none" },
+      _userInvalid: { borderColor: "scarlet" },
       blockSize: 10,
       borderBottomWidth: 2,
       borderColor: "stone.300",

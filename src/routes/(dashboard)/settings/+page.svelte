@@ -4,74 +4,28 @@
   import { toast } from "svelte-sonner";
   import { changePassword } from "#features/auth/auth.remote.ts";
   import {
-    computeSettingsEditableDelta,
-    pickSettingsEditableSnapshot,
-  } from "#features/settings/settings-diff.ts";
-  import {
-    createSettings,
     getSettings,
-    updateSettings,
+    saveSettings,
   } from "#features/settings/settings.remote.ts";
-  import type {
-    SettingsEditableSnapshot,
-    SettingsSelect,
-  } from "#features/settings/types.ts";
-  import { newSettings } from "#features/settings/utils/new-settings.ts";
-  import Form from "#lib/components/Form.svelte";
-  import FormField from "#lib/components/FormField.svelte";
+  import Form from "#lib/components/form/Form.svelte";
+  import FormField from "#lib/components/form/FormField.svelte";
   import Check from "#lib/components/icons/Check.svelte";
   import States from "#lib/components/States.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import LoaderButton from "#lib/components/ui/button/LoaderButton.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
-  import { getErrorMessage } from "#lib/utils/error-message.ts";
+  import { buttonIcon } from "#lib/styles.ts";
+  import Spinner from "#lib/components/Spinner.svelte";
+  import { zipInputAttrs } from "#lib/utils/zip.ts";
 
   const loaded = await getSettings();
 
-  let mySettings = $state<SettingsSelect>(
-    loaded ? { ...loaded } : newSettings()
-  );
-  let isNewSettings = $state(!loaded);
-  let baselineInvoiceDetails = $state<SettingsEditableSnapshot | null>(
-    loaded ? pickSettingsEditableSnapshot(loaded) : null
-  );
-
-  const saveSettings = async () => {
-    try {
-      if (isNewSettings) {
-        const created = await createSettings(mySettings);
-        mySettings = { ...created };
-        baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
-        isNewSettings = false;
-        toast.success("Settings created successfully");
-        return;
-      }
-
-      if (!baselineInvoiceDetails) {
-        baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
-      }
-
-      const delta = computeSettingsEditableDelta(
-        baselineInvoiceDetails,
-        pickSettingsEditableSnapshot(mySettings)
-      );
-
-      if (Object.keys(delta).length === 0) {
-        toast.info("No changes to save");
-        return;
-      }
-
-      const updated = await updateSettings(delta);
-      mySettings = { ...updated };
-      baselineInvoiceDetails = pickSettingsEditableSnapshot(mySettings);
-      toast.success("Settings updated successfully");
-    } catch (error) {
-      toast.error(getErrorMessage(error, "Failed to save settings"));
-    }
+  const handleSettingsSuccess = () => {
+    toast.success("Settings saved successfully");
   };
 
-  function handlePasswordSuccess() {
+  const handlePasswordSuccess = () => {
     toast.success("Password changed successfully");
-  }
+  };
 </script>
 
 <svelte:head>
@@ -84,7 +38,7 @@
 
 <svelte:boundary>
   {#snippet pending()}
-    <p>Loading settings…</p>
+    <Spinner label="Loading settings…" />
   {/snippet}
 
   <h2
@@ -101,66 +55,106 @@
     This information gets included on each invoice.
   </p>
 
-  <form class={grid({ columns: 6, columnGap: 5 })}>
-    <FormField
-      class={gridItem({ colSpan: { base: 6, md: 3 } })}
-      forId="myName"
-      label="Name"
-    >
-      <Input
-        id="myName"
-        name="myName"
-        type="text"
-        bind:value={mySettings.myName}
-      />
-    </FormField>
-    <FormField
-      class={gridItem({ colSpan: { base: 6, md: 3 } })}
-      forId="invoiceEmail"
-      label="Email (shown on invoices)"
-    >
-      <Input
-        id="invoiceEmail"
-        name="invoiceEmail"
-        type="email"
-        bind:value={mySettings.email}
-      />
-    </FormField>
-    <FormField class={gridItem({ colSpan: 6 })} forId="address" label="Address">
-      <Input
-        id="address"
-        name="address"
-        type="text"
-        bind:value={mySettings.street}
-      />
-    </FormField>
-    <FormField
-      class={gridItem({ colSpan: { base: 6, md: 2 } })}
-      forId="city"
-      label="City"
-    >
-      <Input id="city" name="city" type="text" bind:value={mySettings.city} />
-    </FormField>
-    <FormField class={gridItem({ colSpan: { base: 6, md: 2 } })}>
-      <label for="state">State</label>
-      <States bind:value={mySettings.state} />
-    </FormField>
-    <FormField
-      class={gridItem({ colSpan: { base: 6, md: 2 } })}
-      forId="zip"
-      label="Zip"
-    >
-      <Input id="zip" name="zip" type="text" bind:value={mySettings.zip} />
-    </FormField>
-    <FormField
-      class={gridItem({
-        colSpan: { base: 6, md: 2 },
-        gridColumnStart: { md: 5 },
-      })}
-    >
-      <Button onclick={saveSettings}><Check /> Save</Button>
-    </FormField>
-  </form>
+  <Form onSuccess={handleSettingsSuccess} remote={saveSettings}>
+    <div class={grid({ columns: 6, columnGap: 5 })}>
+      <FormField
+        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        forId="myName"
+        issues={saveSettings.fields.myName.issues()}
+        label="Name"
+      >
+        {#snippet children({ errorId })}
+          <Input
+            id="myName"
+            aria-describedby={errorId}
+            {...saveSettings.fields.myName.as("text", loaded?.myName ?? "")}
+          />
+        {/snippet}
+      </FormField>
+      <FormField
+        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        forId="invoiceEmail"
+        issues={saveSettings.fields.email.issues()}
+        label="Email (shown on invoices)"
+      >
+        {#snippet children({ errorId })}
+          <Input
+            id="invoiceEmail"
+            aria-describedby={errorId}
+            {...saveSettings.fields.email.as("email", loaded?.email ?? "")}
+          />
+        {/snippet}
+      </FormField>
+      <FormField
+        class={gridItem({ colSpan: 6 })}
+        forId="address"
+        issues={saveSettings.fields.street.issues()}
+        label="Address"
+      >
+        {#snippet children({ errorId })}
+          <Input
+            id="address"
+            aria-describedby={errorId}
+            {...saveSettings.fields.street.as("text", loaded?.street ?? "")}
+          />
+        {/snippet}
+      </FormField>
+      <FormField
+        class={gridItem({ colSpan: { base: 6, md: 2 } })}
+        forId="city"
+        issues={saveSettings.fields.city.issues()}
+        label="City"
+      >
+        {#snippet children({ errorId })}
+          <Input
+            id="city"
+            aria-describedby={errorId}
+            {...saveSettings.fields.city.as("text", loaded?.city ?? "")}
+          />
+        {/snippet}
+      </FormField>
+      <FormField
+        class={gridItem({ colSpan: { base: 6, md: 2 } })}
+        forId="state"
+        issues={saveSettings.fields.state.issues()}
+        label="State"
+      >
+        {#snippet children({ errorId })}
+          <States
+            aria-describedby={errorId}
+            {...saveSettings.fields.state.as("text", loaded?.state ?? "")}
+          />
+        {/snippet}
+      </FormField>
+      <FormField
+        class={gridItem({ colSpan: { base: 6, md: 2 } })}
+        forId="zip"
+        issues={saveSettings.fields.zip.issues()}
+        label="Zip"
+      >
+        {#snippet children({ errorId })}
+          <Input
+            id="zip"
+            aria-describedby={errorId}
+            {...zipInputAttrs}
+            {...saveSettings.fields.zip.as("text", loaded?.zip ?? "")}
+          />
+        {/snippet}
+      </FormField>
+    </div>
+    {#snippet submit({ pending })}
+      <FormField
+        class={gridItem({
+          colSpan: { base: 6, md: 2 },
+          gridColumnStart: { md: 5 },
+        })}
+      >
+        <LoaderButton class="group" {pending}
+          ><Check class={buttonIcon("check")} /> Save</LoaderButton
+        >
+      </FormField>
+    {/snippet}
+  </Form>
   <div class={gridItem({ colSpan: 6 })}>
     <h2
       class={css({
@@ -181,57 +175,74 @@
       <FormField
         class={gridItem({ colSpan: { base: 6, md: 3 } })}
         forId="email"
+        issues={changePassword.fields.email.issues()}
         label="Email"
       >
-        <Input
-          id="email"
-          required
-          {...changePassword.fields.email.as("email")}
-        />
+        {#snippet children({ errorId })}
+          <Input
+            id="email"
+            required
+            aria-describedby={errorId}
+            {...changePassword.fields.email.as("email")}
+          />
+        {/snippet}
       </FormField>
 
       <FormField
         class={gridItem({ colSpan: { base: 6, md: 3 } })}
         forId="currentPassword"
+        issues={changePassword.fields._currentPassword.issues()}
         label="Current Password"
       >
-        <Input
-          id="currentPassword"
-          minlength={6}
-          required
-          {...changePassword.fields._currentPassword.as("password")}
-        />
+        {#snippet children({ errorId })}
+          <Input
+            id="currentPassword"
+            minlength={6}
+            required
+            aria-describedby={errorId}
+            {...changePassword.fields._currentPassword.as("password")}
+          />
+        {/snippet}
       </FormField>
 
       <FormField
         class={gridItem({ colSpan: { base: 6, md: 3 } })}
         forId="newPassword"
+        issues={changePassword.fields._newPassword.issues()}
         label="New Password"
       >
-        <Input
-          id="newPassword"
-          minlength={6}
-          required
-          {...changePassword.fields._newPassword.as("password")}
-        />
+        {#snippet children({ errorId })}
+          <Input
+            id="newPassword"
+            minlength={6}
+            required
+            aria-describedby={errorId}
+            {...changePassword.fields._newPassword.as("password")}
+          />
+        {/snippet}
       </FormField>
 
       <FormField
         class={gridItem({ colSpan: { base: 6, md: 3 } })}
         forId="confirmPassword"
+        issues={changePassword.fields._confirmPassword.issues()}
         label="Confirm Password"
       >
-        <Input
-          id="confirmPassword"
-          minlength={6}
-          required
-          {...changePassword.fields._confirmPassword.as("password")}
-        />
+        {#snippet children({ errorId })}
+          <Input
+            id="confirmPassword"
+            minlength={6}
+            required
+            aria-describedby={errorId}
+            {...changePassword.fields._confirmPassword.as("password")}
+          />
+        {/snippet}
       </FormField>
     </div>
-    {#snippet submit()}
-      <Check />
-      Save
+    {#snippet submit({ pending })}
+      <LoaderButton class="group" {pending}
+        ><Check class={buttonIcon("check")} /> Save</LoaderButton
+      >
     {/snippet}
   </Form>
 </svelte:boundary>

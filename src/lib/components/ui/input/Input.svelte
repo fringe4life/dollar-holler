@@ -3,6 +3,12 @@
   import type { HTMLInputAttributes } from "svelte/elements";
 
   const inputClass = css({
+    _ariaInvalid: {
+      borderColor: "scarlet",
+    },
+    _userInvalid: {
+      borderColor: "scarlet",
+    },
     backgroundColor: "whisper",
     blockSize: { base: "10", lg: "14" },
     borderColor: "silver",
@@ -25,6 +31,12 @@
   });
 
   const dateInputShell = css({
+    "&:has([aria-invalid='true'])": {
+      borderColor: "scarlet",
+    },
+    "&:has(:user-invalid)": {
+      borderColor: "scarlet",
+    },
     alignItems: "center",
     backgroundColor: "whisper",
     blockSize: { base: "10", lg: "14" },

@@ -1,3 +1,5 @@
+import type { InferOutput } from "valibot";
+import type { HTMLInputAttributes } from "svelte/elements";
 import type { BitsButton, CursorId, List } from "#lib/types.ts";
 import type {
   lineItemEditRowSchema,
@@ -5,9 +7,12 @@ import type {
   lineItemUpdateSchema,
 } from "./schemas.server";
 
-export type LineItemInsert = typeof lineItemInsertSchema.infer;
-export type LineItemEditRow = typeof lineItemEditRowSchema.infer;
-export type LineItemUpdate = Omit<typeof lineItemUpdateSchema.infer, "id">;
+export type LineItemInsert = InferOutput<typeof lineItemInsertSchema>;
+export type LineItemEditRow = InferOutput<typeof lineItemEditRowSchema>;
+export type LineItemUpdate = Omit<
+  InferOutput<typeof lineItemUpdateSchema>,
+  "id"
+>;
 
 export type UIKey = number;
 
@@ -40,9 +45,18 @@ interface LineItemRowsViewProps {
   mode: "view";
 }
 
+export type LineItemFormFieldAttrs = {
+  amount: HTMLInputAttributes;
+  description: HTMLInputAttributes;
+  id?: HTMLInputAttributes;
+  quantity: HTMLInputAttributes;
+};
+
 interface LineItemRowsEditProps {
   addLineItem: BitsButton;
   discount: number;
+  discountAttrs: HTMLInputAttributes;
+  lineItemFieldAttrs: (index: number) => LineItemFormFieldAttrs;
   lineItems: List<LineItemEditRow | NewLineItemWithId>;
   mode: "edit" | "create";
   removeLineItem: (id: Key) => void;
@@ -63,6 +77,7 @@ interface LineItemRowViewProps {
 }
 
 interface LineItemRowEditProps {
+  fieldAttrs: LineItemFormFieldAttrs;
   mode: "edit" | "create";
   removeLineItem: (id: Key) => void;
   updateLineItem: (id: Key, patch: LineItemUpdate) => void;

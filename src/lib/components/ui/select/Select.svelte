@@ -32,6 +32,9 @@
     "&:open::picker-icon": {
       rotate: "180deg",
     },
+    _ariaInvalid: {
+      borderColor: "scarlet",
+    },
     _disabled: {
       _hover: {
         backgroundColor: "inherit",
@@ -55,6 +58,9 @@
         opacity: 0,
         translate: "0 -0.5rem",
       },
+    },
+    _userInvalid: {
+      borderColor: "scarlet",
     },
     _supportsBaseSelect: {
       "& option": {

@@ -1,11 +1,10 @@
 <script lang="ts">
   import type { InvoiceFormProps } from "#features/line-items/types.ts";
-  import Spinner from "#lib/components/Spinner.svelte";
-  import CreateInvoiceForm from "./CreateInvoiceForm.svelte";
-  import EditInvoiceForm from "./EditInvoiceForm.svelte";
   import BoundaryError from "#lib/components/BoundaryError.svelte";
+  import Spinner from "#lib/components/Spinner.svelte";
+  import InvoiceEditor from "./InvoiceEditor.svelte";
 
-  let { mode = "create", closePanel, invoiceId }: InvoiceFormProps = $props();
+  let props: InvoiceFormProps = $props();
 </script>
 
 <svelte:boundary>
@@ -20,9 +19,5 @@
       title="We couldn't load the invoice form"
     />
   {/snippet}
-  {#if mode === "edit" && invoiceId}
-    <EditInvoiceForm {closePanel} {invoiceId} />
-  {:else}
-    <CreateInvoiceForm {closePanel} />
-  {/if}
+  <InvoiceEditor {...props} />
 </svelte:boundary>

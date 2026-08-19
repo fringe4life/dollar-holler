@@ -2,7 +2,7 @@
 
 <div align="center">
 
-[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.23-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.9-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=sqlite&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.6-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers/) [![D1](https://img.shields.io/badge/D1-SQLite-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.13-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.70.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
+[![SvelteKit](https://img.shields.io/badge/SvelteKit-3.0.0--next.23-orange?logo=svelte&logoColor=white)](https://kit.svelte.dev/) [![Svelte](https://img.shields.io/badge/Svelte-5.56.9-red?logo=svelte&logoColor=white)](https://svelte.dev/) [![TypeScript](https://img.shields.io/badge/TypeScript-6.0.2-blue?logo=typescript&logoColor=white)](https://www.typescriptlang.org/) [![Drizzle ORM](https://img.shields.io/badge/Drizzle%20ORM-1.0.0--rc.4-green?logo=sqlite&logoColor=white)](https://orm.drizzle.team/) [![Better Auth](https://img.shields.io/badge/Better%20Auth-1.7.0--rc.6-purple?logo=auth0&logoColor=white)](https://www.better-auth.com/) [![Cloudflare](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/workers/) [![D1](https://img.shields.io/badge/D1-SQLite-F38020?logo=cloudflare&logoColor=white)](https://developers.cloudflare.com/d1/) [![Panda CSS](https://img.shields.io/badge/Panda%20CSS-2.0.0--beta.14-16A34A?logo=css3&logoColor=white)](https://panda-css.com/) [![Sentry](https://img.shields.io/badge/Sentry-10.70.0-362D59?logo=sentry&logoColor=white)](https://sentry.io/)
 
 </div>
 
@@ -69,8 +69,8 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 ## Available Scripts
 
 - `bun run dev` - Start development server (Vite 8)
-- `bun run build` - Build for production (`svelte-kit sync`, `panda build`, view-transition ESM patch, then Vite)
-- `bun run panda:build` - Sync, `panda build`, and view-transition ESM patch only
+- `bun run build` - Build for production (`svelte-kit sync`, `panda build`, then Vite)
+- `bun run panda:build` - Sync and `panda build`
 - `bun run preview` - Preview production build
 - `bun run lint` - Run ESLint
 - `bun run lint:fix` - Run ESLint with auto-fix
@@ -93,7 +93,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - `bun run db:push` - Push schema to remote D1 (D1 HTTP; needs `CLOUDFLARE_*`)
 - `bun run cf:types` - Generate Wrangler `Env` types (`src/worker-configuration.d.ts`, gitignored)
 - `bun run deploy` - Production build then `wrangler deploy`
-- `bun run fallow:prepare` - Sync, `panda build`, and view-transition ESM patch (run before Fallow if you invoke the CLI directly; other `fallow:*` scripts call this automatically)
+- `bun run fallow:prepare` - Sync and `panda build` (run before Fallow if you invoke the CLI directly; other `fallow:*` scripts call this automatically)
 - `bun run fallow` - Full Fallow analysis (after prepare)
 - `bun run fallow:dead-code` - Dead code analysis (after prepare)
 - `bun run fallow:boundaries` - List configured boundaries
@@ -113,11 +113,11 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
 - **Deployment:** Cloudflare Workers + static assets (`@sveltejs/adapter-cloudflare` 8); [`wrangler.jsonc`](./wrangler.jsonc) sets `nodejs_compat`, D1 binding `DB`, and `ASSETS`
 - **Package manager:** Bun
-- **Validation:** ArkType for runtime-safe form validation
+- **Validation:** Valibot for remote `form()` payloads and shared client/server schemas (Drizzle valibot for DB insert/select)
 - **Bundler:** Vite 8.2.1 for dev and production builds (Rolldown)
 - **Devtools:** [`@vitejs/devtools`](https://devtools.vite.dev/) + [`vite-devtools-svelte`](https://www.npmjs.com/package/vite-devtools-svelte) in [`vite.config.ts`](./vite.config.ts) (Svelte panels + Rolldown build analysis); Chrome workspace mapping via `vite-plugin-devtools-json` (separate from Vite DevTools); optional bundle treemap via `rollup-plugin-visualizer` (`stats.html`)
 - **Toasts:** [svelte-sonner](https://github.com/wobsoriano/svelte-sonner) with Panda CSS (Figma snackbar styles, top-center)
-- **Styling:** [Panda CSS](https://panda-css.com/) 2.0 (`2.0.0-beta.13`) with generated `styled-system` via `panda build` (see `panda.config.ts`, PostCSS); `_supportsBaseSelect` styles customizable `<select>` (`appearance: base-select`) with native fallback; search uses Panda `viewTransition()` bags, typed pagination VT stays in colocated `<style>` blocks; [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
+- **Styling:** [Panda CSS](https://panda-css.com/) 2.0 (`2.0.0-beta.14`) with generated `styled-system` via `panda build` (see `panda.config.ts`, PostCSS); form inputs use `_ariaInvalid` / `_userInvalid` for accessible error states; `_supportsBaseSelect` styles customizable `<select>` (`appearance: base-select`) with native fallback; search uses Panda `viewTransition()` bags, typed pagination VT stays in colocated `<style>` blocks; [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
 - **Lint/format:** ESLint 10 with TypeScript ESLint and eslint-plugin-svelte ([`eslint.config.mjs`](./eslint.config.mjs)), Prettier 3 with prettier-plugin-svelte ([`prettier.config.mjs`](./prettier.config.mjs)), Stylelint 17 for CSS ([`stylelint.config.mjs`](./stylelint.config.mjs))
 
 ## Project Structure
@@ -127,7 +127,7 @@ src/
 ├── hooks.server.ts          # Sentry handle, Better Auth session, route guards, font preload
 ├── hooks.client.ts          # Sentry client init and handleError
 ├── instrumentation.server.ts # Sentry server init (Kit experimental instrumentation)
-├── params/                # Kit 3 matchers (`uuid` via `defineParams` in index.ts)
+├── params/                # Kit 3 matchers (`uuid` via Valibot `cursorSchema` in index.ts)
 ├── lib/
 │   ├── auth.server.ts       # Centralized Better Auth configuration (Drizzle adapter, UUIDv7 IDs)
 │   ├── server/
@@ -150,7 +150,7 @@ src/
 │   │   ├── line-items/    # line-items.remote.ts
 │   │   ├── pagination/    # PaginatedList, search, blank states, cursor list-query helpers
 │   │   └── settings/      # settings.remote.ts
-│   ├── components/        # Shared UI (FormPanel, RouteError, Form remote binding, Modal, navbar/, icons, ui/)
+│   ├── components/        # Shared UI (form/ Form + FormField + inline errors, RouteError, Modal, navbar/, icons, ui/)
 │   ├── styles.ts          # Shared class names / style recipes
 │   └── utils/
 ├── routes/
@@ -197,7 +197,8 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Customizable selects:** Native `<select>` with CSS `appearance: base-select` when supported ([`Select.svelte`](./src/lib/components/ui/select/Select.svelte)); fallback is a plain select
 - **Modern UI:** svelte-sonner toasts with Panda CSS
 - **Svelte 5 Runes:** Uses `@attach` directives and reactive patterns; create/edit forms share `FormPanel` + `ItemPanel` (`attach` prop forwarded as `{@attach}` onto `Modal`)
-- **Route matchers:** Client and invoice detail params use `[id=uuid]` (`src/params/uuid.ts`); non-UUIDv7 ids 404 before load
+- **Route matchers:** Client and invoice detail params use `[id=uuid]` (`src/params/index.ts`, Valibot UUIDv7); invalid ids 404 before load
+- **Remote forms:** Shared `Form` / `FormField` / `FieldErrors` with per-field `issues()`; auth, clients, invoices, settings use `save*.fields.*.as()` defaults for edit mode; `LoaderButton` for pending submit width
 - **Shared route errors:** `RouteError` used by root and detail `+error.svelte` pages
 - **Row menus:** Invoice additional options use the native Popover API with CSS anchor positioning
 - **Responsive Design:** Mobile-first with swipe gestures
@@ -217,13 +218,13 @@ bun run deploy
 - Uses Vite 8.2.1 (`vite` in `package.json`) and Varlock 1.16 (`@varlock/bitwarden-plugin` 2.x). Varlock’s Vite plugin uses `ssrInjectMode: "resolved-env"`. Production builds use `rolldownOptions` in `vite.config.ts` (`dropConsole`, `devtools: {}` for Rolldown analysis metadata). Dev: `svelteDevtools()` before `sveltekit()`, then `DevTools()` from `@vitejs/devtools`. Optional Cursor MCP for live Svelte metrics: [`.cursor/mcp.json`](./.cursor/mcp.json) points at `http://localhost:5173/__svelte-devtools/mcp` with `SVELTE_DEVTOOLS_TOKEN` from the token printed when `bun run dev` starts (rotates each restart). Local D1 persist lives under `.wrangler/` (gitignored).
 - Lint and format run through ESLint, Prettier, and Stylelint (`bun run check`, `bun run fix`). ESLint ignores generated paths (`styled-system/`, `.svelte-kit/`) and defers CSS to Stylelint.
 - [Fallow](https://docs.fallow.tools) 3.16 resolves `styled-system/*` and `#features/*` via package.json `imports` / tsconfig paths (no `ignoreUnresolvedImports`). Feature `*.server.ts` files live in a `features-server` zone so remotes can import `require-user.server.ts` without crossing into `src/lib/server/**`. Health ignores [`error-message.ts`](./src/lib/utils/error-message.ts). Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`.
-- Panda CSS 2.0 (`2.0.0-beta.13`) generates `styled-system/` via `panda build`. Root [`tsconfig.json`](./tsconfig.json) extends `$app/tsconfig` and declares `paths` for `#lib`, `#features`, and `styled-system` (also in `package.json` `imports`). [`vite.config.ts`](./vite.config.ts) sets `resolve.tsconfigPaths: true` and a `styled-system` `resolve.alias` because Rolldown can miss tsconfig paths for some `.svelte` virtual-module importers. After `panda build`, [`scripts/fix-panda-view-transition-esm.ts`](./scripts/fix-panda-view-transition-esm.ts) ensures `viewTransition` exports are available (beta codegen gap). Typed pagination view-transition CSS lives in `PaginatedList.svelte`; `removeUnusedKeyframes` is off in `panda.config.ts` so theme keyframes named only from raw CSS are retained. Run `panda build` explicitly (via `bun run build`, `bun run panda:build`, or Fallow prepare) when `styled-system/` is missing.
+- Panda CSS 2.0 (`2.0.0-beta.14`) generates `styled-system/` via `panda build`. Root [`tsconfig.json`](./tsconfig.json) extends `$app/tsconfig` and declares `paths` for `#lib`, `#features`, and `styled-system` (also in `package.json` `imports`). [`vite.config.ts`](./vite.config.ts) sets `resolve.tsconfigPaths: true` and a `styled-system` `resolve.alias` because Rolldown can miss tsconfig paths for some `.svelte` virtual-module importers. Typed pagination view-transition CSS lives in `PaginatedList.svelte`; `removeUnusedKeyframes` is off in `panda.config.ts` so theme keyframes named only from raw CSS are retained. Run `panda build` explicitly (via `bun run build`, `bun run panda:build`, or Fallow prepare) when `styled-system/` is missing.
 - SvelteKit 3 uses `$app/env` (not `$app/environment`) for `building` / `dev` in server code. Typed routes use filesystem route IDs with `resolve()` (for example `/(dashboard)/invoices/[id=uuid]`). Matchers live in [`src/params/`](./src/params/) (`defineParams`). `kit.alias` is deprecated in favor of tsconfig paths / package.json `#` imports. Static assets use `$app/paths` `asset("images/...")` without a leading slash. Shallow list navigations use `goto(url, { shallow: true })` (not deprecated `pushState`).
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` to use UUIDv7 (uuidv7 package) for user ID generation and includes session caching for performance. After upgrading to 1.7 rc.4+, run the account identity migration under `src/lib/server/db/d1/` (rc.4 restores `account_id`; unique key remains `(issuer, account_id)`) before signing in against an existing database.
 - Invoice `notes` and `terms` accept Markdown; create/update remotes derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks.
 - SvelteKit configuration lives in the `sveltekit()` Vite plugin in `vite.config.ts` (`@sveltejs/adapter-cloudflare` 8, preprocess, Svelte 5 async compiler option, `experimental.remoteFunctions`, tracing/server instrumentation for Sentry). Wrangler `platformProxy.persist` keeps local D1 across `bun run dev`.
-- ArkType on Workers: [`src/lib/utils/arktype.config.ts`](./src/lib/utils/arktype.config.ts) sets `jitless: true` (workerd blocks `new Function`). Import that module **before** `arktype` / `drizzle-orm/arktype`. Vite SSR plugin `arktype-jitless` injects the import if a new file forgets it.
+- Form validation uses Valibot (`valibot` 1.4) for remote `form()` schemas in `src/lib/features/*/schemas.ts`; Drizzle Kit uses `drizzle-orm/valibot` for insert/select/update schemas. Invoice create/edit is a single `InvoiceEditor` with server-side persist in `persist-invoice.server.ts` (no client-side edit snapshots).
 
 ## License
 

@@ -9,8 +9,10 @@ export default defineConfig({
       notSupportsLinear:
         "@supports not (animation-timing-function: linear(0, 1))",
       notSupportsScroll: "@supports not (animation-timeline: scroll())",
+      ariaInvalid: "&[aria-invalid='true']",
       peerNotExpanded: "&[aria-expanded='false'] ~ *",
       starting: "@starting-style",
+      userInvalid: "&:user-invalid",
       supportsBaseSelect: "@supports (appearance: base-select)",
       supportsLinear: "@supports (animation-timing-function: linear(0, 1))",
       supportsScroll: "@supports (animation-timeline: scroll())",

@@ -52,6 +52,6 @@
   style:position-anchor={anchorName}
 >
   {#each options as option (option.label)}
-    <AdditionalOptionsItem {option} />
+    <AdditionalOptionsItem {option} commandFor={id} />
   {/each}
 </ul>

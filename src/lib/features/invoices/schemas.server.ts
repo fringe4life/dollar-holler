@@ -1,44 +1,76 @@
-import "#lib/utils/arktype.config.ts";
-import { type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
-} from "drizzle-orm/arktype";
+} from "drizzle-orm/valibot";
+import {
+  check,
+  date,
+  nullable,
+  number,
+  object,
+  omit,
+  optional,
+  pipe,
+  string,
+  transform,
+  union,
+} from "valibot";
+import { cursorSchema } from "#features/pagination/schemas.ts";
+import type { SanitizedHTML } from "#lib/types.ts";
 import { invoices } from "#lib/server/db/schema.ts";
 
+const sanitizedHtml = pipe(
+  string(),
+  transform((value): SanitizedHTML => value as SanitizedHTML)
+);
+
 /**
- * JSON bodies encode dates as ISO strings; Drizzle arktype expects `Date`.
+ * JSON bodies encode dates as ISO strings; Drizzle valibot expects `Date`.
  * Accept `string | Date`, reject unparseable values, morph to `Date`.
- * @see https://orm.drizzle.team/docs/arktype#refinements
  */
-const isoTimestampFromWire = () =>
-  type("string | Date")
-    .narrow((v) => {
-      const d = v instanceof Date ? v : new Date(v);
-      return !Number.isNaN(d.getTime());
-    })
-    .pipe((v) => (v instanceof Date ? v : new Date(v)));
+const isoTimestampFromWire = pipe(
+  union([string(), date()]),
+  check((value) => {
+    const parsed = value instanceof Date ? value : new Date(value);
+    return !Number.isNaN(parsed.getTime());
+  }, "Invalid date"),
+  transform((value) => (value instanceof Date ? value : new Date(value)))
+);
 
-const invoiceDateRefinement = {
-  dueDate: isoTimestampFromWire,
-  issueDate: isoTimestampFromWire,
-} as const;
+const invoiceInsertRefine = {
+  clientId: () => cursorSchema,
+  dueDate: () => isoTimestampFromWire,
+  id: () => optional(cursorSchema),
+  issueDate: () => isoTimestampFromWire,
+};
 
-export const invoiceInsertSchema = createInsertSchema(
-  invoices,
-  invoiceDateRefinement
-).omit("userId", "createdAt", "updatedAt", "notesHtml", "termsHtml");
-export const invoiceSelectSchema = createSelectSchema(invoices).omit("userId");
-export const invoiceUpdateSchema = createUpdateSchema(
-  invoices,
-  invoiceDateRefinement
-).omit("createdAt", "updatedAt", "userId", "notesHtml", "termsHtml");
+const invoiceSelectRefine = {
+  clientId: () => cursorSchema,
+  id: () => cursorSchema,
+  notesHtml: () => nullable(sanitizedHtml),
+  termsHtml: () => nullable(sanitizedHtml),
+};
+
+export const invoiceInsertSchema = omit(
+  createInsertSchema(invoices, invoiceInsertRefine),
+  ["userId", "createdAt", "updatedAt", "notesHtml", "termsHtml"]
+);
+
+export const invoiceSelectSchema = omit(
+  createSelectSchema(invoices, invoiceSelectRefine),
+  ["userId"]
+);
+
+export const invoiceUpdateSchema = omit(
+  createUpdateSchema(invoices, invoiceInsertRefine),
+  ["createdAt", "updatedAt", "userId", "notesHtml", "termsHtml"]
+);
 
 /** Cursor list row: invoice + client name + total (no long markdown/HTML text). */
-export const invoiceListRowSchema = invoiceSelectSchema
-  .omit("notes", "terms", "notesHtml", "termsHtml")
-  .merge({
-    name: "string",
-    total: "number",
-  });
+export const invoiceListRowSchema = object({
+  ...omit(invoiceSelectSchema, ["notes", "terms", "notesHtml", "termsHtml"])
+    .entries,
+  name: string(),
+  total: number(),
+});

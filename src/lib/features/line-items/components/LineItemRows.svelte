@@ -71,6 +71,7 @@
     {:else}
       <LineItemRow
         canDelete={index !== 0}
+        fieldAttrs={props.lineItemFieldAttrs(index)}
         isRequired={index === 0}
         {lineItem}
         mode={props.mode}
@@ -83,7 +84,7 @@
 
 <div class={invoiceLineItem}>
   <div class={gridItem({ colSpan: { base: 1, sm: 2 } })}>
-    {#if isEditable && props.mode === "edit"}
+    {#if props.mode !== "view"}
       <Button onclick={props.addLineItem} variant="textOnly">+ Line Item</Button
       >
     {/if}
@@ -128,10 +129,10 @@
       disabled={!isEditable}
       max="100"
       min="0"
-      name="discount"
-      oninput={isEditable ? onDiscountInput : undefined}
-      type="number"
-      value={props.discount}
+      oninput={props.mode === "view" ? undefined : onDiscountInput}
+      {...props.mode === "view"
+        ? { name: "discount", type: "number", value: props.discount }
+        : props.discountAttrs}
     />
     <span
       class={css({

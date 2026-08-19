@@ -1,12 +1,12 @@
-import "#lib/utils/arktype.config.ts";
-import { type } from "arktype";
-import { command, query, requested } from "$app/server";
+import { command, form, query, requested } from "$app/server";
+import { object, picklist } from "valibot";
 import {
   requireUser,
   requireUserMutation,
 } from "#features/auth/require-user.server.ts";
 import {
   clientInvoiceSummary,
+  clientPickerOptions,
   listClientInvoices,
 } from "#features/clients/clients.remote.ts";
 import { fetchInvoiceDetail } from "#features/invoices/queries/invoice-detail.server.ts";
@@ -14,19 +14,15 @@ import { fetchPaginatedInvoices } from "#features/invoices/queries/invoices-list
 import {
   deleteInvoiceRow,
   fetchInvoiceById,
-  insertInvoice,
-  patchInvoice,
   patchInvoiceStatus,
 } from "#features/invoices/queries/invoices-write.server.ts";
-import {
-  invoiceInsertSchema,
-  invoiceUpdateSchema,
-} from "#features/invoices/schemas.server.ts";
+import { persistInvoice } from "#features/invoices/queries/persist-invoice.server.ts";
+import { invoiceFormSchema } from "#features/invoices/schemas.ts";
 import {
   cursorSchema,
   idSchema,
   listQuerySchema,
-} from "#features/pagination/schemas.server.ts";
+} from "#features/pagination/schemas.ts";
 
 export const listInvoices = query(listQuerySchema, async (normalized) => {
   const user = requireUser();
@@ -49,32 +45,22 @@ const refreshInvoiceLists = async () => {
   await requested(clientInvoiceSummary, 8).refreshAll();
 };
 
-export const createInvoice = command(invoiceInsertSchema, async (body) => {
+export const saveInvoice = form(invoiceFormSchema, async (data) => {
   const user = await requireUserMutation();
-  const result = await insertInvoice(user.id, body);
+  const result = await persistInvoice(user.id, data);
+  void getInvoice(result.id).refresh();
+  void getInvoiceDetail(result.id).refresh();
+  if (data.isNewClient) {
+    void clientPickerOptions().refresh();
+  }
   await refreshInvoiceLists();
   return result;
-});
-
-export const updateInvoice = command(
-  type({
-    id: cursorSchema,
-    patch: invoiceUpdateSchema,
-  }),
-  async ({ id, patch }) => {
-    const user = await requireUserMutation();
-    const result = await patchInvoice(user.id, id, patch);
-    void getInvoice(id).refresh();
-    void getInvoiceDetail(id).refresh();
-    await refreshInvoiceLists();
-    return result;
-  }
-);
+}).preflight(invoiceFormSchema);
 
 export const updateInvoiceStatus = command(
-  type({
+  object({
     id: cursorSchema,
-    invoiceStatus: "'draft' | 'sent' | 'paid'",
+    invoiceStatus: picklist(["draft", "sent", "paid"]),
   }),
   async ({ id, invoiceStatus }) => {
     const user = await requireUserMutation();

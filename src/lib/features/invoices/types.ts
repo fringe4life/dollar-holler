@@ -1,3 +1,4 @@
+import type { InferOutput } from "valibot";
 import type { CursorId } from "#lib/types.ts";
 import type {
   invoiceInsertSchema,
@@ -6,12 +7,12 @@ import type {
   invoiceUpdateSchema,
 } from "./schemas.server";
 
-export type InvoiceInsert = typeof invoiceInsertSchema.infer;
-export type InvoiceSelect = typeof invoiceSelectSchema.infer;
-export type InvoiceUpdate = typeof invoiceUpdateSchema.infer;
+export type InvoiceInsert = InferOutput<typeof invoiceInsertSchema>;
+export type InvoiceSelect = InferOutput<typeof invoiceSelectSchema>;
+export type InvoiceUpdate = InferOutput<typeof invoiceUpdateSchema>;
 
 // List view: only what InvoiceRow needs (client name + total)
-export type InvoiceListResponse = typeof invoiceListRowSchema.infer;
+export type InvoiceListResponse = InferOutput<typeof invoiceListRowSchema>;
 
 export type NewInvoice = Omit<
   InvoiceInsert,

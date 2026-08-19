@@ -2,18 +2,21 @@
   import type { Snippet } from "svelte";
   import type { RemoteForm, RemoteFormInput } from "$app/server";
   import Alert from "#lib/components/Alert.svelte";
-  import Loader from "#lib/components/Loader.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+
+  interface SubmitSlot {
+    pending: boolean;
+  }
 
   interface Props {
+    actions?: Snippet;
     children: Snippet;
     footer?: Snippet;
     onSuccess?: () => void;
     remote: RemoteForm<Input, Output>;
-    submit: Snippet;
+    submit: Snippet<[SubmitSlot]>;
   }
 
-  let { remote, children, submit, footer, onSuccess, ...rest }: Props =
+  let { remote, children, submit, footer, actions, onSuccess, ...rest }: Props =
     $props();
 
   const formProps = $derived(
@@ -26,23 +29,21 @@
       : remote
   );
 
-  const isLoading = $derived(remote.pending > 0);
-  const issues = $derived(remote.fields.allIssues() ?? []);
+  const pending = $derived(remote.pending > 0);
+  // Form-level issues from invalid("…") strings. Field issues render inline via FormField.
+  const issues = $derived(remote.fields.issues() ?? []);
 </script>
 
 <form {...formProps} {...rest}>
   {#each issues as issue, index (index)}
     <Alert message={issue.message} />
   {/each}
-  <fieldset disabled={isLoading}>
+  <fieldset disabled={pending}>
     {@render children()}
-    <Button disabled={isLoading} type="submit" variant="auth">
-      {#if isLoading}
-        <Loader />
-      {:else}
-        {@render submit()}
-      {/if}
-    </Button>
+    {#if actions}
+      {@render actions()}
+    {/if}
+    {@render submit({ pending })}
     {#if footer}
       {@render footer()}
     {/if}

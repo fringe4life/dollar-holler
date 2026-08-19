@@ -78,14 +78,3 @@ export const replaceLineItems = async (
   ]);
   return inserted;
 };
-
-export const deleteLineItemRow = async (userId: string, id: CursorId) => {
-  const [deleted] = await db
-    .delete(lineItemsTable)
-    .where(and(eq(lineItemsTable.id, id), eq(lineItemsTable.userId, userId)))
-    .returning({ id: lineItemsTable.id });
-  if (!deleted) {
-    error(404, "Line item not found");
-  }
-  return { success: true as const };
-};

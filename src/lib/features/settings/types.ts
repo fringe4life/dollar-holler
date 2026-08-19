@@ -1,26 +1,10 @@
+import type { InferOutput } from "valibot";
 import type {
   settingsInsertSchema,
   settingsSelectSchema,
   settingsUpdateSchema,
 } from "./schemas.server";
 
-export type SettingsInsert = typeof settingsInsertSchema.infer;
-export type SettingsSelect = typeof settingsSelectSchema.infer;
-export type SettingsUpdate = typeof settingsUpdateSchema.infer;
-
-/** Invoice-details fields edited on the settings page (exclude ids and timestamps). */
-export const SETTINGS_EDITABLE_KEYS = [
-  "myName",
-  "email",
-  "street",
-  "city",
-  "state",
-  "zip",
-] as const;
-
-type SettingsEditableKey = (typeof SETTINGS_EDITABLE_KEYS)[number];
-
-export type SettingsEditableSnapshot = Pick<
-  SettingsSelect,
-  SettingsEditableKey
->;
+export type SettingsInsert = InferOutput<typeof settingsInsertSchema>;
+export type SettingsSelect = InferOutput<typeof settingsSelectSchema>;
+export type SettingsUpdate = InferOutput<typeof settingsUpdateSchema>;

@@ -1,18 +1,20 @@
 import { error } from "@sveltejs/kit";
 import { db } from "#lib/server/db/index.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type { ClientSelect } from "#features/clients/types.ts";
 import type { LineItemEditRow } from "#features/line-items/types.ts";
 import type { InvoiceSelect } from "../types";
 
-export const fetchInvoiceDetail = async (
-  userId: string,
-  id: CursorId
-): Promise<{
+type InvoiceDetail = {
   client: ClientSelect | null;
   invoice: InvoiceSelect;
   lineItems: LineItemEditRow[];
-}> => {
+};
+
+export const fetchInvoiceDetail = async (
+  userId: string,
+  id: CursorId
+): Promise<InvoiceDetail> => {
   const invoiceRow = await db.query.invoices.findFirst({
     where: { id: { eq: id }, userId: { eq: userId } },
   });

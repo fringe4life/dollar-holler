@@ -28,9 +28,9 @@ import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "#lib/server/db/schema.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 
-export interface ClientReceivedBalance {
+interface ClientReceivedBalance {
   balance: number;
   received: number;
 }

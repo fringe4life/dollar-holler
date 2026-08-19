@@ -1,4 +1,3 @@
-import "#lib/utils/arktype.config.ts";
 // biome-ignore lint/performance/noNamespaceImport: way to use sentry
 import * as Sentry from "@sentry/sveltekit";
 import { redirect } from "@sveltejs/kit";

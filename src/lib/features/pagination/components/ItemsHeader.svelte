@@ -31,6 +31,6 @@
       zIndex: 1,
     })}
   >
-    <Button onclick={open} size="lg">{@render button()}</Button>
+    <Button class="group" onclick={open} size="lg">{@render button()}</Button>
   </div>
 </div>

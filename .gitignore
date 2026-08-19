@@ -21,6 +21,7 @@ Thumbs.db
 .env
 .env.*
 !.env.schema
+!.env.test
 src/worker-configuration.d.ts
 
 # Vite
@@ -33,4 +34,4 @@ styled-system
 styled-system-studio
 # Sentry Config File
 .env.sentry-build-plugin
-.env*
+fallow-viz.html

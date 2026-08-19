@@ -20,20 +20,23 @@
   import HtmlContent from "#lib/components/HtmlContent.svelte";
   import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type {
-    BitsButton,
-    CursorId,
-    Maybe,
-    SanitizedHTML,
-  } from "#lib/types.ts";
+  import type { BitsButton, Maybe } from "#lib/types.ts";
+  import type { SanitizedHTML } from "#lib/schemas/sanitized-html.server.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { tryCatch } from "#lib/utils/try-catch.ts";
 
-  const invoiceId = $derived(page.params.id as CursorId);
-  const [detail, settings] = $derived(
-    await Promise.all([getInvoiceDetail(invoiceId), getSettings()])
-  );
+  import type { PageProps } from "./$types";
+
+  let { params }: PageProps = $props();
+  const invoiceId = $derived(params.id); // CursorId, no assert
+  // Sequential on purpose. `$derived(await Promise.all([query(), query()]))`
+  // over Kit remotes refetch-loops forever under experimental.async.
+  // Revisit parallel fetch when these close:
+  // @see https://github.com/sveltejs/svelte/issues/18662
+  // @see https://github.com/sveltejs/kit/issues/15767
+  const detail = $derived(await getInvoiceDetail(invoiceId));
+  const settings = $derived(await getSettings());
 
   const invoice = $derived(detail.invoice);
   const lineItems = $derived(detail.lineItems ?? []);
@@ -301,7 +304,7 @@
     </div>
 
     <div class={gridItem({ colSpan: 6 })}>
-      <LineItemRows discount={invoice.discount || 0} {lineItems} mode="view" />
+      <LineItemRows discount={invoice.discount ?? 0} {lineItems} mode="view" />
     </div>
 
     {@render htmlBlock("Notes:", invoice.notesHtml)}

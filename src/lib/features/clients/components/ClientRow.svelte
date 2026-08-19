@@ -15,7 +15,7 @@
   import Swipeable from "#lib/components/Swipeable.svelte";
   import Badge from "#lib/components/ui/badge/badge.svelte";
   import { actionButton, tableRowBase, tableRowHover } from "#lib/styles.ts";
-  import type { CursorId } from "#lib/types.ts";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { centsToDollars } from "#lib/utils/moneyHelpers.ts";
   import { clientRow, clientTable } from "../styles";
   import type { ClientListResponse } from "../types";

@@ -3,7 +3,7 @@ import { and, eq } from "drizzle-orm";
 import { verifyInvoice } from "#features/invoices/queries/verify-invoice.ts";
 import { db } from "#lib/server/db/index.ts";
 import { lineItems as lineItemsTable } from "#lib/server/db/schema.ts";
-import type { CursorId } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type { LineItemEditRow, LineItemInsert } from "../types";
 
 const assertInvoiceOwned = async (userId: string, invoiceId: CursorId) => {
@@ -77,15 +77,4 @@ export const replaceLineItems = async (
       .returning(),
   ]);
   return inserted;
-};
-
-export const deleteLineItemRow = async (userId: string, id: CursorId) => {
-  const [deleted] = await db
-    .delete(lineItemsTable)
-    .where(and(eq(lineItemsTable.id, id), eq(lineItemsTable.userId, userId)))
-    .returning({ id: lineItemsTable.id });
-  if (!deleted) {
-    error(404, "Line item not found");
-  }
-  return { success: true as const };
 };

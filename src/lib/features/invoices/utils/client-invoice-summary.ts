@@ -14,12 +14,6 @@ export type ClientInvoiceSummaryFinal = Prettify<
   }
 >;
 
-// interface SummaryInvoice {
-//   dueDate: Date;
-//   invoiceStatus?: "draft" | "paid" | "sent" | null;
-//   total: number;
-// }
-
 type SummaryInvoice = Pick<
   InvoiceListResponse,
   "dueDate" | "total" | "invoiceStatus"

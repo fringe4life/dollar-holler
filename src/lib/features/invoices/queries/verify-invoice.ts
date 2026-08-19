@@ -1,6 +1,7 @@
 import { db } from "#lib/server/db/index.ts";
 import type { InvoiceStatus } from "#lib/server/db/types.ts";
-import type { CursorId, Maybe } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
+import type { Maybe } from "#lib/types.ts";
 import { tryCatch } from "#lib/utils/try-catch.ts";
 export const verifyInvoice = async (
   userId: string,

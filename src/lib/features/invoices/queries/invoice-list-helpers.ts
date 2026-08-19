@@ -23,6 +23,18 @@ import type { Maybe, Total } from "#lib/types.ts";
 /**
  * Scalar subquery: sum of line item amounts for one invoice (for RQB `extras`).
  * Keeps one parent row per invoice (no join explosion).
+ *
+ * `line_items.amount` is the billed line total (qty × unit price, computed in
+ * the editor, stored as-is). Do not recompute from qty × unitPrice on read:
+ * lists and client summaries hit this SUM on every dashboard load (read-heavy),
+ * while Save is rare. Stored amount is also the invoice contract — recalc can
+ * penny-drift (`3 × 3.33` vs `10.00`) and qty `0` has no defined unit price.
+ *
+ * Future (not now): persist `unitPrice`, set `amount = round(qty * unitPrice)`
+ * on write so the column stays the source for this SUM. Materialize
+ * `invoices.total` only if EXPLAIN shows this subquery hurting. Compute-on-read
+ * `SUM(qty * unitPrice)` is fine at current scale, worse for rounding + every
+ * list/summary hit.
  */
 export const lineItemsSubtotalSqlForInvoiceId = (invoiceId: AnyColumn) =>
   sql<number>`COALESCE((SELECT SUM(${lineItemsTable.amount}) FROM ${lineItemsTable} WHERE ${lineItemsTable.invoiceId} = ${invoiceId}), 0)`;

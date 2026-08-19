@@ -1,44 +1,39 @@
-import "#lib/utils/arktype.config.ts";
-import { type } from "arktype";
 import {
   createInsertSchema,
   createSelectSchema,
   createUpdateSchema,
-} from "drizzle-orm/arktype";
-import { cursorSchema } from "#features/pagination/schemas.server.ts";
+} from "drizzle-orm/valibot";
+import { array, number, object, omit, optional, string } from "valibot";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 import { clients } from "#lib/server/db/schema.ts";
 
-export const clientInsertSchema = createInsertSchema(clients).omit(
-  "createdAt",
-  "updatedAt",
-  "userId"
-);
-export const clientSelectSchema = createSelectSchema(clients).omit("userId");
-export const clientUpdateSchema = createUpdateSchema(clients).omit(
-  "createdAt",
-  "updatedAt",
-  "userId"
+export const clientInsertSchema = omit(
+  createInsertSchema(clients, { id: () => optional(cursorSchema) }),
+  ["createdAt", "updatedAt", "userId"]
 );
 
-export const clientStatusSchema = type({
-  clientStatus: "'active' | 'archive'",
-});
+export const clientSelectSchema = omit(
+  createSelectSchema(clients, { id: () => cursorSchema }),
+  ["userId"]
+);
 
-const clientReceivedBalanceSchema = type({
-  balance: "number",
-  received: "number",
-});
+export const clientUpdateSchema = omit(
+  createUpdateSchema(clients, { id: () => optional(cursorSchema) }),
+  ["createdAt", "updatedAt", "userId"]
+);
 
 /** Cursor list row: client + aggregates from list queries. */
-export const clientListRowSchema = clientSelectSchema.merge(
-  clientReceivedBalanceSchema
-);
-
-export const clientPickerOptionSchema = type({
-  id: cursorSchema,
-  name: "string",
+export const clientListRowSchema = object({
+  ...clientSelectSchema.entries,
+  balance: number(),
+  received: number(),
 });
 
-export const clientPickerOptionsResponseSchema = type({
-  options: clientPickerOptionSchema.array(),
+export const clientPickerOptionSchema = object({
+  id: cursorSchema,
+  name: string(),
+});
+
+export const clientPickerOptionsResponseSchema = object({
+  options: array(clientPickerOptionSchema),
 });

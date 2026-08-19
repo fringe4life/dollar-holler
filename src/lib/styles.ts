@@ -2,6 +2,7 @@ import { css, cx } from "#styled-system/css/index.js";
 import { grid, hoverShadow } from "#styled-system/patterns/index.js";
 
 export type ArrowDirection = "backward" | "forward";
+export type ButtonIcon = "check" | "plus";
 
 const arrowMotion = {
   fill: "none",
@@ -18,19 +19,56 @@ const arrowMotion = {
 const backwardArrow = css({
   ...arrowMotion,
   _groupActive: { translate: "-0.25rem 0" },
-  _groupDisabled: { translate: "0 0" },
   _groupHover: { translate: "-0.25rem 0" },
+  _groupDisabled: { translate: "0 0" },
 });
 
 const forwardArrow = css({
   ...arrowMotion,
   _groupActive: { translate: "0.25rem 0" },
-  _groupDisabled: { translate: "0 0" },
   _groupHover: { translate: "0.25rem 0" },
+  _groupDisabled: { translate: "0 0" },
+});
+
+const iconMotion = {
+  display: "inline-block",
+  flexShrink: 0,
+  transformOrigin: "center",
+  transitionDuration: "normal",
+  transitionProperty: "rotate, scale",
+  transitionTimingFunction: {
+    base: "anticipate",
+    _supportsLinear: "elastic",
+  },
+} as const;
+
+const iconRest = { rotate: "0deg", scale: "1" } as const;
+
+const checkIcon = css({
+  ...iconMotion,
+  _active: { rotate: "-4deg", scale: "0.9" },
+  _disabled: iconRest,
+  _groupActive: { rotate: "-4deg", scale: "0.9" },
+  _groupDisabled: iconRest,
+  _groupHover: { rotate: "4deg", scale: "1.1" },
+  _hover: { rotate: "4deg", scale: "1.1" },
+});
+
+const plusIcon = css({
+  ...iconMotion,
+  _active: { rotate: "90deg", scale: "0.9" },
+  _disabled: iconRest,
+  _groupActive: { rotate: "90deg", scale: "0.9" },
+  _groupDisabled: iconRest,
+  _groupHover: { rotate: "90deg", scale: "1.1" },
+  _hover: { rotate: "90deg", scale: "1.1" },
 });
 
 export const directionalArrow = (direction: ArrowDirection) =>
   direction === "backward" ? backwardArrow : forwardArrow;
+
+export const buttonIcon = (icon: ButtonIcon) =>
+  icon === "check" ? checkIcon : plusIcon;
 
 export const actionButton = grid({
   color: "daisyBush",

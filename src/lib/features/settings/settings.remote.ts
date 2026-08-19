@@ -1,4 +1,4 @@
-import { command, query } from "$app/server";
+import { form, query } from "$app/server";
 import {
   requireUser,
   requireUserMutation,
@@ -8,26 +8,19 @@ import {
   insertSettings,
   patchSettings,
 } from "#features/settings/queries/settings.server.ts";
-import {
-  settingsInsertSchema,
-  settingsUpdateSchema,
-} from "#features/settings/schemas.server.ts";
+import { settingsFormSchema } from "#features/settings/schemas.ts";
 
 export const getSettings = query(async () => {
   const user = requireUser();
   return fetchSettings(user.id);
 });
 
-export const createSettings = command(settingsInsertSchema, async (body) => {
+export const saveSettings = form(settingsFormSchema, async (data) => {
   const user = await requireUserMutation();
-  const created = await insertSettings(user.id, body);
-  getSettings().set(created);
-  return created;
-});
-
-export const updateSettings = command(settingsUpdateSchema, async (body) => {
-  const user = await requireUserMutation();
-  const updated = await patchSettings(user.id, body);
-  getSettings().set(updated);
-  return updated;
-});
+  const existing = await fetchSettings(user.id);
+  const saved = existing
+    ? await patchSettings(user.id, data)
+    : await insertSettings(user.id, data);
+  getSettings().set(saved);
+  return saved;
+}).preflight(settingsFormSchema);

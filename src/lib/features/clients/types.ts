@@ -1,20 +1,23 @@
+import type { InferOutput } from "valibot";
 import type {
-  clientInsertSchema,
   clientListRowSchema,
   clientPickerOptionSchema,
   clientPickerOptionsResponseSchema,
   clientSelectSchema,
   clientUpdateSchema,
 } from "./schemas.server";
-export type ClientInsert = typeof clientInsertSchema.infer;
-export type ClientSelect = typeof clientSelectSchema.infer;
-export type ClientUpdate = typeof clientUpdateSchema.infer;
+import type { clientInsertSchema } from "./schemas.server";
+
+export type ClientInsert = InferOutput<typeof clientInsertSchema>;
+export type ClientSelect = InferOutput<typeof clientSelectSchema>;
+export type ClientUpdate = InferOutput<typeof clientUpdateSchema>;
 
 // List view: only what ClientRow needs (received + balance)
-export type ClientListResponse = typeof clientListRowSchema.infer;
+export type ClientListResponse = InferOutput<typeof clientListRowSchema>;
 
-export type ClientPickerOptionsResponse =
-  typeof clientPickerOptionsResponseSchema.infer;
+export type ClientPickerOptionsResponse = InferOutput<
+  typeof clientPickerOptionsResponseSchema
+>;
 
 /** Invoice client `<select>`: id + name only (`clientPickerOptions` query). */
-export type ClientPickerOption = typeof clientPickerOptionSchema.infer;
+export type ClientPickerOption = InferOutput<typeof clientPickerOptionSchema>;

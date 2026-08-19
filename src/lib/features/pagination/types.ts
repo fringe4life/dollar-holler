@@ -1,9 +1,10 @@
-import type { CursorId } from "#lib/types.ts";
+import type { InferOutput } from "valibot";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type {
   listDirectionSchema,
   listQuerySchema,
   paginationMetadataSchema,
-} from "./schemas.server";
+} from "./schemas";
 
 export type PaginationSearchParamsRaw = {
   [key in keyof Required<PaginationSearchParams>]: string | undefined;
@@ -15,12 +16,12 @@ export interface NormalizeListQueryResult {
   normalized: PaginationSearchParams;
 }
 
-export type ListDirection = typeof listDirectionSchema.infer;
+export type ListDirection = InferOutput<typeof listDirectionSchema>;
 
 /** Normalized list query (remotes + URL canonicalization). */
-export type PaginationSearchParams = typeof listQuerySchema.infer;
+export type PaginationSearchParams = InferOutput<typeof listQuerySchema>;
 
-export type PaginationMetadata = typeof paginationMetadataSchema.infer;
+export type PaginationMetadata = InferOutput<typeof paginationMetadataSchema>;
 
 export interface CursorPaginatedList<T extends CursorRow> {
   items: T[];

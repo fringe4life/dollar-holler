@@ -1,7 +1,6 @@
-import "#lib/utils/arktype.config.ts";
-import { type } from "arktype";
-import { command, query, requested } from "$app/server";
+import { command, form, query, requested } from "$app/server";
 import { error } from "@sveltejs/kit";
+import { object, optional, string } from "valibot";
 import {
   requireUser,
   requireUserMutation,
@@ -17,19 +16,15 @@ import {
 } from "#features/clients/queries/clients-write.server.ts";
 import { verifyClient } from "#features/clients/queries/verify-client.ts";
 import {
-  clientInsertSchema,
+  clientFormSchema,
   clientStatusSchema,
-  clientUpdateSchema,
-} from "#features/clients/schemas.server.ts";
+} from "#features/clients/schemas.ts";
 import {
   fetchClientInvoiceSummary,
   fetchPaginatedInvoicesForClient,
 } from "#features/invoices/queries/invoices-list.server.ts";
-import {
-  cursorSchema,
-  idSchema,
-  listQuerySchema,
-} from "#features/pagination/schemas.server.ts";
+import { idSchema, listQuerySchema } from "#features/pagination/schemas.ts";
+import { cursorSchema } from "#lib/schemas/cursor-id.ts";
 
 export const listClients = query(listQuerySchema, async (normalized) => {
   const user = requireUser();
@@ -48,7 +43,7 @@ export const getClient = query(cursorSchema, async (id) => {
 });
 
 export const listClientInvoices = query(
-  type({
+  object({
     clientId: cursorSchema,
     listQuery: listQuerySchema,
   }),
@@ -62,9 +57,9 @@ export const listClientInvoices = query(
 );
 
 export const clientInvoiceSummary = query(
-  type({
+  object({
     clientId: cursorSchema,
-    "q?": "string",
+    q: optional(string()),
   }),
   async ({ clientId, q }) => {
     const user = requireUser();
@@ -75,33 +70,39 @@ export const clientInvoiceSummary = query(
   }
 );
 
-export const createClient = command(clientInsertSchema, async (body) => {
+export const saveClient = form(clientFormSchema, async (data) => {
   const user = await requireUserMutation();
-  const result = await insertClient(user.id, body);
-  void clientPickerOptions().refresh();
-  await requested(listClients, 4).refreshAll();
-  return result;
-});
+  const fields = {
+    city: data.city,
+    email: data.email,
+    name: data.name,
+    state: data.state,
+    street: data.street,
+    zip: data.zip,
+  };
 
-export const updateClient = command(
-  type({
-    id: cursorSchema,
-    patch: clientUpdateSchema,
-  }),
-  async ({ id, patch }) => {
-    const user = await requireUserMutation();
-    const result = await patchClient(user.id, id, patch);
-    getClient(id).set(result);
+  if (data.id) {
+    const result = await patchClient(user.id, data.id, fields);
+    getClient(data.id).set(result);
     void clientPickerOptions().refresh();
     await requested(listClients, 4).refreshAll();
     return { id: result.id };
   }
-);
+
+  const result = await insertClient(user.id, {
+    ...fields,
+    clientStatus: "active",
+  });
+  void clientPickerOptions().refresh();
+  await requested(listClients, 4).refreshAll();
+  return result;
+}).preflight(clientFormSchema);
 
 export const updateClientStatus = command(
-  type({
+  object({
     id: cursorSchema,
-  }).and(clientStatusSchema),
+    ...clientStatusSchema.entries,
+  }),
   async ({ id, clientStatus }) => {
     const user = await requireUserMutation();
     const result = await patchClientStatus(user.id, id, clientStatus);

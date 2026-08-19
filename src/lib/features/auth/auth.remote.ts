@@ -7,7 +7,7 @@ import {
   loginSchema,
   resetPasswordSchema,
   signupSchema,
-} from "#features/auth/schemas.server.ts";
+} from "#features/auth/schemas.ts";
 import { auth } from "#lib/auth.server.ts";
 import { tryCatch } from "#lib/utils/try-catch.ts";
 
@@ -29,7 +29,7 @@ export const login = form(loginSchema, async (data) => {
   }
 
   redirect(303, resolve("invoices"));
-});
+}).preflight(loginSchema);
 
 export const signup = form(signupSchema, async (data) => {
   const { request } = getRequestEvent();
@@ -54,7 +54,7 @@ export const signup = form(signupSchema, async (data) => {
   }
 
   redirect(303, resolve("login"));
-});
+}).preflight(signupSchema);
 
 export const forgotPassword = form(forgotPasswordSchema, async (data) => {
   const { request } = getRequestEvent();
@@ -71,7 +71,7 @@ export const forgotPassword = form(forgotPasswordSchema, async (data) => {
   }
 
   return { success: true as const };
-});
+}).preflight(forgotPasswordSchema);
 
 export const resetPassword = form(resetPasswordSchema, async (data) => {
   const { request } = getRequestEvent();
@@ -91,7 +91,7 @@ export const resetPassword = form(resetPasswordSchema, async (data) => {
   }
 
   redirect(303, resolve("invoices"));
-});
+}).preflight(resetPasswordSchema);
 
 export const logout = form(async () => {
   const { request } = getRequestEvent();
@@ -122,4 +122,4 @@ export const changePassword = form(changePasswordSchema, async (data) => {
   }
 
   return { success: true as const };
-});
+}).preflight(changePasswordSchema);

@@ -24,14 +24,15 @@
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
   import { visibleListUrl } from "#features/pagination/utils/url.ts";
+  import { buttonIcon } from "#lib/styles.ts";
   import {
     ItemPanel,
     upsertKey,
     type UpsertTarget,
   } from "#lib/client/runes/ItemPanel.svelte.ts";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import FormPanel from "#lib/components/FormPanel.svelte";
-  import type { CursorId } from "#lib/types.ts";
+  import FormPanel from "#lib/components/form/FormPanel.svelte";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
 
   const listArg = $derived(
@@ -83,7 +84,8 @@
 
 <ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
-    + Client
+    <span aria-hidden="true" class={buttonIcon("plus")}>+</span>
+    Client
   {/snippet}
 </ItemsHeader>
 
@@ -114,9 +116,9 @@
     {#snippet header()}
       <ClientRowHeader />
     {/snippet}
-    {#snippet row(_client)}
+    {#snippet row(client)}
       <ClientRow
-        client={_client}
+        {client}
         onActivate={handleActivate}
         onArchive={handleArchive}
         onDelete={deleteModal.open}
@@ -184,8 +186,8 @@
   titleText="Are you sure you want to delete this client?"
   {@attach deleteModal.attach}
 >
-  {#snippet descriptionSnippet(_client)}
+  {#snippet descriptionSnippet(client)}
     This will delete Client:
-    <span class={css({ color: "scarlet" })}>{_client?.name ?? "Unknown"}</span>
+    <span class={css({ color: "scarlet" })}>{client?.name ?? "Unknown"}</span>
   {/snippet}
 </ConfirmDelete>

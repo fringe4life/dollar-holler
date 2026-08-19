@@ -1,23 +1,23 @@
 <script lang="ts">
-  import { cx } from "#styled-system/css/index.js";
   import { flex, grid, gridItem } from "#styled-system/patterns/index.js";
-  import type { FormEventHandler } from "svelte/elements";
   import { toast } from "svelte-sonner";
   import {
-    createClient,
     deleteClient,
-    updateClient,
+    saveClient,
   } from "#features/clients/clients.remote.ts";
-  import FormField from "#lib/components/FormField.svelte";
+  import Form from "#lib/components/form/Form.svelte";
+  import FormField from "#lib/components/form/FormField.svelte";
   import Check from "#lib/components/icons/Check.svelte";
   import Trash from "#lib/components/icons/Trash.svelte";
   import States from "#lib/components/States.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
+  import LoaderButton from "#lib/components/ui/button/LoaderButton.svelte";
   import Input from "#lib/components/ui/input/Input.svelte";
+  import { buttonIcon } from "#lib/styles.ts";
   import type { BitsButton } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
-  import type { ClientInsert, ClientSelect } from "../types";
-  import { newClient } from "../utils/new-client";
+  import { zipInputAttrs } from "#lib/utils/zip.ts";
+  import type { ClientSelect } from "../types";
 
   interface Panel {
     closePanel: () => void;
@@ -35,43 +35,15 @@
 
   export type ClientFormProps = CreateProps | EditProps;
 
-  let { formState, closePanel, edit = $bindable() }: ClientFormProps = $props();
+  let { formState, closePanel, edit }: ClientFormProps = $props();
 
-  let client: ClientInsert = $state(newClient());
-
-  // svelte-ignore state_referenced_locally
-  if (formState === "edit" && edit) {
-    const {
-      createdAt: _createdAt,
-      updatedAt: _updatedAt,
-      ...clientData
-    } = edit;
-    client = clientData;
-  }
-
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault();
-
-    try {
-      if (formState === "edit" && edit) {
-        const { id: _id, ...patch } = client;
-        await updateClient({ id: edit.id, patch });
-        toast.success("Client updated successfully");
-      } else {
-        await createClient(client);
-        toast.success("Client created successfully");
-      }
-      closePanel();
-    } catch (error) {
-      toast.error(
-        getErrorMessage(
-          error,
-          formState === "edit"
-            ? "Failed to update client"
-            : "Failed to create client"
-        )
-      );
-    }
+  const handleSaved = () => {
+    toast.success(
+      formState === "edit"
+        ? "Client updated successfully"
+        : "Client created successfully"
+    );
+    closePanel();
   };
 
   const handleDelete: BitsButton = async () => {
@@ -87,75 +59,126 @@
   };
 </script>
 
-<form class={grid({ columns: 6, columnGap: 5 })} onsubmit={handleSubmit}>
-  <FormField class={gridItem({ colSpan: 6 })} forId="name" label="Client Name">
-    <Input
-      id="name"
-      name="name"
-      required
-      type="text"
-      bind:value={client.name}
-    />
-  </FormField>
-
-  <FormField
-    class={gridItem({ colSpan: 6 })}
-    forId="email"
-    label="Client Email"
-  >
-    <Input
-      id="email"
-      name="email"
-      required
-      type="text"
-      bind:value={client.email}
-    />
-  </FormField>
-
-  <FormField class={gridItem({ colSpan: 6 })} forId="street" label="Address">
-    <Input id="street" name="street" type="text" bind:value={client.street} />
-  </FormField>
-
-  <FormField
-    class={gridItem({ colSpan: { base: 6, sm: 2 } })}
-    forId="city"
-    label="City"
-  >
-    <Input id="city" name="city" type="text" bind:value={client.city} />
-  </FormField>
-
-  <FormField
-    class={gridItem({ colSpan: { base: 6, sm: 2 } })}
-    forId="state"
-    label="State"
-  >
-    <States bind:value={client.state} />
-  </FormField>
-
-  <FormField
-    class={gridItem({ colSpan: { base: 6, sm: 2 } })}
-    forId="zip"
-    label="Zip"
-  >
-    <Input
-      id="zip"
-      minlength={4}
-      name="zip"
-      type="text"
-      bind:value={client.zip}
-    />
-  </FormField>
-
-  <FormField class={gridItem({ colSpan: 3 })}>
-    <Button onclick={handleDelete} variant="textOnlyDestructive"
-      ><Trash />
-      Delete</Button
+<Form onSuccess={handleSaved} remote={saveClient}>
+  {#if edit}
+    <input {...saveClient.fields.id.as("hidden", edit.id)} />
+  {/if}
+  <div class={grid({ columns: 6, columnGap: 5 })}>
+    <FormField
+      class={gridItem({ colSpan: 6 })}
+      forId="name"
+      issues={saveClient.fields.name.issues()}
+      label="Client Name"
     >
-  </FormField>
-  <FormField
-    class={cx(gridItem({ colSpan: 3 }), flex({ justify: "end", gap: 5 }))}
-  >
-    <Button onclick={() => closePanel()} variant="secondary">Cancel</Button>
-    <Button type="submit"><Check /> Submit</Button>
-  </FormField>
-</form>
+      {#snippet children({ errorId })}
+        <Input
+          id="name"
+          required
+          aria-describedby={errorId}
+          {...saveClient.fields.name.as("text", edit?.name ?? "")}
+        />
+      {/snippet}
+    </FormField>
+
+    <FormField
+      class={gridItem({ colSpan: 6 })}
+      forId="email"
+      issues={saveClient.fields.email.issues()}
+      label="Client Email"
+    >
+      {#snippet children({ errorId })}
+        <Input
+          id="email"
+          required
+          aria-describedby={errorId}
+          {...saveClient.fields.email.as("email", edit?.email ?? "")}
+        />
+      {/snippet}
+    </FormField>
+
+    <FormField
+      class={gridItem({ colSpan: 6 })}
+      forId="street"
+      issues={saveClient.fields.street.issues()}
+      label="Address"
+    >
+      {#snippet children({ errorId })}
+        <Input
+          id="street"
+          aria-describedby={errorId}
+          {...saveClient.fields.street.as("text", edit?.street ?? "")}
+        />
+      {/snippet}
+    </FormField>
+
+    <FormField
+      class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+      forId="city"
+      issues={saveClient.fields.city.issues()}
+      label="City"
+    >
+      {#snippet children({ errorId })}
+        <Input
+          id="city"
+          aria-describedby={errorId}
+          {...saveClient.fields.city.as("text", edit?.city ?? "")}
+        />
+      {/snippet}
+    </FormField>
+
+    <FormField
+      class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+      forId="state"
+      issues={saveClient.fields.state.issues()}
+      label="State"
+    >
+      {#snippet children({ errorId })}
+        <States
+          aria-describedby={errorId}
+          {...saveClient.fields.state.as("text", edit?.state ?? "")}
+        />
+      {/snippet}
+    </FormField>
+
+    <FormField
+      class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+      forId="zip"
+      issues={saveClient.fields.zip.issues()}
+      label="Zip"
+    >
+      {#snippet children({ errorId })}
+        <Input
+          id="zip"
+          aria-describedby={errorId}
+          {...zipInputAttrs}
+          {...saveClient.fields.zip.as("text", edit?.zip ?? "")}
+        />
+      {/snippet}
+    </FormField>
+  </div>
+  {#snippet submit({ pending })}
+    <div
+      class={flex({
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 5,
+        marginBlockStart: 5,
+      })}
+    >
+      {#if formState === "edit" && edit}
+        <Button onclick={handleDelete} variant="textOnlyDestructive"
+          ><Trash />
+          Delete</Button
+        >
+      {:else}
+        <span></span>
+      {/if}
+      <div class={flex({ gap: 5 })}>
+        <Button onclick={() => closePanel()} variant="secondary">Cancel</Button>
+        <LoaderButton class="group" {pending}
+          ><Check class={buttonIcon("check")} /> Submit</LoaderButton
+        >
+      </div>
+    </div>
+  {/snippet}
+</Form>

@@ -24,7 +24,8 @@ import {
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "#lib/server/db/schema.ts";
-import type { CursorId, Maybe } from "#lib/types.ts";
+import type { CursorId } from "#lib/schemas/cursor-id.ts";
+import type { Maybe } from "#lib/types.ts";
 
 /** Keys allowed in RQB `columns` for `invoices` (matches Drizzle’s `findMany` config). */
 type InvoicesQueryColumnSelection = NonNullable<

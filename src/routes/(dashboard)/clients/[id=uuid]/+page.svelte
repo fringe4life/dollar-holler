@@ -26,6 +26,7 @@
   import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
   import { visibleListUrl } from "#features/pagination/utils/url.ts";
+  import { buttonIcon } from "#lib/styles.ts";
   import {
     ItemPanel,
     upsertKey,
@@ -33,18 +34,23 @@
   } from "#lib/client/runes/ItemPanel.svelte.ts";
   import BoundaryError from "#lib/components/BoundaryError.svelte";
   import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import FormPanel from "#lib/components/FormPanel.svelte";
+  import FormPanel from "#lib/components/form/FormPanel.svelte";
   import Edit from "#lib/components/icons/Edit.svelte";
   import Spinner from "#lib/components/Spinner.svelte";
   import Button from "#lib/components/ui/button/button.svelte";
-  import type { BitsButton, CursorId } from "#lib/types.ts";
+  import type { BitsButton } from "#lib/types.ts";
+  import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
+
+  import type { PageProps } from "./$types";
+
+  let { params }: PageProps = $props();
+  const clientId = $derived(params.id); // CursorId, no assert
 
   const listArg = $derived(
     normalizeListQueryFromUrl(visibleListUrl(page)).normalized
   );
-  const clientId = $derived(page.params.id as CursorId);
   const summaryArg = $derived(
     listArg.q === undefined ? { clientId } : { clientId, q: listArg.q }
   );
@@ -96,7 +102,8 @@
 </svelte:head>
 <ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
-    + Client
+    <span aria-hidden="true" class={buttonIcon("plus")}>+</span>
+    Client
   {/snippet}
 </ItemsHeader>
 

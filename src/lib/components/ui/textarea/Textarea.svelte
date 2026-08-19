@@ -3,11 +3,17 @@
   import type { HTMLTextareaAttributes } from "svelte/elements";
 
   const textareaClass = css({
+    _ariaInvalid: {
+      borderColor: "scarlet",
+    },
     _focusVisible: {
       borderColor: "lavenderIndigo",
       outlineColor: "lavenderIndigo",
       outlineStyle: "solid",
       outlineWidth: "2px",
+    },
+    _userInvalid: {
+      borderColor: "scarlet",
     },
     blockSize: 32,
     borderColor: "silver",

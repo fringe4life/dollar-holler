@@ -2,15 +2,16 @@
   import FlagIcon from "@lucide/svelte/icons/flag";
   import { css } from "#styled-system/css/index.js";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
-  import type { Maybe } from "#lib/types.ts";
   import { stateFlag, states } from "#lib/utils/states.ts";
   import Select from "./ui/select/Select.svelte";
+  import type { HTMLSelectAttributes } from "svelte/elements";
 
-  interface Props {
-    value: Maybe<string>;
-  }
-
-  let { value = $bindable() }: Props = $props();
+  let {
+    value = $bindable(),
+    name = "state",
+    "aria-describedby": ariaDescribedby,
+    "aria-invalid": ariaInvalid,
+  }: HTMLSelectAttributes = $props();
 
   const flagClass = css({
     borderRadius: "xs",
@@ -27,7 +28,13 @@
   });
 </script>
 
-<Select id="state" name="state" bind:value>
+<Select
+  id="state"
+  {name}
+  aria-describedby={ariaDescribedby ?? undefined}
+  aria-invalid={ariaInvalid}
+  bind:value
+>
   {#each states as { value: stateValue, name } (name)}
     {@const flag = stateFlag(stateValue)}
     <option

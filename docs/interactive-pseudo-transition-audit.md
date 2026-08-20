@@ -13,19 +13,19 @@ This document lists places in the codebase where **hover**, **focus** / **focus-
 
 ## Components — no transition on interactive states
 
-`Dialog.Close` in [`Modal.svelte`](../src/lib/components/Modal.svelte#L54-L56) and [`SlidePanel.svelte`](../src/lib/components/SlidePanel.svelte#L52-L54): **closed** — fixed `outline-2` + `outline-color` in `transition-*` (see **Reference — already covered**).
+`Dialog.Close` in [`Modal.svelte`](../src/lib/components/patterns/modal/Modal.svelte#L54-L56): **closed** — fixed `outline-2` + `outline-color` in `transition-*` (see **Reference — already covered**).
 
-### Button variants ([`src/lib/components/ui/button/button.svelte`](../src/lib/components/ui/button/button.svelte))
+### Button variants ([`src/lib/components/primitives/button/button.svelte`](../src/lib/components/primitives/button/button.svelte))
 
 | Variant / area | Lines | Issue |
 | --- | --- | --- |
-| **Base** (all variants) | [L10](../src/lib/components/ui/button/button.svelte#L10) | `focus-visible:border-ring`, `focus-visible:ring-[3px]` — ring/focus changes are **not** covered by a `transition-*` in base (only some variants add their own transitions). |
-| **destructive** | [L16](../src/lib/components/ui/button/button.svelte#L16) | `hover:bg-destructive/90` — **no** `transition-colors` / duration / ease. |
-| **secondary** | [L26](../src/lib/components/ui/button/button.svelte#L26) | `hover:bg-gallery`, `hover:text-blueGem` — **no** transition. |
-| **textOnlyDestructive** | [L22](../src/lib/components/ui/button/button.svelte#L22) | `hover:no-underline` — **no** transition. |
-| **textOnly** | [L24](../src/lib/components/ui/button/button.svelte#L24) | `hover:underline` — **no** transition. |
-| **link** | [L27](../src/lib/components/ui/button/button.svelte#L27) | `hover:underline` — **no** transition. |
-| **auth** | [L28](../src/lib/components/ui/button/button.svelte#L28) | Has `transition-all duration-200` for lift/shadow; **no** `ease-*` / `supports-linear:*` on the same string. |
+| **Base** (all variants) | [L10](../src/lib/components/primitives/button/button.svelte#L10) | `focus-visible:border-ring`, `focus-visible:ring-[3px]` — ring/focus changes are **not** covered by a `transition-*` in base (only some variants add their own transitions). |
+| **destructive** | [L16](../src/lib/components/primitives/button/button.svelte#L16) | `hover:bg-destructive/90` — **no** `transition-colors` / duration / ease. |
+| **secondary** | [L26](../src/lib/components/primitives/button/button.svelte#L26) | `hover:bg-gallery`, `hover:text-blueGem` — **no** transition. |
+| **textOnlyDestructive** | [L22](../src/lib/components/primitives/button/button.svelte#L22) | `hover:no-underline` — **no** transition. |
+| **textOnly** | [L24](../src/lib/components/primitives/button/button.svelte#L24) | `hover:underline` — **no** transition. |
+| **link** | [L27](../src/lib/components/primitives/button/button.svelte#L27) | `hover:underline` — **no** transition. |
+| **auth** | [L28](../src/lib/components/primitives/button/button.svelte#L28) | Has `transition-all duration-200` for lift/shadow; **no** `ease-*` / `supports-linear:*` on the same string. |
 
 **Already in good shape:** `default` (transform + after shadow), `ghost`, `outline` use `transition-*` with `duration-200` (and easing where noted).
 
@@ -56,13 +56,13 @@ These use `underline` / `hover:no-underline` (or similar) **without** a `transit
 
 ## Transition present, but missing explicit duration and easing
 
-These use Tailwind `transition-*` so **something** animates, but the utility string does **not** include both explicit timing and easing (defaults apply). Worth aligning with `duration-*` + `ease-glide` / `supports-linear:ease-*` if you want parity with [`Navbar.svelte`](../src/lib/components/Navbar.svelte#L82-L91) and button polish.
+These use Tailwind `transition-*` so **something** animates, but the utility string does **not** include both explicit timing and easing (defaults apply). Worth aligning with `duration-*` + `ease-glide` / `supports-linear:ease-*` if you want parity with [`Navbar.svelte`](../src/lib/components/patterns/navbar/Navbar.svelte#L82-L91) and button polish.
 
 | File | Notes |
 | --- | --- |
-| [`src/lib/components/ui/input/input.svelte`](../src/lib/components/ui/input/input.svelte#L32-L50) | `transition-[color,box-shadow]` for `focus-visible` ring/border — **no** `duration-*` or `ease-*` in string. |
-| [`src/lib/components/ui/select/select-trigger.svelte`](../src/lib/components/ui/select/select-trigger.svelte#L22) | Same; also `dark:hover:bg-input/50` shares the generic transition. |
-| [`src/lib/components/ui/dialog/dialog-content.svelte`](../src/lib/components/ui/dialog/dialog-content.svelte#L32-L33) | `transition-opacity` + `hover:opacity-100` — **no** `duration-*` / `ease-*` on close control. |
+| [`src/lib/components/primitives/input/Input.svelte`](../src/lib/components/primitives/input/Input.svelte#L32-L50) | `transition-[color,box-shadow]` for `focus-visible` ring/border — **no** `duration-*` or `ease-*` in string. |
+| [`src/lib/components/primitives/select/Select.svelte`](../src/lib/components/primitives/select/Select.svelte#L22) | Same; also `dark:hover:bg-input/50` shares the generic transition. |
+| [`src/lib/components/patterns/modal/Modal.svelte`](../src/lib/components/patterns/modal/Modal.svelte#L32-L33) | `transition-opacity` + `hover:opacity-100` — **no** `duration-*` / `ease-*` on close control. |
 | [`src/routes/+page.svelte`](../src/routes/+page.svelte#L451-L454) | “Already have an account?” link: `transition-colors` + `hover:text-white/90` — **no** `duration-*` (footer links on the same page use `duration-150`). |
 
 ---
@@ -71,14 +71,14 @@ These use Tailwind `transition-*` so **something** animates, but the utility str
 
 These were checked and **do** use `transition-*` with explicit `duration-*` (and often easing) for the main interactive affordance:
 
-- [`src/lib/components/Navbar.svelte`](../src/lib/components/Navbar.svelte#L82-L91) — nav links (`transition-colors duration-200`, `before`/`after` transitions, `supports-linear:ease-dramatic`).
+- [`src/lib/components/patterns/navbar/Navbar.svelte`](../src/lib/components/patterns/navbar/Navbar.svelte#L82-L91) — nav links (`transition-colors duration-200`, `before`/`after` transitions, `supports-linear:ease-dramatic`).
 - [`src/routes/+page.svelte`](../src/routes/+page.svelte#L326) — marketing cards (`transition-all duration-200`, etc.).
-- [`src/lib/components/additionaloptions/AdditionalOptionsButton.svelte`](../src/lib/components/additionaloptions/AdditionalOptionsButton.svelte#L16), [`AdditionalOptionsItem.svelte`](../src/lib/components/additionaloptions/AdditionalOptionsItem.svelte#L25) — `transition-[color] duration-200` + hover (text color only; default easing is enough).
+- [`src/lib/components/patterns/additionaloptions/AdditionalOptionsButton.svelte`](../src/lib/components/patterns/additionaloptions/AdditionalOptionsButton.svelte#L16), [`AdditionalOptionsItem.svelte`](../src/lib/components/patterns/additionaloptions/AdditionalOptionsItem.svelte#L25) — `transition-[color] duration-200` + hover (text color only; default easing is enough).
 - [`src/lib/features/invoices/components/InvoiceRow.svelte`](../src/lib/features/invoices/components/InvoiceRow.svelte#L93), [`src/lib/features/clients/components/ClientRow.svelte`](../src/lib/features/clients/components/ClientRow.svelte#L97) — `transition-colors duration-200` + hover.
 - [`src/lib/features/line-items/components/LineItemRow.svelte`](../src/lib/features/line-items/components/LineItemRow.svelte#L150-L151) — line-item text/number inputs: `transition-colors duration-200` on the scoped base rule; decorative underlines use `transition-[opacity,scale] duration-200` ([L74–L75](../src/lib/features/line-items/components/LineItemRow.svelte#L74-L75), etc.). (Previously flagged for `:focus` border without transition; scoped `:focus` border styling is now commented out.)
-- [`src/lib/components/Search.svelte`](../src/lib/components/Search.svelte#L79-L96) — search `<input>`: `outline-transparent` + `focus-visible:outline-2` + `focus-visible:outline-lavenderIndigo` with `transition-colors duration-200` so the focus ring is a **color** transition (no `outline-none`, which would drop the outline and block interpolation). Decorative underline span: `transition-[opacity,scale] duration-200`; search button: `transition-transform duration-200 ease-out`.
-- [`src/lib/components/ui/badge/badge.svelte`](../src/lib/components/ui/badge/badge.svelte#L4-L11) — **Closed:** `outline-transparent` + `transition-colors duration-200` + `focus-visible:outline-2` + `focus-visible:outline-ring/50` (base) / `focus-visible:outline-destructive/*` (`late`), replacing `ring-*` so focus animates like [`Search.svelte`](../src/lib/components/Search.svelte#L80).
-- [`src/lib/components/Modal.svelte`](../src/lib/components/Modal.svelte#L54-L56), [`SlidePanel.svelte`](../src/lib/components/SlidePanel.svelte#L52-L54) — **Closed:** `Dialog.Close` with `outline-2` / `outline-transparent` / `focus-visible:outline-ring/50` and `transition-[color,outline-color,scale] duration-200`. With constant width, animating **`outline-color`** is enough for the focus ring; `color` and `scale` cover hover text and `active:scale-95`.
+- [`src/lib/features/pagination/components/Search.svelte`](../src/lib/features/pagination/components/Search.svelte#L79-L96) — search `<input>`: `outline-transparent` + `focus-visible:outline-2` + `focus-visible:outline-lavenderIndigo` with `transition-colors duration-200` so the focus ring is a **color** transition (no `outline-none`, which would drop the outline and block interpolation). Decorative underline span: `transition-[opacity,scale] duration-200`; search button: `transition-transform duration-200 ease-out`.
+- [`src/lib/components/primitives/badge/badge.svelte`](../src/lib/components/primitives/badge/badge.svelte#L4-L11) — **Closed:** `outline-transparent` + `transition-colors duration-200` + `focus-visible:outline-2` + `focus-visible:outline-ring/50` (base) / `focus-visible:outline-destructive/*` (`late`), replacing `ring-*` so focus animates like [`Search.svelte`](../src/lib/features/pagination/components/Search.svelte#L80).
+- [`src/lib/components/patterns/modal/Modal.svelte`](../src/lib/components/patterns/modal/Modal.svelte#L54-L56) — **Closed:** close control with `outline-2` / `outline-transparent` / `focus-visible:outline-ring/50` and `transition-[color,outline-color,scale] duration-200`. With constant width, animating **`outline-color`** is enough for the focus ring; `color` and `scale` cover hover text and `active:scale-95`.
 
 ---
 

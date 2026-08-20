@@ -194,7 +194,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Forgot and reset password supported; reset token read from URL and validated; logout remote form redirects to login (no empty `/logout` page)
-- **Customizable selects:** Native `<select>` with CSS `appearance: base-select` when supported ([`Select.svelte`](./src/lib/components/ui/select/Select.svelte)); fallback is a plain select
+- **Customizable selects:** Native `<select>` with CSS `appearance: base-select` when supported ([`Select.svelte`](./src/lib/components/primitives/select/Select.svelte)); fallback is a plain select
 - **Modern UI:** native popover toasts with Panda CSS
 - **Svelte 5 Runes:** Uses `@attach` directives and reactive patterns; create/edit forms share `FormPanel` + `ItemPanel` (`attach` prop forwarded as `{@attach}` onto `Modal`)
 - **Route matchers:** Client and invoice detail params use `[id=uuid]` (`src/params/index.ts`, Valibot UUIDv7); invalid ids 404 before load

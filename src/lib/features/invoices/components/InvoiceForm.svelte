@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { InvoiceFormProps } from "#features/line-items/types.ts";
-  import BoundaryError from "#lib/components/BoundaryError.svelte";
-  import Spinner from "#lib/components/Spinner.svelte";
+  import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
+  import Spinner from "#lib/components/primitives/Spinner.svelte";
   import InvoiceEditor from "./InvoiceEditor.svelte";
 
   let props: InvoiceFormProps = $props();

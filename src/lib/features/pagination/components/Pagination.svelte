@@ -30,8 +30,8 @@
     visibleListUrl,
   } from "#features/pagination/utils/url.ts";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
-  import Button from "#lib/components/ui/button/button.svelte";
-  import Select from "#lib/components/ui/select/Select.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
+  import Select from "#lib/components/primitives/select/Select.svelte";
   import { directionalArrow } from "#lib/styles.ts";
   import { LIMITS, type ListLimit } from "../constants";
   import type { ListDirection } from "../types";

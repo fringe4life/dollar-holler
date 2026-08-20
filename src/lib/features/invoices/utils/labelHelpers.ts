@@ -1,4 +1,4 @@
-import type { BadgeVariant } from "#lib/components/ui/badge/badge.svelte";
+import type { BadgeVariant } from "#lib/components/primitives/badge/badge.svelte";
 import type { Maybe } from "#lib/types.ts";
 import { isLate } from "#lib/utils/dateHelpers.ts";
 

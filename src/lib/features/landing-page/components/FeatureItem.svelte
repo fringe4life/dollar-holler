@@ -8,7 +8,7 @@
   } from "#styled-system/patterns/index.js";
   import type { Component } from "svelte";
   import type { features } from "#features/landing-page/constants/features.ts";
-  import type { IconProps } from "#lib/components/Icon.svelte";
+  import type { IconProps } from "#lib/components/primitives/Icon.svelte";
 
   export interface Feature {
     icon: Component<IconProps>;

@@ -3,11 +3,11 @@
   import { resolve } from "$app/paths";
   import { forgotPassword } from "#features/auth/auth.remote.ts";
   import { authHeading } from "#features/auth/styles.ts";
-  import Alert from "#lib/components/Alert.svelte";
-  import Form from "#lib/components/form/Form.svelte";
-  import FormField from "#lib/components/form/FormField.svelte";
-  import LoaderButton from "#lib/components/ui/button/LoaderButton.svelte";
-  import Input from "#lib/components/ui/input/Input.svelte";
+  import Alert from "#lib/components/patterns/Alert.svelte";
+  import Form from "#lib/components/patterns/form/Form.svelte";
+  import FormField from "#lib/components/patterns/form/FormField.svelte";
+  import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
+  import Input from "#lib/components/primitives/input/Input.svelte";
 </script>
 
 <svelte:head>

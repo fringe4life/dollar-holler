@@ -1,6 +1,6 @@
 <script lang="ts">
   import { grid, gridItem } from "#styled-system/patterns/index.js";
-  import Navbar from "#lib/components/navbar/Navbar.svelte";
+  import Navbar from "#lib/components/patterns/navbar/Navbar.svelte";
 
   let { children } = $props();
 </script>

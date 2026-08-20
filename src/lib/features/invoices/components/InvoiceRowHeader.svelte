@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
-  import type { HeaderProps } from "#lib/components/TableHeader.svelte";
-  import TableHeader from "#lib/components/TableHeader.svelte";
+  import type { HeaderProps } from "#lib/components/primitives/TableHeader.svelte";
+  import TableHeader from "#lib/components/primitives/TableHeader.svelte";
   import { invoiceTable } from "../styles";
 
   let { emptyState = false }: HeaderProps = $props();

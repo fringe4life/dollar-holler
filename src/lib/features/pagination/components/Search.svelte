@@ -21,7 +21,7 @@
     visibleListUrl,
   } from "#features/pagination/utils/url.ts";
   import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
-  import Search from "#lib/components/icons/Search.svelte";
+  import Search from "#lib/components/primitives/icons/Search.svelte";
 
   const searchIconVt = viewTransition({
     group: {

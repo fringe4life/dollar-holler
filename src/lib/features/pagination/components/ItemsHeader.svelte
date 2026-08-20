@@ -3,7 +3,7 @@
   import { flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
   import Search from "#features/pagination/components/Search.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
 
   interface ItemsHeaderProps {
     button: Snippet;

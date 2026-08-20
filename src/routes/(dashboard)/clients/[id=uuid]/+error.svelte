@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
-  import RouteError from "#lib/components/RouteError.svelte";
+  import RouteError from "#lib/components/patterns/RouteError.svelte";
   import { page } from "$app/state";
 </script>
 

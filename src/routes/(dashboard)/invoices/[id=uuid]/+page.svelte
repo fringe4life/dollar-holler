@@ -9,17 +9,17 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
+  import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   import {
     getInvoiceDetail,
     updateInvoiceStatus,
   } from "#features/invoices/invoices.remote.ts";
   import LineItemRows from "#features/line-items/components/LineItemRows.svelte";
   import { getSettings } from "#features/settings/settings.remote.ts";
-  import BoundaryError from "#lib/components/BoundaryError.svelte";
-  import HtmlContent from "#lib/components/HtmlContent.svelte";
-  import Spinner from "#lib/components/Spinner.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
+  import HtmlContent from "#lib/components/primitives/HtmlContent.svelte";
+  import Spinner from "#lib/components/primitives/Spinner.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
   import type { BitsButton, Maybe } from "#lib/types.ts";
   import type { SanitizedHTML } from "#lib/schemas/sanitized-html.server.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";

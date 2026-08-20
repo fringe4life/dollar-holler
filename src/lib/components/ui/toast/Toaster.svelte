@@ -5,6 +5,10 @@
   const TOAST_TOP = "1rem";
   /** Visible peek between stacked cards: minBlockSize token 12 (3rem) minus overlap. */
   const TOAST_STACK_STEP = "2.25rem";
+  /** Extra lift applied to the whole stack on group hover. */
+  const TOAST_HOVER_LIFT = "0.5rem";
+  /** Additional per-index spread on hover, beyond {@link TOAST_STACK_STEP}. */
+  const TOAST_HOVER_FAN_STEP = "1.5rem";
 
   const toastRecipe = cva({
     base: {
@@ -38,7 +42,7 @@
       transitionTimingFunction: "ease-out",
       translate: "0 0.5rem",
       _groupHasToastHover: {
-        insetBlockStart: `calc(${TOAST_TOP} + var(--i) * (${TOAST_STACK_STEP} + 1.5rem) + 0.5rem)`,
+        insetBlockStart: `calc(${TOAST_TOP} + var(--i) * (${TOAST_STACK_STEP} + ${TOAST_HOVER_FAN_STEP}) + ${TOAST_HOVER_LIFT})`,
       },
       _open: {
         display: "flex",
@@ -76,10 +80,17 @@
       } satisfies Record<ToastType, Record<string, unknown>>,
     },
   });
+
+  /** Popover handles top-layer display only; live-region role announces insert to AT. */
+  const toastLiveRegion = (type: ToastType) =>
+    type === "error"
+      ? ({ "aria-live": "assertive", role: "alert" } as const)
+      : ({ "aria-live": "polite", role: "status" } as const);
 </script>
 
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { onMount } from "svelte";
   import Cancel from "#lib/components/icons/Cancel.svelte";
   import {
     createToaster,
@@ -92,6 +103,10 @@
 
   const toaster = createToaster();
   setToast(toaster);
+
+  onMount(() => {
+    toaster.syncDocumentHidden();
+  });
 
   const titleClass = css({
     fontWeight: "bold",
@@ -127,15 +142,15 @@
   });
 </script>
 
-<svelte:document
-  onvisibilitychange={() => toaster.setHidden(document.hidden)}
-/>
+<svelte:document onvisibilitychange={() => toaster.syncDocumentHidden()} />
 
 {#snippet toastCard(item: ToastItem, i: number)}
   {@const elementId = toastElementId(item.id)}
+  {@const liveRegion = toastLiveRegion(item.type)}
   <div
     {@attach toaster.connect(item.id)}
-    aria-label={item.title}
+    aria-atomic="true"
+    aria-live={liveRegion["aria-live"]}
     class={toastRecipe({ type: item.type })}
     id={elementId}
     onpointerenter={() => toaster.pause("hover")}
@@ -151,7 +166,7 @@
       toaster.resume("hover");
     }}
     popover="manual"
-    role="group"
+    role={liveRegion.role}
     style:--i={i}
   >
     <div class={contentClass}>

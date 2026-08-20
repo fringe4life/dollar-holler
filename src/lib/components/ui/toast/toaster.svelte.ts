@@ -1,5 +1,6 @@
 import { createContext } from "svelte";
 import type { Attachment } from "svelte/attachments";
+import { on } from "svelte/events";
 import { SvelteMap, SvelteSet } from "svelte/reactivity";
 
 const TOAST_MAX = 3;
@@ -80,19 +81,33 @@ class Toaster {
       this.#els.set(id, element);
       element.showPopover();
 
+      let exitTimeout: ReturnType<typeof setTimeout> | undefined;
+      let offTransitionEnd: (() => void) | undefined;
+
+      const clearExit = (): void => {
+        if (exitTimeout !== undefined) {
+          clearTimeout(exitTimeout);
+          exitTimeout = undefined;
+        }
+        offTransitionEnd?.();
+        offTransitionEnd = undefined;
+      };
+
       const unmount = (): void => {
+        clearExit();
         this.#unmount(id);
       };
 
-      const onToggle = (event: Event): void => {
+      const offToggle = on(element, "toggle", (event) => {
         if (!(event instanceof ToggleEvent) || event.newState !== "closed") {
           return;
         }
 
         this.#closing.add(id);
         this.#clearClock(id);
+        clearExit();
 
-        const onEnd = (transitionEvent: TransitionEvent): void => {
+        offTransitionEnd = on(element, "transitionend", (transitionEvent) => {
           if (transitionEvent.target !== element) {
             return;
           }
@@ -102,18 +117,14 @@ class Toaster {
           ) {
             return;
           }
-          element.removeEventListener("transitionend", onEnd);
           unmount();
-        };
-
-        element.addEventListener("transitionend", onEnd);
-        window.setTimeout(unmount, TOAST_EXIT_MS);
-      };
-
-      element.addEventListener("toggle", onToggle);
+        });
+        exitTimeout = setTimeout(unmount, TOAST_EXIT_MS);
+      });
 
       return () => {
-        element.removeEventListener("toggle", onToggle);
+        offToggle();
+        clearExit();
         this.#els.delete(id);
       };
     };
@@ -167,6 +178,14 @@ class Toaster {
       return;
     }
     this.resume("hidden");
+  };
+
+  /** Sync timers with Page Visibility API. No-op when `document` is unavailable (SSR). */
+  syncDocumentHidden = (): void => {
+    if (typeof document === "undefined") {
+      return;
+    }
+    this.setHidden(document.hidden);
   };
 
   #push = (type: ToastType, title: string, options?: ToastOptions): string => {

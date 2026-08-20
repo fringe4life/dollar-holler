@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
   import { page } from "$app/state";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import BoundaryError from "#lib/components/BoundaryError.svelte";
   import BlankState from "#features/invoices/components/BlankState.svelte";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
@@ -33,6 +33,7 @@
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
 
+  const toast = getToast();
   const listArg = $derived(
     normalizeListQueryFromUrl(visibleListUrl(page)).normalized
   );

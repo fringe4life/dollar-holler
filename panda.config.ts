@@ -6,6 +6,7 @@ export default defineConfig({
   conditions: {
     extend: {
       groupDataExpanded: ".group[data-expanded='true'] &",
+      groupHasToastHover: ".group:has([popover='manual']:hover) &",
       notSupportsLinear:
         "@supports not (animation-timing-function: linear(0, 1))",
       notSupportsScroll: "@supports not (animation-timeline: scroll())",

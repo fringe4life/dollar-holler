@@ -9,12 +9,14 @@
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import { logout } from "#features/auth/auth.remote.ts";
   import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import { isActive } from "#lib/utils/is-active.ts";
   import NavbarItem from "./NavbarItem.svelte";
   import { navItemControlClass, navItemLiClass } from "./nav-item-styles";
+
+  const toast = getToast();
 
   const navItems = [
     { href: resolve("invoices"), title: "Invoices" },

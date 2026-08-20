@@ -4,10 +4,10 @@
   import { page } from "$app/state";
   import { resetPassword } from "#features/auth/auth.remote.ts";
   import { authHeading } from "#features/auth/styles.ts";
-  import Form from "#lib/components/form/Form.svelte";
-  import FormField from "#lib/components/form/FormField.svelte";
-  import LoaderButton from "#lib/components/ui/button/LoaderButton.svelte";
-  import Input from "#lib/components/ui/input/Input.svelte";
+  import Form from "#lib/components/patterns/form/Form.svelte";
+  import FormField from "#lib/components/patterns/form/FormField.svelte";
+  import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
+  import Input from "#lib/components/primitives/input/Input.svelte";
 
   const token = $derived(page.url.searchParams.get("token") ?? "");
 </script>

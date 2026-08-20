@@ -6,7 +6,7 @@
   import { between, hstack, square } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";
   import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
   import type { Maybe } from "#lib/types.ts";
 
   interface Props {

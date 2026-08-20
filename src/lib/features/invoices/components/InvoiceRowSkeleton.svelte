@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
   import { circle, gridItem } from "#styled-system/patterns/index.js";
-  import Skeleton from "#lib/components/ui/skeleton/skeleton.svelte";
+  import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
   import { tableRowBase } from "#lib/styles.ts";
   import { invoiceRow, invoiceTable } from "../styles";
 </script>

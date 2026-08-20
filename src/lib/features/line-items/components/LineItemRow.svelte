@@ -6,8 +6,8 @@
     LineItemRowProps,
     LineItemUpdate,
   } from "#features/line-items/types.ts";
-  import Trash from "#lib/components/icons/Trash.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
   import { invoiceLineItem } from "../styles";
   import { lineItemFieldRecipe } from "./LineItemRecipe";
 

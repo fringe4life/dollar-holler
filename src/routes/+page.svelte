@@ -18,7 +18,7 @@
   import Features from "#features/landing-page/components/Features.svelte";
   import LandingNav from "#features/landing-page/components/LandingNav.svelte";
   import Reviews from "#features/landing-page/components/Reviews.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
   import { directionalArrow } from "#lib/styles.ts";
 
   const forwardArrowClass = cx(

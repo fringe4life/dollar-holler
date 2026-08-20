@@ -15,10 +15,10 @@
     LineItemUpdate,
     NewLineItemWithId,
   } from "#features/line-items/types.ts";
-  import FormField from "#lib/components/form/FormField.svelte";
-  import States from "#lib/components/States.svelte";
-  import Input from "#lib/components/ui/input/Input.svelte";
-  import Textarea from "#lib/components/ui/textarea/Textarea.svelte";
+  import FormField from "#lib/components/patterns/form/FormField.svelte";
+  import States from "#lib/components/patterns/States.svelte";
+  import Input from "#lib/components/primitives/input/Input.svelte";
+  import Textarea from "#lib/components/primitives/textarea/Textarea.svelte";
   import type { BitsButton } from "#lib/types.ts";
   import { today } from "#lib/utils/dateHelpers.ts";
   import { zipInputAttrs } from "#lib/utils/zip.ts";

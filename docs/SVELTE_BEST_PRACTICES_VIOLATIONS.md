@@ -57,7 +57,7 @@ If prop changes must remount fresh state, prefer `{#key ...}` in parent over rem
 
 ### 3. `Modal.svelte` / `ItemPanel` — `bind:this` + exposed `dialogEl` — **FIXED**
 
-Uses `dialogController` attach (`src/lib/client/attachments/dialogController.ts`). Parents: `{@attach panel.attach}`. `ItemPanel` holds `{ show, close }` only. Autofixer: clean.
+Uses `dialogController` attach (`src/lib/components/patterns/item-panel/dialogController.ts`). Parents: `{@attach panel.attach}`. `ItemPanel` holds `{ show, close }` only. Autofixer: clean.
 
 ### 4. `invoices/[id]/+layout.svelte` — `$derived` for mutable callback state — **FIXED**
 

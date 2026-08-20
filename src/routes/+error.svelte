@@ -1,5 +1,5 @@
 <script lang="ts">
-  import RouteError from "#lib/components/RouteError.svelte";
+  import RouteError from "#lib/components/patterns/RouteError.svelte";
   import { page } from "$app/state";
 </script>
 

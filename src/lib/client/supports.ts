@@ -13,3 +13,12 @@ export const supportsBaseSelect =
   browser &&
   typeof CSS !== "undefined" &&
   CSS.supports("appearance", "base-select");
+
+/**
+ * CSS Typed OM (`CSS.px`, `attributeStyleMap`).
+ *
+ * Support has landed in Firefox 156 nightly; Chrome, Safari 16.4+, and Edge
+ * already ship it. Evaluated once on the client; `false` during SSR.
+ */
+export const supportsCssTypedOm =
+  browser && typeof CSS !== "undefined" && typeof CSS.px === "function";

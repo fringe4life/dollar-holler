@@ -1,8 +1,8 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
   import { page } from "$app/state";
-  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
-  import BoundaryError from "#lib/components/BoundaryError.svelte";
+  import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
+  import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
   import BlankState from "#features/invoices/components/BlankState.svelte";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
   import InvoiceRow from "#features/invoices/components/InvoiceRow.svelte";
@@ -26,9 +26,9 @@
     ItemPanel,
     upsertKey,
     type UpsertTarget,
-  } from "#lib/client/runes/ItemPanel.svelte.ts";
-  import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import FormPanel from "#lib/components/form/FormPanel.svelte";
+  } from "#lib/components/patterns/item-panel/ItemPanel.svelte.ts";
+  import ConfirmDelete from "#lib/components/patterns/ConfirmDelete.svelte";
+  import FormPanel from "#lib/components/patterns/form/FormPanel.svelte";
   import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";

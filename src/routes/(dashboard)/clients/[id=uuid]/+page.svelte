@@ -2,7 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { between } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
-  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
+  import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   import ClientForm from "#features/clients/components/ClientForm.svelte";
   import ClientInvoiceList from "#features/clients/components/ClientInvoiceList.svelte";
   import ClientInvoiceSummary from "#features/clients/components/ClientInvoiceSummary.svelte";
@@ -31,13 +31,13 @@
     ItemPanel,
     upsertKey,
     type UpsertTarget,
-  } from "#lib/client/runes/ItemPanel.svelte.ts";
-  import BoundaryError from "#lib/components/BoundaryError.svelte";
-  import ConfirmDelete from "#lib/components/ConfirmDelete.svelte";
-  import FormPanel from "#lib/components/form/FormPanel.svelte";
-  import Edit from "#lib/components/icons/Edit.svelte";
-  import Spinner from "#lib/components/Spinner.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
+  } from "#lib/components/patterns/item-panel/ItemPanel.svelte.ts";
+  import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
+  import ConfirmDelete from "#lib/components/patterns/ConfirmDelete.svelte";
+  import FormPanel from "#lib/components/patterns/form/FormPanel.svelte";
+  import Edit from "#lib/components/primitives/icons/Edit.svelte";
+  import Spinner from "#lib/components/primitives/Spinner.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
   import type { BitsButton } from "#lib/types.ts";
   import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";

@@ -1,6 +1,6 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
-  import Skeleton from "#lib/components/ui/skeleton/skeleton.svelte";
+  import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
 </script>
 
 <div

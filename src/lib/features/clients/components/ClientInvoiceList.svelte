@@ -1,5 +1,5 @@
 <script lang="ts">
-  import BoundaryError from "#lib/components/BoundaryError.svelte";
+  import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
   import { listClientInvoices } from "#features/clients/clients.remote.ts";
   import BlankState from "#features/clients/components/BlankState.svelte";
   import InvoiceRow from "#features/invoices/components/InvoiceRow.svelte";

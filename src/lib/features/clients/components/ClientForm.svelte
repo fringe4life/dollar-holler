@@ -1,18 +1,18 @@
 <script lang="ts">
   import { flex, grid, gridItem } from "#styled-system/patterns/index.js";
-  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
+  import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   import {
     deleteClient,
     saveClient,
   } from "#features/clients/clients.remote.ts";
-  import Form from "#lib/components/form/Form.svelte";
-  import FormField from "#lib/components/form/FormField.svelte";
-  import Check from "#lib/components/icons/Check.svelte";
-  import Trash from "#lib/components/icons/Trash.svelte";
-  import States from "#lib/components/States.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
-  import LoaderButton from "#lib/components/ui/button/LoaderButton.svelte";
-  import Input from "#lib/components/ui/input/Input.svelte";
+  import Form from "#lib/components/patterns/form/Form.svelte";
+  import FormField from "#lib/components/patterns/form/FormField.svelte";
+  import Check from "#lib/components/primitives/icons/Check.svelte";
+  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import States from "#lib/components/patterns/States.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
+  import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
+  import Input from "#lib/components/primitives/input/Input.svelte";
   import { buttonIcon } from "#lib/styles.ts";
   import type { BitsButton } from "#lib/types.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";

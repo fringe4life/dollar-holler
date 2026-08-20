@@ -8,11 +8,11 @@
   import { newClient as blankClient } from "#features/clients/utils/new-client.ts";
   import { saveInvoice } from "#features/invoices/invoices.remote.ts";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
-  import FormField from "#lib/components/form/FormField.svelte";
-  import InitialsAvatar from "#lib/components/ui/avatar/InitialsAvatar.svelte";
-  import Button from "#lib/components/ui/button/button.svelte";
-  import Input from "#lib/components/ui/input/Input.svelte";
-  import Select from "#lib/components/ui/select/Select.svelte";
+  import FormField from "#lib/components/patterns/form/FormField.svelte";
+  import InitialsAvatar from "#lib/components/primitives/avatar/InitialsAvatar.svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
+  import Input from "#lib/components/primitives/input/Input.svelte";
+  import Select from "#lib/components/primitives/select/Select.svelte";
   import type { NewInvoice } from "../types";
 
   interface ClientFieldProps {

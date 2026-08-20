@@ -41,7 +41,7 @@ These use `underline` / `hover:no-underline` (or similar) **without** a `transit
 | [`src/routes/(auth)/login/+page.svelte`](<../src/routes/(auth)/login/+page.svelte#L27>) and [L39](<../src/routes/(auth)/login/+page.svelte#L39>) |
 | [`src/routes/(auth)/signup/+page.svelte`](<../src/routes/(auth)/signup/+page.svelte#L51>) |
 | [`src/routes/(auth)/reset-password/+page.svelte`](<../src/routes/(auth)/reset-password/+page.svelte#L27>) |
-| [`src/routes/(dashboard)/invoices/[id]/+page.svelte`](<../src/routes/(dashboard)/invoices/[id]/+page.svelte#L80>) |
+| [`src/routes/(dashboard)/invoices/[id=uuid]/+page.svelte`](<../src/routes/(dashboard)/invoices/[id=uuid]/+page.svelte#L149>) |
 
 ---
 

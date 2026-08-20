@@ -9,7 +9,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import {
     getInvoiceDetail,
     updateInvoiceStatus,
@@ -29,6 +29,7 @@
   import type { PageProps } from "./$types";
 
   let { params }: PageProps = $props();
+  const toast = getToast();
   const invoiceId = $derived(params.id); // CursorId, no assert
   // Sequential on purpose. `$derived(await Promise.all([query(), query()]))`
   // over Kit remotes refetch-loops forever under experimental.async.

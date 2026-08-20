@@ -2,7 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { flex } from "#styled-system/patterns/index.js";
   import { onDestroy } from "svelte";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import { clientPickerOptions } from "#features/clients/clients.remote.ts";
   import type { ClientInsert } from "#features/clients/types.ts";
   import { newClient } from "#features/clients/utils/new-client.ts";
@@ -40,6 +40,7 @@
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
   let { mode = "create", closePanel, invoiceId }: InvoiceFormProps = $props();
+  const toast = getToast();
 
   const picker = await clientPickerOptions();
   // svelte-ignore state_referenced_locally -- parent remounts via {#key}

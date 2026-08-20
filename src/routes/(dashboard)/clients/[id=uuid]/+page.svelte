@@ -2,7 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { between } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import ClientForm from "#features/clients/components/ClientForm.svelte";
   import ClientInvoiceList from "#features/clients/components/ClientInvoiceList.svelte";
   import ClientInvoiceSummary from "#features/clients/components/ClientInvoiceSummary.svelte";
@@ -46,6 +46,7 @@
   import type { PageProps } from "./$types";
 
   let { params }: PageProps = $props();
+  const toast = getToast();
   const clientId = $derived(params.id); // CursorId, no assert
 
   const listArg = $derived(

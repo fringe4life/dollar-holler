@@ -1,7 +1,7 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import { changePassword } from "#features/auth/auth.remote.ts";
   import {
     getSettings,
@@ -17,6 +17,7 @@
   import Spinner from "#lib/components/Spinner.svelte";
   import { zipInputAttrs } from "#lib/utils/zip.ts";
 
+  const toast = getToast();
   const loaded = await getSettings();
 
   const handleSettingsSuccess = () => {

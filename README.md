@@ -116,7 +116,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **Validation:** Valibot for remote `form()` payloads and shared client/server schemas (Drizzle valibot for DB insert/select)
 - **Bundler:** Vite 8.2.1 for dev and production builds (Rolldown)
 - **Devtools:** [`@vitejs/devtools`](https://devtools.vite.dev/) + [`vite-devtools-svelte`](https://www.npmjs.com/package/vite-devtools-svelte) in [`vite.config.ts`](./vite.config.ts) (Svelte panels + Rolldown build analysis); Chrome workspace mapping via `vite-plugin-devtools-json` (separate from Vite DevTools); optional bundle treemap via `rollup-plugin-visualizer` (`stats.html`)
-- **Toasts:** [svelte-sonner](https://github.com/wobsoriano/svelte-sonner) with Panda CSS (Figma snackbar styles, top-center)
+- **Toasts:** native `popover="manual"` tray with Panda CSS (Figma snackbar styles, top-center)
 - **Styling:** [Panda CSS](https://panda-css.com/) 2.0 (`2.0.0-beta.14`) with generated `styled-system` via `panda build` (see `panda.config.ts`, PostCSS); form inputs use `_ariaInvalid` / `_userInvalid` for accessible error states; `_supportsBaseSelect` styles customizable `<select>` (`appearance: base-select`) with native fallback; search uses Panda `viewTransition()` bags, typed pagination VT stays in colocated `<style>` blocks; [Source Sans 3 Variable](https://fontsource.org/fonts/source-sans-3) via `@fontsource-variable/source-sans-3`
 - **Lint/format:** ESLint 10 with TypeScript ESLint and eslint-plugin-svelte ([`eslint.config.mjs`](./eslint.config.mjs)), Prettier 3 with prettier-plugin-svelte ([`prettier.config.mjs`](./prettier.config.mjs)), Stylelint 17 for CSS ([`stylelint.config.mjs`](./stylelint.config.mjs))
 
@@ -195,7 +195,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Forgot and reset password supported; reset token read from URL and validated; logout remote form redirects to login (no empty `/logout` page)
 - **Customizable selects:** Native `<select>` with CSS `appearance: base-select` when supported ([`Select.svelte`](./src/lib/components/ui/select/Select.svelte)); fallback is a plain select
-- **Modern UI:** svelte-sonner toasts with Panda CSS
+- **Modern UI:** native popover toasts with Panda CSS
 - **Svelte 5 Runes:** Uses `@attach` directives and reactive patterns; create/edit forms share `FormPanel` + `ItemPanel` (`attach` prop forwarded as `{@attach}` onto `Modal`)
 - **Route matchers:** Client and invoice detail params use `[id=uuid]` (`src/params/index.ts`, Valibot UUIDv7); invalid ids 404 before load
 - **Remote forms:** Shared `Form` / `FormField` / `FieldErrors` with per-field `issues()`; auth, clients, invoices, settings use `save*.fields.*.as()` defaults for edit mode; `LoaderButton` for pending submit width

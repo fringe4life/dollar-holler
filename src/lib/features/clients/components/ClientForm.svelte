@@ -1,6 +1,6 @@
 <script lang="ts">
   import { flex, grid, gridItem } from "#styled-system/patterns/index.js";
-  import { toast } from "svelte-sonner";
+  import { getToast } from "#lib/components/ui/toast/toaster.svelte.ts";
   import {
     deleteClient,
     saveClient,
@@ -33,9 +33,10 @@
     formState: "create";
   }
 
-  export type ClientFormProps = CreateProps | EditProps;
+  type ClientFormProps = CreateProps | EditProps;
 
   let { formState, closePanel, edit }: ClientFormProps = $props();
+  const toast = getToast();
 
   const handleSaved = () => {
     toast.success(

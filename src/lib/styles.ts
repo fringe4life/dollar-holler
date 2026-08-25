@@ -16,11 +16,24 @@ const arrowMotion = {
   },
 } as const;
 
+const arrowViewMotion = {
+  animationFillMode: "both",
+  animationRange: "cover 35% cover 65%",
+  animationTimeline: "view(block)",
+  animationTimingFunction: "linear",
+} as const;
+
 const backwardArrow = css({
   ...arrowMotion,
   _groupActive: { translate: "-0.25rem 0" },
   _groupHover: { translate: "-0.25rem 0" },
   _groupDisabled: { translate: "0 0" },
+  _hoverNone: {
+    _supportsViewTimeline: {
+      ...arrowViewMotion,
+      animationName: "arrow-nudge-backward",
+    },
+  },
 });
 
 const forwardArrow = css({
@@ -28,6 +41,12 @@ const forwardArrow = css({
   _groupActive: { translate: "0.25rem 0" },
   _groupHover: { translate: "0.25rem 0" },
   _groupDisabled: { translate: "0 0" },
+  _hoverNone: {
+    _supportsViewTimeline: {
+      ...arrowViewMotion,
+      animationName: "arrow-nudge-forward",
+    },
+  },
 });
 
 const iconMotion = {

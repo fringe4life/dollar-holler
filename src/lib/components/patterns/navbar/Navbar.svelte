@@ -1,22 +1,18 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
-  import {
-    cq,
-    gridItem,
-    vstack,
-    visuallyHidden,
-  } from "#styled-system/patterns/index.js";
+  import { cq, gridItem } from "#styled-system/patterns/index.js";
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   import { logout } from "#features/auth/auth.remote.ts";
-  import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import { isActive } from "#lib/utils/is-active.ts";
   import NavbarItem from "./NavbarItem.svelte";
+  import NavbarMenuButton from "./NavbarMenuButton.svelte";
   import { navItemControlClass, navItemLiClass } from "./nav-item-styles";
 
   const toast = getToast();
+  const NAVIGATION_ID = "primary-navigation";
 
   const navItems = [
     { href: resolve("invoices"), title: "Invoices" },
@@ -25,143 +21,142 @@
   ];
   const path = $derived(page.url.pathname);
 
-  const nav = new Toggle();
-  afterNavigate(nav.off);
+  let navElement: HTMLElement | undefined;
 
-  const navShell = vstack({
-    backgroundColor: "daisyBush",
+  const handleNavClick = (event: MouseEvent) => {
+    if (!(event.target instanceof Element)) {
+      return;
+    }
+
+    const link = event.target.closest("a");
+    if (
+      !link ||
+      !navElement?.contains(link) ||
+      !navElement.matches(":popover-open")
+    ) {
+      return;
+    }
+
+    navElement.hidePopover();
+  };
+
+  afterNavigate(() => navElement?.hidePopover());
+
+  const navLayer = css({
     blockSize: "100dvh",
+    display: { base: "none", md: "flex" },
     inlineSize: "full",
     inset: 0,
     isolation: "isolate",
-    overflowY: { base: "auto", md: "clip" },
+    margin: 0,
+    maxBlockSize: "none",
+    maxInlineSize: "none",
+    padding: 0,
     position: { base: "fixed", md: "sticky" },
+    transitionBehavior: "allow-discrete",
+    transitionDuration: "normal",
+    transitionProperty: "display, overlay",
+    zIndex: 9999,
+
+    _open: { display: "flex" },
+    "&:popover-open > div": {
+      translate: { base: "0 0", md: "0 0" },
+      _starting: {
+        translate: { base: "-100% 0", md: "0 0" },
+      },
+    },
+    "&:not(:popover-open) > button > span": {
+      rotate: "0deg",
+      _after: { rotate: "0deg", translate: "0 5px" },
+      _before: { opacity: 1, translate: "0 -10px" },
+    },
+  });
+
+  const navDrawer = css({
+    alignItems: "center",
+    backgroundColor: "daisyBush",
+    blockSize: "100dvh",
+    display: "flex",
+    flexDirection: "column",
+    inlineSize: "full",
+    inset: 0,
+    overflowY: { base: "auto", md: "clip" },
+    position: "absolute",
     textAlign: "center",
+    translate: { base: "-100% 0", md: "0 0" },
     transitionDuration: "normal",
     transitionProperty: "translate",
-    zIndex: 9999,
+    zIndex: 0,
   });
-
-  const navTranslateClosed = css({
-    _starting: {
-      translate: { base: "-100% 0", md: "0 0" },
-    },
-    translate: { base: "-100% 0", md: "0 0" },
-  });
-
-  const navTranslateOpen = css({
-    _starting: {
-      translate: { base: "-100% 0", md: "0 0" },
-    },
-    translate: { base: "0 0", md: "0 0" },
-  });
-
-  const handleKeypress = (event: KeyboardEvent) => {
-    if (event.key === "Escape") {
-      nav.off();
-    }
-  };
 </script>
 
-<svelte:window onkeydown={handleKeypress} />
+<svelte:document onclick={handleNavClick} />
 
 <header class={cx(gridItem({ colSpan: { md: 3 }, zIndex: 20 }), cq())}>
   <!-- mobile nav control -->
-  <button
-    aria-controls="primary-navigation"
-    aria-expanded={nav.isOn}
-    class={cx(
-      "group",
-      css({
-        position: "fixed",
-        insetInlineEnd: 6,
-        insetBlockStart: 6,
-        zIndex: 10_000,
-        cursor: "pointer",
-        transitionProperty: "colors",
-        transitionDuration: "normal",
-        display: { md: "none" },
-        color: nav.isOn ? "goldenFizz" : "daisyBush",
-        blockSize: 12,
-        padding: 2,
-      })
-    )}
-    onclick={nav.toggle}
-    type="button"
-  >
-    <span class={visuallyHidden()}>Menu</span>
-    <div
-      class={css({
-        "&::after,&::before,&": {
-          content: "''",
-          display: "block",
-          blockSize: "5px",
-          inlineSize: "32px",
-          rounded: "3px",
-          transitionProperty: ["rotate", "translate", "opacity"],
-          transitionDuration: "normal",
-          backgroundColor: "currentColor",
-        },
-        _before: { translate: "0 -10px" },
-        _after: { translate: "0 5px" },
-        _groupExpanded: {
-          rotate: "45deg",
-          _before: { opacity: "0" },
-          _after: { translate: "0 -3px", rotate: "-90deg" },
-        },
-      })}
-    ></div>
-  </button>
+  <NavbarMenuButton
+    aria-label="Open navigation"
+    command="toggle-popover"
+    commandfor={NAVIGATION_ID}
+    state="open"
+  />
   <nav
-    class={cx(
-      "group",
-      navShell,
-      nav.isOn ? navTranslateOpen : navTranslateClosed
-    )}
-    id="primary-navigation"
+    bind:this={navElement}
+    class={navLayer}
+    id={NAVIGATION_ID}
+    popover="auto"
   >
-    <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>
-      <a href={resolve("/")}>
-        <img
-          alt="Doller Holla company logo"
-          class={css({ marginInline: "auto", zIndex: 0 })}
-          src={asset("images/logo.svg")}
-        />
-      </a>
-    </div>
-    <ul
-      class={cx(
-        "group",
-        css({
-          listStyle: "none",
-          fontSize: { base: "xl", "@/xs": "2xl" },
-          fontWeight: { base: "medium", "@/xs": "semibold" },
-        })
-      )}
-      style:--active-nav-left={`url(${asset("images/active-nav--left.svg")})`}
-      style:--active-nav-right={`url(${asset("images/active-nav--right.svg")})`}
-    >
-      {#each navItems as { href, title } (title)}
-        <NavbarItem {href} isActive={isActive(href, path)} {title} />
-      {/each}
-      <li class={navItemLiClass}>
-        <form
-          {...logout.enhance(async (form) => {
-            if (!(await form.submit())) {
-              toast.error("Logout failed");
-            }
-          })}
-          data-sveltekit-replacestate
-        >
-          <button
-            class={navItemControlClass}
-            disabled={logout.pending > 0}
-            type="submit"
+    <!-- The close control is in the top layer, outside the translated drawer. -->
+    <NavbarMenuButton
+      aria-label="Close navigation"
+      command="hide-popover"
+      commandfor={NAVIGATION_ID}
+      state="close"
+    />
+    <div class={navDrawer}>
+      <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>
+        <a href={resolve("/")}>
+          <img
+            alt="Doller Holla company logo"
+            class={css({ marginInline: "auto", zIndex: 0 })}
+            src={asset("images/logo.svg")}
+          />
+        </a>
+      </div>
+      <ul
+        class={cx(
+          "group",
+          css({
+            fontSize: { base: "xl", "@/xs": "2xl" },
+            fontWeight: { base: "medium", "@/xs": "semibold" },
+            listStyle: "none",
+          })
+        )}
+        style:--active-nav-left={`url(${asset("images/active-nav--left.svg")})`}
+        style:--active-nav-right={`url(${asset("images/active-nav--right.svg")})`}
+      >
+        {#each navItems as { href, title } (title)}
+          <NavbarItem {href} isActive={isActive(href, path)} {title} />
+        {/each}
+        <li class={navItemLiClass}>
+          <form
+            {...logout.enhance(async (form) => {
+              if (!(await form.submit())) {
+                toast.error("Logout failed");
+              }
+            })}
+            data-sveltekit-replacestate
           >
-            Logout
-          </button>
-        </form>
-      </li>
-    </ul>
+            <button
+              class={navItemControlClass}
+              disabled={logout.pending > 0}
+              type="submit"
+            >
+              Logout
+            </button>
+          </form>
+        </li>
+      </ul>
+    </div>
   </nav>
 </header>

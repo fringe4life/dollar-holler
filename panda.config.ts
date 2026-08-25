@@ -7,6 +7,7 @@ export default defineConfig({
     extend: {
       groupDataExpanded: ".group[data-expanded='true'] &",
       groupHasToastHover: ".group:has([popover='manual']:hover) &",
+      hoverNone: "@media (hover: none)",
       notSupportsLinear:
         "@supports not (animation-timing-function: linear(0, 1))",
       notSupportsScroll: "@supports not (animation-timeline: scroll())",
@@ -17,6 +18,7 @@ export default defineConfig({
       supportsBaseSelect: "@supports (appearance: base-select)",
       supportsLinear: "@supports (animation-timing-function: linear(0, 1))",
       supportsScroll: "@supports (animation-timeline: scroll())",
+      supportsViewTimeline: "@supports (animation-timeline: view())",
     },
   },
   // Files to exclude
@@ -49,6 +51,18 @@ export default defineConfig({
     },
     svg: {
       fill: "currentColor",
+    },
+  },
+  globalVars: {
+    "--rotate-distance": {
+      inherits: false,
+      initialValue: "0deg",
+      syntax: "<angle>",
+    },
+    "--slide-distance": {
+      inherits: false,
+      initialValue: "0px",
+      syntax: "<length>",
     },
   },
   // Where to look for your css declarations
@@ -115,6 +129,28 @@ export default defineConfig({
     containerSizes: { xs: "20ch" },
     extend: {
       keyframes: {
+        "arrow-nudge-backward": {
+          "0%": {
+            translate: "0 0",
+          },
+          "50%": {
+            translate: "-0.25rem 0",
+          },
+          "100%": {
+            translate: "0 0",
+          },
+        },
+        "arrow-nudge-forward": {
+          "0%": {
+            translate: "0 0",
+          },
+          "50%": {
+            translate: "0.25rem 0",
+          },
+          "100%": {
+            translate: "0 0",
+          },
+        },
         "fade-in": {
           from: {
             opacity: "0",
@@ -138,6 +174,17 @@ export default defineConfig({
             boxShadow: "0 1px 3px oklch(from var(--colors-black) l c h / 10%)",
           },
         },
+        "rotate-reveal": {
+          "0%": {
+            rotate: "var(--rotate-distance)",
+          },
+          "50%": {
+            rotate: "0deg",
+          },
+          "100%": {
+            rotate: "calc(var(--rotate-distance) * -1)",
+          },
+        },
         "slide-down": {
           to: {
             translate: "0 var(--slide-distance)",
@@ -151,6 +198,11 @@ export default defineConfig({
         "slide-out": {
           to: {
             translate: "var(--slide-distance) 0",
+          },
+        },
+        "slide-out-reverse": {
+          to: {
+            translate: "calc(var(--slide-distance) * -1) 0",
           },
         },
         "slide-up": {

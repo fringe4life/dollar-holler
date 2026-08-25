@@ -532,7 +532,7 @@
     class={css({
       backgroundColor: "daisyBush",
       position: "relative",
-      overflow: "hidden",
+      overflow: "clip",
       paddingBlock: 24,
     })}
   >
@@ -670,27 +670,38 @@
         to streamline their invoicing.
       </p>
       <div class={vstack({ gap: 4 })}>
-        <Button
-          class={css({ fontSize: "lg", minInlineSize: 56 })}
-          href={resolve("signup")}
-          size="lg"
-          variant="auth"
-        >
-          Create Free Account
-        </Button>
-        <a
-          class={css({
-            color: { base: "white/60", _hover: "white/90" },
-            fontSize: "sm",
-            textDecoration: "underline",
-            textUnderlineOffset: 4,
-            transitionProperty: "colors",
-            transitionDuration: "normal",
-          })}
-          href={resolve("login")}
-        >
-          Already have an account? Log in
-        </a>
+        {#if data?.user}
+          <Button
+            class={css({ fontSize: "lg", minInlineSize: 56 })}
+            href={resolve("invoices")}
+            size="lg"
+            variant="auth"
+          >
+            Go to Dashboard
+          </Button>
+        {:else}
+          <Button
+            class={css({ fontSize: "lg", minInlineSize: 56 })}
+            href={resolve("signup")}
+            size="lg"
+            variant="auth"
+          >
+            Create Free Account
+          </Button>
+          <a
+            class={css({
+              color: { base: "white/60", _hover: "white/90" },
+              fontSize: "sm",
+              textDecoration: "underline",
+              textUnderlineOffset: 4,
+              transitionProperty: "colors",
+              transitionDuration: "normal",
+            })}
+            href={resolve("login")}
+          >
+            Already have an account? Log in
+          </a>
+        {/if}
       </div>
     </div>
   </section>
@@ -722,39 +733,42 @@
         fontSize: "sm",
       })}
     >
-      <a
-        class={css({
-          color: { base: "pastelPurple", _hover: "white" },
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-        })}
-        href={resolve("invoices")}>Invoices</a
-      >
-      <a
-        class={css({
-          color: { base: "pastelPurple", _hover: "white" },
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-        })}
-        href={resolve("clients")}>Clients</a
-      >
-      <a
-        class={css({
-          color: { base: "pastelPurple", _hover: "white" },
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-        })}
-        href={resolve("login")}>Login</a
-      >
-      <a
-        class={css({
-          color: { base: "goldenFizz", _hover: "white" },
-          fontWeight: "semibold",
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-        })}
-        href={resolve("signup")}>Sign Up</a
-      >
+      {#if data?.user}
+        <a
+          class={css({
+            color: { base: "pastelPurple", _hover: "white" },
+            transitionProperty: "colors",
+            transitionDuration: "normal",
+          })}
+          href={resolve("invoices")}>Invoices</a
+        >
+        <a
+          class={css({
+            color: { base: "pastelPurple", _hover: "white" },
+            transitionProperty: "colors",
+            transitionDuration: "normal",
+          })}
+          href={resolve("clients")}>Clients</a
+        >
+      {:else}
+        <a
+          class={css({
+            color: { base: "pastelPurple", _hover: "white" },
+            transitionProperty: "colors",
+            transitionDuration: "normal",
+          })}
+          href={resolve("login")}>Login</a
+        >
+        <a
+          class={css({
+            color: { base: "goldenFizz", _hover: "white" },
+            fontWeight: "semibold",
+            transitionProperty: "colors",
+            transitionDuration: "normal",
+          })}
+          href={resolve("signup")}>Sign Up</a
+        >
+      {/if}
     </nav>
   </div>
 </footer>

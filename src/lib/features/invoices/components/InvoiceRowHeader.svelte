@@ -9,20 +9,20 @@
 </script>
 
 <TableHeader className={invoiceTable} {emptyState} headers={tableHeaders}>
-  {#snippet headerSnippet(_title, _emptyState)}
+  {#snippet headerSnippet(title, emptyState)}
     <h3
       class={css({
         fontSize: "xl",
         lineHeight: "snug",
         fontWeight: "bold",
-        textAlign: _title === "Amount" ? "right" : undefined,
-        overflow: _title === "Client" ? "hidden" : undefined,
-        textOverflow: _title === "Client" ? "ellipsis" : undefined,
-        whiteSpace: _title === "Client" ? "nowrap" : undefined,
-        color: _emptyState ? "pastelPurple" : "daisyBush",
+        textAlign: title === "Amount" ? "right" : undefined,
+        overflow: title === "Client" ? "hidden" : undefined,
+        textOverflow: title === "Client" ? "ellipsis" : undefined,
+        whiteSpace: title === "Client" ? "nowrap" : undefined,
+        color: emptyState ? "pastelPurple" : "daisyBush",
       })}
     >
-      {_title}
+      {title}
     </h3>
   {/snippet}
 </TableHeader>

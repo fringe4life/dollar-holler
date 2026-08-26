@@ -1,10 +1,7 @@
 import { describe, expect, it } from "bun:test";
 import { parse } from "valibot";
 import { cursorSchema } from "#lib/schemas/cursor-id.ts";
-import {
-  planLineItemSync,
-  shouldDeleteRemovedLineItems,
-} from "./line-item-sync";
+import { planLineItemSync } from "./line-item-sync";
 
 const idA = parse(cursorSchema, "018f0000-0000-7000-8000-000000000001");
 const idB = parse(cursorSchema, "018f0000-0000-7000-8000-000000000002");
@@ -21,33 +18,28 @@ const row = (
 });
 
 describe("planLineItemSync", () => {
-  it("skips upsert when owned lines unchanged", () => {
-    expect(
-      planLineItemSync([row(idA), row(idB)], [row(idA), row(idB)])
-    ).toEqual({
+  it("upserts every owned id so SQL compares live row values", () => {
+    expect(planLineItemSync([idA, idB], [row(idA), row(idB)])).toEqual({
       keepIds: [idA, idB],
       toInsert: [],
-      toUpsert: [],
+      toUpsert: [row(idA), row(idB)],
     });
   });
 
-  it("upserts only owned rows whose fields changed", () => {
+  it("upserts owned rows including those whose fields match a stale snapshot", () => {
     expect(
-      planLineItemSync(
-        [row(idA), row(idB)],
-        [row(idA, { amount: 20 }), row(idB)]
-      )
+      planLineItemSync([idA, idB], [row(idA, { amount: 20 }), row(idB)])
     ).toEqual({
       keepIds: [idA, idB],
       toInsert: [],
-      toUpsert: [row(idA, { amount: 20 })],
+      toUpsert: [row(idA, { amount: 20 }), row(idB)],
     });
   });
 
   it("inserts rows with missing or unowned ids and strips those ids", () => {
     expect(
       planLineItemSync(
-        [row(idA)],
+        [idA],
         [
           row(idA),
           { amount: 5, description: "New", quantity: 2 },
@@ -60,7 +52,7 @@ describe("planLineItemSync", () => {
         { amount: 5, description: "New", quantity: 2 },
         { amount: 10, description: "Other", quantity: 1 },
       ],
-      toUpsert: [],
+      toUpsert: [row(idA)],
     });
   });
 
@@ -72,23 +64,30 @@ describe("planLineItemSync", () => {
     });
   });
 
-  it("drops existing ids missing from incoming (delete via keepIds)", () => {
-    const plan = planLineItemSync([row(idA), row(idB)], [row(idA)]);
-    expect(plan.keepIds).toEqual([idA]);
+  it("keeps last duplicate owned id instead of dropping an earlier update", () => {
     expect(
-      shouldDeleteRemovedLineItems([row(idA), row(idB)], plan.keepIds)
-    ).toBe(true);
+      planLineItemSync(
+        [idA],
+        [row(idA, { amount: 20 }), row(idA, { amount: 10 })]
+      )
+    ).toEqual({
+      keepIds: [idA],
+      toInsert: [],
+      toUpsert: [row(idA, { amount: 10 })],
+    });
+  });
+
+  it("omits existing ids missing from incoming (delete via keepIds)", () => {
+    const plan = planLineItemSync([idA, idB], [row(idA)]);
+    expect(plan.keepIds).toEqual([idA]);
+    expect(plan.toUpsert).toEqual([row(idA)]);
   });
 
   it("empty incoming keeps nothing so all existing delete", () => {
-    const plan = planLineItemSync([row(idA)], []);
-    expect(plan).toEqual({ keepIds: [], toInsert: [], toUpsert: [] });
-    expect(shouldDeleteRemovedLineItems([row(idA)], plan.keepIds)).toBe(true);
-  });
-});
-
-describe("shouldDeleteRemovedLineItems", () => {
-  it("is false when every existing id is kept", () => {
-    expect(shouldDeleteRemovedLineItems([row(idA)], [idA])).toBe(false);
+    expect(planLineItemSync([idA], [])).toEqual({
+      keepIds: [],
+      toInsert: [],
+      toUpsert: [],
+    });
   });
 });

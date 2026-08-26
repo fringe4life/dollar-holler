@@ -62,4 +62,28 @@ describe("invoiceFormSchema", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects duplicate persisted line item ids", () => {
+    const result = safeParse(invoiceFormSchema, {
+      ...baseFields,
+      clientId: CLIENT_ID,
+      lineItems: [
+        { amount: 10, description: "Dev", id: CLIENT_ID, quantity: 1 },
+        { amount: 20, description: "QA", id: CLIENT_ID, quantity: 1 },
+      ],
+    });
+    expect(result.success).toBe(false);
+  });
+
+  it("allows multiple new lines without ids", () => {
+    const result = safeParse(invoiceFormSchema, {
+      ...baseFields,
+      clientId: CLIENT_ID,
+      lineItems: [
+        { amount: 10, description: "Dev", quantity: 1 },
+        { amount: 20, description: "QA", quantity: 1 },
+      ],
+    });
+    expect(result.success).toBe(true);
+  });
 });

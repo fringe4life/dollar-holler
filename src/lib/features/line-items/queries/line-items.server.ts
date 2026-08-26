@@ -6,10 +6,7 @@ import { db } from "#lib/server/db/index.ts";
 import { lineItems as lineItemsTable } from "#lib/server/db/schema.ts";
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type { LineItemEditRow, LineItemInsert } from "../types";
-import {
-  planLineItemSync,
-  shouldDeleteRemovedLineItems,
-} from "../utils/line-item-sync";
+import { planLineItemSync } from "../utils/line-item-sync";
 
 const assertInvoiceOwned = async (userId: string, invoiceId: CursorId) => {
   if (!(await verifyInvoice(userId, invoiceId))) {
@@ -70,24 +67,32 @@ export const insertLineItems = async (
   return db.insert(lineItemsTable).values(items).returning();
 };
 
-/** Keep owned rows, upsert changed, insert new, delete missing. */
+/** Keep owned rows, upsert payload, insert new, delete missing — one batch. */
 export const syncLineItems = async (
   userId: string,
   invoiceId: CursorId,
   lineItems: LineItemInsert[]
 ) => {
-  const existing = await fetchLineItemsForEdit(userId, invoiceId);
-  const { keepIds, toInsert, toUpsert } = planLineItemSync(existing, lineItems);
+  await assertInvoiceOwned(userId, invoiceId);
+  const existing = await db.query.lineItems.findMany({
+    columns: { id: true },
+    where: {
+      invoiceId: { eq: invoiceId },
+      userId: { eq: userId },
+    },
+  });
+  const { keepIds, toInsert, toUpsert } = planLineItemSync(
+    existing.map((row) => row.id),
+    lineItems
+  );
   const owned = lineItemsOwnedByInvoice(userId, invoiceId);
-  const statements: BatchItem<"sqlite">[] = [];
-
-  if (shouldDeleteRemovedLineItems(existing, keepIds)) {
-    const deleteWhere =
-      keepIds.length === 0
-        ? owned
-        : and(owned, notInArray(lineItemsTable.id, keepIds));
-    statements.push(db.delete(lineItemsTable).where(deleteWhere));
-  }
+  const deleteWhere =
+    keepIds.length === 0
+      ? owned
+      : and(owned, notInArray(lineItemsTable.id, keepIds));
+  const statements: BatchItem<"sqlite">[] = [
+    db.delete(lineItemsTable).where(deleteWhere),
+  ];
 
   if (toUpsert.length > 0) {
     statements.push(

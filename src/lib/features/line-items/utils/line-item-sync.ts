@@ -1,5 +1,5 @@
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
-import type { LineItemEditRow, LineItemInsert } from "../types";
+import type { LineItemInsert } from "../types";
 
 export type LineItemSyncPlan = {
   keepIds: CursorId[];
@@ -22,28 +22,36 @@ const DEFAULT_LINE_QUANTITY = 1;
 const resolvedQuantity = (quantity: LineItemInsert["quantity"]): number =>
   quantity ?? DEFAULT_LINE_QUANTITY;
 
-const lineFieldsEqual = (
-  existing: LineItemEditRow,
-  incoming: LineItemInsert
-): boolean =>
-  existing.amount === incoming.amount &&
-  existing.description === incoming.description &&
-  existing.quantity === resolvedQuantity(incoming.quantity);
+const toUpsertRow = (
+  id: CursorId,
+  item: LineItemInsert
+): LineItemSyncPlan["toUpsert"][number] => ({
+  amount: item.amount,
+  description: item.description,
+  id,
+  quantity: resolvedQuantity(item.quantity),
+});
 
-/** Split incoming lines: keep owned ids, upsert changed, insert unknown/new. */
+/**
+ * Classify incoming lines vs currently owned ids.
+ * Field equality is left to SQL `ON CONFLICT … WHERE` so the save payload
+ * always writes; a pre-read snapshot cannot skip mutations.
+ * Duplicate owned ids: last occurrence wins.
+ */
 export const planLineItemSync = (
-  existing: LineItemEditRow[],
+  existingIds: Iterable<CursorId>,
   incoming: LineItemInsert[]
 ): LineItemSyncPlan => {
-  const existingById = new Map(existing.map((row) => [row.id, row]));
+  const ownedIds = new Set(existingIds);
   const keepIds: CursorId[] = [];
   const seenKeep = new Set<CursorId>();
   const toInsert: LineItemSyncPlan["toInsert"] = [];
   const upsertById = new Map<CursorId, LineItemSyncPlan["toUpsert"][number]>();
 
   for (const item of incoming) {
-    const owned = item.id === undefined ? undefined : existingById.get(item.id);
-    if (!owned) {
+    const ownedId =
+      item.id !== undefined && ownedIds.has(item.id) ? item.id : undefined;
+    if (ownedId === undefined) {
       toInsert.push({
         amount: item.amount,
         description: item.description,
@@ -51,29 +59,12 @@ export const planLineItemSync = (
       });
       continue;
     }
-    if (!seenKeep.has(owned.id)) {
-      seenKeep.add(owned.id);
-      keepIds.push(owned.id);
+    if (!seenKeep.has(ownedId)) {
+      seenKeep.add(ownedId);
+      keepIds.push(ownedId);
     }
-    if (lineFieldsEqual(owned, item)) {
-      upsertById.delete(owned.id);
-      continue;
-    }
-    upsertById.set(owned.id, {
-      amount: item.amount,
-      description: item.description,
-      id: owned.id,
-      quantity: resolvedQuantity(item.quantity),
-    });
+    upsertById.set(ownedId, toUpsertRow(ownedId, item));
   }
 
   return { keepIds, toInsert, toUpsert: [...upsertById.values()] };
-};
-
-export const shouldDeleteRemovedLineItems = (
-  existing: LineItemEditRow[],
-  keepIds: CursorId[]
-): boolean => {
-  const keep = new Set(keepIds);
-  return existing.some((row) => !keep.has(row.id));
 };

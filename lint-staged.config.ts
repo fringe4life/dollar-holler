@@ -1,5 +1,8 @@
 import type { Configuration } from "lint-staged";
 
+/** Dummy literals in `.env.test` — no Bitwarden fetch (same as CI `VARLOCK_ENV=test`). */
+process.env.VARLOCK_ENV = "test";
+
 const config: Configuration = {
   "*.{js,ts,svelte}": [
     "eslint --fix --no-warn-ignored",

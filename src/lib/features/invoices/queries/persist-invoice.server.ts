@@ -8,7 +8,7 @@ import {
 import type { InvoiceFormData } from "#features/invoices/schemas.ts";
 import {
   insertLineItems,
-  replaceLineItems,
+  syncLineItems,
 } from "#features/line-items/queries/line-items.server.ts";
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import {
@@ -60,7 +60,7 @@ export const persistInvoice = async (
 
   if (data.id) {
     await patchInvoice(userId, data.id, fields);
-    await replaceLineItems(userId, data.id, lineItems);
+    await syncLineItems(userId, data.id, lineItems);
     return { id: data.id };
   }
 

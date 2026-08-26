@@ -24,6 +24,22 @@ export const invoiceFormLineItemSchema = object({
   quantity: number(),
 });
 
+type InvoiceFormLineItem = InferOutput<typeof invoiceFormLineItemSchema>;
+
+const uniquePersistedLineItemIds = check((items: InvoiceFormLineItem[]) => {
+  const seen = new Set<string>();
+  for (const item of items) {
+    if (item.id === undefined) {
+      continue;
+    }
+    if (seen.has(item.id)) {
+      return false;
+    }
+    seen.add(item.id);
+  }
+  return true;
+}, "Duplicate line item");
+
 const invoiceFormObjectSchema = object({
   city: optional(string()),
   clientId: optional(cursorSchema),
@@ -34,7 +50,10 @@ const invoiceFormObjectSchema = object({
   invoiceNumber: pipe(string(), minLength(1, "Invoice number required")),
   isNewClient: optional(boolean(), false),
   issueDate: pipe(string(), isoDate()),
-  lineItems: optional(array(invoiceFormLineItemSchema), []),
+  lineItems: optional(
+    pipe(array(invoiceFormLineItemSchema), uniquePersistedLineItemIds),
+    []
+  ),
   name: optional(string()),
   notes: optional(string()),
   state: optional(string()),

@@ -4,15 +4,17 @@
  * - browsers skip `highlightAll` (would fight `{@html}` in the overlay)
  * - Cloudflare Workers skip the Worker `message` highlighter
  */
-const host = globalThis as typeof globalThis & {
-  Prism?: {
-    disableWorkerMessageHandler?: boolean;
-    manual?: boolean;
-  };
-};
+const isObjectRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
 
-host.Prism = {
-  ...host.Prism,
+const existingPrism: unknown = Reflect.get(globalThis, "Prism");
+let previousFlags: Record<string, unknown> = {};
+if (isObjectRecord(existingPrism)) {
+  previousFlags = existingPrism;
+}
+
+Reflect.set(globalThis, "Prism", {
+  ...previousFlags,
   disableWorkerMessageHandler: true,
   manual: true,
-};
+});

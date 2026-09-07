@@ -29,13 +29,18 @@ const sourceForOverlay = (source: string): string =>
 const isToken = (node: string | PrismToken): node is PrismToken =>
   typeof node === "object" && node !== null && typeof node.type === "string";
 
+const normalizeAliases = (alias: PrismToken["alias"]): string[] => {
+  if (alias == null) {
+    return [];
+  }
+  if (Array.isArray(alias)) {
+    return alias;
+  }
+  return [alias];
+};
+
 const tokenClassNames = (token: PrismToken): string => {
-  const aliases =
-    token.alias == null
-      ? []
-      : Array.isArray(token.alias)
-        ? token.alias
-        : [token.alias];
+  const aliases = normalizeAliases(token.alias);
   const parts = ["token", token.type, ...aliases].filter((part) =>
     SAFE_TOKEN_CLASS.test(part)
   );

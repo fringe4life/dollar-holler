@@ -21,6 +21,7 @@
     overflow: "auto",
     overflowWrap: "break-word",
     p: 4,
+    scrollbarGutter: "stable",
     tabSize: 2,
     whiteSpace: "pre-wrap",
   } as const;
@@ -34,7 +35,13 @@
   const overlayClass = css({
     ...overlayFace,
     "&::-webkit-scrollbar": {
-      display: "none",
+      backgroundColor: "transparent",
+    },
+    "&::-webkit-scrollbar-thumb": {
+      backgroundColor: "transparent",
+    },
+    "&::-webkit-scrollbar-track": {
+      backgroundColor: "transparent",
     },
     "& .token.blockquote": { color: "daisyBush" },
     "& .token.bold": { color: "daisyBush" },
@@ -57,7 +64,7 @@
     margin: 0,
     minBlockSize: 0,
     pointerEvents: "none",
-    scrollbarWidth: "none",
+    scrollbarColor: "transparent transparent",
     zIndex: 0,
   });
 

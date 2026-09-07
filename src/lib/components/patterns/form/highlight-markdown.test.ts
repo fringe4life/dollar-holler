@@ -13,6 +13,15 @@ describe("highlightMarkdown", () => {
     expect(highlightMarkdown("**strong**")).toContain('class="token bold"');
   });
 
+  it("includes Prism token aliases in overlay classes", () => {
+    expect(highlightMarkdown("# heading")).toContain(
+      'class="token title important"'
+    );
+    expect(highlightMarkdown("`inline`")).toContain(
+      'class="token code-snippet code keyword"'
+    );
+  });
+
   it("html-encodes user text so overlay {@html} cannot inject tags", () => {
     const html = highlightMarkdown('<script>alert("x")</script> & more');
     expect(html).not.toMatch(/<script/i);

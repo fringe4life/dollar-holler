@@ -1,4 +1,5 @@
 [install]
+linker = "isolated"
 minimumReleaseAge=259200
 minimumReleaseAgeExcludes = [
   "@sveltejs/kit",

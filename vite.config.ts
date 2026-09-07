@@ -20,7 +20,12 @@ export default defineConfig({
     rolldownOptions: {
       // Enable Rolldown build-analysis metadata for Vite DevTools panels
       devtools: {},
-      output: { minify: { compress: { dropConsole: true } } },
+      output: {
+        minify: {
+          compress: { dropConsole: true },
+          mangle: false,
+        },
+      },
     },
   },
   plugins: [

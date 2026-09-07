@@ -1,0 +1,33 @@
+{
+  "mcpServers": {
+    "eslint": {
+      "command": "node",
+      "args": ["${workspaceFolder}/node_modules/.bin/mcp"],
+      "cwd": "${workspaceFolder}"
+    },
+    "svelte-devtools": {
+      "url": "http://localhost:5173/__svelte-devtools/mcp",
+      "headers": {
+        "x-svelte-devtools-token": ""
+      }
+    },
+    "fallow": {
+      "command": "node",
+      "args": ["${workspaceFolder}/node_modules/.bin/fallow-mcp"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "FALLOW_BIN": "${workspaceFolder}/node_modules/.bin/fallow",
+        "FALLOW_AGENT_SOURCE": "cursor"
+      }
+    },
+    "panda": {
+      "command": "node",
+      "args": [
+        "${workspaceFolder}/node_modules/.bin/panda-mcp",
+        "--cwd",
+        "${workspaceFolder}"
+      ],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}

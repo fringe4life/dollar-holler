@@ -5,6 +5,20 @@
       {
         "command": "bun run fix"
       }
+    ],
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/fallow-gate.sh --event beforeShellExecution",
+        "matcher": "\\bgit\\b",
+        "timeout": 180
+      }
+    ],
+    "stop": [
+      {
+        "command": ".cursor/hooks/fallow-gate.sh --event stop",
+        "timeout": 180,
+        "loop_limit": 3
+      }
     ]
   }
 }

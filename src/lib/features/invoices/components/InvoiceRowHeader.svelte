@@ -2,27 +2,29 @@
   import { css } from "#styled-system/css/index.js";
   import type { HeaderProps } from "#lib/components/primitives/TableHeader.svelte";
   import TableHeader from "#lib/components/primitives/TableHeader.svelte";
+  import TableHeaderItem from "#lib/components/primitives/TableHeaderItem.svelte";
   import { invoiceTable } from "../styles";
 
   let { emptyState = false }: HeaderProps = $props();
-  let tableHeaders = ["Status", "Due Date", "ID", "Client", "Amount"] as const;
+
+  const tableHeaders = [
+    { title: "Status" },
+    { title: "Due Date" },
+    { title: "ID" },
+    {
+      class: css({
+        overflow: "hidden",
+        textOverflow: "ellipsis",
+        whiteSpace: "nowrap",
+      }),
+      title: "Client",
+    },
+    { class: css({ textAlign: "right" }), title: "Amount" },
+  ];
 </script>
 
-<TableHeader className={invoiceTable} {emptyState} headers={tableHeaders}>
-  {#snippet headerSnippet(title, emptyState)}
-    <h3
-      class={css({
-        fontSize: "xl",
-        lineHeight: "snug",
-        fontWeight: "bold",
-        textAlign: title === "Amount" ? "right" : undefined,
-        overflow: title === "Client" ? "hidden" : undefined,
-        textOverflow: title === "Client" ? "ellipsis" : undefined,
-        whiteSpace: title === "Client" ? "nowrap" : undefined,
-        color: emptyState ? "pastelPurple" : "daisyBush",
-      })}
-    >
-      {title}
-    </h3>
+<TableHeader className={invoiceTable} headers={tableHeaders}>
+  {#snippet headerSnippet({ title, class: columnClass })}
+    <TableHeaderItem class={columnClass} {emptyState}>{title}</TableHeaderItem>
   {/snippet}
 </TableHeader>

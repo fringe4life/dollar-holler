@@ -6,38 +6,60 @@ import { getRequestEvent } from "$app/server";
 import { db } from "#lib/server/db/index.ts";
 import { schemaTables } from "#lib/server/db/schema.ts";
 import { createId } from "./server/utils/create-id";
-export const auth = betterAuth({
-  advanced: {
-    database: {
-      generateId: createId,
-      joins: true,
+
+const createAuth = () =>
+  betterAuth({
+    advanced: {
+      database: {
+        generateId: createId,
+        joins: true,
+      },
     },
-  },
-  allowedHosts: [
-    "localhost:*",
-    "*.workers.dev",
-    "*.pages.dev",
-    "dolla-holla.org",
-  ],
-  appName: "Dollar Holler",
-  basePath: "/api/auth",
-  baseURL: ENV.PUBLIC_BASE_URL,
-  database: drizzleAdapter(db, {
-    provider: "sqlite",
-    schema: schemaTables,
-  }),
-  emailAndPassword: {
-    enabled: true,
-    requireEmailVerification: false,
-  },
-  // sveltekit must be the last plugin
-  plugins: [sveltekitCookies(getRequestEvent)],
-  secret: ENV.BETTER_AUTH_SECRET,
-  session: {
-    cookieCache: {
+    allowedHosts: [
+      "localhost:*",
+      "*.workers.dev",
+      "*.pages.dev",
+      "dolla-holla.org",
+    ],
+    appName: "Dollar Holler",
+    basePath: "/api/auth",
+    baseURL: ENV.PUBLIC_BASE_URL,
+    database: drizzleAdapter(db, {
+      provider: "sqlite",
+      schema: schemaTables,
+    }),
+    emailAndPassword: {
       enabled: true,
-      maxAge: 5 * 60,
+      requireEmailVerification: false,
     },
+    // sveltekit must be the last plugin
+    plugins: [sveltekitCookies(getRequestEvent)],
+    secret: ENV.BETTER_AUTH_SECRET,
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+      },
+    },
+    trustedOrigins: [ENV.PUBLIC_BASE_URL],
+  });
+
+type Auth = ReturnType<typeof createAuth>;
+
+let instance: Auth | undefined;
+
+const getAuth = (): Auth => {
+  instance ??= createAuth();
+  return instance;
+};
+
+/** Isolate-cached. `drizzleAdapter` reads `db._` at construct — must not run at import. */
+export const auth: Auth = new Proxy({} as Auth, {
+  get(_target, property, receiver) {
+    const resolved = getAuth();
+    const value = Reflect.get(resolved, property, receiver);
+    return typeof value === "function"
+      ? (value as (...args: never[]) => unknown).bind(resolved)
+      : value;
   },
-  trustedOrigins: [ENV.PUBLIC_BASE_URL],
 });

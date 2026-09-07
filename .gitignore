@@ -9,9 +9,9 @@ node_modules
 /.svelte-kit
 /build
 .cursor/*.log
-.cursor/mcp.json
 .fallow
 .kombai
+.qodo
 
 # OS
 .DS_Store

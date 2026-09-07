@@ -16,9 +16,9 @@
     NewLineItemWithId,
   } from "#features/line-items/types.ts";
   import FormField from "#lib/components/patterns/form/FormField.svelte";
+  import HighlightedTextarea from "#lib/components/patterns/form/HighlightedTextarea.svelte";
   import States from "#lib/components/patterns/States.svelte";
   import Input from "#lib/components/primitives/input/Input.svelte";
-  import Textarea from "#lib/components/primitives/textarea/Textarea.svelte";
   import type { BitsButton } from "#lib/types.ts";
   import { today } from "#lib/utils/dateHelpers.ts";
   import { zipInputAttrs } from "#lib/utils/zip.ts";
@@ -263,11 +263,11 @@
     label="Notes"
   >
     {#snippet children({ errorId })}
-      <Textarea
+      <HighlightedTextarea
         id="notes"
         aria-describedby={errorId}
         {...saveInvoice.fields.notes.as("text", invoice.notes ?? "")}
-      ></Textarea>
+      />
     {/snippet}
     {#snippet hint()}
       <span class={css({ fontWeight: "normal" })}
@@ -283,11 +283,11 @@
     label="Terms"
   >
     {#snippet children({ errorId })}
-      <Textarea
+      <HighlightedTextarea
         id="terms"
         aria-describedby={errorId}
         {...saveInvoice.fields.terms.as("text", invoice.terms ?? "")}
-      ></Textarea>
+      />
     {/snippet}
     {#snippet hint()}
       <p class={css({ fontSize: "xs", color: "gray.400" })}>

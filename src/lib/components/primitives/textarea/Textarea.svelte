@@ -22,6 +22,7 @@
     inlineSize: "full",
     p: 4,
     resize: "none",
+    scrollbarGutter: "stable",
     transitionDuration: "normal",
     transitionProperty: "colors",
   });

@@ -5,7 +5,9 @@
     "@sveltejs/mcp",
     "@fontsource-variable/source-sans-3",
     "svelte-eslint-parser",
-    "@typescript/native"
+    "@typescript/native",
+    "@pandacss/mcp",
+    "@eslint/mcp"
   ],
   "rules": {
     "boundary-violation": "warn",
@@ -91,8 +93,8 @@
     ]
   },
   "health": {
-    "maxCyclomatic": 25,
-    "maxCognitive": 25,
+    "maxCyclomatic": 15,
+    "maxCognitive": 15,
     "maxCrap": 75,
     "suggestInlineSuppression": true,
     "ignore": ["src/lib/utils/error-message.ts"]

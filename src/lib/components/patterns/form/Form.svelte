@@ -4,6 +4,12 @@
   import Alert from "#lib/components/patterns/Alert.svelte";
   import { formIssueKey } from "#lib/components/patterns/form/form-issue.ts";
 
+  /** `.for(id)` returns `Omit<RemoteForm, "for">` (kit#14802 workaround). */
+  type RemoteFormInstance<I extends RemoteFormInput, O = unknown> = Omit<
+    RemoteForm<I, O>,
+    "for"
+  >;
+
   interface SubmitSlot {
     pending: boolean;
   }
@@ -13,7 +19,7 @@
     children: Snippet;
     footer?: Snippet;
     onSuccess?: () => void;
-    remote: RemoteForm<Input, Output>;
+    remote: RemoteFormInstance<Input, Output>;
     submit: Snippet<[SubmitSlot]>;
   }
 

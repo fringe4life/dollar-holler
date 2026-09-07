@@ -2,13 +2,17 @@
   import { css } from "#styled-system/css/index.js";
   import { between } from "#styled-system/patterns/index.js";
   import { resolve } from "$app/paths";
-  import { login } from "#features/auth/auth.remote.ts";
+  import { login as loginForm } from "#features/auth/auth.remote.ts";
   import { authHeading } from "#features/auth/styles.ts";
   import Form from "#lib/components/patterns/form/Form.svelte";
   import FormField from "#lib/components/patterns/form/FormField.svelte";
   import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
   import Input from "#lib/components/primitives/input/Input.svelte";
   import Label from "#lib/components/primitives/label/Label.svelte";
+
+  // Per-mount instance. Drop `.for()` when sveltejs/kit#14802 is fixed.
+  const uid = $props.id();
+  const login = loginForm.for(uid);
 </script>
 
 <svelte:head>

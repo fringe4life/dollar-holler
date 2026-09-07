@@ -16,6 +16,7 @@ export default defineConfig(
       "dist/**",
       "node_modules/**",
       "styled-system/**",
+      ".cursor/hooks/**",
       "**/*.css",
       "src/env-varlock.d.ts",
       "docs/**",

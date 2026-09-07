@@ -2,13 +2,16 @@
   import { css } from "#styled-system/css/index.js";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { resetPassword } from "#features/auth/auth.remote.ts";
+  import { resetPassword as resetPasswordForm } from "#features/auth/auth.remote.ts";
   import { authHeading } from "#features/auth/styles.ts";
   import Form from "#lib/components/patterns/form/Form.svelte";
   import FormField from "#lib/components/patterns/form/FormField.svelte";
   import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
   import Input from "#lib/components/primitives/input/Input.svelte";
 
+  // Per-mount instance. Drop `.for()` when sveltejs/kit#14802 is fixed.
+  const uid = $props.id();
+  const resetPassword = resetPasswordForm.for(uid);
   const token = $derived(page.url.searchParams.get("token") ?? "");
 </script>
 

@@ -182,7 +182,7 @@ This repo's `.cursor/hooks.json`:
 | `beforeShellExecution` | `.cursor/hooks/fallow-gate.sh --event beforeShellExecution` (matcher `\bgit\b`, timeout 180s) | Deny `git commit` / `git push` when audit `verdict` is `fail` |
 | `stop` | `.cursor/hooks/fallow-gate.sh --event stop` (timeout 180s, `loop_limit` 3) | If agent completes with a failing changeset, auto-submit a follow-up with the JSON findings |
 
-Shared implementation: `.cursor/hooks/fallow-gate.ts` (Bun). Wrapper `.cursor/hooks/fallow-gate.sh` sets `VARLOCK_ENV=test` **before** Bun starts so Varlock preload does not hit Bitwarden.
+Shared implementation: `.cursor/hooks/fallow-gate.ts` (Bun). Wrapper `.cursor/hooks/fallow-gate.sh` sets `VARLOCK_ENV=test` unconditionally **before** Bun starts so Varlock preload does not hit Bitwarden.
 
 Gate semantics match Claude's official script:
 
@@ -191,7 +191,7 @@ Gate semantics match Claude's official script:
 - `pass` / `warn` allowed; `verdict: "fail"` blocked
 - Runtime errors (`error: true`, exit 2, invalid JSON, missing binary) **fail open**
 - Version floor `FALLOW_GATE_MIN_VERSION` (default `2.85.0`) **fail closed** — older binaries reject `--gate-marker`
-- Git detection tokenizes so `git -c k=v commit` and `/usr/bin/git push` still gate; `git log commit-message.txt` does not
+- Git detection uses command position (after `KEY=value` and wrappers like `sudo`/`env`) so `git -c k=v commit` and `/usr/bin/git push` still gate; `echo git commit` and `git log commit-message.txt` do not
 - If `styled-system/` is missing, runs `bun run fallow:prepare` first (Cloud Agents clone without that folder)
 
 `stop` input is `{ status, loop_count }`. Follow-up only when `status === "completed"` and the audit fails. Cursor submits `followup_message` as the next user message. Cap is `loop_limit` 3. Do **not** run Fallow on every `afterFileEdit`.

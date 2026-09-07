@@ -2,7 +2,8 @@
  * Cursor-native Fallow gate. Claude's fallow-gate.sh is PreToolUse + jq;
  * Cursor uses beforeShellExecution (permission) and stop (followup_message).
  *
- * Fail-open on runtime errors. Deny / follow up only on audit verdict "fail".
+ * Fail-open on runtime errors. Deny / follow up only on audit verdict "fail"
+ * or version floor (fail-closed when min version is non-empty).
  * VARLOCK_ENV=test must be set by the shell wrapper (bunfig preloads varlock).
  */
 import { spawnSync } from "node:child_process";
@@ -29,6 +30,16 @@ const GIT_VALUE_OPTIONS = new Set([
   "--list-cmds",
   "--attr-source",
 ]);
+const COMMAND_WRAPPERS = new Set([
+  "sudo",
+  "command",
+  "env",
+  "nice",
+  "nohup",
+  "time",
+]);
+const ENV_ASSIGNMENT = /^[A-Za-z_][A-Za-z0-9_]*=/;
+const VERSION_HEAD = /^\d+/;
 
 type HookEvent = "beforeShellExecution" | "stop";
 
@@ -53,8 +64,21 @@ type AuditOutcome =
   | { status: "skip"; reason: string }
   | { status: "deny_version"; reason: string };
 
+const isPlainRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 const isAuditJson = (value: unknown): value is AuditJson =>
-  typeof value === "object" && value !== null;
+  isPlainRecord(value);
+
+const isShellHookInput = (value: unknown): value is ShellHookInput => {
+  if (!isPlainRecord(value)) {
+    return false;
+  }
+  return value.command === undefined || typeof value.command === "string";
+};
+
+const isStopHookInput = (value: unknown): value is StopHookInput =>
+  isPlainRecord(value);
 
 const repoRoot = process.cwd();
 const fallowBin = join(repoRoot, "node_modules/.bin/fallow");
@@ -80,41 +104,77 @@ const readStdinJson = (): unknown => {
   return JSON.parse(raw) as unknown;
 };
 
+const tokenName = (token: string): string =>
+  basename(token.replaceAll("\\", "/"));
+
 const isGitExecutable = (token: string): boolean => {
-  const name = basename(token.replaceAll("\\", "/"));
+  const name = tokenName(token);
   return name === "git" || name === "git.exe";
+};
+
+const isEnvAssignment = (token: string): boolean => ENV_ASSIGNMENT.test(token);
+
+const isCommandWrapper = (token: string): boolean =>
+  COMMAND_WRAPPERS.has(tokenName(token));
+
+const findCommandIndex = (tokens: readonly string[]): number => {
+  let index = 0;
+  while (index < tokens.length) {
+    const token = tokens[index];
+    if (token === undefined) {
+      break;
+    }
+    if (isEnvAssignment(token)) {
+      index += 1;
+      continue;
+    }
+    if (isCommandWrapper(token)) {
+      index += 1;
+      while (index < tokens.length) {
+        const next = tokens[index];
+        if (
+          next !== undefined &&
+          (next.startsWith("-") || isEnvAssignment(next))
+        ) {
+          index += 1;
+          continue;
+        }
+        break;
+      }
+      continue;
+    }
+    return index;
+  }
+  return -1;
 };
 
 const isGitWriteCommand = (command: string): boolean => {
   const segments = command.split(/[;|&()]/);
   for (const segment of segments) {
     const tokens = segment.match(/\S+/g) ?? [];
-    let index = 0;
+    const commandIndex = findCommandIndex(tokens);
+    const commandToken = commandIndex === -1 ? undefined : tokens[commandIndex];
+    if (commandToken === undefined || !isGitExecutable(commandToken)) {
+      continue;
+    }
+    let index = commandIndex + 1;
     while (index < tokens.length) {
-      const token = tokens[index];
-      if (token === undefined || !isGitExecutable(token)) {
+      const gitArg = tokens[index];
+      if (gitArg === undefined) {
+        break;
+      }
+      if (gitArg === "commit" || gitArg === "push") {
+        return true;
+      }
+      if (GIT_VALUE_OPTIONS.has(gitArg)) {
+        index += 2;
+        continue;
+      }
+      if (gitArg.startsWith("-")) {
         index += 1;
         continue;
       }
-      index += 1;
-      while (index < tokens.length) {
-        const gitArg = tokens[index];
-        if (gitArg === undefined) {
-          break;
-        }
-        if (gitArg === "commit" || gitArg === "push") {
-          return true;
-        }
-        if (GIT_VALUE_OPTIONS.has(gitArg)) {
-          index += 2;
-          continue;
-        }
-        if (gitArg.startsWith("-")) {
-          index += 1;
-          continue;
-        }
-        break;
-      }
+      break;
     }
   }
   return false;
@@ -127,6 +187,9 @@ const parseSemver = (version: string): [number, number, number] => {
   });
   return [major, minor, patch];
 };
+
+const isVerifiableVersion = (version: string): boolean =>
+  VERSION_HEAD.test(version);
 
 const isBelowMinVersion = (version: string, minVersion: string): boolean => {
   const actual = parseSemver(version);
@@ -168,6 +231,19 @@ const ensureStyledSystem = (): string | undefined => {
   return undefined;
 };
 
+const parseFallowVersion = (stdout: string): string => {
+  const versionRaw = stdout.trim();
+  return versionRaw.replace(/^fallow\s+/, "").split(/\s+/)[0] ?? "";
+};
+
+const isVersionUnverifiable = (
+  versionResult: ReturnType<typeof spawnSync>,
+  version: string
+): boolean =>
+  versionResult.error !== undefined ||
+  versionResult.status !== 0 ||
+  !isVerifiableVersion(version);
+
 const runAudit = (): AuditOutcome => {
   if (!existsSync(fallowBin)) {
     return {
@@ -181,18 +257,19 @@ const runAudit = (): AuditOutcome => {
     cwd: repoRoot,
     encoding: "utf8",
   });
-  const versionRaw = (versionResult.stdout || "").trim();
-  const version = versionRaw.replace(/^fallow\s+/, "").split(/\s+/)[0] ?? "";
+  const version = parseFallowVersion(versionResult.stdout ?? "");
   const minVersion = process.env.FALLOW_GATE_MIN_VERSION ?? MIN_VERSION_DEFAULT;
-  if (
-    minVersion.length > 0 &&
-    version.length > 0 &&
-    isBelowMinVersion(version, minVersion)
-  ) {
-    return {
-      status: "deny_version",
-      reason: `fallow-gate: ${fallowBin} is fallow ${version}, below required ${minVersion}. Upgrade fallow or set FALLOW_GATE_MIN_VERSION= to disable.`,
-    };
+  if (minVersion.length > 0) {
+    const versionUnverifiable = isVersionUnverifiable(versionResult, version);
+    if (versionUnverifiable || isBelowMinVersion(version, minVersion)) {
+      const reason = versionUnverifiable
+        ? `fallow-gate: ${fallowBin} version is unverifiable (status ${String(versionResult.status)}), cannot confirm required ${minVersion}. Upgrade fallow or set FALLOW_GATE_MIN_VERSION= to disable.`
+        : `fallow-gate: ${fallowBin} is fallow ${version}, below required ${minVersion}. Upgrade fallow or set FALLOW_GATE_MIN_VERSION= to disable.`;
+      return {
+        status: "deny_version",
+        reason,
+      };
+    }
   }
 
   const prepareError = ensureStyledSystem();
@@ -350,9 +427,19 @@ if (event === undefined) {
 try {
   const input = readStdinJson();
   if (event === "beforeShellExecution") {
-    handleShell(input as ShellHookInput);
+    if (!isShellHookInput(input)) {
+      process.stderr.write(
+        "fallow-gate: invalid beforeShellExecution input, skipping.\n"
+      );
+      writeJson({ permission: "allow" });
+    } else {
+      handleShell(input);
+    }
+  } else if (!isStopHookInput(input)) {
+    process.stderr.write("fallow-gate: invalid stop input, skipping.\n");
+    writeJson({});
   } else {
-    handleStop(input as StopHookInput);
+    handleStop(input);
   }
 } catch (error) {
   const message = error instanceof Error ? error.message : "unknown error";

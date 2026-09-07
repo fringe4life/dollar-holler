@@ -8,13 +8,14 @@ import {
 } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/env";
-import { auth } from "#lib/auth.server.ts";
+import { getAuth } from "#lib/auth.server.ts";
 
 const SENTRY_DSN =
   "https://09af8526419b32d328f0c046d2ee5d09@o4511356309536768.ingest.us.sentry.io/4511356313010176";
 
 // get session from better auth and populate locals
 const localsHandler: Handle = async ({ event, resolve }) => {
+  const auth = getAuth();
   const result = await auth.api.getSession({
     headers: event.request.headers,
   });

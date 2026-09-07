@@ -48,18 +48,8 @@ type Auth = ReturnType<typeof createAuth>;
 
 let instance: Auth | undefined;
 
-const getAuth = (): Auth => {
+/** Isolate-cached. `drizzleAdapter` reads `db._` at construct — must not run at import. */
+export const getAuth = (): Auth => {
   instance ??= createAuth();
   return instance;
 };
-
-/** Isolate-cached. `drizzleAdapter` reads `db._` at construct — must not run at import. */
-export const auth: Auth = new Proxy({} as Auth, {
-  get(_target, property, receiver) {
-    const resolved = getAuth();
-    const value = Reflect.get(resolved, property, receiver);
-    return typeof value === "function"
-      ? (value as (...args: never[]) => unknown).bind(resolved)
-      : value;
-  },
-});

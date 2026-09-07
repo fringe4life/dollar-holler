@@ -23,7 +23,7 @@
   }: TableHeaderItemProps = $props();
 </script>
 
-<h3
+<span
   class={cx(
     tableHeaderItemClass,
     emptyState ? emptyColor : filledColor,
@@ -31,4 +31,4 @@
   )}
 >
   {@render children()}
-</h3>
+</span>

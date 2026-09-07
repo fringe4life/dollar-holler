@@ -11,6 +11,17 @@ import {
 import { getAuth } from "#lib/auth.server.ts";
 import { tryCatch } from "#lib/utils/try-catch.ts";
 
+/**
+ * Kit caches the imported `form()` instance, so field values/issues/result
+ * survive SPA navigation (login → logout → login still filled). Auth pages
+ * must call `.for($props.id())` for a per-mount instance.
+ *
+ * Drop `.for()` when these are resolved:
+ * - https://github.com/sveltejs/kit/issues/14802 (values persist after nav)
+ * - https://github.com/sveltejs/kit/issues/14210 (no `form.reset()` / `clear()`)
+ * - https://github.com/sveltejs/kit/issues/15051 (`_password` kept in DOM with JS)
+ * Related unmerged factory: https://github.com/sveltejs/kit/pull/14815
+ */
 export const login = form(loginSchema, async (data) => {
   const { request } = getRequestEvent();
 

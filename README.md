@@ -110,7 +110,7 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - **ORM:** Drizzle ORM 1.0 (rc.4) with `drizzle-orm/d1`; per-request client from `event.platform.env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)); Drizzle Kit `dialect: "sqlite"` + optional `d1-http`
 - **Authentication:** Better Auth 1.7 (`1.7.2`) with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts) isolate-cached `getAuth()` so `drizzleAdapter` does not construct at import, Drizzle adapter `provider: "sqlite"`, `advanced.database.joins`, `allowedHosts` for `localhost`, `*.workers.dev`, and `*.pages.dev`, `@better-auth/drizzle-adapter` relations-v2); login/signup/forgot/reset/change-password/logout via remote forms (logout `redirect`s to login); account rows keyed by `(issuer, account_id)` (credentials use `local:credential`)
 - **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
-- **Rich text:** Notes and terms accept Markdown; rendered HTML is sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) and persisted alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
+- **Rich text:** Notes and terms accept Markdown. The invoice form paints a Prism 1.30 overlay on the editor ([`HighlightedTextarea.svelte`](./src/lib/components/patterns/form/HighlightedTextarea.svelte), [`highlight-markdown.ts`](./src/lib/components/patterns/form/highlight-markdown.ts) tokenizes markdown and emits escaped `span.token` only — not `Prism.highlight` / wrap-hook HTML). Persisted HTML is still sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
 - **Deployment:** Cloudflare Workers + static assets (`@sveltejs/adapter-cloudflare` 8); [`wrangler.jsonc`](./wrangler.jsonc) sets `nodejs_compat`, D1 binding `DB`, and `ASSETS`
 - **Package manager:** Bun
 - **Validation:** Valibot for remote `form()` payloads and shared client/server schemas (Drizzle valibot for DB insert/select)
@@ -150,7 +150,7 @@ src/
 │   │   ├── line-items/    # line-items.remote.ts
 │   │   ├── pagination/    # PaginatedList, search, blank states, cursor list-query helpers
 │   │   └── settings/      # settings.remote.ts
-│   ├── components/        # Shared UI: primitives (TableHeader, TableHeaderItem, select), patterns (form/ FormPanel, Form + FormField), RouteError, Modal, navbar/, icons
+│   ├── components/        # Shared UI: primitives (TableHeader, TableHeaderItem, select, Textarea), patterns (form/ FormPanel, Form + FormField, HighlightedTextarea Prism overlay), RouteError, Modal, navbar/, icons
 │   ├── styles.ts          # Shared class names / style recipes
 │   └── utils/
 ├── routes/
@@ -190,7 +190,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 - **Type-Safe Database:** Drizzle ORM with full TypeScript support
 - **Serverless Ready:** Cloudflare Workers + D1 binding (no outbound DB URL)
 - **Resilient IDs:** UUIDv7 (uuidv7 package) for cursor-based navigation and performance
-- **Safe rich text:** Markdown notes/terms sanitized server-side and stored as both source and HTML
+- **Safe rich text:** Markdown notes/terms with Prism overlay highlighting while editing; sanitized HTML stored alongside source (overlay HTML is never persisted)
 - **Recent Data:** Seed script generates realistic data from the last 6 months
 - **Multi-User Support:** Data is distributed randomly among users
 - **Auth Flows:** Forgot and reset password supported; reset token read from URL and validated; logout remote form redirects to login (no empty `/logout` page)
@@ -222,7 +222,7 @@ bun run deploy
 - SvelteKit 3 uses `$app/env` (not `$app/environment`) for `building` / `dev` in server code. Typed routes use filesystem route IDs with `resolve()` (for example `/(dashboard)/invoices/[id=uuid]`). Matchers live in [`src/params/`](./src/params/) (`defineParams`). `kit.alias` is deprecated in favor of tsconfig paths / package.json `#` imports. Static assets use `$app/paths` `asset("images/...")` without a leading slash. Shallow list navigations use `goto(url, { shallow: true })` (not deprecated `pushState`).
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` as isolate-cached `getAuth()` so `drizzleAdapter` does not read `db._` at import; UUIDv7 (uuidv7 package) for user ID generation; session cookie cache enabled. After upgrading to 1.7 rc.4+, run the account identity migration under `src/lib/server/db/d1/` (rc.4 restores `account_id`; unique key remains `(issuer, account_id)`) before signing in against an existing database.
-- Invoice `notes` and `terms` accept Markdown; create/update remotes derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks.
+- Invoice `notes` and `terms` accept Markdown. Editor overlay uses Prism `tokenize` + a local serializer (escaped text + `span.token`); create/update remotes derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks. Overlay markup is paint-only — never stored as `notes_html` / `terms_html`.
 - SvelteKit configuration lives in the `sveltekit()` Vite plugin in `vite.config.ts` (`@sveltejs/adapter-cloudflare` 8, preprocess, Svelte 5 async compiler option, `experimental.remoteFunctions`, tracing/server instrumentation for Sentry). Wrangler `platformProxy.persist` keeps local D1 across `bun run dev`.
 - Form validation uses Valibot (`valibot` 1.4) for remote `form()` schemas in `src/lib/features/*/schemas.ts`; Drizzle Kit uses `drizzle-orm/valibot` for insert/select/update schemas. Invoice create/edit is a single `InvoiceEditor` with server-side persist in `persist-invoice.server.ts` (no client-side edit snapshots).
 

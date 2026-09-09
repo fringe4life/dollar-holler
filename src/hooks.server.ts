@@ -7,6 +7,7 @@ import {
   sequence,
 } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
+import { waitUntil } from "cloudflare:workers";
 import { building } from "$app/env";
 import { getAuth } from "#lib/auth.server.ts";
 
@@ -109,8 +110,5 @@ export const handleError: HandleServerError = async (input) => {
     },
   });
 
-  const platform = input.event.platform;
-  if (typeof platform?.ctx.waitUntil === "function") {
-    platform.ctx.waitUntil(Promise.resolve(Sentry.flush(2000)));
-  }
+  waitUntil(Promise.resolve(Sentry.flush(2000)));
 };

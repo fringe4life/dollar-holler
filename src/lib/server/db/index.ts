@@ -1,13 +1,13 @@
 import type { D1Database } from "@cloudflare/workers-types";
-import { getRequestEvent } from "$app/server";
+import { env } from "cloudflare:workers";
 import { createDb, type AppDatabase } from "./create-db";
 
 const cache = new WeakMap<D1Database, AppDatabase>();
 
 const getDb = (): AppDatabase => {
-  const d1 = getRequestEvent().platform?.env.DB;
+  const d1 = env.DB;
   if (!d1) {
-    throw new Error("D1 binding DB missing from event.platform.env");
+    throw new Error("D1 binding DB missing from cloudflare:workers env");
   }
   const cached = cache.get(d1);
   if (cached) {

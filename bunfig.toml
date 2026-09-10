@@ -3,7 +3,8 @@ linker = "isolated"
 minimumReleaseAge=259200
 minimumReleaseAgeExcludes = [
   "@sveltejs/kit",
-  "@sveltejs/adapter-cloudflare"
+  "@sveltejs/adapter-cloudflare",
+  "vite"
 ]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).

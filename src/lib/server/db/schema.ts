@@ -5,7 +5,6 @@ import {
   real,
   sqliteTable,
   text,
-  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type { SanitizedHTML } from "#lib/schemas/sanitized-html.server.ts";
@@ -68,9 +67,7 @@ export const account = sqliteTable(
     createdAt: timestampMs("created_at"),
     id: text("id").primaryKey(),
     idToken: text("id_token"),
-    /** Synthetic issuer, e.g. `local:credential` for email/password. */
-    issuer: text("issuer").notNull(),
-    /** Subject within issuer; credentials use the linked user id. */
+    /** Provider subject; credentials use the linked user id. */
     accountId: text("account_id").notNull(),
     password: text("password"),
     providerId: text("provider_id").notNull(),
@@ -87,8 +84,8 @@ export const account = sqliteTable(
       .references(() => user.id, { onDelete: "cascade" }),
   },
   (table) => [
-    uniqueIndex("account_issuer_accountId_uidx").on(
-      table.issuer,
+    index("account_providerId_accountId_idx").on(
+      table.providerId,
       table.accountId
     ),
     index("account_userId_idx").on(table.userId),

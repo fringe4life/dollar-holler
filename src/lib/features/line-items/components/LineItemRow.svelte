@@ -61,6 +61,10 @@
     display: { _print: "none", base: "none", sm: "block" },
   });
 
+  const descriptionStyles = lineItemFieldRecipe({
+    align: "left",
+    inputType: "text",
+  });
   const qtyStyles = lineItemFieldRecipe({
     align: "center",
     inputType: "number",
@@ -93,7 +97,7 @@
       >Description</label
     >
     <input
-      class="line-item"
+      class={descriptionStyles.input}
       disabled={!isEditable}
       id="description-{props.lineItem.id}"
       oninput={isEditable ? onDescriptionInput : undefined}
@@ -106,7 +110,6 @@
           }
         : props.fieldAttrs.description}
     />
-    <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
 
   <div class={gridItem({ position: "relative", gridArea: "unitPrice" })}>
@@ -125,7 +128,6 @@
       type={isEditable ? "number" : "text"}
       value={isEditable ? unitPrice : displayUnitPrice}
     />
-    <span aria-hidden="true" class={priceStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "quantity", position: "relative" })}>
     <label class={qtyStyles.label} for="quantity-{props.lineItem.id}">Qty</label
@@ -145,7 +147,6 @@
           }
         : props.fieldAttrs.quantity}
     />
-    <span aria-hidden="true" class={qtyStyles.border}></span>
   </div>
   <div class={gridItem({ gridArea: "amount" })}>
     <label class={amountStyles.label} for="amount-{props.lineItem.id}"

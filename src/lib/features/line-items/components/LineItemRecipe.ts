@@ -2,25 +2,14 @@ import { sva } from "#styled-system/css/index.js";
 
 export const lineItemFieldRecipe = sva({
   base: {
-    border: {
-      // the animated span border
-      borderColor: "lavenderIndigo",
-      borderStyle: "solid",
-      borderWidth: 2,
-      inset: 0,
-      opacity: "0",
-      pointerEvents: "none",
-      position: "absolute",
-      scaleX: 0.9,
-      transformOrigin: "left",
-      transitionDuration: "normal",
-      transitionProperty: ["opacity", "scale"],
-      transitionTimingFunction: "anticipate",
-    },
     input: {
       _ariaInvalid: { borderColor: "scarlet" },
       _disabled: { bg: "transparent", borderBottomWidth: 0 },
-      _focus: { outline: "none" },
+      _focus: {
+        borderBottomColor: "lavenderIndigo",
+        borderBottomStyle: "solid",
+        outline: "none",
+      },
       _userInvalid: { borderColor: "scarlet" },
       blockSize: 10,
       borderBottomWidth: 2,
@@ -42,7 +31,7 @@ export const lineItemFieldRecipe = sva({
     align: "left",
     inputType: "text",
   },
-  slots: ["root", "label", "input", "border"],
+  slots: ["root", "label", "input"],
   variants: {
     align: {
       center: {

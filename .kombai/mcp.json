@@ -1,0 +1,23 @@
+{
+  "mcpServers": {
+    "panda": {
+      "command": "node",
+      "args": [
+        "node_modules/.bin/panda-mcp",
+        "--cwd",
+        ".",
+        "--config",
+        "./panda.config.ts"
+      ]
+    },
+    "fallow": {
+      "command": "node",
+      "args": ["node_modules/.bin/fallow-mcp"],
+      "timeout": 180000,
+      "env": {
+        "FALLOW_BIN": "node_modules/.bin/fallow",
+        "FALLOW_TIMEOUT_SECS": "180"
+      }
+    }
+  }
+}

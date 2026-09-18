@@ -11,7 +11,7 @@
 
 <p
   class={css({
-    color: "scarlet",
+    color: "destructive",
     fontSize: "sm",
     marginBlockStart: 1.5,
   })}

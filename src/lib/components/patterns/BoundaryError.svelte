@@ -23,9 +23,9 @@
 
   const rootClass = css({
     alignItems: { base: "stretch", sm: "center" },
-    backgroundColor: "white",
-    borderColor: "scarlet/30",
-    borderInlineStartColor: "scarlet",
+    backgroundColor: "card",
+    borderColor: "destructive/30",
+    borderInlineStartColor: "destructive",
     borderInlineStartWidth: 4,
     borderStyle: "solid",
     borderWidth: 1,
@@ -40,9 +40,9 @@
 
   const iconWrapperClass = css({
     alignItems: "center",
-    backgroundColor: "goldenFizz",
+    backgroundColor: "warning",
     borderRadius: "full",
-    color: "scarlet",
+    color: "destructive",
     display: "flex",
     flexShrink: 0,
     justifyContent: "center",
@@ -62,7 +62,7 @@
   });
 
   const titleClass = css({
-    color: "daisyBush",
+    color: "foreground",
     fontSize: "xl",
     fontWeight: "bold",
     lineHeight: "tight",
@@ -70,7 +70,7 @@
   });
 
   const messageClass = css({
-    color: "monsoon",
+    color: "textMuted",
     maxInlineSize: "prose",
   });
 

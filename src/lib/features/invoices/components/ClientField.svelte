@@ -72,7 +72,7 @@
         </Select>
         <p
           class={css({
-            color: "monsoon",
+            color: "textMuted",
             fontWeight: "bold",
           })}
         >

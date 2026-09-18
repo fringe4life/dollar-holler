@@ -16,7 +16,11 @@ export const navItemControlClass = css({
   position: "relative",
   display: "inline-block",
   paddingInline: 8,
-  color: { base: "white", _hover: "goldenFizz", _current: "robinEggBlue" },
+  color: {
+    base: "navigationForeground",
+    _hover: "warning",
+    _current: "accent",
+  },
   transitionProperty: "colors",
   transitionDuration: "normal",
   "&::before,&::after": {
@@ -51,7 +55,7 @@ export const navItemControlClass = css({
     _before: { opacity: "1" },
     _after: { opacity: "1" },
     _hover: {
-      color: "robinEggBlue",
+      color: "accent",
       _before: { translate: "-1px 0" },
       _after: { translate: "1px 0" },
     },

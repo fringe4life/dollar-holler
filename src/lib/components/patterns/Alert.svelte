@@ -11,8 +11,8 @@
 {#if message}
   <div
     class={css({
-      backgroundColor: "lavenderIndigo",
-      color: "white",
+      backgroundColor: "primary",
+      color: "primaryForeground",
       marginBlockEnd: 8,
       minBlockSize: 14,
       p: 4,

@@ -46,7 +46,7 @@
 <a
   class={css({
     zIndex: 1000,
-    color: { base: "pastelPurple", _hover: "daisyBush" },
+    color: { base: "mutedAction", _hover: "foreground" },
     position: "fixed",
     insetInlineStart: 7,
     insetBlockStart: 5,
@@ -60,7 +60,7 @@
 >
 <div
   class={css({
-    backgroundColor: { base: "whisper", _print: "transparent" },
+    backgroundColor: { base: "background", _print: "transparent" },
     overflowY: "clip",
     paddingBlockStart: { base: 16, lg: 12 },
     paddingBlockEnd: { lg: 32 },

@@ -146,9 +146,9 @@
           transitionProperty: "colors",
           transitionDuration: "normal",
           color: {
-            base: "pastelPurple",
-            _groupHover: "daisyBush/50",
-            _hover: "daisyBush",
+            base: "mutedAction",
+            _groupHover: "foreground/50",
+            _hover: "foreground",
           },
         })}
         href={resolved}><View /></a

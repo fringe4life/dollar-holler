@@ -28,7 +28,7 @@
     columns: { base: 1, sm: 2, lg: 4 },
     gap: 4,
     marginBlockEnd: 10,
-    backgroundColor: "gallery",
+    backgroundColor: "surfaceSecondary",
     borderRadius: "lg",
     paddingInline: { base: 6, md: 8, lg: 10 },
     paddingBlock: { base: 4, md: 6, lg: 8 },

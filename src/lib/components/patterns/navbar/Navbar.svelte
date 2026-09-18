@@ -5,6 +5,7 @@
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
+  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
   import { logout } from "#features/auth/auth.remote.ts";
   import { isActive } from "#lib/utils/is-active.ts";
   import NavbarItem from "./NavbarItem.svelte";
@@ -74,8 +75,9 @@
 
   const navDrawer = css({
     alignItems: "center",
-    backgroundColor: "daisyBush",
+    backgroundColor: "navigationSurface",
     blockSize: "100dvh",
+    color: "navigationForeground",
     display: "flex",
     flexDirection: "column",
     inlineSize: "full",
@@ -157,6 +159,16 @@
           </form>
         </li>
       </ul>
+      <div
+        class={css({
+          inlineSize: "calc(100% - 3rem)",
+          marginBlockStart: "auto",
+          maxInlineSize: 72,
+          paddingBlockEnd: 8,
+        })}
+      >
+        <ModeSelect />
+      </div>
     </div>
   </nav>
 </header>

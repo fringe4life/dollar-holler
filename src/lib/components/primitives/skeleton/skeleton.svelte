@@ -11,7 +11,7 @@
 <div
   aria-hidden="true"
   class={cx(
-    css({ animation: "pulse", rounded: "md", backgroundColor: "gray.300" }),
+    css({ animation: "pulse", rounded: "md", backgroundColor: "skeleton" }),
     className
   )}
   {...restProps}

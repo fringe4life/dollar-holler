@@ -46,7 +46,7 @@
   // Lucide icons are stroke-based; undo the global `svg { fill }` rule.
   const limitIconClass = cx(
     square({ size: 4 }),
-    css({ color: "monsoon", fill: "none", flexShrink: 0 })
+    css({ color: "textMuted", fill: "none", flexShrink: 0 })
   );
 
   interface Props {
@@ -137,7 +137,7 @@
       paddingInlineEnd: 1,
       textAlign: "right",
       fontSize: "sm",
-      color: "gray.500",
+      color: "textMuted",
       fontStyle: "italic",
     })}
   >
@@ -190,7 +190,10 @@
       >
         <ChevronLeftIcon
           aria-hidden="true"
-          class={cx(square({ size: 4 }), directionalArrow("backward"))}
+          class={cx(
+            square({ size: 4 }),
+            directionalArrow({ direction: "backward" })
+          )}
         />
       </Button>
       <Button
@@ -204,7 +207,10 @@
       >
         <ChevronRightIcon
           aria-hidden="true"
-          class={cx(square({ size: 4 }), directionalArrow("forward"))}
+          class={cx(
+            square({ size: 4 }),
+            directionalArrow({ direction: "forward" })
+          )}
         />
       </Button>
     </nav>

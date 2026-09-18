@@ -3,17 +3,17 @@ import { sva } from "#styled-system/css/index.js";
 export const lineItemFieldRecipe = sva({
   base: {
     input: {
-      _ariaInvalid: { borderColor: "scarlet" },
+      _ariaInvalid: { borderColor: "destructive" },
       _disabled: { bg: "transparent", borderBottomWidth: 0 },
       _focus: {
-        borderBottomColor: "lavenderIndigo",
+        borderBottomColor: "ring",
         borderBottomStyle: "solid",
         outline: "none",
       },
-      _userInvalid: { borderColor: "scarlet" },
+      _userInvalid: { borderColor: "destructive" },
       blockSize: 10,
       borderBottomWidth: 2,
-      borderColor: "stone.300",
+      borderColor: "borderMuted",
       borderStyle: "dashed",
       display: "block",
       inlineSize: "full",
@@ -21,7 +21,7 @@ export const lineItemFieldRecipe = sva({
       transitionProperty: "colors",
     },
     label: {
-      color: "monsoon",
+      color: "textMuted",
       display: { base: "block", sm: "none" },
       fontFamily: "sansserif",
       fontWeight: "bold",

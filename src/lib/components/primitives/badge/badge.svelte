@@ -1,5 +1,5 @@
 <script lang="ts" module>
-  import { cva, cx, type RecipeVariant } from "#styled-system/css/index.js";
+  import { cva, cx } from "#styled-system/css/index.js";
   import type { HTMLAnchorAttributes } from "svelte/elements";
 
   const badgeVariants = cva({
@@ -24,23 +24,23 @@
       },
       variant: {
         draft: {
-          borderColor: "pastelPurple",
-          color: "pastelPurple",
+          borderColor: "statusDraft",
+          color: "statusDraft",
         },
         late: {
-          backgroundColor: "scarlet",
-          borderColor: "scarlet",
-          color: "goldenFizz",
+          backgroundColor: "statusLate",
+          borderColor: "statusLate",
+          color: "statusLateForeground",
         },
         paid: {
-          backgroundColor: "pastelPurple",
-          borderColor: "pastelPurple",
-          color: "white",
+          backgroundColor: "statusPaid",
+          borderColor: "statusPaid",
+          color: "statusPaidForeground",
         },
         sent: {
-          backgroundColor: "robinEggBlue",
-          borderColor: "robinEggBlue",
-          color: "blueGem",
+          backgroundColor: "statusSent",
+          borderColor: "statusSent",
+          color: "statusSentForeground",
         },
       },
     },
@@ -48,8 +48,8 @@
 </script>
 
 <script lang="ts">
-  export type BadgeVariant = RecipeVariant<typeof badgeVariants>["variant"];
-  export type BadgeSize = RecipeVariant<typeof badgeVariants>["size"];
+  import type { BadgeSize, BadgeVariant } from "./badge.types";
+
   type BadgeProps = HTMLAnchorAttributes &
     HTMLAnchorAttributes & {
       variant?: BadgeVariant;

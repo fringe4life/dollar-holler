@@ -28,7 +28,7 @@
   });
 
   const headingClass = css({
-    color: "daisyBush",
+    color: "foreground",
     fontSize: "5xl",
     fontWeight: "black",
     lineHeight: "none",
@@ -36,14 +36,14 @@
   });
 
   const subheadingClass = css({
-    color: "daisyBush",
+    color: "foreground",
     fontSize: "lg",
     fontWeight: "bold",
     textAlign: "center",
   });
 
   const messageClass = css({
-    color: "daisyBush",
+    color: "foreground",
     fontSize: "lg",
     textAlign: "center",
   });

@@ -57,25 +57,25 @@
     variants: {
       type: {
         error: {
-          "& [data-description]": { color: "goldenFizz" },
-          backgroundColor: "scarlet",
-          borderColor: "scarlet",
-          color: "goldenFizz",
+          "& [data-description]": { color: "destructiveForeground" },
+          backgroundColor: "destructive",
+          borderColor: "destructive",
+          color: "destructiveForeground",
         },
         info: {
-          backgroundColor: "fog",
-          borderColor: "fog",
-          color: "daisyBush",
+          backgroundColor: "muted",
+          borderColor: "borderSubtle",
+          color: "foreground",
         },
         success: {
-          backgroundColor: "white",
-          borderColor: "caribbeanGreen",
-          color: "daisyBush",
+          backgroundColor: "surface",
+          borderColor: "success",
+          color: "foreground",
         },
         warning: {
-          backgroundColor: "white",
-          borderColor: "goldenFizz",
-          color: "daisyBush",
+          backgroundColor: "surface",
+          borderColor: "warning",
+          color: "foreground",
         },
       } satisfies Record<ToastType, Record<string, unknown>>,
     },
@@ -114,7 +114,7 @@
   });
 
   const descriptionClass = css({
-    color: "monsoon",
+    color: "textMuted",
     fontSize: "sm",
     fontWeight: "normal",
   });

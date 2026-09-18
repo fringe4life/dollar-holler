@@ -103,7 +103,7 @@
 </svelte:head>
 <ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
-    <span aria-hidden="true" class={buttonIcon("plus")}>+</span>
+    <span aria-hidden="true" class={buttonIcon({ icon: "plus" })}>+</span>
     Client
   {/snippet}
 </ItemsHeader>
@@ -123,7 +123,7 @@
 
   <div class={between({ marginBlockEnd: 7, inlineSize: "full" })}>
     <h1
-      class={css({ color: "daisyBush", fontSize: "3xl", fontWeight: "bold" })}
+      class={css({ color: "foreground", fontSize: "3xl", fontWeight: "bold" })}
     >
       {client.name}
     </h1>
@@ -210,9 +210,9 @@
 >
   {#snippet descriptionSnippet(item)}
     This will delete the invoice to
-    <span class={css({ color: "scarlet" })}>{item?.name ?? "Unknown"}</span>
+    <span class={css({ color: "destructive" })}>{item?.name ?? "Unknown"}</span>
     for
-    <span class={css({ color: "scarlet" })}
+    <span class={css({ color: "destructive" })}
       >{formatTotal(item?.total ?? 0)}</span
     >
   {/snippet}

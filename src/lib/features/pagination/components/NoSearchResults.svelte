@@ -29,7 +29,7 @@
   <h2
     class={css({
       fontFamily: "handwriting",
-      color: "caribbeanGreen",
+      color: "success",
       fontSize: "4xl",
       fontWeight: "bold",
     })}
@@ -38,7 +38,7 @@
   </h2>
   <p
     class={css({
-      color: "caribbeanGreen",
+      color: "success",
       fontSize: "xl",
       fontWeight: "bold",
     })}

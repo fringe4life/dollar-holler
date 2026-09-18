@@ -15,6 +15,7 @@
   "include": [
     "src",
     "panda.config.ts",
+    "theme/**/*.ts",
     "drizzle.config.ts",
     "vite.config.ts",
     "scripts/**/*.ts",

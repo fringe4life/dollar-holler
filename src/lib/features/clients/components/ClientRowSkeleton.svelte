@@ -17,7 +17,7 @@
     >
       <Skeleton
         class={css({
-          bg: "prim/40",
+          bg: "skeletonSubtle/40",
           rounded: "full",
           blockSize: 6,
           inlineSize: 15,
@@ -28,21 +28,33 @@
     <!-- clientname: ~160px -->
     <div class={gridItem({ gridArea: "clientName" })}>
       <Skeleton
-        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+        class={css({
+          bg: "skeletonSubtle/40",
+          aspectRatio: "5/1",
+          inlineSize: 20,
+        })}
       />
     </div>
 
     <!-- received: right-aligned, ~80px -->
     <div class={gridItem({ gridArea: "received" })}>
       <Skeleton
-        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+        class={css({
+          bg: "skeletonSubtle/40",
+          aspectRatio: "5/1",
+          inlineSize: 20,
+        })}
       />
     </div>
 
     <!-- balance: right-aligned, ~80px -->
     <div class={gridItem({ gridArea: "balance", justifySelf: "end" })}>
       <Skeleton
-        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+        class={css({
+          bg: "skeletonSubtle/40",
+          aspectRatio: "5/1",
+          inlineSize: 20,
+        })}
       />
     </div>
 
@@ -54,7 +66,7 @@
         placeSelf: "center",
       })}
     >
-      <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
+      <Skeleton class={circle({ bg: "skeletonSubtle/40", size: 8 })} />
     </div>
 
     <!-- three dots: 32px circle, hidden on mobile -->
@@ -65,7 +77,7 @@
         placeSelf: "center",
       })}
     >
-      <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
+      <Skeleton class={circle({ bg: "skeletonSubtle/40", size: 8 })} />
     </div>
   </div>
 </div>

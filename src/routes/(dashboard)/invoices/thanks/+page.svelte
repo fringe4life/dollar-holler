@@ -24,7 +24,7 @@
   <div>
     <h1
       class={css({
-        color: "daisyBush",
+        color: "foreground",
         fontSize: "5xl",
         lineHeight: "none",
         fontWeight: "black",
@@ -32,7 +32,7 @@
     >
       Thank You!
     </h1>
-    <p class={css({ color: "daisyBush", fontSize: "lg" })}>
+    <p class={css({ color: "foreground", fontSize: "lg" })}>
       Your payment has been received!
     </p>
   </div>

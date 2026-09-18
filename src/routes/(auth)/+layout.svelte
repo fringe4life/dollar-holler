@@ -8,7 +8,7 @@
 
 <div
   class={css({
-    backgroundColor: "daisyBush",
+    backgroundColor: "authBackground",
     backgroundRepeat: "no-repeat",
     backgroundSize: "cover",
     backgroundPosition: "center",

@@ -31,7 +31,7 @@
   {#snippet title()}
     <h2
       class={css({
-        color: "daisyBush",
+        color: "foreground",
         fontSize: "xl",
         fontWeight: "bold",
         textAlign: "center",
@@ -44,7 +44,7 @@
   {#snippet description()}
     <h2
       class={css({
-        color: "daisyBush",
+        color: "foreground",
         fontSize: "lg",
         fontWeight: "medium",
         textAlign: "center",

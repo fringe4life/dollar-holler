@@ -26,7 +26,7 @@
     class={circle({
       animation: "spin",
       borderBottomColor: "transparent",
-      borderColor: "daisyBush",
+      borderColor: "foreground",
       borderWidth: 2,
       size: spinnerSize[size],
     })}

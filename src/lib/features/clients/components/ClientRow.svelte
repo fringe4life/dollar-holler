@@ -138,7 +138,7 @@
         textAlign: "right",
         fontSize: { base: "sm", lg: "lg" },
         fontWeight: "bold",
-        color: "scarlet",
+        color: "destructive",
       })}
     >
       {balanceDisplay}
@@ -153,9 +153,9 @@
       <a
         class={css({
           color: {
-            base: "pastelPurple",
-            _hover: "daisyBush",
-            _groupHover: "daisyBush/50",
+            base: "mutedAction",
+            _hover: "foreground",
+            _groupHover: "foreground/50",
           },
           transitionProperty: "colors",
           transitionDuration: "normal",

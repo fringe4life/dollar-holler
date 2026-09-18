@@ -124,7 +124,7 @@
       paddingBlockStart: 4,
     })}
   >
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>From</div>
+    <div class={css({ color: "textMuted", fontWeight: "bold" })}>From</div>
     {#if hasFromName}
       <p>
         {settings?.myName}<br />
@@ -138,14 +138,14 @@
     {:else}
       <div
         class={center({
-          backgroundColor: "gallery",
+          backgroundColor: "surfaceSecondary",
           borderRadius: "md",
           minBlockSize: 17,
         })}
       >
         <a
           class={css({
-            color: "stone.600",
+            color: "linkMuted",
             textDecoration: { base: "underline", _hover: "none" },
           })}
           href={settingsLink}>Add your contact information.</a
@@ -157,7 +157,7 @@
 
 {#snippet billTo()}
   <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
-    <div class={css({ color: "monsoon", fontWeight: "bold" })}>Bill To:</div>
+    <div class={css({ color: "textMuted", fontWeight: "bold" })}>Bill To:</div>
     <p>
       {#if client}
         {#if client.name}
@@ -185,7 +185,7 @@
 {#snippet htmlBlock(title: string, html: Maybe<SanitizedHTML>)}
   {#if html}
     <div class={gridItem({ colSpan: 6 })}>
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>{title}</div>
+      <div class={css({ color: "textMuted", fontWeight: "bold" })}>{title}</div>
       <HtmlContent {html} />
     </div>
   {/if}
@@ -220,7 +220,7 @@
   >
     <h1
       class={gridItem({
-        color: "daisyBush",
+        color: "foreground",
         fontSize: "3xl",
         fontWeight: "bold",
       })}
@@ -252,7 +252,7 @@
       insetBlockStart: { base: 36, _print: 0 },
       zIndex: 10,
       shadow: { base: "addInvoice", _print: "none" },
-      backgroundColor: "white",
+      backgroundColor: "surface",
     })}
   >
     <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
@@ -271,13 +271,15 @@
         gridColumnStart: { sm: 5 },
       })}
     >
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>
+      <div class={css({ color: "textMuted", fontWeight: "bold" })}>
         Invoice Id:
       </div>
       <p>{invoice.invoiceNumber}</p>
     </div>
     <div class={gridItem({ colSpan: 3 })}>
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Due Date:</div>
+      <div class={css({ color: "textMuted", fontWeight: "bold" })}>
+        Due Date:
+      </div>
       <p>
         {convertDate(invoice.dueDate === null ? null : String(invoice.dueDate))}
       </p>
@@ -289,7 +291,7 @@
         gridColumnStart: { sm: 5 },
       })}
     >
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>
+      <div class={css({ color: "textMuted", fontWeight: "bold" })}>
         Issue Date:
       </div>
       <p>
@@ -300,7 +302,9 @@
     </div>
 
     <div class={gridItem({ colSpan: 6 })}>
-      <div class={css({ color: "monsoon", fontWeight: "bold" })}>Subject:</div>
+      <div class={css({ color: "textMuted", fontWeight: "bold" })}>
+        Subject:
+      </div>
       <p>{invoice.subject}</p>
     </div>
 

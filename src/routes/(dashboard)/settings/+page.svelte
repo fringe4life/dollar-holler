@@ -16,6 +16,7 @@
   import { buttonIcon } from "#lib/styles.ts";
   import Spinner from "#lib/components/primitives/Spinner.svelte";
   import { zipInputAttrs } from "#lib/utils/zip.ts";
+  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
 
   const toast = getToast();
   const loaded = await getSettings();
@@ -44,7 +45,23 @@
 
   <h2
     class={css({
-      color: "daisyBush",
+      color: "foreground",
+      marginBlockEnd: 1,
+      fontSize: "3xl",
+      fontWeight: "black",
+    })}
+  >
+    Appearance
+  </h2>
+  <p class={css({ marginBlockEnd: 8 })}>
+    Light, dark, or match the operating system.
+  </p>
+  <ModeSelect />
+
+  <h2
+    class={css({
+      color: "foreground",
+      marginBlockStart: 10,
       marginBlockEnd: 1,
       fontSize: "3xl",
       fontWeight: "black",
@@ -151,7 +168,7 @@
         })}
       >
         <LoaderButton class="group" {pending}
-          ><Check class={buttonIcon("check")} /> Save</LoaderButton
+          ><Check class={buttonIcon({ icon: "check" })} /> Save</LoaderButton
         >
       </FormField>
     {/snippet}
@@ -159,7 +176,7 @@
   <div class={gridItem({ colSpan: 6 })}>
     <h2
       class={css({
-        color: "daisyBush",
+        color: "foreground",
         marginBlockEnd: 1,
         fontSize: "3xl",
         fontWeight: "black",
@@ -242,7 +259,7 @@
     </div>
     {#snippet submit({ pending })}
       <LoaderButton class="group" {pending}
-        ><Check class={buttonIcon("check")} /> Save</LoaderButton
+        ><Check class={buttonIcon({ icon: "check" })} /> Save</LoaderButton
       >
     {/snippet}
   </Form>

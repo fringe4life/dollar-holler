@@ -4,19 +4,19 @@
 
   const textareaClass = css({
     _ariaInvalid: {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     _focusVisible: {
-      borderColor: "lavenderIndigo",
-      outlineColor: "lavenderIndigo",
+      borderColor: "ring",
+      outlineColor: "ring",
       outlineStyle: "solid",
       outlineWidth: "2px",
     },
     _userInvalid: {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     blockSize: 32,
-    borderColor: "silver",
+    borderColor: "input",
     borderWidth: 2,
     fontFamily: "sansserif",
     inlineSize: "full",

@@ -10,6 +10,8 @@ import { svelteKitHandler } from "better-auth/svelte-kit";
 import { waitUntil } from "cloudflare:workers";
 import { building } from "$app/env";
 import { getAuth } from "#lib/auth.server.ts";
+import { THEME_COOKIE_NAME, parseStoredTheme } from "#lib/theme/schema.ts";
+import { stampHtmlTheme } from "#lib/theme/theme.ts";
 
 const SENTRY_DSN =
   "https://09af8526419b32d328f0c046d2ee5d09@o4511356309536768.ingest.us.sentry.io/4511356313010176";
@@ -59,6 +61,15 @@ const authGuard: Handle = ({ event, resolve }) => {
   return resolve(event);
 };
 
+/** Stamp `.dark` / `.light` on `<html>` when the theme cookie is set. */
+const themeHandler: Handle = ({ event, resolve }) => {
+  const stored = parseStoredTheme(event.cookies.get(THEME_COOKIE_NAME));
+
+  return resolve(event, {
+    transformPageChunk: ({ html }) => stampHtmlTheme(html, stored),
+  });
+};
+
 /** Preload self-hosted fonts from bundled CSS (not invoked in vite dev). */
 const fontPreloadHandler: Handle = async ({ event, resolve }) =>
   resolve(event, {
@@ -76,6 +87,7 @@ export const handle: Handle = sequence(
   Sentry.sentryHandle(),
   localsHandler,
   authGuard,
+  themeHandler,
   fontPreloadHandler
 );
 

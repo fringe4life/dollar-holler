@@ -78,7 +78,7 @@
     <div>
       <h3
         class={css({
-          color: "daisyBush",
+          color: "foreground",
           marginBlockEnd: 2,
           fontSize: "lg",
           fontWeight: "black",
@@ -90,7 +90,7 @@
         class={css({
           fontSize: "sm",
           lineHeight: "relaxed",
-          color: "stone.600",
+          color: "linkMuted",
         })}
       >
         {feature.description}

@@ -33,7 +33,7 @@
   };
 
   const lineItemHeaders = css({
-    color: "daisyBush",
+    color: "foreground",
     display: { _print: "block", base: "none", sm: "block" },
   });
 
@@ -47,7 +47,7 @@
   class={cx(
     invoiceLineItem,
     css({
-      borderColor: "daisyBush",
+      borderColor: "inverse",
       borderBottomWidth: 2,
       paddingBlockEnd: 2,
     })
@@ -91,7 +91,7 @@
   </div>
   <div
     class={gridItem({
-      color: "monsoon",
+      color: "textMuted",
       paddingBlock: 5,
       textAlign: "right",
       fontWeight: "bold",
@@ -114,7 +114,7 @@
 <div class={invoiceLineItem}>
   <p
     class={gridItem({
-      color: "monsoon",
+      color: "textMuted",
       paddingBlock: 5,
       textAlign: "right",
       fontWeight: "bold",

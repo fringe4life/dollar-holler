@@ -66,7 +66,7 @@
         marginBlockStart: 4,
         textAlign: "center",
         fontSize: "sm",
-        color: "white",
+        color: "authForeground",
       })}
     >
       <a

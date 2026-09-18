@@ -7,8 +7,11 @@
   import { page } from "$app/state";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
   import Select from "#lib/components/primitives/select/Select.svelte";
+  import {
+    resolvedThemeChoice,
+    selectThemeChoice,
+  } from "#lib/theme/choice.svelte.ts";
   import { THEME_CHOICES, type ThemeChoice } from "#lib/theme/schema.ts";
-  import { persistThemeChoice } from "#lib/theme/theme.ts";
 
   const labels = {
     dark: "Dark",
@@ -28,8 +31,10 @@
     css({ color: "textMuted", fill: "none", flexShrink: 0 })
   );
 
+  const selected = $derived(resolvedThemeChoice(page.data.theme ?? "system"));
+
   const setColorMode = (mode: ThemeChoice) => {
-    persistThemeChoice(mode);
+    selectThemeChoice(mode);
   };
 </script>
 
@@ -42,7 +47,7 @@
       setColorMode(value);
     }
   }}
-  value={page.data.theme ?? "system"}
+  value={selected}
 >
   {#each THEME_CHOICES as value (value)}
     {@const ThemeIcon = icons[value]}

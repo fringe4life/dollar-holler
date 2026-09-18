@@ -8,14 +8,14 @@
     <script>
       (function () {
         try {
-          var root = document.documentElement;
+          const root = document.documentElement;
           if (
             root.classList.contains("dark") ||
             root.classList.contains("light")
           ) {
             return;
           }
-          var dark = matchMedia("(prefers-color-scheme: dark)").matches;
+          const dark = matchMedia("(prefers-color-scheme: dark)").matches;
           root.classList.add(dark ? "dark" : "light");
           root.style.colorScheme = dark ? "dark" : "light";
         } catch {

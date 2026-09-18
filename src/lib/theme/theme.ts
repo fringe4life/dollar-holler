@@ -52,14 +52,35 @@ export const applyDocumentTheme = (theme: ThemeChoice): void => {
   );
 };
 
-const persistThemeCookie = (theme: ThemeChoice): void => {
+const encodedCookieName = encodeURIComponent(THEME_COOKIE_NAME);
+
+export const serializeThemeCookie = (
+  theme: ThemeChoice,
+  https: boolean
+): string => {
   if (theme === "system") {
-    document.cookie = `${THEME_COOKIE_NAME}=; Path=/; Max-Age=0; SameSite=Lax`;
-    return;
+    return `${encodedCookieName}=; Path=/; Max-Age=0; SameSite=Lax`;
   }
 
-  const secure = location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${THEME_COOKIE_NAME}=${theme}; Path=/; Max-Age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
+  const value = encodeURIComponent(theme);
+  const secure = https ? "; Secure" : "";
+  return `${encodedCookieName}=${value}; Path=/; Max-Age=${THEME_COOKIE_MAX_AGE}; SameSite=Lax${secure}`;
+};
+
+export const parseThemeCookieHeader = (
+  cookieHeader: string
+): StoredTheme | null => {
+  const prefix = `${encodedCookieName}=`;
+  const pair = cookieHeader.split("; ").find((row) => row.startsWith(prefix));
+  if (pair === undefined) {
+    return null;
+  }
+
+  return parseStoredTheme(decodeURIComponent(pair.slice(prefix.length)));
+};
+
+const persistThemeCookie = (theme: ThemeChoice): void => {
+  document.cookie = serializeThemeCookie(theme, location.protocol === "https:");
 };
 
 export const persistThemeChoice = (theme: ThemeChoice): void => {
@@ -67,10 +88,5 @@ export const persistThemeChoice = (theme: ThemeChoice): void => {
   applyDocumentTheme(theme);
 };
 
-export const readThemeCookie = (): StoredTheme | null => {
-  const prefix = `${THEME_COOKIE_NAME}=`;
-  const pair = document.cookie
-    .split("; ")
-    .find((row) => row.startsWith(prefix));
-  return parseStoredTheme(pair?.slice(prefix.length));
-};
+export const readThemeCookie = (): StoredTheme | null =>
+  parseThemeCookieHeader(document.cookie);

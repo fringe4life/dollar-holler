@@ -95,6 +95,7 @@
     "db:push": "varlock run -- bun x drizzle-kit push",
     "cf:types": "wrangler types ./src/worker-configuration.d.ts --include-runtime false",
     "deploy": "bun run build && wrangler deploy",
+    "deploy:project": "wrangler deploy",
     "fix": "bun run lint:fix && bun run format && bun run stylelint -- --fix",
     "env:typegen": "varlock typegen",
     "test": "bun test",

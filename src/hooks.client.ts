@@ -1,9 +1,12 @@
 import * as Sentry from "@sentry/sveltekit";
 import type { HandleClientError } from "@sveltejs/kit/hooks";
+import { hydrateThemeChoice } from "#lib/theme/choice.svelte.ts";
 import { applyDocumentTheme, readThemeCookie } from "#lib/theme/theme.ts";
 
 export function init() {
-  applyDocumentTheme(readThemeCookie() ?? "system");
+  const theme = readThemeCookie() ?? "system";
+  hydrateThemeChoice(theme);
+  applyDocumentTheme(theme);
 }
 
 Sentry.init({

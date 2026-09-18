@@ -85,7 +85,7 @@
 
 <ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
-    <span aria-hidden="true" class={buttonIcon("plus")}>+</span>
+    <span aria-hidden="true" class={buttonIcon({ icon: "plus" })}>+</span>
     Client
   {/snippet}
 </ItemsHeader>
@@ -189,6 +189,8 @@
 >
   {#snippet descriptionSnippet(client)}
     This will delete Client:
-    <span class={css({ color: "scarlet" })}>{client?.name ?? "Unknown"}</span>
+    <span class={css({ color: "destructive" })}
+      >{client?.name ?? "Unknown"}</span
+    >
   {/snippet}
 </ConfirmDelete>

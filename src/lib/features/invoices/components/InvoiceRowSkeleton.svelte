@@ -17,7 +17,7 @@
     >
       <Skeleton
         class={css({
-          bg: "prim/40",
+          bg: "skeletonSubtle/40",
           rounded: "full",
           aspectRatio: "9/4",
           inlineSize: "54px",
@@ -28,26 +28,44 @@
     <!-- duedate: fits 100px col on desktop -->
     <div class={gridItem({ gridArea: "duedate" })}>
       <Skeleton
-        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+        class={css({
+          bg: "skeletonSubtle/40",
+          aspectRatio: "5/1",
+          inlineSize: 20,
+        })}
       />
     </div>
 
     <!-- invoicenumber: 100px col on desktop -->
     <div class={gridItem({ gridArea: "invoicenumber" })}>
-      <Skeleton class={css({ bg: "prim/40", blockSize: 4, inlineSize: 25 })} />
+      <Skeleton
+        class={css({
+          bg: "skeletonSubtle/40",
+          blockSize: 4,
+          inlineSize: 25,
+        })}
+      />
     </div>
 
     <!-- clientname: 100px col on desktop -->
     <div class={gridItem({ gridArea: "clientName" })}>
       <Skeleton
-        class={css({ bg: "prim/40", aspectRatio: "4/1", inlineSize: 20 })}
+        class={css({
+          bg: "skeletonSubtle/40",
+          aspectRatio: "4/1",
+          inlineSize: 20,
+        })}
       />
     </div>
 
     <!-- amount: right-aligned, ~80px -->
     <div class={gridItem({ gridArea: "amount", justifySelf: "end" })}>
       <Skeleton
-        class={css({ bg: "prim/40", aspectRatio: "5/1", inlineSize: 20 })}
+        class={css({
+          bg: "skeletonSubtle/40",
+          aspectRatio: "5/1",
+          inlineSize: 20,
+        })}
       />
     </div>
 
@@ -59,7 +77,7 @@
         gridArea: "view",
       })}
     >
-      <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
+      <Skeleton class={circle({ bg: "skeletonSubtle/40", size: 8 })} />
     </div>
 
     <!-- threeDots: 32px circle, hidden on mobile -->
@@ -70,7 +88,7 @@
         gridArea: "threeDots",
       })}
     >
-      <Skeleton class={circle({ bg: "prim/40", size: 8 })} />
+      <Skeleton class={circle({ bg: "skeletonSubtle/40", size: 8 })} />
     </div>
   </div>
 </div>

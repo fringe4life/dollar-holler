@@ -290,7 +290,7 @@
       />
     {/snippet}
     {#snippet hint()}
-      <p class={css({ fontSize: "xs", color: "gray.400" })}>
+      <p class={css({ fontSize: "xs", color: "textMuted" })}>
         Formatting tips: <strong>*bold*</strong>, <em>_italic_</em>
       </p>
     {/snippet}

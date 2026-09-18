@@ -7,8 +7,8 @@
     fontWeight: "bold",
     lineHeight: "snug",
   });
-  const emptyColor = css({ color: "pastelPurple" });
-  const filledColor = css({ color: "daisyBush" });
+  const emptyColor = css({ color: "textSubtle" });
+  const filledColor = css({ color: "foreground" });
 
   interface TableHeaderItemProps {
     children: Snippet;

@@ -23,7 +23,7 @@
 
   const forwardArrowClass = cx(
     square({ size: 4 }),
-    directionalArrow("forward")
+    directionalArrow({ direction: "forward" })
   );
 
   let { data } = $props();
@@ -59,7 +59,7 @@
           insetBlockStart: 0,
           translate: "25%",
           opacity: "0.1",
-          backgroundColor: "lavenderIndigo",
+          backgroundColor: "featurePrimary",
         }),
         circle({ size: { base: 200, sm: 400, md: 500, lg: 600 } })
       )}
@@ -71,7 +71,7 @@
           insetBlockEnd: 0,
           translate: "33%",
           opacity: "0.1",
-          backgroundColor: "daisyBush",
+          backgroundColor: "inverse",
         }),
         circle({ size: { base: 200, sm: 300, md: 400 } })
       )}
@@ -96,9 +96,9 @@
             display: "inline-flex",
             borderWidth: "1px",
             borderStyle: "solid",
-            borderColor: "lavenderIndigo/20",
-            backgroundColor: "lavenderIndigo/10",
-            color: "lavenderIndigo",
+            borderColor: "featurePrimary/20",
+            backgroundColor: "featurePrimary/10",
+            color: "featurePrimary",
             alignItems: "center",
             gap: 2,
             rounded: "full",
@@ -117,7 +117,7 @@
             fontWeight: "black",
             letterSpacing: "tight",
             fontSize: { base: "5xl", sm: "6xl", lg: "7xl" },
-            color: "daisyBush",
+            color: "foreground",
           })}
         >
           Get Paid,<br />Faster Than<br />Ever Before.
@@ -126,7 +126,7 @@
           class={css({
             fontSize: "lg",
             lineHeight: "relaxed",
-            color: "stone.600",
+            color: "linkMuted",
             maxInlineSize: "lg",
           })}
         >
@@ -150,7 +150,7 @@
         <p
           class={css({
             fontSize: "sm",
-            color: "stone.400",
+            color: "textMuted",
           })}
         >
           No credit card required · Cancel anytime
@@ -171,15 +171,15 @@
             shadow: "lg",
             paddingInline: 4,
             paddingBlock: 2.5,
-            backgroundColor: "goldenFizz/90",
+            backgroundColor: "warning/90",
           })}
         >
-          <StarIcon class={css({ color: "daisyBush" })} size={16} />
+          <StarIcon class={css({ color: "warningForeground" })} size={16} />
           <p
             class={css({
               fontSize: "sm",
               fontWeight: "bold",
-              color: "daisyBush",
+              color: "warningForeground",
             })}
           >
             4.9 Client Rating
@@ -189,11 +189,11 @@
         <!-- Mock Invoice Card -->
         <div
           class={css({
-            backgroundColor: "whisper",
+            backgroundColor: "surfaceMuted",
             position: "relative",
             rounded: "2xl",
             borderWidth: 1,
-            borderColor: "gray.200",
+            borderColor: "displayBorder",
             shadow: "2xl",
             inlineSize: "full",
             maxInlineSize: "md",
@@ -211,7 +211,7 @@
               zIndex: 10,
               translate: "-50% 0",
               rounded: "xl",
-              backgroundColor: "white",
+              backgroundColor: "surface",
               paddingInline: 4,
               paddingBlock: 2.5,
               shadow: "lg",
@@ -220,7 +220,7 @@
             <div
               class={cx(
                 circle({ size: 8 }),
-                center({ backgroundColor: "green.100", fontSize: "sm" })
+                center({ backgroundColor: "displaySuccess", fontSize: "sm" })
               )}
             >
               💰
@@ -230,7 +230,7 @@
                 class={css({
                   fontSize: "xs",
                   fontWeight: "semibold",
-                  color: "green.700",
+                  color: "displaySuccessText",
                 })}
               >
                 Payment Received
@@ -238,7 +238,7 @@
               <p
                 class={css({
                   fontSize: "xs",
-                  color: "green.600",
+                  color: "displaySuccessMuted",
                 })}
               >
                 $4,200.00
@@ -248,7 +248,7 @@
           <!-- Invoice Header -->
           <div
             class={css({
-              backgroundColor: "daisyBush",
+              backgroundColor: "inverse",
               roundedTop: "2xl",
               paddingInline: 6,
               paddingBlock: 4,
@@ -263,7 +263,7 @@
                     fontWeight: "bold",
                     letterSpacing: "widest",
                     textTransform: "uppercase",
-                    color: "goldenFizz",
+                    color: "warning",
                   })}
                 >
                   Dollar Holler
@@ -272,14 +272,16 @@
                   class={css({
                     marginBlockStart: 0.5,
                     fontSize: "xs",
-                    color: "white/60",
+                    color: "foregroundInverse/60",
                   })}
                 >
                   Invoice
                 </p>
               </div>
               <div class={css({ textAlign: "right" })}>
-                <p class={css({ fontSize: "xs", color: "white/70" })}>
+                <p
+                  class={css({ fontSize: "xs", color: "foregroundInverse/70" })}
+                >
                   Invoice No.
                 </p>
                 <p
@@ -287,7 +289,7 @@
                     fontFamily: "sansserif",
                     fontSize: "sm",
                     fontWeight: "bold",
-                    color: "white",
+                    color: "foregroundInverse",
                   })}
                 >
                   #INV-0042
@@ -313,7 +315,7 @@
                     fontSize: "xs",
                     fontWeight: "semibold",
                     letterSpacing: "wide",
-                    color: "gray.400",
+                    color: "displayMuted",
                     textTransform: "uppercase",
                   })}
                 >
@@ -324,12 +326,12 @@
                     fontFamily: "sansserif",
                     fontSize: "sm",
                     fontWeight: "bold",
-                    color: "daisyBush",
+                    color: "foreground",
                   })}
                 >
                   Acme Design Co.
                 </p>
-                <p class={css({ fontSize: "xs", color: "gray.500" })}>
+                <p class={css({ fontSize: "xs", color: "displayMuted" })}>
                   sarah@acme.com
                 </p>
               </div>
@@ -340,7 +342,7 @@
                     fontSize: "xs",
                     fontWeight: "semibold",
                     letterSpacing: "wide",
-                    color: "gray.400",
+                    color: "displayMuted",
                     textTransform: "uppercase",
                   })}
                 >
@@ -348,7 +350,7 @@
                 </p>
                 <p
                   class={css({
-                    color: "daisyBush",
+                    color: "foreground",
                     fontSize: "sm",
                     fontWeight: "semibold",
                   })}
@@ -364,16 +366,16 @@
                 marginBlockEnd: 5,
                 overflow: "hidden",
                 rounded: "xl",
-                border: "gray.100",
+                border: "displayDivider",
               })}
             >
               <div
                 class={grid({
                   gridTemplateColumns: "1fr auto",
-                  color: "gray.400",
+                  color: "displayMuted",
                   borderBottomWidth: 1,
-                  borderBottomColor: "gray.100",
-                  backgroundColor: "gray.50",
+                  borderBottomColor: "displayDivider",
+                  backgroundColor: "displaySurface",
                   paddingInline: 4,
                   paddingBlock: 2,
                   fontSize: "xs",
@@ -385,7 +387,7 @@
                 <span>Description</span>
                 <span class={css({ textAlign: "right" })}>Amount</span>
               </div>
-              <div class={css({ divideY: "gray.50" })}>
+              <div class={css({ divideY: "displayDivider" })}>
                 <div
                   class={grid({
                     gridTemplateColumns: "1fr auto",
@@ -395,16 +397,16 @@
                   })}
                 >
                   <div>
-                    <p class={css({ fontSize: "sm", color: "gray.800" })}>
+                    <p class={css({ fontSize: "sm", color: "displayText" })}>
                       Brand Identity Package
                     </p>
-                    <p class={css({ fontSize: "xs", color: "gray.400" })}>
+                    <p class={css({ fontSize: "xs", color: "displayMuted" })}>
                       20 hrs × $150/hr
                     </p>
                   </div>
                   <span
                     class={css({
-                      color: "daisyBush",
+                      color: "foreground",
                       alignSelf: "center",
                       fontWeight: "semibold",
                     })}>$3,000.00</span
@@ -419,16 +421,21 @@
                   })}
                 >
                   <div>
-                    <p class={css({ fontWeight: "medium", color: "gray.800" })}>
+                    <p
+                      class={css({
+                        fontWeight: "medium",
+                        color: "displayText",
+                      })}
+                    >
                       Website Redesign
                     </p>
-                    <p class={css({ fontSize: "xs", color: "gray.400" })}>
+                    <p class={css({ fontSize: "xs", color: "displayMuted" })}>
                       8 hrs × $150/hr
                     </p>
                   </div>
                   <span
                     class={css({
-                      color: "daisyBush",
+                      color: "foreground",
                       alignSelf: "center",
                       fontWeight: "semibold",
                     })}>$1,200.00</span
@@ -445,7 +452,7 @@
                     fontSize: "xs",
                     fontWeight: "semibold",
                     letterSpacing: "wide",
-                    color: "gray.400",
+                    color: "displayMuted",
                     textTransform: "uppercase",
                   })}
                 >
@@ -454,7 +461,7 @@
                 <p
                   class={css({
                     fontFamily: "sansserif",
-                    color: "daisyBush",
+                    color: "foreground",
                     fontSize: "2xl",
                     fontWeight: "black",
                   })}
@@ -465,13 +472,13 @@
               <span
                 class={css({
                   rounded: "full",
-                  backgroundColor: "green.100",
+                  backgroundColor: "displaySuccess",
                   paddingInline: 4,
                   paddingBlock: 1.5,
                   fontSize: "xs",
                   fontWeight: "bold",
                   letterSpacing: "widest",
-                  color: "green.700",
+                  color: "displaySuccessText",
                   textTransform: "uppercase",
                 })}
               >
@@ -485,7 +492,7 @@
   </section>
 
   <!-- ═══════════════════════════════════════════════ FEATURES -->
-  <section class={css({ backgroundColor: "white", paddingBlock: 24 })}>
+  <section class={css({ backgroundColor: "surface", paddingBlock: 24 })}>
     <div
       class={css({
         marginInline: "auto",
@@ -497,7 +504,7 @@
       <div class={css({ marginBlockEnd: 16, textAlign: "center" })}>
         <p
           class={css({
-            color: "lavenderIndigo",
+            color: "featurePrimary",
             marginBlockEnd: 3,
             fontSize: "sm",
             fontWeight: "bold",
@@ -510,7 +517,7 @@
         <h2
           class={css({
             fontFamily: "sansserif",
-            color: "daisyBush",
+            color: "foreground",
             fontSize: { base: "4xl", sm: "5xl" },
             fontWeight: "black",
           })}
@@ -530,7 +537,7 @@
   <!-- ══════════════════════════════════════════════ REVIEWS -->
   <section
     class={css({
-      backgroundColor: "daisyBush",
+      backgroundColor: "inverse",
       position: "relative",
       overflow: "clip",
       paddingBlock: 24,
@@ -544,7 +551,7 @@
           insetInlineEnd: 0,
           insetBlockEnd: 0,
           opacity: "0.1",
-          backgroundColor: "lavenderIndigo",
+          backgroundColor: "featurePrimary",
         })
       )}
     />
@@ -554,7 +561,7 @@
         css({
           insetInlineStart: 0,
           insetBlockEnd: 0,
-          backgroundColor: "black/20",
+          backgroundColor: "overlay/20",
           opacity: "0.1",
         })
       )}
@@ -572,7 +579,7 @@
       <div class={css({ marginBlockEnd: 16, textAlign: "center" })}>
         <p
           class={css({
-            color: "goldenFizz",
+            color: "warning",
             marginBlockEnd: 3,
             fontSize: "sm",
             fontWeight: "bold",
@@ -587,12 +594,12 @@
             fontFamily: "sansserif",
             fontSize: { base: "4xl", sm: "5xl" },
             fontWeight: "black",
-            color: "white",
+            color: "foregroundInverse",
           })}
         >
           What our customers say
         </h2>
-        <p class={css({ color: "pastelPurple", marginBlockStart: 3 })}>
+        <p class={css({ color: "textSubtle", marginBlockStart: 3 })}>
           Trusted by freelancers and small businesses worldwide
         </p>
       </div>
@@ -605,7 +612,7 @@
   <!-- ══════════════════════════════════════════════════ CTA -->
   <section
     class={css({
-      backgroundColor: "lavenderIndigo",
+      backgroundColor: "primary",
       position: "relative",
       overflow: "hidden",
       paddingBlock: 28,
@@ -619,7 +626,7 @@
           insetInlineStart: "1/2",
           insetBlockStart: 0,
           translate: "-1/2",
-          backgroundColor: "daisyBush",
+          backgroundColor: "inverse",
           opacity: "0.4",
         })
       )}
@@ -631,7 +638,7 @@
           insetInlineEnd: 0,
           insetBlockEnd: 0,
           translate: "1/3",
-          backgroundColor: "robinEggBlue",
+          backgroundColor: "accent",
           opacity: "0.2",
         })
       )}
@@ -649,7 +656,7 @@
       <h2
         class={css({
           fontFamily: "sansserif",
-          color: "goldenFizz",
+          color: "warning",
           marginBlockEnd: 5,
           letterSpacing: "tight",
           fontWeight: "black",
@@ -663,7 +670,7 @@
           marginBlockEnd: 10,
           fontSize: "lg",
           letterSpacing: "relaxed",
-          color: "white/80",
+          color: "foregroundInverse/80",
         })}
       >
         Join thousands of freelancers and small businesses who use Dollar Holler
@@ -690,7 +697,10 @@
           </Button>
           <a
             class={css({
-              color: { base: "white/60", _hover: "white/90" },
+              color: {
+                base: "foregroundInverse/60",
+                _hover: "foregroundInverse/90",
+              },
               fontSize: "sm",
               textDecoration: "underline",
               textUnderlineOffset: 4,
@@ -709,9 +719,9 @@
 <!-- ══════════════════════════════════════════════ FOOTER -->
 <footer
   class={css({
-    backgroundColor: "daisyBush",
+    backgroundColor: "inverse",
     borderTopWidth: 1,
-    borderColor: "white/10",
+    borderColor: "foregroundInverse/10",
     paddingBlock: 10,
   })}
 >
@@ -724,7 +734,7 @@
       marginInline: "auto",
     })}
   >
-    <p class={css({ color: "pastelPurple", fontSize: "sm" })}>
+    <p class={css({ color: "textSubtle", fontSize: "sm" })}>
       © 2026 Dollar Holler. All rights reserved.
     </p>
     <nav
@@ -736,7 +746,7 @@
       {#if data?.user}
         <a
           class={css({
-            color: { base: "pastelPurple", _hover: "white" },
+            color: { base: "textSubtle", _hover: "foregroundInverse" },
             transitionProperty: "colors",
             transitionDuration: "normal",
           })}
@@ -744,7 +754,7 @@
         >
         <a
           class={css({
-            color: { base: "pastelPurple", _hover: "white" },
+            color: { base: "textSubtle", _hover: "foregroundInverse" },
             transitionProperty: "colors",
             transitionDuration: "normal",
           })}
@@ -753,7 +763,7 @@
       {:else}
         <a
           class={css({
-            color: { base: "pastelPurple", _hover: "white" },
+            color: { base: "textSubtle", _hover: "foregroundInverse" },
             transitionProperty: "colors",
             transitionDuration: "normal",
           })}
@@ -761,7 +771,7 @@
         >
         <a
           class={css({
-            color: { base: "goldenFizz", _hover: "white" },
+            color: { base: "warning", _hover: "foregroundInverse" },
             fontWeight: "semibold",
             transitionProperty: "colors",
             transitionDuration: "normal",

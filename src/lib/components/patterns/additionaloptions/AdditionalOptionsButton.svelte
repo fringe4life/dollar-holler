@@ -13,8 +13,8 @@
 <button
   class={css({
     color: {
-      _groupHover: "daisyBush/50",
-      _hover: "daisyBush",
+      _groupHover: "foreground/50",
+      _hover: "foreground",
     },
     cursor: "pointer",
     transitionDuration: "normal",

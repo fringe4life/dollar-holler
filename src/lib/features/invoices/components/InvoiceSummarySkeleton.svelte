@@ -16,7 +16,7 @@
 >
   <Skeleton
     class={css({
-      bg: "prim/40",
+      bg: "skeletonSubtle/40",
       blockSize: 4,
       inlineSize: "70%",
       maxInlineSize: "9rem",
@@ -24,7 +24,7 @@
   />
   <Skeleton
     class={css({
-      bg: "prim/40",
+      bg: "skeletonSubtle/40",
       blockSize: 9,
       inlineSize: "50%",
       maxInlineSize: "7rem",

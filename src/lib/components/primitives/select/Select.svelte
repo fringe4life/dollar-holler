@@ -6,8 +6,8 @@
   const selectClass = css({
     "&::picker(select)": {
       appearance: "base-select",
-      backgroundColor: "white",
-      borderColor: "silver",
+      backgroundColor: "popover",
+      borderColor: "border",
       borderRadius: "lg",
       borderWidth: 2,
       boxShadow: "tableRowHover",
@@ -21,7 +21,7 @@
       translate: "0 -0.5rem",
     },
     "&::picker-icon": {
-      color: "monsoon",
+      color: "textMuted",
       transitionDuration: "normal",
       transitionProperty: "rotate",
     },
@@ -33,7 +33,7 @@
       rotate: "180deg",
     },
     _ariaInvalid: {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     _disabled: {
       _hover: {
@@ -42,14 +42,14 @@
         color: "inherit",
       },
       backgroundColor: "transparent",
-      borderColor: "red.500",
-      color: "red.500",
+      borderColor: "destructive",
+      color: "destructive",
       cursor: "not-allowed",
     },
-    _focusWithin: { borderColor: "lavenderIndigo" },
+    _focusWithin: { borderColor: "ring" },
     _focusVisible: {
-      borderColor: "lavenderIndigo",
-      outlineColor: "lavenderIndigo",
+      borderColor: "ring",
+      outlineColor: "ring",
       outlineStyle: "solid",
       outlineWidth: "2px",
     },
@@ -60,16 +60,16 @@
       },
     },
     _userInvalid: {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     _supportsBaseSelect: {
       "& option": {
         _checked: {
-          color: "daisyBush",
+          color: "foreground",
           fontWeight: "bold",
         },
         _hover: {
-          backgroundColor: "whisper",
+          backgroundColor: "inputBackground",
         },
         alignItems: "center",
         borderRadius: "md",
@@ -81,7 +81,7 @@
         transitionProperty: "background-color, color",
       },
       "& option::checkmark": {
-        color: "lavenderIndigo",
+        color: "ring",
       },
       "& selectedcontent": {
         alignItems: "center",
@@ -100,7 +100,7 @@
     backgroundPosition: "97% center",
     backgroundRepeat: "no-repeat",
     blockSize: 10,
-    borderColor: "silver",
+    borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
     inlineSize: "full",

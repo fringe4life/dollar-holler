@@ -147,7 +147,7 @@
       <div class={flex({ gap: 5 })}>
         <Button onclick={() => closePanel()} variant="secondary">Cancel</Button>
         <LoaderButton class="group" {pending}
-          ><Check class={buttonIcon("check")} /> Save</LoaderButton
+          ><Check class={buttonIcon({ icon: "check" })} /> Save</LoaderButton
         >
       </div>
     </div>
@@ -176,9 +176,9 @@
   >
     {#snippet descriptionSnippet(_item)}
       This will delete the invoice to
-      <span class={css({ color: "scarlet" })}>{clientName}</span>
+      <span class={css({ color: "destructive" })}>{clientName}</span>
       for
-      <span class={css({ color: "scarlet" })}>{totalDisplay}</span>
+      <span class={css({ color: "destructive" })}>{totalDisplay}</span>
     {/snippet}
   </ConfirmDelete>
 {/if}

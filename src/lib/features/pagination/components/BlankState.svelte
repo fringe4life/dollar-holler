@@ -32,7 +32,7 @@
       fontWeight: "bold",
       textTransform: "capitalize",
       fontFamily: "handwriting",
-      color: "caribbeanGreen",
+      color: "success",
       translate: "0 -25%",
     })}
   >

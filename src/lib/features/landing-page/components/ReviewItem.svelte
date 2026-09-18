@@ -47,8 +47,8 @@
         rounded: "2xl",
         borderWidth: "1px",
         borderStyle: "solid",
-        borderColor: "white/10",
-        backgroundColor: "white/8",
+        borderColor: "foregroundInverse/10",
+        backgroundColor: "foregroundInverse/8",
         padding: 6,
         transitionProperty: "scale",
         transitionDuration: "normal",
@@ -62,12 +62,18 @@
     <!-- Stars -->
     <div class={flex({ gap: 1 })}>
       {#each { length: 5 } as _, i (i)}
-        <StarIcon class={css({ color: "goldenFizz" })} size={16} />
+        <StarIcon class={css({ color: "warning" })} size={16} />
       {/each}
     </div>
 
     <!-- Quote -->
-    <p class={css({ flex: 1, lineHeight: "relaxed", color: "white/90" })}>
+    <p
+      class={css({
+        flex: 1,
+        lineHeight: "relaxed",
+        color: "foregroundInverse/90",
+      })}
+    >
       "{review.quote}"
     </p>
 
@@ -77,7 +83,11 @@
         alt={review.name}
         class={cx(
           circle({ size: 11 }),
-          css({ objectFit: "cover", ring: 2, ringColor: "white/20" })
+          css({
+            objectFit: "cover",
+            ring: 2,
+            ringColor: "foregroundInverse/20",
+          })
         )}
         height="44"
         src={review.avatar}
@@ -89,12 +99,12 @@
             fontFamily: "sansserif",
             fontSize: "sm",
             fontWeight: "bold",
-            color: "white",
+            color: "foregroundInverse",
           })}
         >
           {review.name}
         </p>
-        <p class={css({ color: "pastelPurple", fontSize: "xs" })}>
+        <p class={css({ color: "textSubtle", fontSize: "xs" })}>
           {review.role}
         </p>
       </div>

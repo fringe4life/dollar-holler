@@ -6,13 +6,17 @@
 
 <dl class={css({ textAlign: "center" })}>
   <dt
-    class={css({ color: "lightGray", fontSize: "sm", fontWeight: "semibold" })}
+    class={css({
+      color: "metricLabel",
+      fontSize: "sm",
+      fontWeight: "semibold",
+    })}
   >
     {title}
   </dt>
   <dd
     class={css({
-      color: "purple",
+      color: "metric",
       fontSize: "3xl",
       fontWeight: "bold",
       truncate: true,

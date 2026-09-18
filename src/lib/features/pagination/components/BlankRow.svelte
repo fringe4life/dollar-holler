@@ -4,7 +4,7 @@
 
 <div
   class={css({
-    backgroundColor: "prim/40",
+    backgroundColor: "skeletonSubtle/40",
     marginBlockEnd: 3,
     borderRadius: "lg",
     blockSize: 20,

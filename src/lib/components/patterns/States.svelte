@@ -21,7 +21,7 @@
   // Fallback for states without a flag on flagcdn (District of Columbia).
   const fallbackFlagClass = css({
     blockSize: "18px",
-    color: "monsoon",
+    color: "textMuted",
     fill: "none",
     flexShrink: 0,
     inlineSize: 6,

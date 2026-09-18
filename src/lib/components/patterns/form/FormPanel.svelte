@@ -22,7 +22,7 @@
   }: FormPanelProps = $props();
 
   const panelTitle = css({
-    color: "daisyBush",
+    color: "foreground",
     fontFamily: "sansserif",
     fontSize: "3xl",
     fontWeight: "bold",

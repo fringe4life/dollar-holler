@@ -87,7 +87,7 @@
     class={cx(
       searchIconVt,
       gridItem({
-        color: "pastelPurple",
+        color: "mutedAction",
         aspectRatio: "square",
         alignSelf: "center",
         contain: "strict",
@@ -120,17 +120,17 @@
       zIndex: 0,
     })}
   >
-    <!-- "peer search border-b-pastelPurple font-sansserif border-b-2 border-dashed bg-transparent pe-16 text-black transition-colors duration-200 inline-full placeholder:text-transparent md:pe-0 md:inline-52 lg:text-xl lg:inline-72" -->
+    <!-- "peer search border-b-borderMuted font-sansserif border-b-2 border-dashed bg-transparent pe-16 text-foreground transition-colors duration-200 inline-full placeholder:text-transparent md:pe-0 md:inline-52 lg:text-xl lg:inline-72" -->
     <input
       class={cx(
         "peer",
         css({
-          borderBottom: "pastelPurple",
+          borderBottom: "borderMuted",
           fontFamily: "sansserif",
           borderBottomWidth: 2,
           borderBottomStyle: "dashed",
           backgroundColor: "transparent",
-          color: "black",
+          color: "foreground",
           transitionProperty: "colors",
           transitionDuration: "normal",
           paddingInlineEnd: { base: 16, md: 0 },
@@ -140,7 +140,7 @@
           },
           _focus: { outline: "none" },
           _focusVisible: {
-            outlineColor: "lavenderIndigo",
+            outlineColor: "ring",
             outlineWidth: "2px",
             outlineStyle: "solid",
           },
@@ -174,25 +174,25 @@
         opacity: "0",
         borderBottomWidth: 2,
         borderBottomStyle: "solid",
-        borderBottomColor: "lavenderIndigo",
+        borderBottomColor: "ring",
         _focus: { outline: "none" },
       })}
-      // class="border-b-lavenderIndigo ease-anticipate supports-linear:ease-anticipate pointer-events-none absolute inset-x-0 bottom-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200 block-2 peer-not-placeholder-shown:scale-x-100 peer-not-placeholder-shown:opacity-100 peer-focus:scale-x-100 peer-focus:opacity-100 md:inline-52 lg:inline-72"
+      // class="border-b-ring ease-anticipate supports-linear:ease-anticipate pointer-events-none absolute inset-x-0 bottom-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200 block-2 peer-not-placeholder-shown:scale-x-100 peer-not-placeholder-shown:opacity-100 peer-focus:scale-x-100 peer-focus:opacity-100 md:inline-52 lg:inline-72"
     ></span>
     <button
       class={css({
         fontFamily: "sansserif",
         color: {
-          base: "pastelPurple",
-          _peerFocus: "lavenderIndigo",
-          _peerHover: "daisyBush",
+          base: "mutedAction",
+          _peerFocus: "ring",
+          _peerHover: "foreground",
         },
         pointerEvents: "none",
         position: "absolute",
         _peerPlaceholderShown: { pointerEvents: "auto" },
         ".peer:is(:focus, :not(:placeholder-shown)) ~ &": {
           pointerEvents: "auto",
-          color: "lavenderIndigo",
+          color: "ring",
           insetInlineEnd: { base: 0, md: "auto" },
           translate: {
             base: "0 100%",
@@ -212,7 +212,7 @@
         inlineSize: 15,
         _focus: { outline: "none" },
         _focusVisible: {
-          outlineColor: "lavenderIndigo",
+          outlineColor: "ring",
           outlineWidth: "2px",
           outlineStyle: "solid",
         },
@@ -220,7 +220,7 @@
       onclick={handleSearchClick}
       onkeydown={handleKeydown}
       type="button"
-      // class="font-sansserif text-pastelPurple peer-not-placeholder-shown:text-lavenderIndigo peer-focus:text-lavenderIndigo peer-focus:hover:text-daisyBush peer-focus:focus:text-daisyBush supports-linear:ease-anticipate pointer-events-none absolute translate-x-0 transform text-xl font-black transition-transform duration-200 ease-out inline-15.5 not-placeholder-shown:pointer-events-auto"
+      // class="font-sansserif text-mutedAction peer-not-placeholder-shown:text-ring peer-focus:text-ring peer-focus:hover:text-foreground peer-focus:focus:text-foreground supports-linear:ease-anticipate pointer-events-none absolute translate-x-0 transform text-xl font-black transition-transform duration-200 ease-out inline-15.5 not-placeholder-shown:pointer-events-auto"
     >
       Search
     </button>

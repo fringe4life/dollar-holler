@@ -26,7 +26,7 @@
   <li
     class={css({
       _last: { borderBottomColor: "transparent", borderBottomWidth: 0 },
-      borderBottomColor: "whisper",
+      borderBottomColor: "borderSubtle",
       borderBottomStyle: "solid",
       borderBottomWidth: 2,
     })}
@@ -34,9 +34,9 @@
     <button
       class={flex({
         color: {
-          _hover: "daisyBush",
-          base: "pastelPurple",
-          _groupHover: "daisyBush/50",
+          _hover: "foreground",
+          base: "mutedAction",
+          _groupHover: "foreground/50",
         },
         columnGap: 2,
         cursor: "pointer",

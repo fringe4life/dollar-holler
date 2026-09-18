@@ -8,7 +8,7 @@
     base: {
       dialog: {
         _backdrop: {
-          background: "blueGem/60",
+          background: "backdrop/60",
           opacity: "0",
           transitionBehavior: "allow-discrete",
           transitionDuration: "slow",
@@ -68,7 +68,7 @@
               scale: "1",
               translate: "-50% -50%",
             },
-            backgroundColor: "white",
+            backgroundColor: "surface",
             borderRadius: "lg",
             boxShadow: "md",
             display: "flex",
@@ -96,7 +96,7 @@
               },
               translate: "0 0",
             },
-            backgroundColor: "white",
+            backgroundColor: "surface",
             boxShadow: "addInvoice",
             inlineSize: { base: "full", lg: "3/4" },
             insetBlockStart: 0,

@@ -42,6 +42,7 @@
         "name": "shared",
         "patterns": [
           "src/lib/runes/**",
+          "src/lib/theme/**",
           "src/lib/utils/**"
         ]
       },

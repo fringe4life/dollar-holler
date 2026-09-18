@@ -31,7 +31,7 @@
       marginBlockStart: 4,
       textAlign: "center",
       fontSize: "sm",
-      color: "white",
+      color: "authForeground",
     })}
   >
     <a
@@ -45,7 +45,7 @@
       forId="email"
       issues={forgotPassword.fields.email.issues()}
       label="Email Address"
-      labelClass={css({ color: "goldenFizz" })}
+      labelClass={css({ color: "authLabel" })}
     >
       {#snippet children({ errorId })}
         <Input
@@ -68,7 +68,7 @@
           marginBlockStart: 4,
           textAlign: "center",
           fontSize: "sm",
-          color: "white",
+          color: "authForeground",
         })}
       >
         <a

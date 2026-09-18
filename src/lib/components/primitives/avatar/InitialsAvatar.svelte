@@ -11,7 +11,7 @@
     alignItems: "center",
     blockSize: 6,
     borderRadius: "full",
-    color: "white",
+    color: "avatarForeground",
     display: "inline-flex",
     flexShrink: 0,
     fontSize: "xs",
@@ -22,12 +22,12 @@
     textTransform: "uppercase",
   });
 
-  // Literal css() calls so Panda can statically extract each color class.
+  // Literal css() calls so Panda can statically extract each semantic color class.
   const backgroundClasses = [
-    css({ backgroundColor: "lavenderIndigo" }),
-    css({ backgroundColor: "daisyBush" }),
-    css({ backgroundColor: "blueGem" }),
-    css({ backgroundColor: "purple" }),
+    css({ backgroundColor: "avatarPrimary" }),
+    css({ backgroundColor: "avatarSecondary" }),
+    css({ backgroundColor: "avatarTertiary" }),
+    css({ backgroundColor: "avatarAccent" }),
   ];
 
   const HASH_PRIME = 31;

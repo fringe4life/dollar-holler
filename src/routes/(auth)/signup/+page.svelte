@@ -27,7 +27,7 @@
     forId="name"
     issues={signup.fields.name.issues()}
     label="Full Name"
-    labelClass={css({ color: "goldenFizz" })}
+    labelClass={css({ color: "authLabel" })}
   >
     {#snippet children({ errorId })}
       <Input
@@ -44,7 +44,7 @@
     forId="email"
     issues={signup.fields.email.issues()}
     label="Email"
-    labelClass={css({ color: "goldenFizz" })}
+    labelClass={css({ color: "authLabel" })}
   >
     {#snippet children({ errorId })}
       <Input
@@ -59,7 +59,7 @@
     forId="password"
     issues={signup.fields._password.issues()}
     label="Password"
-    labelClass={css({ color: "goldenFizz" })}
+    labelClass={css({ color: "authLabel" })}
   >
     {#snippet children({ errorId })}
       <Input
@@ -75,7 +75,7 @@
     forId="confirmPassword"
     issues={signup.fields._confirmPassword.issues()}
     label="Confirm Password"
-    labelClass={css({ color: "goldenFizz" })}
+    labelClass={css({ color: "authLabel" })}
   >
     {#snippet children({ errorId })}
       <Input
@@ -96,7 +96,7 @@
         marginBlockStart: 4,
         textAlign: "center",
         fontSize: "sm",
-        color: "white",
+        color: "authForeground",
       })}
     >
       <a

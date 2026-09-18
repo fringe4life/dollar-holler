@@ -1,12 +1,13 @@
 <script lang="ts">
   import type { User } from "better-auth";
-  import { css } from "#styled-system/css/index.js";
+  import { css, keyframes } from "#styled-system/css/index.js";
   import { between, hstack, square } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";
   import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
   import LogIn from "@lucide/svelte/icons/log-in";
   import UserPlus from "@lucide/svelte/icons/user-plus";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
   import type { Maybe } from "#lib/types.ts";
 
   interface Props {
@@ -14,6 +15,39 @@
   }
 
   let { user = null }: Props = $props();
+
+  const navSolidify = keyframes({
+    from: {
+      backdropFilter: "blur(0)",
+      backgroundColor: "transparent",
+      boxShadow: "0 0 0 oklch(from var(--colors-black) l c h / 0%)",
+    },
+    to: {
+      backdropFilter: "blur(4px)",
+      backgroundColor: "oklch(from var(--colors-background) l c h / 95%)",
+      boxShadow: "0 1px 3px oklch(from var(--colors-black) l c h / 10%)",
+    },
+  });
+
+  const landingNav = css({
+    backdropFilter: "auto",
+    insetBlockStart: 0,
+    insetInline: 0,
+    position: "fixed",
+    zIndex: "50",
+    _notSupportsScroll: {
+      backgroundColor: "background/95",
+      backdropFilter: "xs",
+      shadow: "xs",
+    },
+    _supportsScroll: {
+      animationFillMode: "both",
+      animationName: navSolidify,
+      animationRange: "0px 80px",
+      animationTimeline: "scroll()",
+      animationTimingFunction: "linear",
+    },
+  });
 
   const landingActions = hstack({
     gap: { base: 2, md: 3 },
@@ -34,29 +68,14 @@
   const landingActionLabel = css({
     display: { base: "none", md: "inline" },
   });
+
+  const landingModeSelect = css({
+    color: "foreground",
+    inlineSize: { base: 24, md: 32 },
+  });
 </script>
 
-<nav
-  class={css({
-    backdropFilter: "auto",
-    insetBlockStart: 0,
-    insetInline: 0,
-    position: "fixed",
-    zIndex: "50",
-    _notSupportsScroll: {
-      backgroundColor: "whisper/95",
-      backdropFilter: "xs",
-      shadow: "xs",
-    },
-    _supportsScroll: {
-      animationFillMode: "both",
-      animationName: "nav-solidify",
-      animationRange: "0px 80px",
-      animationTimeline: "scroll(root block)",
-      animationTimingFunction: "linear",
-    },
-  })}
->
+<nav class={landingNav}>
   <div
     class={between({
       marginInline: "auto",
@@ -74,7 +93,7 @@
       />
       <span
         class={css({
-          color: "daisyBush",
+          color: "foreground",
           fontFamily: "sansserif",
           fontSize: "xl",
           fontWeight: "black",
@@ -86,6 +105,9 @@
     </a>
     <!-- Responsive actions -->
     <div class={landingActions}>
+      <div class={landingModeSelect}>
+        <ModeSelect />
+      </div>
       {#if user}
         <Button
           aria-label="Go to dashboard"

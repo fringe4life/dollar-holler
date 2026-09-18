@@ -15,7 +15,7 @@
 <ul
   aria-label="Additional options"
   class={css({
-    bgColor: "white",
+    bgColor: "popover",
     inset: "auto",
     insetBlockStart: "anchor(bottom)",
     insetInlineEnd: "anchor(right)",

@@ -83,7 +83,7 @@
   class={cx(
     invoiceLineItem,
     css({
-      borderColor: "fog",
+      borderColor: "borderSubtle",
       borderBottomWidth: 2,
       paddingBlock: { base: 4, sm: 2 },
     })

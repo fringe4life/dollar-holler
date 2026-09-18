@@ -9,6 +9,7 @@
     "src/**/*.svelte.js",
     "vite.config.ts",
     "panda.config.ts",
+    "theme/**/*.ts",
     "drizzle.config.ts",
     "eslint.config.mjs",
     "prettier.config.mjs",

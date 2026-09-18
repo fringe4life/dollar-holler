@@ -4,14 +4,14 @@
 
   const inputClass = css({
     _ariaInvalid: {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     _userInvalid: {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
-    backgroundColor: "whisper",
+    backgroundColor: "inputBackground",
     blockSize: { base: "10", lg: "14" },
-    borderColor: "silver",
+    borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
     fontFamily: "sansserif",
@@ -32,15 +32,15 @@
 
   const dateInputShell = css({
     "&:has([aria-invalid='true'])": {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     "&:has(:user-invalid)": {
-      borderColor: "scarlet",
+      borderColor: "destructive",
     },
     alignItems: "center",
-    backgroundColor: "whisper",
+    backgroundColor: "inputBackground",
     blockSize: { base: "10", lg: "14" },
-    borderColor: "silver",
+    borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
     display: "flex",

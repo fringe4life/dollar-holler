@@ -177,7 +177,7 @@
       <div class={flex({ gap: 5 })}>
         <Button onclick={() => closePanel()} variant="secondary">Cancel</Button>
         <LoaderButton class="group" {pending}
-          ><Check class={buttonIcon("check")} /> Submit</LoaderButton
+          ><Check class={buttonIcon({ icon: "check" })} /> Submit</LoaderButton
         >
       </div>
     </div>

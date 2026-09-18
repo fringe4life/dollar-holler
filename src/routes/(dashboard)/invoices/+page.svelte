@@ -76,7 +76,7 @@
 
 <ItemsHeader open={() => formPanel.open({ kind: "create" })}>
   {#snippet button()}
-    <span aria-hidden="true" class={buttonIcon("plus")}>+</span>
+    <span aria-hidden="true" class={buttonIcon({ icon: "plus" })}>+</span>
     Invoice
   {/snippet}
 </ItemsHeader>
@@ -175,9 +175,11 @@
 >
   {#snippet descriptionSnippet(invoice)}
     This will delete the invoice to
-    <span class={css({ color: "scarlet" })}>{invoice?.name ?? "Unknown"}</span>
+    <span class={css({ color: "destructive" })}
+      >{invoice?.name ?? "Unknown"}</span
+    >
     for
-    <span class={css({ color: "scarlet" })}
+    <span class={css({ color: "destructive" })}
       >{formatTotal(invoice?.total ?? 0)}</span
     >
   {/snippet}

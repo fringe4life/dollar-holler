@@ -7,7 +7,7 @@
 
 <div
   class={grid({
-    backgroundColor: "whisper",
+    backgroundColor: "background",
     columns: 12,
     overflowX: "clip",
     minBlockSize: "100dvh",

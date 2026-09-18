@@ -33,7 +33,7 @@
       state: {
         close: {
           button: {
-            color: "goldenFizz",
+            color: "navigationForeground",
             position: "absolute",
           },
           icon: {
@@ -49,7 +49,7 @@
         },
         open: {
           button: {
-            color: "daisyBush",
+            color: "foreground",
             position: "fixed",
           },
           icon: {

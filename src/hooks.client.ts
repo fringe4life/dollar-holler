@@ -1,5 +1,10 @@
 import * as Sentry from "@sentry/sveltekit";
 import type { HandleClientError } from "@sveltejs/kit/hooks";
+import { applyDocumentTheme, readThemeCookie } from "#lib/theme/theme.ts";
+
+export function init() {
+  applyDocumentTheme(readThemeCookie() ?? "system");
+}
 
 Sentry.init({
   dsn: "https://09af8526419b32d328f0c046d2ee5d09@o4511356309536768.ingest.us.sentry.io/4511356313010176",

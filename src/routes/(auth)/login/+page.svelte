@@ -30,7 +30,7 @@
     forId="email"
     issues={login.fields.email.issues()}
     label="Email"
-    labelClass={css({ color: "goldenFizz" })}
+    labelClass={css({ color: "authLabel" })}
   >
     {#snippet children({ errorId })}
       <Input
@@ -45,12 +45,12 @@
   <FormField forId="password" issues={login.fields._password.issues()}>
     {#snippet children({ errorId })}
       <div class={between()}>
-        <Label class={css({ color: "goldenFizz" })} for="password"
+        <Label class={css({ color: "authLabel" })} for="password"
           >Password</Label
         >
         <a
           class={css({
-            color: "whisper",
+            color: "authLink",
             fontSize: "sm",
             textDecoration: { base: "underline", _hover: "none" },
           })}
@@ -75,7 +75,7 @@
         marginBlockStart: 4,
         textAlign: "center",
         fontSize: "sm",
-        color: "white",
+        color: "authForeground",
       })}
     >
       <a

@@ -11,13 +11,7 @@
     resolvedThemeChoice,
     selectThemeChoice,
   } from "#lib/theme/choice.svelte.ts";
-  import { THEME_CHOICES, type ThemeChoice } from "#lib/theme/schema.ts";
-
-  const labels = {
-    dark: "Dark",
-    light: "Light",
-    system: "System",
-  } as const satisfies Record<ThemeChoice, Capitalize<ThemeChoice>>;
+  import { parseThemeChoice, type ThemeChoice } from "#lib/theme/schema.ts";
 
   const icons = {
     dark: MoonIcon,
@@ -33,24 +27,24 @@
 
   const selected = $derived(resolvedThemeChoice(page.data.theme ?? "system"));
 
-  const setColorMode = (mode: ThemeChoice) => {
-    selectThemeChoice(mode);
+  const setColorMode = (raw: string) => {
+    const mode = parseThemeChoice(raw);
+    if (mode) {
+      selectThemeChoice(mode);
+    }
   };
 </script>
 
 <Select
   aria-label="Color mode"
+  class={css({ textTransform: "capitalize" })}
   name="theme"
   onchange={(e) => {
-    const { value } = e.currentTarget;
-    if (value === "dark" || value === "light" || value === "system") {
-      setColorMode(value);
-    }
+    setColorMode(e.currentTarget.value);
   }}
   value={selected}
 >
-  {#each THEME_CHOICES as value (value)}
-    {@const ThemeIcon = icons[value]}
+  {#each Object.entries(icons) as [value, ThemeIcon] (value)}
     <option
       onclick={() => {
         if (supportsBaseSelect) {
@@ -62,7 +56,7 @@
       {#if supportsBaseSelect}
         <ThemeIcon aria-hidden="true" class={themeIconClass} />
       {/if}
-      {labels[value]}
+      {value}
     </option>
   {/each}
 </Select>

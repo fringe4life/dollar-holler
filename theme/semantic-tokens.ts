@@ -59,6 +59,7 @@ export const semanticTokens = defineSemanticTokens({
     mutedForeground: color("{colors.monsoon}", "{colors.gray.400}"),
     navigationForeground: color("{colors.white}", "{colors.gray.100}"),
     navigationSurface: color("{colors.daisyBush}", "{colors.gray.900}"),
+    outline: color("{colors.daisyBush}", "{colors.gray.100}"),
     overlay: color("{colors.black}"),
     popover: color("{colors.white}", "{colors.gray.900}"),
     popoverForeground: color("{colors.daisyBush}", "{colors.gray.100}"),

@@ -1,7 +1,7 @@
 <script lang="ts">
   import MoonIcon from "@lucide/svelte/icons/moon";
   import SunIcon from "@lucide/svelte/icons/sun";
-  import SunMoonIcon from "@lucide/svelte/icons/sun-moon";
+  import MonitorIcon from "@lucide/svelte/icons/monitor";
   import { css, cx } from "#styled-system/css/index.js";
   import { square } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
@@ -16,7 +16,7 @@
   const icons = {
     dark: MoonIcon,
     light: SunIcon,
-    system: SunMoonIcon,
+    system: MonitorIcon,
   } as const satisfies Record<ThemeChoice, typeof SunIcon>;
 
   // Lucide icons are stroke-based; undo the global `svg { fill }` rule.

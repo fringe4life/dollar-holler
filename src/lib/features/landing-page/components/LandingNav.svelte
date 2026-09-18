@@ -98,6 +98,7 @@
           fontSize: "xl",
           fontWeight: "black",
           letterSpacing: "tight",
+          display: { base: "none", sm: "inline" },
         })}
       >
         Dollar Holler

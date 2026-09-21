@@ -76,6 +76,8 @@
         marginInline: "auto",
         maxInlineSize: "5xl",
         minBlockSize: "100dvh",
+        // Keep the visually offset invoice surface inside the scrollable flow.
+        paddingBlockEnd: { base: 36, _print: 0 },
         translate: "0 0",
         transitionProperty: "translate",
         transitionDuration: "normal",

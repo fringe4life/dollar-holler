@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { enhancedImages } from "@sveltejs/enhanced-img";
@@ -13,10 +11,15 @@ import { svelteDevtools } from "vite-devtools-svelte";
 // Chrome DevTools workspace (com.chrome.devtools.json) — separate from @vitejs/devtools
 // (Vite/Rolldown UI + vite-devtools-svelte panels). See https://devtools.vite.dev/guide
 import devToolsJson from "vite-plugin-devtools-json";
+import {
+  CLOUDFLARE_WORKERS,
+  restoreCloudflareWorkersInDir,
+  rewriteCloudflareWorkersSpecifier,
+  SERVER_OUTPUT_DIR,
+  stubCloudflareWorkersInDir,
+} from "./scripts/cloudflare-workers-specifier.ts";
 
 const FILE_REGEX = /[/\\]/;
-const CLOUDFLARE_WORKERS = "cloudflare:workers";
-const SERVER_OUTPUT_DIR = path.resolve(".svelte-kit/output/server");
 const ADAPTER_VIRTUAL_WORKERS_PLUGIN =
   "vite-plugin-sveltekit-adapter-cloudflare-virtual-workers-module";
 
@@ -29,22 +32,7 @@ type BundleChunk = {
   code?: string;
 };
 
-const quotedCloudflareWorkers = [
-  `"${CLOUDFLARE_WORKERS}"`,
-  `'${CLOUDFLARE_WORKERS}'`,
-  `\`${CLOUDFLARE_WORKERS}\``,
-] as const;
-
 let stubImport: string | undefined;
-
-const rewriteCloudflareWorkersSpecifier = (code: string, stub: string) => {
-  const replacement = JSON.stringify(stub);
-  let next = code;
-  for (const quoted of quotedCloudflareWorkers) {
-    next = next.replaceAll(quoted, replacement);
-  }
-  return next;
-};
 
 const captureAdapterStubImport = (plugins: readonly Plugin[]) => {
   const adapterPlugin = plugins.find(
@@ -67,36 +55,13 @@ const rewriteSsrBundle = (bundle: Record<string, BundleChunk>, stub: string) => 
   }
 };
 
-const visitJsFiles = (directory: string, onFile: (full: string) => void) => {
-  for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
-    const full = path.join(directory, entry.name);
-    if (entry.isDirectory()) {
-      visitJsFiles(full, onFile);
-      continue;
-    }
-    if (entry.name.endsWith(".js")) {
-      onFile(full);
-    }
-  }
-};
-
-const rewriteJsFilesInDir = (directory: string, stub: string) => {
-  if (!fs.existsSync(directory)) {
-    return;
-  }
-  visitJsFiles(directory, (full) => {
-    const contents = fs.readFileSync(full, "utf8");
-    const next = rewriteCloudflareWorkersSpecifier(contents, stub);
-    if (next !== contents) {
-      fs.writeFileSync(full, next);
-    }
-  });
-};
-
 /**
  * Rolldown leaves `cloudflare:workers` as an external protocol import, so
  * Node/Bun cannot load the SSR output. Rewrite to the adapter's Node stub
- * during SSR and again at preview (after adapt restores the protocol).
+ * during SSR (prerender) and again at preview (after adapt restores the
+ * protocol). Restore on preview close — `vite preview` otherwise leaves
+ * `file://...virtual-cloudflare-workers.js?<uuid>` in
+ * `.svelte-kit/output/server`, which wrangler cannot resolve.
  *
  * TODO(agent): reevaluate on the next `@sveltejs/kit` / `@sveltejs/adapter-cloudflare`
  * bump. Delete this plugin if `vite build` + `vite preview` work with a bare
@@ -115,10 +80,17 @@ const stubCloudflareWorkersPlugin = (): Plugin => ({
       rewriteSsrBundle(bundle, stubImport);
     }
   },
-  configurePreviewServer() {
-    if (stubImport) {
-      rewriteJsFilesInDir(SERVER_OUTPUT_DIR, stubImport);
+  configurePreviewServer(server) {
+    if (!stubImport) {
+      return;
     }
+    stubCloudflareWorkersInDir(SERVER_OUTPUT_DIR, stubImport);
+    return () => {
+      const stub = stubImport;
+      server.httpServer?.once("close", () => {
+        restoreCloudflareWorkersInDir(SERVER_OUTPUT_DIR, stub);
+      });
+    };
   },
 });
 

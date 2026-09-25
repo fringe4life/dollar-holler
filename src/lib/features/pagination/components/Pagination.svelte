@@ -30,6 +30,7 @@
     visibleListUrl,
   } from "#features/pagination/utils/url.ts";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
+  import { withViewTransition } from "#lib/client/view-transition.ts";
   import Button from "#lib/components/primitives/button/button.svelte";
   import Select from "#lib/components/primitives/select/Select.svelte";
   import { directionalArrow } from "#lib/styles.ts";
@@ -77,21 +78,10 @@
     next: PaginationSearchParams,
     direction: ListDirection
   ) => {
-    if (typeof document?.startViewTransition !== "function") {
-      await navigateWithQuery(next);
-      return;
-    }
-
-    try {
-      await document.startViewTransition({
-        types: [direction],
-        update: async () => {
-          await navigateWithQuery(next);
-        },
-      }).finished;
-    } catch {
-      await navigateWithQuery(next);
-    }
+    await withViewTransition({
+      types: [direction],
+      update: () => navigateWithQuery(next),
+    });
   };
   const handleForward = async () => {
     const last = items.at(-1);

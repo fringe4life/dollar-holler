@@ -21,11 +21,12 @@
     visibleListUrl,
   } from "#features/pagination/utils/url.ts";
   import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
+  import { withViewTransition } from "#lib/client/view-transition.ts";
   import Search from "#lib/components/primitives/icons/Search.svelte";
 
   const searchIconVt = viewTransition({
     group: {
-      animationDuration: "0.35s",
+      animationDuration: "slow",
       animationTimingFunction: "glide",
     },
     old: { mixBlendMode: "normal" },
@@ -49,13 +50,9 @@
     const n = toNormalizedListQuery(searchTerm || undefined, { limit });
     const url = `${listUrl.pathname}${buildListSearchString(n)}`;
     try {
-      if (typeof document.startViewTransition === "function") {
-        await document.startViewTransition(async () => {
-          await goto(url, { shallow: true });
-        }).finished;
-      } else {
-        await goto(url, { shallow: true });
-      }
+      await withViewTransition({
+        update: () => goto(url, { shallow: true }),
+      });
     } finally {
       loading.off();
     }
@@ -120,7 +117,6 @@
       zIndex: 0,
     })}
   >
-    <!-- "peer search border-b-borderMuted font-sansserif border-b-2 border-dashed bg-transparent pe-16 text-foreground transition-colors duration-200 inline-full placeholder:text-transparent md:pe-0 md:inline-52 lg:text-xl lg:inline-72" -->
     <input
       class={cx(
         "peer",
@@ -133,17 +129,11 @@
           color: "foreground",
           transitionProperty: "colors",
           transitionDuration: "normal",
-          paddingInlineEnd: { base: 16, md: 0 },
           inlineSize: { base: "full", md: 52, lg: 72 },
           _placeholder: {
             color: "transparent",
           },
           _focus: { outline: "none" },
-          _focusVisible: {
-            outlineColor: "ring",
-            outlineWidth: "2px",
-            outlineStyle: "solid",
-          },
           fontSize: "xl",
         })
       )}
@@ -177,7 +167,6 @@
         borderBottomColor: "ring",
         _focus: { outline: "none" },
       })}
-      // class="border-b-ring ease-anticipate supports-linear:ease-anticipate pointer-events-none absolute inset-x-0 bottom-0 origin-left scale-x-90 border-b-2 border-solid opacity-0 transition-[opacity,scale] duration-200 block-2 peer-not-placeholder-shown:scale-x-100 peer-not-placeholder-shown:opacity-100 peer-focus:scale-x-100 peer-focus:opacity-100 md:inline-52 lg:inline-72"
     ></span>
     <button
       class={css({
@@ -220,7 +209,6 @@
       onclick={handleSearchClick}
       onkeydown={handleKeydown}
       type="button"
-      // class="font-sansserif text-mutedAction peer-not-placeholder-shown:text-ring peer-focus:text-ring peer-focus:hover:text-foreground peer-focus:focus:text-foreground supports-linear:ease-anticipate pointer-events-none absolute translate-x-0 transform text-xl font-black transition-transform duration-200 ease-out inline-15.5 not-placeholder-shown:pointer-events-auto"
     >
       Search
     </button>

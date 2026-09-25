@@ -1,3 +1,4 @@
+import { withViewTransition } from "#lib/client/view-transition.ts";
 import {
   parseStoredTheme,
   THEME_COOKIE_MAX_AGE,
@@ -50,6 +51,15 @@ export const applyDocumentTheme = (theme: ThemeChoice): void => {
   root.style.colorScheme = colorSchemeForTheme(
     theme === "system" ? null : theme
   );
+};
+
+export const withThemeViewTransition = (update: () => void): void => {
+  void withViewTransition({
+    types: ["theme-change"],
+    update,
+  }).catch(() => {
+    update();
+  });
 };
 
 const encodedCookieName = encodeURIComponent(THEME_COOKIE_NAME);

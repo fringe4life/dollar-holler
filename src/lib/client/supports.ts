@@ -24,3 +24,12 @@ export const supportsBaseSelect =
  */
 export const supportsCssTypedOm =
   browser && typeof CSS !== "undefined" && typeof CSS.px === "function";
+
+/**
+ * Document View Transitions API (`document.startViewTransition`).
+ *
+ * Checked when a transition starts, not at module load, so tests can stub
+ * `document`. `false` during SSR via `browser`.
+ */
+export const supportsViewTransition = (): boolean =>
+  browser && typeof document.startViewTransition === "function";

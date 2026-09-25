@@ -47,4 +47,12 @@ export const keyframes = defineKeyframes({
       translate: "0 var(--slide-distance)",
     },
   },
+  "theme-circle-reveal": {
+    from: {
+      clipPath: "circle(0 at 100% 0)",
+    },
+    to: {
+      clipPath: "circle(150vmax at 100% 0)",
+    },
+  },
 });

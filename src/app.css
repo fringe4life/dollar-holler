@@ -17,3 +17,30 @@
     U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
     U+2215, U+FEFF, U+FFFD;
 }
+
+html {
+  view-transition-name: theme;
+}
+
+/*
+ * UA stylesheet (prefers-reduced-motion: reduce) sets
+ * `animation: none !important` on view-transition pseudos.
+ * Author duration loses unless the shorthand is also !important.
+ */
+:active-view-transition-type(theme-change)::view-transition-group(theme) {
+  animation-duration: 500ms !important;
+  animation-fill-mode: both !important;
+  animation-timing-function: var(--easings-glide) !important;
+}
+
+:active-view-transition-type(theme-change)::view-transition-old(theme) {
+  display: block;
+  animation: none !important;
+  mix-blend-mode: normal;
+}
+
+:active-view-transition-type(theme-change)::view-transition-new(theme) {
+  display: block;
+  animation: theme-circle-reveal 500ms var(--easings-glide) both !important;
+  mix-blend-mode: normal;
+}

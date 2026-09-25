@@ -7,7 +7,7 @@
     wrap,
   } from "#styled-system/patterns/index.js";
   import { goto } from "$app/navigation";
-  import { resolve } from "$app/paths";
+  import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   import {
@@ -33,9 +33,8 @@
   const invoiceId = $derived(params.id); // CursorId, no assert
   // Sequential on purpose. `$derived(await Promise.all([query(), query()]))`
   // over Kit remotes refetch-loops forever under experimental.async.
-  // Revisit parallel fetch when these close:
+  // kit#15767 is closed (Svelte bug, not Kit). Still open:
   // @see https://github.com/sveltejs/svelte/issues/18662
-  // @see https://github.com/sveltejs/kit/issues/15767
   const detail = $derived(await getInvoiceDetail(invoiceId));
   const settings = $derived(await getSettings());
 
@@ -256,10 +255,12 @@
     })}
   >
     <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
-      <enhanced:img
+      <img
         alt="Compressed fm"
         class={css({ inlineSize: "316px", blockSize: "134px" })}
-        src="#lib/assets/logo.png"
+        height="134"
+        src={asset("images/logo-wordmark.svg")}
+        width="316"
       />
     </div>
 

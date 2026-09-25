@@ -1,6 +1,5 @@
 import { sentrySvelteKit } from "@sentry/sveltekit";
 import adapter from "@sveltejs/adapter-cloudflare";
-import { enhancedImages } from "@sveltejs/enhanced-img";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
@@ -129,7 +128,6 @@ export default defineConfig({
       org: "coinnich",
       project: "javascript-sveltekit",
     }),
-    enhancedImages(),
     sveltekit({
       adapter: adapter({
         platformProxy: {

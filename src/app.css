@@ -25,22 +25,25 @@ html {
 /*
  * UA stylesheet (prefers-reduced-motion: reduce) sets
  * `animation: none !important` on view-transition pseudos.
- * Author duration loses unless the shorthand is also !important.
+ * These rules stay inside no-preference so that UA rule wins.
+ * No !important here: it would beat reduced motion.
  */
-:active-view-transition-type(theme-change)::view-transition-group(theme) {
-  animation-duration: 500ms !important;
-  animation-fill-mode: both !important;
-  animation-timing-function: var(--easings-glide) !important;
-}
+@media (prefers-reduced-motion: no-preference) {
+  :active-view-transition-type(theme-change)::view-transition-group(theme) {
+    animation-duration: 500ms;
+    animation-fill-mode: both;
+    animation-timing-function: var(--easings-glide);
+  }
 
-:active-view-transition-type(theme-change)::view-transition-old(theme) {
-  display: block;
-  animation: none !important;
-  mix-blend-mode: normal;
-}
+  :active-view-transition-type(theme-change)::view-transition-old(theme) {
+    display: block;
+    animation: none;
+    mix-blend-mode: normal;
+  }
 
-:active-view-transition-type(theme-change)::view-transition-new(theme) {
-  display: block;
-  animation: theme-circle-reveal 500ms var(--easings-glide) both !important;
-  mix-blend-mode: normal;
+  :active-view-transition-type(theme-change)::view-transition-new(theme) {
+    display: block;
+    animation: theme-circle-reveal 500ms var(--easings-glide) both;
+    mix-blend-mode: normal;
+  }
 }

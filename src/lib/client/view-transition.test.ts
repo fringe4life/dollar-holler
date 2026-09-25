@@ -201,6 +201,54 @@ describe("withViewTransition", () => {
     expect(updates).toBe(1);
   });
 
+  it("does not replay an update after a newer transition starts", async () => {
+    let firstUpdates = 0;
+    let secondUpdates = 0;
+    const calls: Array<{
+      update: ViewTransitionUpdateCallback | undefined;
+      finished: ReturnType<typeof Promise.withResolvers<void>>;
+    }> = [];
+
+    await withDocument(
+      (callbackOptions) => {
+        const finished = Promise.withResolvers<void>();
+        calls.push({
+          update: capturedUpdate(callbackOptions),
+          finished,
+        });
+        return {
+          ready: Promise.resolve(),
+          finished: finished.promise,
+          updateCallbackDone: Promise.resolve(),
+        };
+      },
+      async () => {
+        const first = withViewTransition({
+          update: () => {
+            firstUpdates += 1;
+            if (firstUpdates === 1) {
+              throw new Error("navigation aborted");
+            }
+          },
+        });
+        const second = withViewTransition({
+          update: () => {
+            secondUpdates += 1;
+          },
+        });
+
+        await calls[0]?.update?.().catch(() => undefined);
+        calls[0]?.finished.reject(new Error("navigation aborted"));
+        await calls[1]?.update?.();
+        calls[1]?.finished.resolve();
+        await Promise.all([first, second]);
+      }
+    );
+
+    expect(firstUpdates).toBe(1);
+    expect(secondUpdates).toBe(1);
+  });
+
   it("swallows a skipped transition's ready rejection", async () => {
     let updates = 0;
     let transitionUpdate: ViewTransitionUpdateCallback | undefined;

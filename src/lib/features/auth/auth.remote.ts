@@ -16,11 +16,14 @@ import { tryCatch } from "#lib/utils/try-catch.ts";
  * survive SPA navigation (login → logout → login still filled). Auth pages
  * must call `.for($props.id())` for a per-mount instance.
  *
- * Drop `.for()` when these are resolved:
- * - https://github.com/sveltejs/kit/issues/14802 (values persist after nav)
- * - https://github.com/sveltejs/kit/issues/14210 (no `form.reset()` / `clear()`)
- * - https://github.com/sveltejs/kit/issues/15051 (`_password` kept in DOM with JS)
- * Related unmerged factory: https://github.com/sveltejs/kit/pull/14815
+ * Still required on kit 3.0.0-next.28:
+ * - https://github.com/sveltejs/kit/issues/14802 (open: values persist after nav)
+ * - https://github.com/sveltejs/kit/issues/14210 (open: no `form.reset()` / `clear()`)
+ * - https://github.com/sveltejs/kit/pull/14815 (open: form factory)
+ *
+ * kit#15051 is docs-only: `_password` stays in the DOM when JS runs.
+ * Underscore fields are omitted from the response. next.28 (#17128) extends
+ * that redaction to nested and typed fields; it does not clear client inputs.
  */
 export const login = form(loginSchema, async (data) => {
   const { request } = getRequestEvent();

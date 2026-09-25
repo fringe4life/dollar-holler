@@ -85,6 +85,7 @@ async function createSeedProxy() {
     "Seeding REMOTE Cloudflare D1. Wipes clients, invoices, line_items, and settings. Auth users are kept."
   );
   // getPlatformProxy remote session hangs forever under Bun (workerd/miniflare).
+  // workers-sdk#7718 closed won't-fix: Wrangler does not support Bun.
   // db:seed:remote must run via Node (tsx). @see https://github.com/cloudflare/workers-sdk/issues/7718
   console.log(
     "Starting wrangler remote proxy (needs Node + wrangler login)..."

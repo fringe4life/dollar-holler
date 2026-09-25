@@ -17,3 +17,33 @@
     U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
     U+2215, U+FEFF, U+FFFD;
 }
+
+html {
+  view-transition-name: theme;
+}
+
+/*
+ * UA stylesheet (prefers-reduced-motion: reduce) sets
+ * `animation: none !important` on view-transition pseudos.
+ * These rules stay inside no-preference so that UA rule wins.
+ * No !important here: it would beat reduced motion.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  :active-view-transition-type(theme-change)::view-transition-group(theme) {
+    animation-duration: 500ms;
+    animation-fill-mode: both;
+    animation-timing-function: var(--easings-glide);
+  }
+
+  :active-view-transition-type(theme-change)::view-transition-old(theme) {
+    display: block;
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  :active-view-transition-type(theme-change)::view-transition-new(theme) {
+    display: block;
+    animation: theme-circle-reveal 500ms var(--easings-glide) both;
+    mix-blend-mode: normal;
+  }
+}

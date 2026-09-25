@@ -18,6 +18,7 @@
     backgroundRepeat: "no-repeat",
     inlineSize: "full",
     backgroundImage: "var(--bg-thankYou)",
+    minBlockSize: "full",
   })}
   style:--bg-thankYou={`url(${asset("images/bg-thankYou.svg")})`}
 >
@@ -25,14 +26,14 @@
     <h1
       class={css({
         color: "foreground",
-        fontSize: "5xl",
+        fontSize: { base: "3xl", sm: "5xl" },
         lineHeight: "none",
         fontWeight: "black",
       })}
     >
       Thank You!
     </h1>
-    <p class={css({ color: "foreground", fontSize: "lg" })}>
+    <p class={css({ color: "foreground", fontSize: { base: "sm", sm: "lg" } })}>
       Your payment has been received!
     </p>
   </div>

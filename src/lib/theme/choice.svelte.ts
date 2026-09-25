@@ -1,5 +1,5 @@
 import type { ThemeChoice } from "./schema.ts";
-import { persistThemeChoice } from "./theme.ts";
+import { persistThemeChoice, withThemeViewTransition } from "./theme.ts";
 
 /** Client-only live choice. Null on the server so SSR stays request-scoped. */
 const themeChoice = $state<{ current: ThemeChoice | null }>({
@@ -14,6 +14,8 @@ export const hydrateThemeChoice = (theme: ThemeChoice): void => {
 };
 
 export const selectThemeChoice = (theme: ThemeChoice): void => {
-  themeChoice.current = theme;
-  persistThemeChoice(theme);
+  withThemeViewTransition(() => {
+    themeChoice.current = theme;
+    persistThemeChoice(theme);
+  });
 };

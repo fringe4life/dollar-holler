@@ -1,3 +1,4 @@
+import { browser } from "$app/env";
 import { createContext } from "svelte";
 import type { Attachment } from "svelte/attachments";
 import { on } from "svelte/events";
@@ -180,9 +181,9 @@ class Toaster {
     this.resume("hidden");
   };
 
-  /** Sync timers with Page Visibility API. No-op when `document` is unavailable (SSR). */
+  /** Sync timers with Page Visibility API. No-op during SSR. */
   syncDocumentHidden = (): void => {
-    if (typeof document === "undefined") {
+    if (!browser) {
       return;
     }
     this.setHidden(document.hidden);

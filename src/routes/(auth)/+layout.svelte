@@ -26,12 +26,17 @@
       minBlockSize: "100dvh",
       gap: { base: 0, md: 5 },
       gridAutoRows: { base: "min", md: "fr" },
+      gridTemplateAreas: {
+        base: '"logo logo logo logo logo logo logo logo logo logo logo logo" "form form form form form form form form form form form form"',
+        md: '"logo logo logo logo logo logo form form form form form form"',
+        lg: '". . logo logo logo logo form form form form . ."',
+        xl: '". . . logo logo logo form form form . . ."',
+      },
     })}
   >
     <div
       class={gridItem({
-        colSpan: { base: 12, md: 6, lg: 4, xl: 3 },
-        gridColumnStart: { lg: 3, xl: 4 },
+        gridArea: "logo",
         paddingBlockStart: 8,
         marginBlock: { md: "auto" },
       })}
@@ -44,7 +49,7 @@
     </div>
     <div
       class={gridItem({
-        colSpan: { base: 12, md: 6, lg: 4, xl: 3 },
+        gridArea: "form",
         marginBlock: { md: "auto" },
       })}
     >

@@ -89,6 +89,17 @@
         gap: 2,
         overflow: "hidden",
       },
+      "& selectedcontent > *": {
+        _starting: {
+          opacity: 0,
+          translate: "0 var(--spacing-1)",
+        },
+        opacity: 1,
+        transitionDuration: "fast",
+        transitionProperty: "opacity, translate",
+        transitionTimingFunction: "out",
+        translate: "0 0",
+      },
       alignItems: "center",
       appearance: "base-select",
       backgroundImage: "none",

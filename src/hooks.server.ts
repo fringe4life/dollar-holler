@@ -1,13 +1,8 @@
 // biome-ignore lint/performance/noNamespaceImport: way to use sentry
 import * as Sentry from "@sentry/sveltekit";
 import { redirect } from "@sveltejs/kit";
-import {
-  type Handle,
-  type HandleServerError,
-  sequence,
-} from "@sveltejs/kit/hooks";
+import { type Handle, sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
-import { waitUntil } from "cloudflare:workers";
 import { building } from "$app/env";
 import { getAuth } from "#lib/auth.server.ts";
 import { THEME_COOKIE_NAME, parseStoredTheme } from "#lib/theme/schema.ts";
@@ -70,18 +65,40 @@ const themeHandler: Handle = ({ event, resolve }) => {
   });
 };
 
-/** Preload self-hosted fonts from bundled CSS (not invoked in vite dev). */
+/** Body face only. `filename` is the source path; `path` is the hashed URL. */
+const BODY_FONT_FILE = "@fontsource-variable/source-sans-3/";
+
+/**
+ * Preload JS, CSS, and the body font (Source Sans 3 woff2).
+ *
+ * This filter runs for every page, so each match is an extra download on
+ * landing and login too. Source Sans 3 is the `body` face, so it is the
+ * text on first paint. Source Code Pro is only invoice line items, and
+ * Kalam is only empty states; those still load from `@font-face` when used.
+ *
+ * Match `filename` (the source path). `path` is the hashed build URL.
+ * `.woff2` only: the Fontsource CSS also points at `.woff`, and Kit would
+ * preload that fallback too. This filter does not run in vite dev.
+ */
 const fontPreloadHandler: Handle = async ({ event, resolve }) =>
   resolve(event, {
-    preload: ({ type }) => type === "js" || type === "css" || type === "font",
+    preload: (input) => {
+      if (input.type === "js" || input.type === "css") {
+        return true;
+      }
+
+      return (
+        input.type === "font" &&
+        input.filename.endsWith(".woff2") &&
+        input.filename.includes(BODY_FONT_FILE)
+      );
+    },
   });
 
 // Order: Sentry instruments the request first; session/locals before auth; preload last on resolve.
 export const handle: Handle = sequence(
   Sentry.initCloudflareSentryHandle({
     dsn: SENTRY_DSN,
-    enableLogs: true,
-    sendDefaultPii: true,
     tracesSampleRate: 1,
   }),
   Sentry.sentryHandle(),
@@ -91,36 +108,4 @@ export const handle: Handle = sequence(
   fontPreloadHandler
 );
 
-/**
- * Kit 3 moved status onto `error` / kind payloads. Sentry's stock
- * `handleErrorWithSentry` still reads deprecated top-level `input.status`.
- */
-const statusFromCaught = (input: Parameters<HandleServerError>[0]): number => {
-  const { kind, error } = input;
-  if (
-    (kind === "app" || kind === "framework" || kind === "validation") &&
-    error &&
-    typeof error === "object" &&
-    "status" in error &&
-    typeof error.status === "number"
-  ) {
-    return error.status;
-  }
-  return 500;
-};
-
-export const handleError: HandleServerError = async (input) => {
-  const status = statusFromCaught(input);
-  if (status >= 400 && status < 500) {
-    return;
-  }
-
-  Sentry.captureException(input.error, {
-    mechanism: {
-      handled: false,
-      type: "auto.function.sveltekit.handle_error",
-    },
-  });
-
-  waitUntil(Promise.resolve(Sentry.flush(2000)));
-};
+export const handleError = Sentry.handleErrorWithSentry();

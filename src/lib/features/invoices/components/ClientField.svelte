@@ -31,7 +31,7 @@
 </script>
 
 <FormField
-  class={gridItem({ colSpan: { base: 6, md: 4 } })}
+  class={gridItem({ gridColumn: { base: "1 / -1", md: "span 4" } })}
   forId={isNewClient ? "newClient" : "client"}
   issues={isNewClient
     ? saveInvoice.fields.name.issues()

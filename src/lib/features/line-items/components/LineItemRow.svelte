@@ -58,7 +58,7 @@
   };
 
   const lineItemLabel = css({
-    display: { _print: "none", base: "none", sm: "block" },
+    display: { _print: "none", base: "block", sm: "none" },
   });
 
   const descriptionStyles = lineItemFieldRecipe({

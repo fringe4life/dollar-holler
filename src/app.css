@@ -47,3 +47,7 @@ html {
     mix-blend-mode: normal;
   }
 }
+
+:active-view-transition-type(theme-change) :where(*) {
+  view-transition-name: none !important;
+}

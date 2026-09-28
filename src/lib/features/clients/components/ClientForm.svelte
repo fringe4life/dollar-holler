@@ -64,9 +64,19 @@
   {#if edit}
     <input {...saveClient.fields.id.as("hidden", edit.id)} />
   {/if}
-  <div class={grid({ columns: 6, columnGap: 5 })}>
+  <div
+    class={grid({
+      alignItems: "start",
+      columns: 6,
+      columnGap: 5,
+      gridTemplateAreas: {
+        base: '"name name name name name name" "email email email email email email" "street street street street street street" "city city city city city city" "state state state state state state" "zip zip zip zip zip zip"',
+        sm: '"name name name name name name" "email email email email email email" "street street street street street street" "city city state state zip zip"',
+      },
+    })}
+  >
     <FormField
-      class={gridItem({ colSpan: 6 })}
+      class={gridItem({ gridArea: "name" })}
       forId="name"
       issues={saveClient.fields.name.issues()}
       label="Client Name"
@@ -82,7 +92,7 @@
     </FormField>
 
     <FormField
-      class={gridItem({ colSpan: 6 })}
+      class={gridItem({ gridArea: "email" })}
       forId="email"
       issues={saveClient.fields.email.issues()}
       label="Client Email"
@@ -98,7 +108,7 @@
     </FormField>
 
     <FormField
-      class={gridItem({ colSpan: 6 })}
+      class={gridItem({ gridArea: "street" })}
       forId="street"
       issues={saveClient.fields.street.issues()}
       label="Address"
@@ -113,7 +123,7 @@
     </FormField>
 
     <FormField
-      class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+      class={gridItem({ gridArea: "city" })}
       forId="city"
       issues={saveClient.fields.city.issues()}
       label="City"
@@ -128,7 +138,7 @@
     </FormField>
 
     <FormField
-      class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+      class={gridItem({ gridArea: "state" })}
       forId="state"
       issues={saveClient.fields.state.issues()}
       label="State"
@@ -142,7 +152,7 @@
     </FormField>
 
     <FormField
-      class={gridItem({ colSpan: { base: 6, sm: 2 } })}
+      class={gridItem({ gridArea: "zip" })}
       forId="zip"
       issues={saveClient.fields.zip.issues()}
       label="Zip"

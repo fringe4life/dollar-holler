@@ -118,8 +118,7 @@
 {#snippet fromAddress()}
   <div
     class={gridItem({
-      colSpan: { base: 6, sm: 2, _print: 3 },
-      gridColumnStart: { sm: 5 },
+      gridArea: "from",
       paddingBlockStart: 4,
     })}
   >
@@ -155,7 +154,7 @@
 {/snippet}
 
 {#snippet billTo()}
-  <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
+  <div class={gridItem({ gridArea: "bill" })}>
     <div class={css({ color: "textMuted", fontWeight: "bold" })}>Bill To:</div>
     <p>
       {#if client}
@@ -183,7 +182,7 @@
 
 {#snippet htmlBlock(title: string, html: Maybe<SanitizedHTML>)}
   {#if html}
-    <div class={gridItem({ colSpan: 6 })}>
+    <div class={gridItem({ gridColumn: "1 / -1" })}>
       <div class={css({ color: "textMuted", fontWeight: "bold" })}>{title}</div>
       <HtmlContent {html} />
     </div>
@@ -245,6 +244,12 @@
       columns: 6,
       columnGap: 5,
       rowGap: 8,
+      gridTemplateAreas: {
+        base: '"logo logo logo logo logo logo" "from from from from from from" "bill bill bill bill bill bill" "invoiceId invoiceId invoiceId invoiceId invoiceId invoiceId" "due due due issued issued issued" "subject subject subject subject subject subject"',
+        sm: '"logo logo logo . from from" "bill bill bill . invoiceId invoiceId" "due due due . issued issued" "subject subject subject subject subject subject"',
+        _print:
+          '"logo logo logo from from from" "bill bill bill invoiceId invoiceId invoiceId" "due due due issued issued issued" "subject subject subject subject subject subject"',
+      },
       paddingInline: { base: 5, md: 32 },
       paddingBlock: { base: 8, md: 16 },
       position: "relative",
@@ -254,7 +259,7 @@
       backgroundColor: "surface",
     })}
   >
-    <div class={gridItem({ colSpan: { base: 6, sm: 3, _print: 3 } })}>
+    <div class={gridItem({ gridArea: "logo" })}>
       <img
         alt="Compressed fm"
         class={css({ inlineSize: "316px", blockSize: "134px" })}
@@ -266,18 +271,13 @@
 
     {@render fromAddress()}
     {@render billTo()}
-    <div
-      class={gridItem({
-        colSpan: { base: 6, sm: 2, _print: 3 },
-        gridColumnStart: { sm: 5 },
-      })}
-    >
+    <div class={gridItem({ gridArea: "invoiceId" })}>
       <div class={css({ color: "textMuted", fontWeight: "bold" })}>
         Invoice Id:
       </div>
       <p>{invoice.invoiceNumber}</p>
     </div>
-    <div class={gridItem({ colSpan: 3 })}>
+    <div class={gridItem({ gridArea: "due" })}>
       <div class={css({ color: "textMuted", fontWeight: "bold" })}>
         Due Date:
       </div>
@@ -286,12 +286,7 @@
       </p>
     </div>
 
-    <div
-      class={gridItem({
-        colSpan: { base: 3, sm: 2, _print: 3 },
-        gridColumnStart: { sm: 5 },
-      })}
-    >
+    <div class={gridItem({ gridArea: "issued" })}>
       <div class={css({ color: "textMuted", fontWeight: "bold" })}>
         Issue Date:
       </div>
@@ -302,14 +297,14 @@
       </p>
     </div>
 
-    <div class={gridItem({ colSpan: 6 })}>
+    <div class={gridItem({ gridArea: "subject" })}>
       <div class={css({ color: "textMuted", fontWeight: "bold" })}>
         Subject:
       </div>
       <p>{invoice.subject}</p>
     </div>
 
-    <div class={gridItem({ colSpan: 6 })}>
+    <div class={gridItem({ gridColumn: "1 / -1" })}>
       <LineItemRows discount={invoice.discount ?? 0} {lineItems} mode="view" />
     </div>
 

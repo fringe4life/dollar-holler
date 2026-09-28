@@ -97,7 +97,7 @@
 
 <svelte:document onclick={handleNavClick} />
 
-<header class={cx(gridItem({ colSpan: { md: 3 }, zIndex: 20 }), cq())}>
+<header class={cx(gridItem({ gridArea: "nav", zIndex: 20 }), cq())}>
   <!-- mobile nav control -->
   <NavbarMenuButton
     aria-label="Open navigation"

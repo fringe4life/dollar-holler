@@ -74,9 +74,19 @@
   </p>
 
   <Form onSuccess={handleSettingsSuccess} remote={saveSettings}>
-    <div class={grid({ columns: 6, columnGap: 5 })}>
+    <div
+      class={grid({
+        alignItems: "start",
+        columns: 6,
+        columnGap: 5,
+        gridTemplateAreas: {
+          base: '"name name name name name name" "invoiceEmail invoiceEmail invoiceEmail invoiceEmail invoiceEmail invoiceEmail" "address address address address address address" "city city city city city city" "state state state state state state" "zip zip zip zip zip zip"',
+          md: '"name name name invoiceEmail invoiceEmail invoiceEmail" "address address address address address address" "city city state state zip zip"',
+        },
+      })}
+    >
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        class={gridItem({ gridArea: "name" })}
         forId="myName"
         issues={saveSettings.fields.myName.issues()}
         label="Name"
@@ -90,7 +100,7 @@
         {/snippet}
       </FormField>
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        class={gridItem({ gridArea: "invoiceEmail" })}
         forId="invoiceEmail"
         issues={saveSettings.fields.email.issues()}
         label="Email (shown on invoices)"
@@ -104,7 +114,7 @@
         {/snippet}
       </FormField>
       <FormField
-        class={gridItem({ colSpan: 6 })}
+        class={gridItem({ gridArea: "address" })}
         forId="address"
         issues={saveSettings.fields.street.issues()}
         label="Address"
@@ -118,7 +128,7 @@
         {/snippet}
       </FormField>
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 2 } })}
+        class={gridItem({ gridArea: "city" })}
         forId="city"
         issues={saveSettings.fields.city.issues()}
         label="City"
@@ -132,7 +142,7 @@
         {/snippet}
       </FormField>
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 2 } })}
+        class={gridItem({ gridArea: "state" })}
         forId="state"
         issues={saveSettings.fields.state.issues()}
         label="State"
@@ -145,7 +155,7 @@
         {/snippet}
       </FormField>
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 2 } })}
+        class={gridItem({ gridArea: "zip" })}
         forId="zip"
         issues={saveSettings.fields.zip.issues()}
         label="Zip"
@@ -161,19 +171,14 @@
       </FormField>
     </div>
     {#snippet submit({ pending })}
-      <FormField
-        class={gridItem({
-          colSpan: { base: 6, md: 2 },
-          gridColumnStart: { md: 5 },
-        })}
-      >
+      <FormField>
         <LoaderButton class="group" {pending}
           ><Check class={buttonIcon({ icon: "check" })} /> Save</LoaderButton
         >
       </FormField>
     {/snippet}
   </Form>
-  <div class={gridItem({ colSpan: 6 })}>
+  <div>
     <h2
       class={css({
         color: "foreground",
@@ -189,9 +194,19 @@
     </p>
   </div>
   <Form onSuccess={handlePasswordSuccess} remote={changePassword}>
-    <div class={grid({ columns: 6, columnGap: 5 })}>
+    <div
+      class={grid({
+        alignItems: "start",
+        columns: 6,
+        columnGap: 5,
+        gridTemplateAreas: {
+          base: '"email email email email email email" "currentPassword currentPassword currentPassword currentPassword currentPassword currentPassword" "newPassword newPassword newPassword newPassword newPassword newPassword" "confirmPassword confirmPassword confirmPassword confirmPassword confirmPassword confirmPassword"',
+          md: '"email email email currentPassword currentPassword currentPassword" "newPassword newPassword newPassword confirmPassword confirmPassword confirmPassword"',
+        },
+      })}
+    >
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        class={gridItem({ gridArea: "email" })}
         forId="email"
         issues={changePassword.fields.email.issues()}
         label="Email"
@@ -207,7 +222,7 @@
       </FormField>
 
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        class={gridItem({ gridArea: "currentPassword" })}
         forId="currentPassword"
         issues={changePassword.fields._currentPassword.issues()}
         label="Current Password"
@@ -224,7 +239,7 @@
       </FormField>
 
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        class={gridItem({ gridArea: "newPassword" })}
         forId="newPassword"
         issues={changePassword.fields._newPassword.issues()}
         label="New Password"
@@ -241,7 +256,7 @@
       </FormField>
 
       <FormField
-        class={gridItem({ colSpan: { base: 6, md: 3 } })}
+        class={gridItem({ gridArea: "confirmPassword" })}
         forId="confirmPassword"
         issues={changePassword.fields._confirmPassword.issues()}
         label="Confirm Password"

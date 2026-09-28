@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css, cx } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
   import { slide } from "svelte/transition";
   import type {
@@ -81,14 +81,19 @@
   };
 </script>
 
-<div class={grid({ columns: 6, columnGap: { base: 2, md: 5 } })}>
+<div
+  class={grid({
+    alignItems: "start",
+    columns: 6,
+    columnGap: { base: 2, md: 5 },
+  })}
+>
   <ClientField {clientOptions} bind:invoice bind:isNewClient bind:newClient />
 
   <FormField
     class={gridItem({
       order: { base: -1, sm: 0 },
-      colSpan: { base: 6, sm: 2 },
-      alignSelf: "end",
+      gridColumn: { base: "1 / -1", sm: "span 2" },
     })}
     forId="invoiceNumber"
     issues={saveInvoice.fields.invoiceNumber.issues()}
@@ -106,8 +111,23 @@
   </FormField>
 
   {#if isNewClient}
-    <div class={gridItem({ colSpan: 6, columnGap: 5 })} transition:slide>
+    <div
+      class={cx(
+        grid({
+          alignItems: "start",
+          columnGap: { base: 2, md: 5 },
+          columns: { base: 1, sm: 3 },
+          gridTemplateAreas: {
+            base: '"email" "street" "city" "state" "zip"',
+            sm: '"email email email" "street street street" "city state zip"',
+          },
+        }),
+        gridItem({ gridColumn: "1 / -1" })
+      )}
+      transition:slide
+    >
       <FormField
+        class={gridItem({ gridArea: "email" })}
         forId="email"
         issues={saveInvoice.fields.email.issues()}
         label="Client's Email"
@@ -123,6 +143,7 @@
       </FormField>
 
       <FormField
+        class={gridItem({ gridArea: "street" })}
         forId="street"
         issues={saveInvoice.fields.street.issues()}
         label="Street"
@@ -138,7 +159,7 @@
       </FormField>
 
       <FormField
-        class={gridItem({ colSpan: 2 })}
+        class={gridItem({ gridArea: "city" })}
         forId="city"
         issues={saveInvoice.fields.city.issues()}
         label="City"
@@ -154,7 +175,7 @@
       </FormField>
 
       <FormField
-        class={gridItem({ colSpan: 2 })}
+        class={gridItem({ gridArea: "state" })}
         forId="state"
         issues={saveInvoice.fields.state.issues()}
         label="State"
@@ -168,7 +189,7 @@
       </FormField>
 
       <FormField
-        class={gridItem({ colSpan: 2 })}
+        class={gridItem({ gridArea: "zip" })}
         forId="zipCode"
         issues={saveInvoice.fields.zip.issues()}
         label="Zip Code"
@@ -187,7 +208,7 @@
   {/if}
 
   <FormField
-    class={gridItem({ colSpan: { base: 6, md: 2 } })}
+    class={gridItem({ gridColumn: { base: "1 / -1", md: "span 2" } })}
     forId="dueDate"
     issues={saveInvoice.fields.dueDate.issues()}
     label="Due Date"
@@ -205,9 +226,7 @@
 
   <FormField
     class={gridItem({
-      colSpan: { base: 6, md: 2 },
-      colStart: { md: 5 },
-      colEnd: { md: 7 },
+      gridColumn: { base: "1 / -1", md: "5 / 7" },
     })}
     forId="issueDate"
     issues={saveInvoice.fields.issueDate.issues()}
@@ -224,7 +243,7 @@
   </FormField>
 
   <FormField
-    class={gridItem({ colSpan: 6 })}
+    class={gridItem({ gridColumn: "1 / -1" })}
     forId="subject"
     issues={saveInvoice.fields.subject.issues()}
     label="Subject"
@@ -240,7 +259,7 @@
   </FormField>
 
   <FormField
-    class={gridItem({ colSpan: 6 })}
+    class={gridItem({ gridColumn: "1 / -1" })}
     issues={saveInvoice.fields.lineItems.allIssues()}
   >
     <LineItemRows
@@ -257,7 +276,7 @@
   </FormField>
 
   <FormField
-    class={gridItem({ colSpan: 6 })}
+    class={gridItem({ gridColumn: "1 / -1" })}
     forId="notes"
     issues={saveInvoice.fields.notes.issues()}
     label="Notes"
@@ -277,7 +296,7 @@
   </FormField>
 
   <FormField
-    class={gridItem({ colSpan: 6 })}
+    class={gridItem({ gridColumn: "1 / -1" })}
     forId="terms"
     issues={saveInvoice.fields.terms.issues()}
     label="Terms"

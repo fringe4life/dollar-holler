@@ -8,11 +8,15 @@
 <div
   class={grid({
     backgroundColor: "background",
-    columns: 12,
+    columns: { base: 1, md: 12 },
     overflowX: "clip",
     minBlockSize: "100dvh",
     columnGap: { base: 0, md: 16 },
     position: "relative",
+    gridTemplateAreas: {
+      base: '"nav" "main"',
+      md: '"nav nav nav main main main main main main main main ."',
+    },
   })}
 >
   <Navbar />
@@ -22,7 +26,7 @@
       flexDirection: "column",
       paddingInline: 4,
       minBlockSize: "100dvh",
-      colSpan: { base: 12, md: 8 },
+      gridArea: "main",
       paddingBlockStart: { base: 4, md: 10 },
     })}
   >

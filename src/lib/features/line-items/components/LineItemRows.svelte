@@ -6,7 +6,11 @@
   import CircledAmount from "#lib/components/primitives/CircledAmount.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
   import { centsToDollars, sumLineItems } from "#lib/utils/moneyHelpers.ts";
-  import { invoiceLineItem } from "../styles";
+  import {
+    invoiceLineItem,
+    invoiceLineItemDiscount,
+    invoiceLineItemSubtotal,
+  } from "../styles";
   import { lineItemFieldRecipe } from "./LineItemRecipe";
   import LineItemRow from "./LineItemRow.svelte";
 
@@ -53,10 +57,36 @@
     })
   )}
 >
-  <div class={lineItemHeaders}>Description</div>
-  <div class={cx(lineItemHeaders, css({ textAlign: "right" }))}>Unit price</div>
-  <div class={cx(lineItemHeaders, css({ textAlign: "center" }))}>Qty</div>
-  <div class={cx(lineItemHeaders, css({ textAlign: "right" }))}>Amount</div>
+  <div class={cx(lineItemHeaders, gridItem({ gridArea: "description" }))}>
+    Description
+  </div>
+  <div
+    class={cx(
+      lineItemHeaders,
+      gridItem({ gridArea: "unitPrice" }),
+      css({ textAlign: "right" })
+    )}
+  >
+    Unit price
+  </div>
+  <div
+    class={cx(
+      lineItemHeaders,
+      gridItem({ gridArea: "quantity" }),
+      css({ textAlign: "center" })
+    )}
+  >
+    Qty
+  </div>
+  <div
+    class={cx(
+      lineItemHeaders,
+      gridItem({ gridArea: "amount" }),
+      css({ textAlign: "right" })
+    )}
+  >
+    Amount
+  </div>
 </div>
 
 {#if props.lineItems}
@@ -82,8 +112,10 @@
   {/each}
 {/if}
 
-<div class={invoiceLineItem}>
-  <div class={gridItem({ colSpan: { base: 1, sm: 2 } })}>
+<div class={invoiceLineItemSubtotal}>
+  <div
+    class={gridItem({ display: { _print: "none" }, gridArea: "addLineItem" })}
+  >
     {#if props.mode !== "view"}
       <Button onclick={props.addLineItem} variant="textOnly">+ Line Item</Button
       >
@@ -92,16 +124,17 @@
   <div
     class={gridItem({
       color: "textMuted",
+      fontWeight: "bold",
+      gridArea: "subtotal",
       paddingBlock: 5,
       textAlign: "right",
-      fontWeight: "bold",
-      colSpan: { _print: 3 },
     })}
   >
     Subtotal
   </div>
   <div
     class={gridItem({
+      gridArea: "amount",
       paddingBlock: 5,
       textAlign: "right",
       fontFamily: "mono",
@@ -111,19 +144,19 @@
   </div>
 </div>
 
-<div class={invoiceLineItem}>
+<div class={invoiceLineItemDiscount}>
   <p
     class={gridItem({
       color: "textMuted",
+      fontWeight: "bold",
+      gridArea: "discountLabel",
       paddingBlock: 5,
       textAlign: "right",
-      fontWeight: "bold",
-      colSpan: { base: 1, sm: 2, _print: 3 },
     })}
   >
     Discount
   </p>
-  <div class={gridItem({ position: "relative" })}>
+  <div class={gridItem({ gridArea: "discountInput", position: "relative" })}>
     <input
       class={cx(discountStyles.input, css({ paddingInlineEnd: 3 }))}
       disabled={!isEditable}
@@ -145,6 +178,7 @@
   </div>
   <div
     class={gridItem({
+      gridArea: "amount",
       paddingBlock: 5,
       textAlign: "right",
       fontFamily: "mono",

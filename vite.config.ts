@@ -1,3 +1,4 @@
+import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
@@ -151,6 +152,9 @@ export default defineConfig({
         server: true,
       },
     }),
+    // After sveltekit: rewrite static css()/cva()/sva()/pattern calls to class strings.
+    // Also injects generated CSS (replaces @pandacss/dev/postcss).
+    pandacss({ transform: true }),
   ],
   preview: {
     port: 5173,

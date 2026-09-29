@@ -21,7 +21,9 @@ minimumReleaseAgeExcludes = [
   "@pandacss/postcss",
   "@pandacss/preset-base",
   "@pandacss/preset-panda",
+  "@pandacss/transformer",
   "@pandacss/types",
+  "@pandacss/vite",
 ]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).

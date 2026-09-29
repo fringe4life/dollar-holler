@@ -43,4 +43,5 @@ Please update README.md based on the codebase. Keep sections accurate and concis
 ## Post-update
 
 - Run format: `bun run fix` (Ultracite)
-- Generate commit message: see `git-commit-msg.md`. If README was updated alongside code changes, the commit message must describe **all** staged changes (config, deps, refactors, etc.), not only documentation.
+- Commit: use global `git-commit` skill. If README updated alongside code, message must cover **all** staged changes (config, deps, refactors, etc.), not only docs.
+- Optional full ship: use global `prepare-pr` skill

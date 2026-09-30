@@ -31,10 +31,19 @@
   let { params }: PageProps = $props();
   const toast = getToast();
   const invoiceId = $derived(params.id); // CursorId, no assert
-  // Sequential on purpose. `$derived(await Promise.all([query(), query()]))`
-  // over Kit remotes refetch-loops forever under experimental.async.
-  // kit#15767 is closed (Svelte bug, not Kit). Still open:
-  // @see https://github.com/sveltejs/svelte/issues/18662
+  /**
+   * Workaround: await Kit remotes sequentially — `$derived(await Promise.all([...]))`
+   * refetch-loops forever under experimental.async.
+   *
+   * @remarks
+   * Still required on svelte@5.57.1 / @sveltejs/kit@3.0.0-next.31.
+   * Drop when upstream ships a fix; re-verify before deleting.
+   *
+   * @see https://github.com/sveltejs/svelte/issues/18662 — open
+   * @see https://github.com/sveltejs/svelte/pull/18880 — fix in flight
+   * @see https://github.com/sveltejs/kit/issues/15767 — closed (mis-filed; Svelte bug)
+   * @see https://github.com/fringe4life/dollar-holler/issues/105 — tracking
+   */
   const detail = $derived(await getInvoiceDetail(invoiceId));
   const settings = $derived(await getSettings());
 

@@ -56,18 +56,23 @@ const rewriteSsrBundle = (bundle: Record<string, BundleChunk>, stub: string) => 
 };
 
 /**
- * Rolldown leaves `cloudflare:workers` as an external protocol import, so
- * Node/Bun cannot load the SSR output. Rewrite to the adapter's Node stub
- * during SSR (prerender) and again at preview (after adapt restores the
- * protocol). Restore on preview close — `vite preview` otherwise leaves
+ * Workaround: rewrite `cloudflare:workers` to the adapter's Node stub during
+ * SSR (prerender) and again at preview (after adapt restores the protocol);
+ * restore on preview close. Rolldown leaves the protocol as an external, so
+ * Node/Bun cannot load SSR output; bare `vite preview` otherwise leaves
  * `file://...virtual-cloudflare-workers.js?<uuid>` in
  * `.svelte-kit/output/server`, which wrangler cannot resolve.
  *
- * TODO(agent): reevaluate on the next `@sveltejs/kit` / `@sveltejs/adapter-cloudflare`
- * bump. Delete this plugin if `vite build` + `vite preview` work with a bare
- * `import { env } from "cloudflare:workers"` (no leftover protocol specifier
- * in `.svelte-kit/output/server`). Upstream: sveltejs/kit#16966 (analyse
- * via Vite so adapter `resolveId` can stub `cloudflare:workers`).
+ * @remarks
+ * Still required on `@sveltejs/adapter-cloudflare@8.0.0-next.8`
+ * (and `@sveltejs/kit@3.0.0-next.31`). Drop when `vite build` + `vite preview`
+ * work with a bare `import { env } from "cloudflare:workers"` (no leftover
+ * protocol specifier in `.svelte-kit/output/server`); re-verify before deleting.
+ *
+ * @see https://github.com/sveltejs/kit/issues/17271 — open
+ * @see https://github.com/sveltejs/kit/issues/16966 — closed (analyse via Vite
+ *   so adapter `resolveId` can stub; only proxy dispose landed)
+ * @see https://github.com/fringe4life/dollar-holler/issues/105 — tracking
  */
 const stubCloudflareWorkersPlugin = (): Plugin => ({
   name: "stub-cloudflare-workers",
@@ -152,8 +157,23 @@ export default defineConfig({
         server: true,
       },
     }),
-    // After sveltekit: rewrite static css()/cva()/sva()/pattern calls to class strings.
-    // Also injects generated CSS (replaces @pandacss/dev/postcss).
+    // After sveltekit — required for SFC pipeline; keep even when #3847 lands.
+    /**
+     * Workaround: keep `panda:build` in `dev`/`build` scripts and leave
+     * `transform: true` for CSS inject + `.ts`/`.js` folds only. Plugin claims
+     * to rewrite static `css()`/`cva()`/`sva()`/pattern calls, but `@pandacss/vite`
+     * never transforms `.svelte` — `SOURCE_RE` rejects SFCs before the native
+     * Svelte adapter runs, so almost all style calls still ship runtime helpers.
+     *
+     * @remarks
+     * Still required on `@pandacss/vite@2.0.0` (and `@pandacss/dev@2.0.0`).
+     * Drop when a release with #3848 is in our range and `.svelte` folds under
+     * `transform: true`; re-verify before deleting `panda:build` pre-step / this note.
+     *
+     * @see https://github.com/chakra-ui/panda/issues/3847 — closed
+     * @see https://github.com/chakra-ui/panda/pull/3848 — merged (not on npm yet; latest still 2.0.0)
+     * @see https://github.com/fringe4life/dollar-holler/issues/106 — tracking
+     */
     pandacss({ transform: true }),
   ],
   preview: {

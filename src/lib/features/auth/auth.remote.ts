@@ -12,18 +12,21 @@ import { getAuth } from "#lib/auth.server.ts";
 import { tryCatch } from "#lib/utils/try-catch.ts";
 
 /**
- * Kit caches the imported `form()` instance, so field values/issues/result
- * survive SPA navigation (login → logout → login still filled). Auth pages
- * must call `.for($props.id())` for a per-mount instance.
+ * Workaround: call `.for($props.id())` on auth remotes for a per-mount instance —
+ * Kit caches the imported `form()`, so values/issues/result survive SPA nav
+ * (login → logout → login still filled). Underscore fields are redacted from
+ * the response (#17128) but still stay in the DOM when JS runs; redaction does
+ * not clear client inputs.
  *
- * Still required on kit 3.0.0-next.28:
- * - https://github.com/sveltejs/kit/issues/14802 (open: values persist after nav)
- * - https://github.com/sveltejs/kit/issues/14210 (open: no `form.reset()` / `clear()`)
- * - https://github.com/sveltejs/kit/pull/14815 (open: form factory)
+ * @remarks
+ * Still required on `@sveltejs/kit@3.0.0-next.31`.
+ * Drop when upstream ships a fix; re-verify before deleting.
  *
- * kit#15051 is docs-only: `_password` stays in the DOM when JS runs.
- * Underscore fields are omitted from the response. next.28 (#17128) extends
- * that redaction to nested and typed fields; it does not clear client inputs.
+ * @see https://github.com/sveltejs/kit/issues/14802 — open: values persist after nav
+ * @see https://github.com/sveltejs/kit/issues/14210 — open: no `form.reset()` / `clear()`
+ *   (reset PR #14779 closed — prefer fixing native reset handler)
+ * @see https://github.com/sveltejs/kit/pull/14815 — open: form factory
+ * @see https://github.com/fringe4life/dollar-holler/issues/105 — tracking
  */
 export const login = form(loginSchema, async (data) => {
   const { request } = getRequestEvent();

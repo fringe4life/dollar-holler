@@ -22,13 +22,16 @@
       rounded: "lg",
       whiteSpace: "nowrap",
     },
+    defaultVariants: {
+      size: "default",
+      variant: "default",
+    },
     variants: {
       size: {
         default: {
-          has: {
-            svg: {
-              paddingInline: 3,
-            },
+          // Prefer `_icon` over invalid `has:{svg}` — latter blocks vite transform fold.
+          _icon: {
+            paddingInline: 3,
           },
           paddingBlock: 2,
           paddingInline: 5,
@@ -37,10 +40,8 @@
           inlineSize: 5,
         },
         lg: {
-          has: {
-            svg: {
-              paddingInline: 4,
-            },
+          _icon: {
+            paddingInline: 4,
           },
           paddingBlock: 3,
           paddingInline: 10,
@@ -50,13 +51,11 @@
           paddingInline: 4,
         },
         sm: {
+          _icon: {
+            paddingInline: 2.5,
+          },
           blockSize: 9,
           gap: 1.5,
-          has: {
-            svg: {
-              paddingInline: 2.5,
-            },
-          },
           paddingInline: 3,
           rounded: "md",
         },
@@ -119,11 +118,6 @@
           transitionDuration: "normal",
           transitionProperty: "translate",
           transitionTimingFunction: "anticipate",
-        },
-
-        defaultVariants: {
-          size: "default",
-          variant: "default",
         },
         destructive: {
           backgroundColor: { _hover: "destructive/90", base: "destructive" },

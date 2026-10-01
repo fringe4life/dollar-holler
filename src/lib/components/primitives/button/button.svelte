@@ -29,10 +29,6 @@
     variants: {
       size: {
         default: {
-          // Prefer `_icon` over invalid `has:{svg}` — latter blocks vite transform fold.
-          _icon: {
-            paddingInline: 3,
-          },
           paddingBlock: 2,
           paddingInline: 5,
         },
@@ -40,9 +36,6 @@
           inlineSize: 5,
         },
         lg: {
-          _icon: {
-            paddingInline: 4,
-          },
           paddingBlock: 3,
           paddingInline: 10,
         },
@@ -51,9 +44,6 @@
           paddingInline: 4,
         },
         sm: {
-          _icon: {
-            paddingInline: 2.5,
-          },
           blockSize: 9,
           gap: 1.5,
           paddingInline: 3,

@@ -108,6 +108,21 @@ export default defineConfig({
       output: {
         minify: {
           compress: { dropConsole: true },
+          /**
+           * Workaround: disable Oxc name mangling so Svelte snippet / `__name`
+           * helpers stay callable in prod SSR (otherwise `iN is not a function`).
+           *
+           * @remarks
+           * Still required on `vite@8.3.1` (Rolldown ~1.2.x) with
+           * `svelte@5.57.1` / `@sveltejs/kit@3.0.0-next.31`. Drop when default
+           * mangling no longer breaks SSR routes; re-verify
+           * `bun run build` + preview `/login` `/signup` before deleting.
+           *
+           * @see https://github.com/rolldown/rolldown/issues/11061 — open
+           * @see https://github.com/sveltejs/vite-plugin-svelte/issues/1143 — related
+           * @see https://github.com/fringe4life/dollar-holler/pull/66 — introduced
+           * @see https://github.com/fringe4life/dollar-holler/issues/114 — tracking
+           */
           mangle: false,
         },
       },

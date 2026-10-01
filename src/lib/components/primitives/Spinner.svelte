@@ -9,28 +9,42 @@
 
   let { label = "Loading", size = "md" }: Props = $props();
 
-  const spinnerSize = { lg: 12, md: 8, sm: 5 } as const;
-  const minBlock = { lg: 40, md: 24, sm: 10 } as const;
-</script>
-
-<div
-  aria-live="polite"
-  class={center({
-    inlineSize: "full",
-    minBlockSize: minBlock[size],
-  })}
-  role="status"
->
-  <div
-    aria-hidden="true"
-    class={circle({
+  // Enumerate pattern calls (literal args). Indexing `minBlock[size]` inside
+  // `center({…})` is fold-hostile — Rust transform keeps full pattern runtime.
+  // Axis/enum maps fold to class strings; not Cartesian. See #112 / panda docs
+  // “Enumerate, don't compute”.
+  const wrapBySize = {
+    lg: center({ inlineSize: "full", minBlockSize: 40 }),
+    md: center({ inlineSize: "full", minBlockSize: 24 }),
+    sm: center({ inlineSize: "full", minBlockSize: 10 }),
+  } as const;
+  const spinBySize = {
+    lg: circle({
       animation: "spin",
       borderBottomColor: "transparent",
       borderColor: "foreground",
       borderWidth: 2,
-      size: spinnerSize[size],
-    })}
-  ></div>
+      size: 12,
+    }),
+    md: circle({
+      animation: "spin",
+      borderBottomColor: "transparent",
+      borderColor: "foreground",
+      borderWidth: 2,
+      size: 8,
+    }),
+    sm: circle({
+      animation: "spin",
+      borderBottomColor: "transparent",
+      borderColor: "foreground",
+      borderWidth: 2,
+      size: 5,
+    }),
+  } as const;
+</script>
+
+<div aria-live="polite" class={wrapBySize[size]} role="status">
+  <div aria-hidden="true" class={spinBySize[size]}></div>
   <span
     class={css({
       clip: "rect(0, 0, 0, 0)",

@@ -176,8 +176,10 @@ export default defineConfig({
     /**
      * Keep `panda:build` for `styled-system` codegen; `transform: true` folds
      * static `css()` / `cva()` / patterns in `.ts` and `.svelte` (SFC_RE / #3848).
-     * Prefer `_icon` over invalid `has:{svg}` — unsupported keys silent-bail the
-     * whole-file transform and re-ship full `css`/`cva` runtime.
+     * Avoid invalid nest keys like `has:{svg}` — unsupported keys silent-bail the
+     * whole-file transform and re-ship full `css`/`cva` runtime. Do not use `_icon`
+     * for button padding: it targets child `svg` and collapses Lucide icons under
+     * `box-sizing: border-box`. Use `&:has(svg)` / a custom condition if needed.
      *
      * @remarks
      * Verified on `@pandacss/vite@2.0.1`. Drop `panda:build` pre-step only if

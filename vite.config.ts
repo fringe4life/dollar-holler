@@ -157,22 +157,21 @@ export default defineConfig({
         server: true,
       },
     }),
-    // After sveltekit — required for SFC pipeline; keep even when #3847 lands.
+    // After sveltekit — required for SFC pipeline.
     /**
-     * Workaround: keep `panda:build` in `dev`/`build` scripts and leave
-     * `transform: true` for CSS inject + `.ts`/`.js` folds only. Plugin claims
-     * to rewrite static `css()`/`cva()`/`sva()`/pattern calls, but `@pandacss/vite`
-     * never transforms `.svelte` — `SOURCE_RE` rejects SFCs before the native
-     * Svelte adapter runs, so almost all style calls still ship runtime helpers.
+     * Keep `panda:build` for `styled-system` codegen; `transform: true` folds
+     * static `css()` / `cva()` / patterns in `.ts` and `.svelte` (SFC_RE / #3848).
+     * Prefer `_icon` over invalid `has:{svg}` — unsupported keys silent-bail the
+     * whole-file transform and re-ship full `css`/`cva` runtime.
      *
      * @remarks
-     * Still required on `@pandacss/vite@2.0.0` (and `@pandacss/dev@2.0.0`).
-     * Drop when a release with #3848 is in our range and `.svelte` folds under
-     * `transform: true`; re-verify before deleting `panda:build` pre-step / this note.
+     * Verified on `@pandacss/vite@2.0.1`. Drop `panda:build` pre-step only if
+     * codegen is otherwise covered; re-verify. Watch #3853 for transform diagnostics.
      *
-     * @see https://github.com/chakra-ui/panda/issues/3847 — closed
-     * @see https://github.com/chakra-ui/panda/pull/3848 — merged (not on npm yet; latest still 2.0.0)
-     * @see https://github.com/fringe4life/dollar-holler/issues/106 — tracking
+     * @see https://github.com/chakra-ui/panda/pull/3848 — merged in 2.0.1
+     * @see https://github.com/chakra-ui/panda/issues/3853 — open: silent no-op on bad keys
+     * @see https://github.com/fringe4life/dollar-holler/issues/106 — SFC transform tracking
+     * @see https://github.com/fringe4life/dollar-holler/issues/109 — remaining runtime epic
      */
     pandacss({ transform: true }),
   ],

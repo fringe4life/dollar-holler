@@ -18,6 +18,8 @@ On local Miniflare D1 seed (same fixture as BEFORE baseline):
 
 `hash` = SHA-256 of key-sorted JSON of `results` only. `fixture.nowMs` is frozen so outstanding/overdue CASE buckets do not drift wall-clock.
 
+The hashed SQL lives in `scripts/sql-list-oracle.ts` (mirrored shapes). Production `fetch*` helpers import `db` from `cloudflare:workers`, so this script does not call them. A production-only edit can stay green until the mirror is updated.
+
 ## Commands
 
 ```bash

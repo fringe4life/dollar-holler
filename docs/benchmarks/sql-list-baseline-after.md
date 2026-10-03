@@ -20,7 +20,7 @@
 
 | Issue | Decision | Why |
 | --- | --- | --- |
-| #122 Client detail share money + drop verify | **KEEP** | Dropped 2× `verifyClient` RTTs on remotes. One request-memoized client CTE feeds list row totals + summary rolls. Oracle green. EXPLAIN: `invoices_userId_clientId_id_idx` (unchanged good plan). |
+| #122 Client detail share money + drop verify | **KEEP** | Dropped 2× `verifyClient` RTTs on remotes. One request-memoized client CTE feeds list row totals + summary rolls. Review fix: CTE search includes client name (same as the list), and both sides round `subtotal * (1 - discount/100)` once. Oracle green. EXPLAIN: `invoices_userId_clientId_id_idx` (unchanged good plan). |
 | #123 Invoice list batch CTE / `IN (page ids)` | **DISCARD** | Oracle green + EXPLAIN loses `CORRELATED SCALAR SUBQUERY`, but same-run median **worse**: RQB page+batch **21.26 ms / 2 RTT** vs correlated extras **~14–15 ms / 1 RTT**. Seed-scale RTT floor dominates. Prod stays on correlated `extras`. |
 | #125 Extra indexes | **SKIP** | Money CTE AFTER plan is `SEARCH invoices_userId_id_idx` (thanks to #120 `userId`), not PK SCAN. Client detail CTE already uses `invoices_userId_clientId_id_idx`. No new migration. |
 | #126 Materialize `invoices.total` | **deferred** | Question ticket — not implemented. |

@@ -5,7 +5,7 @@ import {
   type ClientInvoiceTotalRow,
 } from "#lib/features/invoices/queries/client-invoice-summary-roll.ts";
 import {
-  invoiceTotalFromSubtotalSql,
+  invoiceTotalFromSubtotal,
   lineItemsSubtotalSqlForInvoiceId,
   mapRowsWithTotal,
   type RowWithSubtotal,
@@ -23,6 +23,7 @@ import {
 } from "#features/pagination/utils/cursor-paginated-fetch.server.ts";
 import { db } from "#lib/server/db/index.ts";
 import {
+  clients as clientsTable,
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "#lib/server/db/schema.ts";
@@ -152,6 +153,10 @@ export const fetchPaginatedInvoices = async (
   });
 };
 
+/**
+ * Same search as `searchWhere` / `clientInvoiceListWhere`, including client name.
+ * A narrower CTE drops name-only hits and the list then maps those ids to total 0.
+ */
 const clientInvoiceSearchFilters = (
   userId: string,
   clientId: CursorId,
@@ -166,7 +171,8 @@ const clientInvoiceSearchFilters = (
     const pattern = `%${trimmed}%`;
     const search = or(
       like(invoicesTable.invoiceNumber, pattern),
-      like(invoicesTable.subject, pattern)
+      like(invoicesTable.subject, pattern),
+      like(clientsTable.name, pattern)
     );
     if (search) {
       filters.push(search);
@@ -176,8 +182,8 @@ const clientInvoiceSearchFilters = (
 };
 
 /**
- * One pass: SUM(line_items) per invoice for a client (+ optional search).
- * Returns subtotal (list) + SQL ROUND total (summary buckets).
+ * One SUM per invoice for a client (+ optional search).
+ * List rows and summary buckets both use {@link invoiceTotalFromSubtotal}.
  */
 const fetchClientInvoiceTotalRows = async (
   userId: string,
@@ -189,19 +195,17 @@ const fetchClientInvoiceTotalRows = async (
   const invoiceTotals = db.$with("invoice_totals").as(
     db
       .select({
+        discount: invoicesTable.discount,
         dueDate: invoicesTable.dueDate,
         id: invoicesTable.id,
         invoiceStatus: invoicesTable.invoiceStatus,
         subtotal: sql<number>`COALESCE(SUM(${lineItemsTable.amount}), 0)`.as(
           "subtotal"
         ),
-        total: invoiceTotalFromSubtotalSql(
-          sql`SUM(${lineItemsTable.amount})`,
-          invoicesTable.discount
-        ).as("total"),
       })
       .from(invoicesTable)
       .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
+      .leftJoin(clientsTable, eq(clientsTable.id, invoicesTable.clientId))
       .where(and(...filters))
       .groupBy(invoicesTable.id)
   );
@@ -209,24 +213,31 @@ const fetchClientInvoiceTotalRows = async (
   const rows = await db
     .with(invoiceTotals)
     .select({
+      discount: invoiceTotals.discount,
       dueDate: invoiceTotals.dueDate,
       id: invoiceTotals.id,
       invoiceStatus: invoiceTotals.invoiceStatus,
       subtotal: invoiceTotals.subtotal,
-      total: invoiceTotals.total,
     })
     .from(invoiceTotals);
 
-  return rows.map((row) => ({
-    dueDate: row.dueDate,
-    id: row.id,
-    invoiceStatus: row.invoiceStatus,
-    subtotal: Math.round(Number(row.subtotal ?? 0)),
-    total: Math.round(Number(row.total ?? 0)),
-  }));
+  return rows.map((row) => {
+    const subtotal = Number(row.subtotal ?? 0);
+    const discountPercent = Number(row.discount ?? 0);
+    return {
+      dueDate: row.dueDate,
+      id: row.id,
+      invoiceStatus: row.invoiceStatus,
+      subtotal,
+      total: invoiceTotalFromSubtotal(subtotal, discountPercent),
+    };
+  });
 };
 
 type TotalsCache = Map<string, Promise<ClientInvoiceTotalRow[]>>;
+type KitRequestEvent = ReturnType<typeof getRequestEvent>;
+
+const totalsByEvent = new WeakMap<KitRequestEvent, TotalsCache>();
 
 const totalsCacheKey = (
   userId: string,
@@ -245,21 +256,23 @@ const getClientInvoiceTotalRowsCached = (
 ): Promise<ClientInvoiceTotalRow[]> => {
   const key = totalsCacheKey(userId, clientId, q);
   const run = () => fetchClientInvoiceTotalRows(userId, clientId, q);
+  let event: KitRequestEvent;
   try {
-    const { locals } = getRequestEvent();
-    const bag = locals as App.Locals & {
-      clientInvoiceTotalsCache?: TotalsCache;
-    };
-    const cache = (bag.clientInvoiceTotalsCache ??= new Map());
-    let pending = cache.get(key);
-    if (!pending) {
-      pending = run();
-      cache.set(key, pending);
-    }
-    return pending;
+    event = getRequestEvent();
   } catch {
     return run();
   }
+  let cache = totalsByEvent.get(event);
+  if (!cache) {
+    cache = new Map();
+    totalsByEvent.set(event, cache);
+  }
+  let pending = cache.get(key);
+  if (!pending) {
+    pending = run();
+    cache.set(key, pending);
+  }
+  return pending;
 };
 
 // biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList

@@ -55,6 +55,15 @@ export const invoiceTotalFromSubtotalSql = (
 ) =>
   sql<number>`ROUND(COALESCE(${subtotal}, 0) * (1 - COALESCE(${discountPercent}, 0) / 100))`;
 
+/**
+ * Same algebra as {@link invoiceTotalFromSubtotalSql} for numbers already in JS.
+ * Round the product. Rounding the subtotal first, then multiplying, drifts by a cent.
+ */
+export const invoiceTotalFromSubtotal = (
+  subtotal: number,
+  discountPercent: number
+): number => Math.round(subtotal * (1 - discountPercent / 100));
+
 export interface RowWithSubtotal {
   discount: Maybe<string | number>;
   subtotal: Maybe<string | number>;
@@ -66,7 +75,7 @@ export const mapRowsWithTotal = <T extends RowWithSubtotal>(
   rows.map((row) => {
     const subtotal = Number(row.subtotal ?? 0);
     const discountPercent = Number(row.discount ?? 0);
-    const total = Math.round(subtotal * (1 - discountPercent / 100));
+    const total = invoiceTotalFromSubtotal(subtotal, discountPercent);
     const { subtotal: _s, ...rest } = row;
     return { ...rest, total } satisfies Omit<T, "subtotal"> & Total;
   });

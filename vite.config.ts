@@ -64,8 +64,8 @@ const rewriteSsrBundle = (bundle: Record<string, BundleChunk>, stub: string) => 
  * `.svelte-kit/output/server`, which wrangler cannot resolve.
  *
  * @remarks
- * Still required on `@sveltejs/adapter-cloudflare@8.0.0-next.8`
- * (and `@sveltejs/kit@3.0.0-next.31`). Drop when `vite build` + `vite preview`
+ * Still required on `@sveltejs/adapter-cloudflare@8.0.0`
+ * (and `@sveltejs/kit@3.0.0`). Drop when `vite build` + `vite preview`
  * work with a bare `import { env } from "cloudflare:workers"` (no leftover
  * protocol specifier in `.svelte-kit/output/server`); re-verify before deleting.
  *
@@ -108,22 +108,9 @@ export default defineConfig({
       output: {
         minify: {
           compress: { dropConsole: true },
-          /**
-           * Workaround: disable Oxc name mangling so Svelte snippet / `__name`
-           * helpers stay callable in prod SSR (otherwise `iN is not a function`).
-           *
-           * @remarks
-           * Still required on `vite@8.3.1` (Rolldown ~1.2.x) with
-           * `svelte@5.57.1` / `@sveltejs/kit@3.0.0-next.31`. Drop when default
-           * mangling no longer breaks SSR routes; re-verify
-           * `bun run build` + preview `/login` `/signup` before deleting.
-           *
-           * @see https://github.com/rolldown/rolldown/issues/11061 — open
-           * @see https://github.com/sveltejs/vite-plugin-svelte/issues/1143 — related
-           * @see https://github.com/fringe4life/dollar-holler/pull/66 — introduced
-           * @see https://github.com/fringe4life/dollar-holler/issues/114 — tracking
-           */
-          mangle: false,
+          // Oxc mangling re-enabled: SSR crash was Wrangler/esbuild
+          // `alwaysStrict` + Annex B hoisting (see tsconfig.wrangler.json / #114),
+          // not Oxc itself. Keep compress/dropConsole.
         },
       },
     },
@@ -182,7 +169,7 @@ export default defineConfig({
      * `box-sizing: border-box`. Use `&:has(svg)` / a custom condition if needed.
      *
      * @remarks
-     * Verified on `@pandacss/vite@2.0.1`. Drop `panda:build` pre-step only if
+     * Verified on `@pandacss/vite@2.1.0`. Drop `panda:build` pre-step only if
      * codegen is otherwise covered; re-verify. Watch #3853 for transform diagnostics.
      *
      * @see https://github.com/chakra-ui/panda/pull/3848 — merged in 2.0.1

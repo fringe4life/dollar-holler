@@ -4,6 +4,9 @@
   "main": ".svelte-kit/cloudflare/_worker.js",
   "compatibility_date": "2026-08-14",
   "compatibility_flags": ["nodejs_compat"],
+  // Wrangler-only: `alwaysStrict: false` while keeping `strict: true`.
+  // See pin-comment in tsconfig.wrangler.json / issue #114.
+  "tsconfig": "tsconfig.wrangler.json",
   // `vite preview` rewrites SSR output to a Node file:// stub. Restore
   // `cloudflare:workers` before Wrangler bundles, including after Ctrl+C.
   "build": {

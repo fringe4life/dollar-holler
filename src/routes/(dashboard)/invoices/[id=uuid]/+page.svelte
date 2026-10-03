@@ -36,7 +36,7 @@
    * refetch-loops forever under experimental.async.
    *
    * @remarks
-   * Still required on svelte@5.57.1 / @sveltejs/kit@3.0.0-next.31.
+   * Still required on svelte@5.57.1 / @sveltejs/kit@3.0.0.
    * Drop when upstream ships a fix; re-verify before deleting.
    *
    * @see https://github.com/sveltejs/svelte/issues/18662 — open

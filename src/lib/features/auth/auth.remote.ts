@@ -19,7 +19,7 @@ import { tryCatch } from "#lib/utils/try-catch.ts";
  * not clear client inputs.
  *
  * @remarks
- * Still required on `@sveltejs/kit@3.0.0-next.31`.
+ * Still required on `@sveltejs/kit@3.0.0`.
  * Drop when upstream ships a fix; re-verify before deleting.
  *
  * @see https://github.com/sveltejs/kit/issues/14802 — open: values persist after nav

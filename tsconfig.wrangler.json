@@ -1,0 +1,25 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "strict": true,
+    /**
+     * Workaround: keep `strict` for typecheck intent, but force
+     * `alwaysStrict: false` so Wrangler's esbuild rebundle does not leave
+     * nested scopes in sloppy mode (Annex B hoisting then shadows Oxc-mangled
+     * Svelte helpers → `TypeError: rN is not a function` on SSR).
+     *
+     * @remarks
+     * Still required on `wrangler@4.144.0` / esbuild 0.28.x used by Wrangler,
+     * with `vite@8.3.1` Oxc mangling enabled. Drop when esbuild propagates
+     * `alwaysStrict` into existing child scopes; re-verify
+     * `bun run build` + wrangler-served `/login` `/signup` with default mangle
+     * before deleting.
+     *
+     * @see https://github.com/evanw/esbuild/issues/4545 — open (upstream fix)
+     * @see https://github.com/rolldown/rolldown/issues/11061 — open (camc314 diagnosis)
+     * @see https://github.com/evanw/esbuild/blob/v0.28.1/internal/js_parser/js_parser.go#L18281
+     * @see https://github.com/fringe4life/dollar-holler/issues/114 — tracking
+     */
+    "alwaysStrict": false
+  }
+}

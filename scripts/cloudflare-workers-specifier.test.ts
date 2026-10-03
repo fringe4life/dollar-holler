@@ -6,7 +6,7 @@ import {
 } from "./cloudflare-workers-specifier.ts";
 
 const STUB =
-  "file:///home/cc/Programming/Svelte%205/dollar-holler/node_modules/.bun/@sveltejs+adapter-cloudflare@8.0.0-next.7+45fad09fad93029d/node_modules/@sveltejs/adapter-cloudflare/src/virtual-cloudflare-workers.js?92fd340b-1982-4e90-99d2-ef8b372edaee";
+  "file:///workspace/node_modules/.bun/@sveltejs+adapter-cloudflare@8.0.0+test/node_modules/@sveltejs/adapter-cloudflare/src/virtual-cloudflare-workers.js?test-id";
 
 describe("rewriteCloudflareWorkersSpecifier", () => {
   it("rewrites double, single, and backtick specifiers to the adapter stub", () => {

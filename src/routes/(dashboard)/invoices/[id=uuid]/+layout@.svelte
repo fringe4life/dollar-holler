@@ -39,7 +39,7 @@
 <svelte:window
   onkeydown={(e) => {
     if (e.key === "Escape") {
-      goto(getBackUrl, { replaceState: true });
+      goto(getBackUrl, { replace: true });
     }
   }}
 />

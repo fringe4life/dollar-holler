@@ -3,6 +3,8 @@
 **Compare to:** [`sql-list-baseline-before.md`](./sql-list-baseline-before.md)  
 **Harness:** `bun run bench:sql-list` (same machine + seed counts)  
 **Oracle:** `bun run oracle:sql-list` — green  
+**PR:** https://github.com/fringe4life/dollar-holler/pull/127  
+**Commits:** `df99ae2` (ship), `553e217` (client-name search + one rounding path)  
 `hash=3cdf593a07a7fc0fa0f51cbd09978f235ec283d322c90b498993cb2532f47d6b`
 
 ## Meta

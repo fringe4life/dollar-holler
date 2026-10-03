@@ -1,15 +1,17 @@
+import { getRequestEvent } from "$app/server";
 import { and, eq, like, or, type SQL, sql } from "drizzle-orm";
 import {
-  invoiceTotalFromSubtotalSql,
+  rollClientInvoiceSummary,
+  type ClientInvoiceTotalRow,
+} from "#lib/features/invoices/queries/client-invoice-summary-roll.ts";
+import {
+  invoiceTotalFromSubtotal,
   lineItemsSubtotalSqlForInvoiceId,
   mapRowsWithTotal,
   type RowWithSubtotal,
 } from "#lib/features/invoices/queries/invoice-list-helpers.ts";
 import type { InvoiceListResponse } from "#features/invoices/types.ts";
-import type {
-  ClientInvoiceSummaryFinal,
-  ClientInvoiceSummaryInitial,
-} from "#features/invoices/utils/client-invoice-summary.ts";
+import type { ClientInvoiceSummaryFinal } from "#features/invoices/utils/client-invoice-summary.ts";
 import type {
   CursorPaginatedList,
   PaginationSearchParams,
@@ -21,6 +23,7 @@ import {
 } from "#features/pagination/utils/cursor-paginated-fetch.server.ts";
 import { db } from "#lib/server/db/index.ts";
 import {
+  clients as clientsTable,
   invoices as invoicesTable,
   lineItems as lineItemsTable,
 } from "#lib/server/db/schema.ts";
@@ -67,12 +70,6 @@ const clientInvoiceListWhere = (
   return { AND: parts };
 };
 
-const invoiceSubtotalExtras = {
-  /** Second arg is RQB `{ sql }`; unused — subtotal comes from `lineItemsSubtotalSqlForInvoiceId`. */
-  subtotal: (inv: typeof invoicesTable, _helpers: { sql: typeof sql }) =>
-    lineItemsSubtotalSqlForInvoiceId(inv.id),
-};
-
 /** RQB `columns`: booleans only; keys checked against `InvoicesQueryColumnSelection`. */
 const invoiceListColumns = {
   clientId: true,
@@ -106,10 +103,33 @@ const mapRows = (
     })
   );
 
+const invoiceSubtotalExtras = {
+  /** Second arg is RQB `{ sql }`; unused — subtotal from `lineItemsSubtotalSqlForInvoiceId`. */
+  subtotal: (inv: typeof invoicesTable, _helpers: { sql: typeof sql }) =>
+    lineItemsSubtotalSqlForInvoiceId(inv.id),
+};
+
+/** Global invoice list: correlated extras kept after #123 discard (1 RTT wins at seed). */
 const fetchInvoiceListPage = async ({ where, orderBy, limit }: FetchPageArgs) =>
   await db.query.invoices.findMany({
     columns: invoiceListColumns,
     extras: invoiceSubtotalExtras,
+    limit,
+    orderBy,
+    where,
+    with: {
+      client: { columns: { name: true } },
+    },
+  });
+
+/** Client detail list page: no extras — totals from shared CTE (#122). */
+const fetchInvoicePageWithoutExtras = async ({
+  where,
+  orderBy,
+  limit,
+}: FetchPageArgs) =>
+  await db.query.invoices.findMany({
+    columns: invoiceListColumns,
     limit,
     orderBy,
     where,
@@ -133,33 +153,15 @@ export const fetchPaginatedInvoices = async (
   });
 };
 
-// biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
-export const fetchPaginatedInvoicesForClient = async (
-  userId: string,
-  clientId: CursorId,
-  input: PaginationSearchParams
-): Promise<CursorPaginatedList<InvoiceListResponse>> => {
-  const ws = clientInvoiceListWhere(userId, clientId, input.q);
-  return fetchCursorPaginatedList({
-    baseWhere: ws,
-    fetchPage: fetchInvoiceListPage,
-    idColumn: invoicesTable.id,
-    input,
-    map: mapRows,
-  });
-};
-
 /**
- * Client invoice money buckets in one SQL round-trip (B).
- * Inner CTE: one `SUM(line_items)` per invoice + discount algebra (A).
- * Outer: CASE/SUM into draft / paid / overdue / outstanding.
- * Search `q` matches invoice number/subject only (client already scoped).
+ * Same search as `searchWhere` / `clientInvoiceListWhere`, including client name.
+ * A narrower CTE drops name-only hits and the list then maps those ids to total 0.
  */
-export const fetchClientInvoiceSummary = async (
+const clientInvoiceSearchFilters = (
   userId: string,
   clientId: CursorId,
   q: Maybe<string>
-): Promise<ClientInvoiceSummaryFinal> => {
+): SQL[] => {
   const filters: SQL[] = [
     eq(invoicesTable.userId, userId),
     eq(invoicesTable.clientId, clientId),
@@ -169,71 +171,153 @@ export const fetchClientInvoiceSummary = async (
     const pattern = `%${trimmed}%`;
     const search = or(
       like(invoicesTable.invoiceNumber, pattern),
-      like(invoicesTable.subject, pattern)
+      like(invoicesTable.subject, pattern),
+      like(clientsTable.name, pattern)
     );
     if (search) {
       filters.push(search);
     }
   }
+  return filters;
+};
 
-  const nowMs = Date.now();
+/**
+ * One SUM per invoice for a client (+ optional search).
+ * List rows and summary buckets both use {@link invoiceTotalFromSubtotal}.
+ */
+const fetchClientInvoiceTotalRows = async (
+  userId: string,
+  clientId: CursorId,
+  q: Maybe<string>
+): Promise<ClientInvoiceTotalRow[]> => {
+  const filters = clientInvoiceSearchFilters(userId, clientId, q);
+
   const invoiceTotals = db.$with("invoice_totals").as(
     db
       .select({
+        discount: invoicesTable.discount,
         dueDate: invoicesTable.dueDate,
         id: invoicesTable.id,
         invoiceStatus: invoicesTable.invoiceStatus,
-        total: invoiceTotalFromSubtotalSql(
-          sql`SUM(${lineItemsTable.amount})`,
-          invoicesTable.discount
-        ).as("total"),
+        subtotal: sql<number>`COALESCE(SUM(${lineItemsTable.amount}), 0)`.as(
+          "subtotal"
+        ),
       })
       .from(invoicesTable)
       .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
+      .leftJoin(clientsTable, eq(clientsTable.id, invoicesTable.clientId))
       .where(and(...filters))
       .groupBy(invoicesTable.id)
   );
 
-  const [row] = await db
+  const rows = await db
     .with(invoiceTotals)
     .select({
-      draft:
-        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'draft' THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
-          "draft"
-        ),
-      outstanding:
-        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'sent' AND ${invoiceTotals.dueDate} >= ${nowMs} THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
-          "outstanding"
-        ),
-      overdue:
-        sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'sent' AND ${invoiceTotals.dueDate} < ${nowMs} THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
-          "overdue"
-        ),
-      paid: sql<number>`COALESCE(SUM(CASE WHEN ${invoiceTotals.invoiceStatus} = 'paid' THEN ${invoiceTotals.total} ELSE 0 END), 0)`.as(
-        "paid"
-      ),
+      discount: invoiceTotals.discount,
+      dueDate: invoiceTotals.dueDate,
+      id: invoiceTotals.id,
+      invoiceStatus: invoiceTotals.invoiceStatus,
+      subtotal: invoiceTotals.subtotal,
     })
     .from(invoiceTotals);
 
-  return createSummary(row);
+  return rows.map((row) => {
+    const subtotal = Number(row.subtotal ?? 0);
+    const discountPercent = Number(row.discount ?? 0);
+    return {
+      dueDate: row.dueDate,
+      id: row.id,
+      invoiceStatus: row.invoiceStatus,
+      subtotal,
+      total: invoiceTotalFromSubtotal(subtotal, discountPercent),
+    };
+  });
 };
 
-const createSummary = (
-  row: Partial<ClientInvoiceSummaryInitial>
-): ClientInvoiceSummaryFinal => {
-  const calculateDraft = handleSummary(row.draft);
-  const calculateOutstanding = handleSummary(row.outstanding);
-  const calculateOverdue = handleSummary(row.overdue);
-  const calculatePaid = handleSummary(row.paid);
-  const calculateGrandTotal =
-    calculateDraft + calculateOutstanding + calculateOverdue + calculatePaid;
-  return {
-    draft: calculateDraft,
-    grandTotal: calculateGrandTotal,
-    outstanding: calculateOutstanding,
-    overdue: calculateOverdue,
-    paid: calculatePaid,
-  };
+type TotalsCache = Map<string, Promise<ClientInvoiceTotalRow[]>>;
+type KitRequestEvent = ReturnType<typeof getRequestEvent>;
+
+const totalsByEvent = new WeakMap<KitRequestEvent, TotalsCache>();
+
+const totalsCacheKey = (
+  userId: string,
+  clientId: CursorId,
+  q: Maybe<string>
+): string => `${userId}\0${clientId}\0${q?.trim() ?? ""}`;
+
+/**
+ * Request-scoped memo so `/clients/[id]` list + summary share one money CTE (#122).
+ * Outside a request (scripts/tests): uncached fetch.
+ */
+const getClientInvoiceTotalRowsCached = (
+  userId: string,
+  clientId: CursorId,
+  q: Maybe<string>
+): Promise<ClientInvoiceTotalRow[]> => {
+  const key = totalsCacheKey(userId, clientId, q);
+  const run = () => fetchClientInvoiceTotalRows(userId, clientId, q);
+  let event: KitRequestEvent;
+  try {
+    event = getRequestEvent();
+  } catch {
+    return run();
+  }
+  let cache = totalsByEvent.get(event);
+  if (!cache) {
+    cache = new Map();
+    totalsByEvent.set(event, cache);
+  }
+  let pending = cache.get(key);
+  if (!pending) {
+    pending = run();
+    cache.set(key, pending);
+  }
+  return pending;
 };
 
-const handleSummary = (invoice?: number) => Math.round(Number(invoice ?? 0));
+// biome-ignore lint/suspicious/useAwait: await is not needed for fetchCursorPaginatedList
+export const fetchPaginatedInvoicesForClient = async (
+  userId: string,
+  clientId: CursorId,
+  input: PaginationSearchParams
+): Promise<CursorPaginatedList<InvoiceListResponse>> => {
+  const ws = clientInvoiceListWhere(userId, clientId, input.q);
+  // Kick money CTE immediately so summary remote can share (#122).
+  const totalsPromise = getClientInvoiceTotalRowsCached(
+    userId,
+    clientId,
+    input.q
+  );
+  return fetchCursorPaginatedList({
+    baseWhere: ws,
+    fetchPage: async ({ where, orderBy, limit }) => {
+      const [rows, totals] = await Promise.all([
+        fetchInvoicePageWithoutExtras({ where, orderBy, limit }),
+        totalsPromise,
+      ]);
+      const subtotalById = new Map(
+        totals.map((row) => [row.id, row.subtotal] as const)
+      );
+      return rows.map((row) => ({
+        ...row,
+        subtotal: subtotalById.get(row.id) ?? 0,
+      }));
+    },
+    idColumn: invoicesTable.id,
+    input,
+    map: mapRows,
+  });
+};
+
+/**
+ * Client invoice money buckets (#122).
+ * Uses the same request-memoized CTE as `fetchPaginatedInvoicesForClient`.
+ */
+export const fetchClientInvoiceSummary = async (
+  userId: string,
+  clientId: CursorId,
+  q: Maybe<string>
+): Promise<ClientInvoiceSummaryFinal> => {
+  const rows = await getClientInvoiceTotalRowsCached(userId, clientId, q);
+  return rollClientInvoiceSummary(rows, Date.now());
+};

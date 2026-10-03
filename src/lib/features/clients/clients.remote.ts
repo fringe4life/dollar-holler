@@ -1,5 +1,4 @@
 import { command, form, query, requested } from "$app/server";
-import { error } from "@sveltejs/kit";
 import { object, optional, string } from "valibot";
 import {
   requireUser,
@@ -14,7 +13,6 @@ import {
   patchClient,
   patchClientStatus,
 } from "#features/clients/queries/clients-write.server.ts";
-import { verifyClient } from "#features/clients/queries/verify-client.ts";
 import {
   clientFormSchema,
   clientStatusSchema,
@@ -42,6 +40,10 @@ export const getClient = query(cursorSchema, async (id) => {
   return fetchClientById(user.id, id);
 });
 
+/**
+ * Ownership: queries scope `userId`+`clientId` (#122 — no extra verifyClient RTT).
+ * Page still 404s via `getClient` when the client is missing.
+ */
 export const listClientInvoices = query(
   object({
     clientId: cursorSchema,
@@ -49,9 +51,6 @@ export const listClientInvoices = query(
   }),
   async ({ clientId, listQuery }) => {
     const user = requireUser();
-    if (!(await verifyClient(user.id, clientId))) {
-      error(404, "Client not found");
-    }
     return fetchPaginatedInvoicesForClient(user.id, clientId, listQuery);
   }
 );
@@ -63,9 +62,6 @@ export const clientInvoiceSummary = query(
   }),
   async ({ clientId, q }) => {
     const user = requireUser();
-    if (!(await verifyClient(user.id, clientId))) {
-      error(404, "Client not found");
-    }
     return fetchClientInvoiceSummary(user.id, clientId, q);
   }
 );

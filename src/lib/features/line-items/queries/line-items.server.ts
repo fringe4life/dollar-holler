@@ -5,9 +5,10 @@ import { verifyInvoice } from "#features/invoices/queries/verify-invoice.ts";
 import { db } from "#lib/server/db/index.ts";
 import { lineItems as lineItemsTable } from "#lib/server/db/schema.ts";
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
-import type { LineItemEditRow, LineItemInsert } from "../types";
+import type { LineItemInsert } from "../types";
 import { planLineItemSync } from "../utils/line-item-sync";
 
+/** Mutations only — reads use invoice-scoped RQB (`fetchInvoiceDetail`, #121). */
 const assertInvoiceOwned = async (userId: string, invoiceId: CursorId) => {
   if (!(await verifyInvoice(userId, invoiceId))) {
     error(404, "Invoice not found");
@@ -32,25 +33,6 @@ const runLineItemStatements = async (statements: BatchItem<"sqlite">[]) => {
     return;
   }
   await db.batch(statements as [BatchItem<"sqlite">, ...BatchItem<"sqlite">[]]);
-};
-
-export const fetchLineItemsForEdit = async (
-  userId: string,
-  invoiceId: CursorId
-): Promise<LineItemEditRow[]> => {
-  await assertInvoiceOwned(userId, invoiceId);
-  return db.query.lineItems.findMany({
-    columns: {
-      amount: true,
-      description: true,
-      id: true,
-      quantity: true,
-    },
-    where: {
-      invoiceId: { eq: invoiceId },
-      userId: { eq: userId },
-    },
-  });
 };
 
 export const insertLineItems = async (

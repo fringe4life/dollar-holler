@@ -92,6 +92,9 @@ A modern invoice management application built with SvelteKit 3 (pre-release) and
 - `bun run db:seed:remote` - Seed remote Cloudflare D1 via Node (`tsx` + `getPlatformProxy` + D1 `remote: true`; bun hangs; wrangler login)
 - `bun run db:studio` - Open Drizzle Studio (D1 HTTP; needs `CLOUDFLARE_*`)
 - `bun run db:push` - Push schema to remote D1 (D1 HTTP; needs `CLOUDFLARE_*`)
+- `bun run bench:sql-list` - Time local D1 invoice and client list SQL (throwaway harness)
+- `bun run oracle:sql-list` - Check those SQL shapes against the golden oracle
+- `bun run oracle:sql-list:write` - Rewrite the sql-list oracle golden fixture
 - `bun run cf:types` - Generate Wrangler `Env` types (`src/worker-configuration.d.ts`, gitignored)
 - `bun run cf:restore-workers` - Restore `cloudflare:workers` in `.svelte-kit/output/server` after `vite preview` (Wrangler `build.command`)
 - `bun run deploy` - Production build then `wrangler deploy`

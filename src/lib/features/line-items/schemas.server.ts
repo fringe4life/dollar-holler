@@ -23,7 +23,7 @@ const lineItemSelectSchema = omit(
   ["userId", "invoiceId"]
 );
 
-/** Invoice edit form / `listLineItemsForEdit` — no timestamps on the wire. */
+/** Invoice edit / detail line-item rows — no timestamps on the wire. */
 export const lineItemEditRowSchema = omit(lineItemSelectSchema, [
   "createdAt",
   "updatedAt",

@@ -378,3 +378,17 @@ ESLint + Prettier + Stylelint's linter will catch most issues automatically. Foc
 ---
 
 Most formatting and common issues are automatically fixed by ESLint + Prettier + Stylelint. Run `bun x ultracite fix` before committing to ensure compliance.
+
+## Agent skills
+
+### Issue tracker
+
+GitHub Issues on `fringe4life/dollar-holler` (`gh` or GitKraken MCP failover). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical roles mapped in `docs/agents/triage-labels.md` (create labels on GitHub when convenient; body `## Status` until then).
+
+### Domain docs
+
+Single-context. See `docs/agents/domain.md`.

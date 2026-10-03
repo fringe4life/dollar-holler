@@ -21,7 +21,7 @@
  * @see ../../invoices/queries/invoiceListHelpers.ts for single-SUM total algebra.
  */
 
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { invoiceTotalFromSubtotalSql } from "#features/invoices/queries/invoice-list-helpers.ts";
 import { db } from "#lib/server/db/index.ts";
 import {
@@ -41,8 +41,10 @@ const emptyMoney = (): ClientReceivedBalance => ({ balance: 0, received: 0 });
  * One pass over invoices + line_items for the given client ids.
  * Invoice total = `ROUND(SUM(amount) * (1 - discount/100))` (single SUM).
  * Then roll into received (paid) vs balance (not paid).
+ * Tenant-scoped via `userId` (defense-in-depth; matches other invoice queries).
  */
 export const fetchClientReceivedBalanceForIds = async (
+  userId: string,
   clientIds: readonly CursorId[]
 ): Promise<Map<CursorId, ClientReceivedBalance>> => {
   const result = new Map<CursorId, ClientReceivedBalance>();
@@ -66,7 +68,12 @@ export const fetchClientReceivedBalanceForIds = async (
       })
       .from(invoicesTable)
       .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
-      .where(inArray(invoicesTable.clientId, [...clientIds]))
+      .where(
+        and(
+          eq(invoicesTable.userId, userId),
+          inArray(invoicesTable.clientId, [...clientIds])
+        )
+      )
       .groupBy(invoicesTable.id)
   );
 

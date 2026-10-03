@@ -1,0 +1,191 @@
+{
+  "version": 1,
+  "seedCounts": {
+    "users": 3,
+    "clients": 6,
+    "invoices": 45,
+    "lineItems": 94,
+    "settings": 3
+  },
+  "fixture": {
+    "userId": "01a0f5ce-c2aa-7ef4-baa0-eea21790d011",
+    "clientIds": [
+      "01a0f5d0-aa18-754b-a52d-acd25768b419",
+      "01a0f5d0-aa18-754b-a52d-acd1fa3ed91a"
+    ],
+    "focusClientId": "01a0f5d0-aa18-754b-a52d-acd25768b419",
+    "nowMs": 1790863199212,
+    "listLimit": 10,
+    "take": 11
+  },
+  "results": {
+    "invoiceListPage": [
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa48-7f83-88ae-27ac78973394",
+        "invoiceNumber": "01A0F5-0015",
+        "invoiceStatus": "paid",
+        "subtotal": 4335,
+        "total": 4335
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa47-7055-ac4c-cb19e3cd6ad7",
+        "invoiceNumber": "01A0F5-0014",
+        "invoiceStatus": "draft",
+        "subtotal": 4731,
+        "total": 4731
+      },
+      {
+        "discount": 10,
+        "id": "01a0f5d0-aa47-7055-ac4c-cb16122b1d85",
+        "invoiceNumber": "01A0F5-0013",
+        "invoiceStatus": "sent",
+        "subtotal": 5337,
+        "total": 4803
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa46-7aa0-b6a3-14c0812f9d1b",
+        "invoiceNumber": "01A0F5-0012",
+        "invoiceStatus": "sent",
+        "subtotal": 4170,
+        "total": 4170
+      },
+      {
+        "discount": 19,
+        "id": "01a0f5d0-aa46-7aa0-b6a3-14bca4276c8b",
+        "invoiceNumber": "01A0F5-0011",
+        "invoiceStatus": "sent",
+        "subtotal": 8619,
+        "total": 6981
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa46-7aa0-b6a3-14b920ae5ded",
+        "invoiceNumber": "01A0F5-0010",
+        "invoiceStatus": "paid",
+        "subtotal": 6396,
+        "total": 6396
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa45-774e-8fe7-84913673564c",
+        "invoiceNumber": "01A0F5-0009",
+        "invoiceStatus": "sent",
+        "subtotal": 2765,
+        "total": 2765
+      },
+      {
+        "discount": 9,
+        "id": "01a0f5d0-aa44-7abf-81c6-098cf3a199ad",
+        "invoiceNumber": "01A0F5-0008",
+        "invoiceStatus": "paid",
+        "subtotal": 3322,
+        "total": 3023
+      },
+      {
+        "discount": 13,
+        "id": "01a0f5d0-aa44-7abf-81c6-0989ac99104f",
+        "invoiceNumber": "01A0F5-0007",
+        "invoiceStatus": "paid",
+        "subtotal": 3911,
+        "total": 3403
+      },
+      {
+        "discount": 14,
+        "id": "01a0f5d0-aa43-7236-a5f1-b84d9a480c2a",
+        "invoiceNumber": "01A0F5-0006",
+        "invoiceStatus": "paid",
+        "subtotal": 6322,
+        "total": 5437
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa43-7236-a5f1-b849d5ee2b10",
+        "invoiceNumber": "01A0F5-0005",
+        "invoiceStatus": "sent",
+        "subtotal": 4845,
+        "total": 4845
+      }
+    ],
+    "clientsMoney": [
+      {
+        "clientId": "01a0f5d0-aa18-754b-a52d-acd25768b419",
+        "balance": 8901,
+        "received": 28830
+      },
+      {
+        "clientId": "01a0f5d0-aa18-754b-a52d-acd1fa3ed91a",
+        "balance": 23583,
+        "received": 14948
+      }
+    ],
+    "clientSummary": {
+      "draft": 4731,
+      "outstanding": 0,
+      "overdue": 4170,
+      "paid": 28830,
+      "grandTotal": 37731
+    },
+    "invoiceListForClient": [
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa47-7055-ac4c-cb19e3cd6ad7",
+        "invoiceNumber": "01A0F5-0014",
+        "invoiceStatus": "draft",
+        "subtotal": 4731,
+        "total": 4731
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa46-7aa0-b6a3-14c0812f9d1b",
+        "invoiceNumber": "01A0F5-0012",
+        "invoiceStatus": "sent",
+        "subtotal": 4170,
+        "total": 4170
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa46-7aa0-b6a3-14b920ae5ded",
+        "invoiceNumber": "01A0F5-0010",
+        "invoiceStatus": "paid",
+        "subtotal": 6396,
+        "total": 6396
+      },
+      {
+        "discount": 9,
+        "id": "01a0f5d0-aa44-7abf-81c6-098cf3a199ad",
+        "invoiceNumber": "01A0F5-0008",
+        "invoiceStatus": "paid",
+        "subtotal": 3322,
+        "total": 3023
+      },
+      {
+        "discount": 14,
+        "id": "01a0f5d0-aa43-7236-a5f1-b84d9a480c2a",
+        "invoiceNumber": "01A0F5-0006",
+        "invoiceStatus": "paid",
+        "subtotal": 6322,
+        "total": 5437
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa42-77ea-a4dc-1f38f737e51a",
+        "invoiceNumber": "01A0F5-0004",
+        "invoiceStatus": "paid",
+        "subtotal": 7746,
+        "total": 7746
+      },
+      {
+        "discount": 0,
+        "id": "01a0f5d0-aa41-7242-9bee-8c62b09482df",
+        "invoiceNumber": "01A0F5-0002",
+        "invoiceStatus": "paid",
+        "subtotal": 6228,
+        "total": 6228
+      }
+    ]
+  },
+  "hash": "3cdf593a07a7fc0fa0f51cbd09978f235ec283d322c90b498993cb2532f47d6b"
+}

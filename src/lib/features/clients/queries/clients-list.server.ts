@@ -51,6 +51,7 @@ export const fetchPaginatedClients = async (
         where,
       });
       const moneyByClient = await fetchClientReceivedBalanceForIds(
+        userId,
         rows.map((row) => row.id)
       );
       return rows.map((row): ClientListResponse => {

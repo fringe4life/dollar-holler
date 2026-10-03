@@ -8,10 +8,9 @@
   import { newClient } from "#features/clients/utils/new-client.ts";
   import {
     deleteInvoice,
-    getInvoice,
+    getInvoiceDetail,
     saveInvoice,
   } from "#features/invoices/invoices.remote.ts";
-  import { listLineItemsForEdit } from "#features/line-items/line-items.remote.ts";
   import type {
     InvoiceFormProps,
     LineItemEditRow,
@@ -45,10 +44,12 @@
   const picker = await clientPickerOptions();
   // svelte-ignore state_referenced_locally -- parent remounts via {#key}
   const editInvoiceId = mode === "edit" ? invoiceId : undefined;
-  const loadedInvoice = editInvoiceId ? await getInvoice(editInvoiceId) : null;
-  const loadedLineItems = editInvoiceId
-    ? await listLineItemsForEdit(editInvoiceId)
-    : [];
+  // One RQB load (invoice + lineItems); was getInvoice + listLineItems (+ verify). #121
+  const editDetail = editInvoiceId
+    ? await getInvoiceDetail(editInvoiceId)
+    : null;
+  const loadedInvoice = editDetail?.invoice ?? null;
+  const loadedLineItems = editDetail?.lineItems ?? [];
 
   const toEditableInvoice = (full: InvoiceSelect): NewInvoice => ({
     clientId: full.clientId,

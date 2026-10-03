@@ -4,15 +4,20 @@
  * Paginated list handlers use `ORDER BY` + `LIMIT` on the parent row (`invoices`
  * or `clients`). Line-item amounts must not multiply rows before `LIMIT`.
  *
- * **Pattern:** `db.query.invoices.findMany` / `db.query.clients.findMany` with
- * `extras` scalar subqueries (`lineItemsSubtotalSqlForInvoiceId`) — one parent
- * row per invoice — or batch CTE joins that SUM `line_items` once per invoice
- * (`ROUND(subtotal * (1 - discount/100))`, not two identical SUM subqueries).
+ * **Pattern:** `db.query.invoices.findMany` with `extras` scalar subqueries
+ * (`lineItemsSubtotalSqlForInvoiceId`) — one parent row per invoice, **1 RTT**.
+ *
+ * Group B #123 tried page + `SUM … IN (page ids)` batch: oracle green, EXPLAIN
+ * dropped CORRELATED SCALAR SUBQUERY, but seed-scale median worse (2 RTTs vs 1;
+ * Miniflare RTT floor). **Discarded** — see `docs/benchmarks/sql-list-baseline-after.md`.
+ * Client detail (#122) still shares one money CTE via request memo.
+ *
+ * Totals: `ROUND(subtotal * (1 - discount/100))` via `invoiceTotalFromSubtotalSql`.
  *
  * Do not join raw `line_items` into paginated lists without collapsing to one
  * row per invoice first.
  *
- * @see ../clients/queries/clientListHelpers.ts for per-client received/balance.
+ * @see ../clients/queries/client-list-helpers.ts for per-client received/balance.
  */
 
 import type { AnyColumn, SQL } from "drizzle-orm";

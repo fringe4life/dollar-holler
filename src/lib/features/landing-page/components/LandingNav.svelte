@@ -32,8 +32,7 @@
   const landingNav = css({
     backdropFilter: "auto",
     insetBlockStart: 0,
-    insetInline: 0,
-    position: "fixed",
+    position: "sticky",
     zIndex: "50",
     _notSupportsScroll: {
       backgroundColor: "background/95",
@@ -49,9 +48,50 @@
     },
   });
 
-  const landingActions = hstack({
-    gap: { base: 2, md: 3 },
+  const navInner = between({
+    marginInline: "auto",
+    maxInlineSize: "6xl",
+    paddingBlock: 3,
+    paddingInline: { base: 5, md: 6 },
   });
+
+  const brandClass = hstack({
+    flexShrink: 0,
+    gap: { base: 2, md: 2.5 },
+  });
+
+  const brandNameClass = css({
+    color: "foreground",
+    display: { base: "none", sm: "inline" },
+    fontFamily: "sansserif",
+    fontSize: "xl",
+    fontWeight: "black",
+    letterSpacing: "tight",
+  });
+
+  const navLinksClass = hstack({
+    color: "textMuted",
+    display: { base: "none", lg: "flex" },
+    fontSize: "sm",
+    fontWeight: "semibold",
+    gap: 7,
+    _hover: { color: "primary" },
+  });
+
+  const navLinkClass = css({
+    color: "textMuted",
+    transitionDuration: "normal",
+    transitionProperty: "color",
+    _hover: { color: "primary" },
+    _focusVisible: {
+      outlineColor: "ring",
+      outlineOffset: 3,
+      outlineStyle: "solid",
+      outlineWidth: 2,
+    },
+  });
+
+  const landingActions = hstack({ gap: { base: 2, md: 3 } });
 
   const landingActionButton = css({
     gap: { base: 1.5, md: 2 },
@@ -61,13 +101,9 @@
     paddingInline: { base: 2.5, md: 5 },
   });
 
-  const landingActionIcon = css({
-    flexShrink: 0,
-  });
+  const landingActionIcon = css({ flexShrink: 0 });
 
-  const landingActionLabel = css({
-    display: { base: "none", md: "inline" },
-  });
+  const landingActionLabel = css({ display: { base: "none", md: "inline" } });
 
   const landingModeSelect = css({
     color: "foreground",
@@ -75,36 +111,18 @@
   });
 </script>
 
-<nav class={landingNav}>
-  <div
-    class={between({
-      marginInline: "auto",
-      maxInlineSize: "6xl",
-      paddingBlock: 4,
-      paddingInline: 6,
-    })}
-  >
-    <!-- Logo -->
-    <a class={hstack({ gap: 2.5 })} href={resolve("/")}>
-      <img
-        alt="Dollar Holler"
-        class={square({ size: 8 })}
-        src={asset("images/logo.svg")}
-      />
-      <span
-        class={css({
-          color: "foreground",
-          fontFamily: "sansserif",
-          fontSize: "xl",
-          fontWeight: "black",
-          letterSpacing: "tight",
-          display: { base: "none", sm: "inline" },
-        })}
-      >
-        Dollar Holler
-      </span>
+<nav aria-label="Main navigation" class={landingNav}>
+  <div class={navInner}>
+    <a aria-label="Dollar Holler home" class={brandClass} href={resolve("/")}>
+      <img alt="" class={square({ size: 8 })} src={asset("images/logo.svg")} />
+      <span class={brandNameClass}>Dollar Holler</span>
     </a>
-    <!-- Responsive actions -->
+
+    <div class={navLinksClass}>
+      <a class={navLinkClass} href="#features">Made simple</a>
+      <a class={navLinkClass} href="#reviews">Little notes</a>
+    </div>
+
     <div class={landingActions}>
       <div class={landingModeSelect}>
         <ModeSelect />

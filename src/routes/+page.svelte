@@ -1,784 +1,395 @@
 <script lang="ts">
-  import { ArrowRightIcon, StarIcon } from "@lucide/svelte";
+  import { ArrowUpRightIcon } from "@lucide/svelte";
   import { css, cx } from "#styled-system/css/index.js";
-  import {
-    between,
-    center,
-    circle,
-    flex,
-    grid,
-    hstack,
-    square,
-    stack,
-    vstack,
-    wrap,
-  } from "#styled-system/patterns/index.js";
-  import { resolve } from "$app/paths";
-  import AuroraBlob from "#features/landing-page/components/AuroraBlob.svelte";
+  import { grid, hstack, stack } from "#styled-system/patterns/index.js";
+  import { asset, resolve } from "$app/paths";
   import Features from "#features/landing-page/components/Features.svelte";
+  import GlowingOrb from "#features/landing-page/components/GlowingOrb.svelte";
   import LandingNav from "#features/landing-page/components/LandingNav.svelte";
   import Reviews from "#features/landing-page/components/Reviews.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
   import { directionalArrow } from "#lib/styles.ts";
 
-  const forwardArrowClass = cx(
-    square({ size: 4 }),
+  let { data } = $props();
+
+  const arrowClass = cx(
+    css({ flexShrink: 0, height: 4, width: 4 }),
     directionalArrow({ direction: "forward" })
   );
 
-  let { data } = $props();
+  const pageClass = css({
+    backgroundColor: "background",
+    color: "foreground",
+    overflow: "clip",
+  });
+
+  const heroSectionClass = css({
+    backgroundColor: "background",
+    backgroundImage:
+      "radial-gradient(ellipse at 79% 37%, color-mix(in srgb, var(--colors-warning) 21%, transparent), transparent 28%), radial-gradient(ellipse at 9% 13%, color-mix(in srgb, var(--colors-feature-primary) 18%, transparent), transparent 42%), linear-gradient(115deg, var(--colors-background) 20%, color-mix(in srgb, var(--colors-feature-primary) 5%, var(--colors-background)) 61%, color-mix(in srgb, var(--colors-warning) 7%, var(--colors-background)))",
+    clipPath:
+      "polygon(0 0, 100% 0, 100% 91%, 87% 95%, 70% 92%, 53% 100%, 35% 95%, 17% 99%, 0 93%)",
+    isolation: "isolate",
+    overflow: "clip",
+    paddingBlockEnd: { base: 24, md: 32 },
+    paddingBlockStart: { base: 8, md: 10 },
+    position: "relative",
+    _dark: {
+      backgroundImage:
+        "radial-gradient(ellipse at 79% 37%, color-mix(in srgb, var(--colors-warning) 10%, transparent), transparent 30%), radial-gradient(ellipse at 12% 10%, color-mix(in srgb, var(--colors-feature-primary) 20%, transparent), transparent 42%), linear-gradient(125deg, var(--colors-background), color-mix(in srgb, var(--colors-primary) 8%, var(--colors-background)) 54%, var(--colors-background))",
+      clipPath:
+        "polygon(0 0, 100% 0, 100% 89%, 84% 95%, 65% 91%, 47% 100%, 28% 95%, 12% 98%, 0 91%)",
+    },
+    smDown: {
+      clipPath:
+        "polygon(0 0, 100% 0, 100% 94%, 82% 98%, 63% 94%, 45% 100%, 27% 96%, 12% 99%, 0 95%)",
+    },
+  });
+
+  const heroLayoutClass = grid({
+    alignItems: "center",
+    columns: { base: 1, lg: 2 },
+    gap: { base: 5, md: 12, lg: 16 },
+    marginInline: "auto",
+    maxInlineSize: "6xl",
+    paddingInline: { base: 5, md: 6 },
+  });
+
+  const heroCopyClass = stack({ align: "start", gap: { base: 4, md: 5 } });
+
+  const kickerClass = css({
+    alignItems: "center",
+    color: "primary",
+    display: "inline-flex",
+    fontSize: { base: "xs", md: "sm" },
+    fontWeight: "bold",
+    gap: 2.5,
+    letterSpacing: "widest",
+    marginBlockEnd: 1,
+    textTransform: "uppercase",
+    _before: {
+      backgroundColor: "warning",
+      borderColor: "warning/60",
+      borderRadius: "full",
+      borderStyle: "solid",
+      borderWidth: 1,
+      content: '""',
+      flexShrink: 0,
+      height: 3,
+      width: 3,
+    },
+  });
+
+  const heroTitleClass = css({
+    color: "foreground",
+    fontFamily: "sansserif",
+    fontSize: { base: "5xl", sm: "6xl", md: "6xl", lg: "7xl" },
+    fontWeight: "black",
+    letterSpacing: "tighter",
+    lineHeight: "none",
+    maxInlineSize: "10ch",
+    margin: 0,
+    _dark: {
+      color: "foreground",
+    },
+  });
+
+  const highlightClass = css({
+    color: "primary",
+    display: "inline-block",
+    position: "relative",
+    whiteSpace: "nowrap",
+    zIndex: 0,
+    _after: {
+      backgroundColor: "warning",
+      borderRadius: "full",
+      content: '""',
+      height: 3,
+      insetBlockEnd: 0.5,
+      insetInline: "-2%",
+      opacity: 0.7,
+      position: "absolute",
+      rotate: "-2deg",
+      zIndex: -1,
+    },
+    _dark: {
+      color: "warning",
+      _after: { backgroundColor: "primary/50" },
+    },
+  });
+
+  const heroLedeClass = css({
+    color: "linkMuted",
+    fontSize: { base: "md", md: "lg" },
+    lineHeight: "relaxed",
+    marginBlock: { base: 4, md: 5 },
+    maxInlineSize: "46ch",
+  });
+
+  const heroActionsClass = hstack({
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: { base: 3, md: 4 },
+  });
+
+  const primaryButtonClass = css({
+    borderRadius: "full",
+    boxShadow: "colored",
+    paddingBlock: { base: 2.5, md: 3 },
+    paddingInline: { base: 5, md: 6 },
+    _hover: { rotate: "-1deg", translate: "0 -2px" },
+  });
+
+  const heroNoteClass = css({
+    color: "textMuted",
+    fontFamily: "handwriting",
+    fontSize: { base: "sm", md: "md" },
+    marginBlockStart: 2,
+    marginInlineStart: 1,
+    rotate: "-2deg",
+  });
+
+  const heroLoginClass = css({
+    color: "linkMuted",
+    fontSize: "sm",
+    fontWeight: "bold",
+    textDecoration: "underline",
+    textDecorationColor: "primary/40",
+    textUnderlineOffset: 4,
+    _hover: { color: "primary" },
+    _focusVisible: {
+      outlineColor: "ring",
+      outlineOffset: 3,
+      outlineStyle: "solid",
+      outlineWidth: 2,
+    },
+  });
+
+  const reviewSectionClass = css({
+    backgroundColor: "landingReview",
+    backgroundImage:
+      "radial-gradient(ellipse at 88% 7%, color-mix(in srgb, var(--colors-feature-primary) 24%, transparent), transparent 27%), linear-gradient(125deg, var(--colors-landing-review), color-mix(in srgb, var(--colors-landing-review) 92%, var(--colors-primary)))",
+    clipPath:
+      "polygon(0 4%, 12% 0, 28% 3%, 47% 0, 67% 4%, 86% 1%, 100% 4%, 100% 95%, 87% 100%, 68% 96%, 47% 100%, 27% 96%, 9% 100%, 0 96%)",
+    isolation: "isolate",
+    overflow: "clip",
+    paddingBlock: { base: 20, md: 28 },
+    position: "relative",
+    _dark: {
+      backgroundImage:
+        "radial-gradient(ellipse at 88% 7%, color-mix(in srgb, var(--colors-feature-primary) 22%, transparent), transparent 30%), linear-gradient(125deg, var(--colors-landing-review), color-mix(in srgb, var(--colors-landing-review) 83%, var(--colors-gray-950)))",
+      clipPath:
+        "polygon(0 3%, 16% 0, 35% 4%, 54% 0, 74% 3%, 100% 1%, 100% 96%, 84% 100%, 61% 96%, 40% 100%, 19% 96%, 0 100%)",
+    },
+    smDown: {
+      clipPath:
+        "polygon(0 2%, 20% 0, 43% 3%, 68% 0, 100% 2%, 100% 97%, 78% 100%, 53% 97%, 29% 100%, 0 97%)",
+    },
+  });
+
+  const sectionContainerClass = css({
+    marginInline: "auto",
+    maxInlineSize: "6xl",
+    paddingInline: { base: 5, md: 6 },
+    position: "relative",
+  });
+
+  const reviewHeadClass = css({
+    alignItems: { base: "start", md: "end" },
+    display: "flex",
+    flexDirection: { base: "column", md: "row" },
+    gap: { base: 3, md: 8 },
+    justifyContent: "space-between",
+    marginBlockEnd: { base: 8, md: 12 },
+  });
+
+  const reviewEyebrowClass = css({
+    color: "warning",
+    fontSize: "xs",
+    fontWeight: "bold",
+    letterSpacing: "widest",
+    marginBlockEnd: 2,
+    textTransform: "uppercase",
+  });
+
+  const reviewTitleClass = css({
+    color: "foregroundInverse",
+    fontFamily: "sansserif",
+    fontSize: { base: "4xl", sm: "5xl", md: "6xl" },
+    fontWeight: "black",
+    letterSpacing: "tight",
+    lineHeight: "tight",
+    margin: 0,
+    whiteSpace: { base: "normal", md: "nowrap" },
+  });
+
+  const reviewIntroClass = css({
+    color: "foregroundInverse/85",
+    fontSize: { base: "sm", md: "md" },
+    lineHeight: "relaxed",
+    margin: 0,
+    maxInlineSize: "32ch",
+  });
+
+  const footerClass = css({
+    backgroundColor: "background",
+    backgroundImage:
+      "linear-gradient(115deg, color-mix(in srgb, var(--colors-warning) 13%, var(--colors-background)), color-mix(in srgb, var(--colors-feature-primary) 10%, var(--colors-background)) 52%, var(--colors-background))",
+    clipPath:
+      "polygon(0 6%, 12% 0, 31% 5%, 49% 0, 68% 6%, 85% 1%, 100% 6%, 100% 96%, 83% 100%, 62% 96%, 42% 100%, 19% 96%, 0 100%)",
+    paddingBlock: { base: 7, md: 9 },
+    position: "relative",
+    _dark: {
+      backgroundImage:
+        "linear-gradient(115deg, color-mix(in srgb, var(--colors-warning) 6%, var(--colors-background)), color-mix(in srgb, var(--colors-primary) 12%, var(--colors-background)) 52%, var(--colors-background))",
+    },
+    smDown: {
+      clipPath:
+        "polygon(0 3%, 22% 0, 45% 3%, 70% 0, 100% 3%, 100% 97%, 74% 100%, 48% 97%, 23% 100%, 0 97%)",
+    },
+  });
+
+  const footerInnerClass = css({
+    alignItems: { base: "start", sm: "center" },
+    display: "flex",
+    flexDirection: { base: "column", sm: "row" },
+    gap: { base: 3, sm: 5 },
+    justifyContent: "space-between",
+    marginInline: "auto",
+    maxInlineSize: "6xl",
+    minBlockSize: { sm: 20 },
+    paddingBlockStart: 4,
+    paddingInline: { base: 5, md: 6 },
+  });
+
+  const footerBrandClass = hstack({
+    color: "foreground",
+    fontFamily: "sansserif",
+    fontSize: "md",
+    fontWeight: "black",
+    gap: 2.5,
+  });
+
+  const footerLogoClass = css({
+    height: 8,
+    objectFit: "contain",
+    width: 8,
+  });
+
+  const footerTagClass = css({
+    color: "textMuted",
+    fontFamily: "handwriting",
+    fontSize: "sm",
+    margin: 0,
+  });
+
+  const footerLinksClass = hstack({
+    flexWrap: "wrap",
+    gap: { base: 3, md: 5 },
+  });
 </script>
 
 <svelte:head>
-  <title>Dollar Holler — Invoice Management Made Simple</title>
+  <title>Dollar Holler — Invoicing with a little less admin</title>
   <meta
-    content="Create professional invoices, track payments, and manage clients — all from one beautiful dashboard."
+    content="Create invoices, keep client details close, and set invoice statuses when you're ready. Dollar Holler records your status—it doesn't process payments."
     name="description"
   />
 </svelte:head>
-<main
-  class={css({
-    paddingInline: 4,
-    paddingBlockStart: { base: 4, md: 10 },
-  })}
->
+
+<div class={pageClass}>
   <LandingNav user={data?.user} />
-  <!-- ═══════════════════════════════════════════════════ HERO -->
-  <section
-    class={hstack({
-      position: "relative",
-      paddingBlockStart: 20,
-      paddingBlockEnd: 16,
-    })}
-  >
-    <!-- Aurora background blobs -->
-    <AuroraBlob
-      className={cx(
-        css({
-          insetInlineStart: 0,
-          insetBlockStart: 0,
-          translate: "25%",
-          opacity: "0.1",
-          backgroundColor: "featurePrimary",
-        }),
-        circle({ size: { base: 200, sm: 400, md: 500, lg: 600 } })
-      )}
-    />
-    <AuroraBlob
-      className={cx(
-        css({
-          insetInlineStart: 0,
-          insetBlockEnd: 0,
-          translate: "33%",
-          opacity: "0.1",
-          backgroundColor: "inverse",
-        }),
-        circle({ size: { base: 200, sm: 300, md: 400 } })
-      )}
-    />
-    <div
-      class={grid({
-        columns: { base: 1, lg: 2 },
-        gap: { base: 12, lg: 16 },
-        alignItems: "center",
-        position: "relative",
-        marginInline: "auto",
-        paddingInline: 6,
-        inlineSize: "full",
-        maxInlineSize: "6xl",
-      })}
-    >
-      <!-- Left: Copy -->
-      <div class={stack({ gap: 6, align: "start" })}>
-        <!-- Eyebrow badge -->
-        <span
-          class={css({
-            display: "inline-flex",
-            borderWidth: "1px",
-            borderStyle: "solid",
-            borderColor: "featurePrimary/20",
-            backgroundColor: "featurePrimary/10",
-            color: "featurePrimary",
-            alignItems: "center",
-            gap: 2,
-            rounded: "full",
-            fontWeight: "semibold",
-            paddingInline: 4,
-            paddingBlock: 1.5,
-          })}
-        >
-          ✨ Invoice management, simplified
-        </span>
 
-        <h1
-          class={css({
-            fontFamily: "sansserif",
-            lineHeight: "1.1",
-            fontWeight: "black",
-            letterSpacing: "tight",
-            fontSize: { base: "5xl", sm: "6xl", lg: "7xl" },
-            color: "foreground",
-          })}
-        >
-          Get Paid,<br />Faster Than<br />Ever Before.
-        </h1>
-        <p
-          class={css({
-            fontSize: "lg",
-            lineHeight: "relaxed",
-            color: "linkMuted",
-            maxInlineSize: "lg",
-          })}
-        >
-          Stop chasing payments. Create professional invoices, track payments,
-          and manage clients — all from one beautiful dashboard.
-        </p>
-        <div class={wrap({ align: "center", gap: 3 })}>
-          {#if data?.user}
-            <Button class="group" href={resolve("invoices")} size="lg">
-              Go to Dashboard
-              <ArrowRightIcon aria-hidden="true" class={forwardArrowClass} />
+  <main>
+    <section aria-labelledby="hero-title" class={heroSectionClass} id="top">
+      <div class={heroLayoutClass}>
+        <div class={heroCopyClass}>
+          <p class={kickerClass}>A little more room to make</p>
+          <h1 class={heroTitleClass} id="hero-title">
+            Make it.<br />
+            Send it.<br />
+            <span class={highlightClass}>Get back</span><br />
+            to making.
+          </h1>
+          <p class={heroLedeClass}>
+            Create invoices, keep client details close, and decide when each one
+            moves from draft to sent to paid.
+          </p>
+          <div class={heroActionsClass}>
+            <Button
+              class={cx("group", primaryButtonClass)}
+              href={resolve(data?.user ? "invoices" : "signup")}
+              size="lg"
+            >
+              {data?.user ? "Go to your invoices" : "Create your account"}
+              <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
             </Button>
-          {:else}
-            <Button class="group" href={resolve("signup")} size="lg">
-              Start for Free
-              <ArrowRightIcon aria-hidden="true" class={forwardArrowClass} />
-            </Button>
-            <Button href={resolve("login")} size="lg">Log in</Button>
-          {/if}
+            {#if !data?.user}
+              <a class={heroLoginClass} href={resolve("login")}
+                >Already have an account?</a
+              >
+            {/if}
+          </div>
+          <p class={heroNoteClass}>For the work you love doing.</p>
         </div>
-        <p
-          class={css({
-            fontSize: "sm",
-            color: "textMuted",
-          })}
-        >
-          No credit card required · Cancel anytime
-        </p>
+        <GlowingOrb />
       </div>
+    </section>
 
-      <!-- Right: Mock Invoice Card -->
-      <div class={flex({ justify: "center", position: "relative" })}>
-        <!-- Floating badge: Rating -->
-        <div
-          class={hstack({
-            gap: 2,
-            position: "absolute",
-            insetInline: "auto",
-            insetBlockEnd: -4,
-            zIndex: 10,
-            rounded: "xl",
-            shadow: "lg",
-            paddingInline: 4,
-            paddingBlock: 2.5,
-            backgroundColor: "warning/90",
-          })}
-        >
-          <StarIcon class={css({ color: "warningForeground" })} size={16} />
-          <p
-            class={css({
-              fontSize: "sm",
-              fontWeight: "bold",
-              color: "warningForeground",
-            })}
-          >
-            4.9 Client Rating
+    <Features />
+
+    <section
+      aria-labelledby="reviews-title"
+      class={reviewSectionClass}
+      id="reviews"
+    >
+      <div class={sectionContainerClass}>
+        <div class={reviewHeadClass}>
+          <div>
+            <p class={reviewEyebrowClass}>Illustrative sample reviews</p>
+            <h2 class={reviewTitleClass} id="reviews-title">
+              A few kind words.
+            </h2>
+          </div>
+          <p class={reviewIntroClass}>
+            Good work is worth sharing. Here are a couple of notes from the
+            creative day.
           </p>
         </div>
-
-        <!-- Mock Invoice Card -->
-        <div
-          class={css({
-            backgroundColor: "surfaceMuted",
-            position: "relative",
-            rounded: "2xl",
-            borderWidth: 1,
-            borderColor: "displayBorder",
-            shadow: "2xl",
-            inlineSize: "full",
-            maxInlineSize: "md",
-          })}
-          style="box-shadow: 0 25px 60px oklch(38.26% 0.202 288.17 / 0.18), 0 8px 20px oklch(0% 0 0 / 0.08);"
-        >
-          <!-- Floating badge: Payment -->
-          <div
-            class={flex({
-              align: "center",
-              gap: 2,
-              position: "absolute",
-              insetInlineStart: "50%",
-              insetBlockStart: -6,
-              zIndex: 10,
-              translate: "-50% 0",
-              rounded: "xl",
-              backgroundColor: "surface",
-              paddingInline: 4,
-              paddingBlock: 2.5,
-              shadow: "lg",
-            })}
-          >
-            <div
-              class={cx(
-                circle({ size: 8 }),
-                center({ backgroundColor: "displaySuccess", fontSize: "sm" })
-              )}
-            >
-              💰
-            </div>
-            <div>
-              <p
-                class={css({
-                  fontSize: "xs",
-                  fontWeight: "semibold",
-                  color: "displaySuccessText",
-                })}
-              >
-                Payment Received
-              </p>
-              <p
-                class={css({
-                  fontSize: "xs",
-                  color: "displaySuccessMuted",
-                })}
-              >
-                $4,200.00
-              </p>
-            </div>
-          </div>
-          <!-- Invoice Header -->
-          <div
-            class={css({
-              backgroundColor: "inverse",
-              roundedTop: "2xl",
-              paddingInline: 6,
-              paddingBlock: 4,
-            })}
-          >
-            <div class={between()}>
-              <div>
-                <p
-                  class={css({
-                    fontFamily: "sansserif",
-                    fontSize: "xs",
-                    fontWeight: "bold",
-                    letterSpacing: "widest",
-                    textTransform: "uppercase",
-                    color: "warning",
-                  })}
-                >
-                  Dollar Holler
-                </p>
-                <p
-                  class={css({
-                    marginBlockStart: 0.5,
-                    fontSize: "xs",
-                    color: "foregroundInverse/60",
-                  })}
-                >
-                  Invoice
-                </p>
-              </div>
-              <div class={css({ textAlign: "right" })}>
-                <p
-                  class={css({ fontSize: "xs", color: "foregroundInverse/70" })}
-                >
-                  Invoice No.
-                </p>
-                <p
-                  class={css({
-                    fontFamily: "sansserif",
-                    fontSize: "sm",
-                    fontWeight: "bold",
-                    color: "foregroundInverse",
-                  })}
-                >
-                  #INV-0042
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Invoice Body -->
-          <div class={css({ paddingInline: 6, paddingBlock: 6 })}>
-            <!-- Billing info -->
-            <div
-              class={hstack({
-                marginBlockEnd: 5,
-                alignItems: "start",
-                justifyContent: "space-between",
-              })}
-            >
-              <div>
-                <p
-                  class={css({
-                    marginBlockEnd: 1,
-                    fontSize: "xs",
-                    fontWeight: "semibold",
-                    letterSpacing: "wide",
-                    color: "displayMuted",
-                    textTransform: "uppercase",
-                  })}
-                >
-                  Bill To
-                </p>
-                <p
-                  class={css({
-                    fontFamily: "sansserif",
-                    fontSize: "sm",
-                    fontWeight: "bold",
-                    color: "foreground",
-                  })}
-                >
-                  Acme Design Co.
-                </p>
-                <p class={css({ fontSize: "xs", color: "displayMuted" })}>
-                  sarah@acme.com
-                </p>
-              </div>
-              <div class={css({ textAlign: "right" })}>
-                <p
-                  class={css({
-                    marginBlockEnd: 1,
-                    fontSize: "xs",
-                    fontWeight: "semibold",
-                    letterSpacing: "wide",
-                    color: "displayMuted",
-                    textTransform: "uppercase",
-                  })}
-                >
-                  Due Date
-                </p>
-                <p
-                  class={css({
-                    color: "foreground",
-                    fontSize: "sm",
-                    fontWeight: "semibold",
-                  })}
-                >
-                  Mar 30, 2026
-                </p>
-              </div>
-            </div>
-
-            <!-- Line items -->
-            <div
-              class={css({
-                marginBlockEnd: 5,
-                overflow: "hidden",
-                rounded: "xl",
-                border: "displayDivider",
-              })}
-            >
-              <div
-                class={grid({
-                  gridTemplateColumns: "1fr auto",
-                  color: "displayMuted",
-                  borderBottomWidth: 1,
-                  borderBottomColor: "displayDivider",
-                  backgroundColor: "displaySurface",
-                  paddingInline: 4,
-                  paddingBlock: 2,
-                  fontSize: "xs",
-                  fontWeight: "semibold",
-                  textTransform: "uppercase",
-                  letterSpacing: "wide",
-                })}
-              >
-                <span>Description</span>
-                <span class={css({ textAlign: "right" })}>Amount</span>
-              </div>
-              <div class={css({ divideY: "displayDivider" })}>
-                <div
-                  class={grid({
-                    gridTemplateColumns: "1fr auto",
-                    paddingInline: 4,
-                    paddingBlock: 3,
-                    fontSize: "sm",
-                  })}
-                >
-                  <div>
-                    <p class={css({ fontSize: "sm", color: "displayText" })}>
-                      Brand Identity Package
-                    </p>
-                    <p class={css({ fontSize: "xs", color: "displayMuted" })}>
-                      20 hrs × $150/hr
-                    </p>
-                  </div>
-                  <span
-                    class={css({
-                      color: "foreground",
-                      alignSelf: "center",
-                      fontWeight: "semibold",
-                    })}>$3,000.00</span
-                  >
-                </div>
-                <div
-                  class={grid({
-                    gridTemplateColumns: "1fr auto",
-                    paddingInline: 4,
-                    paddingBlock: 3,
-                    fontSize: "sm",
-                  })}
-                >
-                  <div>
-                    <p
-                      class={css({
-                        fontWeight: "medium",
-                        color: "displayText",
-                      })}
-                    >
-                      Website Redesign
-                    </p>
-                    <p class={css({ fontSize: "xs", color: "displayMuted" })}>
-                      8 hrs × $150/hr
-                    </p>
-                  </div>
-                  <span
-                    class={css({
-                      color: "foreground",
-                      alignSelf: "center",
-                      fontWeight: "semibold",
-                    })}>$1,200.00</span
-                  >
-                </div>
-              </div>
-            </div>
-
-            <!-- Total + Status -->
-            <div class={between()}>
-              <div>
-                <p
-                  class={css({
-                    fontSize: "xs",
-                    fontWeight: "semibold",
-                    letterSpacing: "wide",
-                    color: "displayMuted",
-                    textTransform: "uppercase",
-                  })}
-                >
-                  Total
-                </p>
-                <p
-                  class={css({
-                    fontFamily: "sansserif",
-                    color: "foreground",
-                    fontSize: "2xl",
-                    fontWeight: "black",
-                  })}
-                >
-                  $4,200.00
-                </p>
-              </div>
-              <span
-                class={css({
-                  rounded: "full",
-                  backgroundColor: "displaySuccess",
-                  paddingInline: 4,
-                  paddingBlock: 1.5,
-                  fontSize: "xs",
-                  fontWeight: "bold",
-                  letterSpacing: "widest",
-                  color: "displaySuccessText",
-                  textTransform: "uppercase",
-                })}
-              >
-                ✓ Paid
-              </span>
-            </div>
-          </div>
-        </div>
+        <Reviews />
       </div>
-    </div>
-  </section>
+    </section>
+  </main>
 
-  <!-- ═══════════════════════════════════════════════ FEATURES -->
-  <section class={css({ backgroundColor: "surface", paddingBlock: 24 })}>
-    <div
-      class={css({
-        marginInline: "auto",
-        paddingInline: 6,
-        maxInlineSize: "6xl",
-      })}
-    >
-      <!-- Section header -->
-      <div class={css({ marginBlockEnd: 16, textAlign: "center" })}>
-        <p
-          class={css({
-            color: "featurePrimary",
-            marginBlockEnd: 3,
-            fontSize: "sm",
-            fontWeight: "bold",
-            letterSpacing: "widest",
-            textTransform: "uppercase",
-          })}
-        >
-          Why Dollar Holler?
-        </p>
-        <h2
-          class={css({
-            fontFamily: "sansserif",
-            color: "foreground",
-            fontSize: { base: "4xl", sm: "5xl" },
-            fontWeight: "black",
-          })}
-        >
-          Everything you need<br
-            class={css({ display: { base: "none", sm: "block" } })}
-          />
-          to get paid on time
-        </h2>
-      </div>
-
-      <!-- Feature Cards Grid -->
-      <Features />
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════ REVIEWS -->
-  <section
-    class={css({
-      backgroundColor: "inverse",
-      position: "relative",
-      overflow: "clip",
-      paddingBlock: 24,
-    })}
-  >
-    <!-- Subtle aurora blob -->
-    <AuroraBlob
-      className={cx(
-        circle({ size: 96 }),
-        css({
-          insetInlineEnd: 0,
-          insetBlockEnd: 0,
-          opacity: "0.1",
-          backgroundColor: "featurePrimary",
-        })
-      )}
-    />
-    <AuroraBlob
-      className={cx(
-        circle({ size: 64 }),
-        css({
-          insetInlineStart: 0,
-          insetBlockEnd: 0,
-          backgroundColor: "overlay/20",
-          opacity: "0.1",
-        })
-      )}
-    />
-
-    <div
-      class={css({
-        position: "relative",
-        marginInline: "auto",
-        paddingInline: 6,
-        maxInlineSize: "6xl",
-      })}
-    >
-      <!-- Section header -->
-      <div class={css({ marginBlockEnd: 16, textAlign: "center" })}>
-        <p
-          class={css({
-            color: "warning",
-            marginBlockEnd: 3,
-            fontSize: "sm",
-            fontWeight: "bold",
-            letterSpacing: "widest",
-            textTransform: "uppercase",
-          })}
-        >
-          Real People, Real Results
-        </p>
-        <h2
-          class={css({
-            fontFamily: "sansserif",
-            fontSize: { base: "4xl", sm: "5xl" },
-            fontWeight: "black",
-            color: "foregroundInverse",
-          })}
-        >
-          What our customers say
-        </h2>
-        <p class={css({ color: "textSubtle", marginBlockStart: 3 })}>
-          Trusted by freelancers and small businesses worldwide
-        </p>
-      </div>
-
-      <!-- Review Cards -->
-      <Reviews />
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════════════════ CTA -->
-  <section
-    class={css({
-      backgroundColor: "primary",
-      position: "relative",
-      overflow: "hidden",
-      paddingBlock: 28,
-    })}
-  >
-    <!-- Aurora blobs -->
-    <AuroraBlob
-      className={cx(
-        circle({ size: 96 }),
-        css({
-          insetInlineStart: "1/2",
-          insetBlockStart: 0,
-          translate: "-1/2",
-          backgroundColor: "inverse",
-          opacity: "0.4",
-        })
-      )}
-    />
-    <AuroraBlob
-      className={cx(
-        circle({ size: 72 }),
-        css({
-          insetInlineEnd: 0,
-          insetBlockEnd: 0,
-          translate: "1/3",
-          backgroundColor: "accent",
-          opacity: "0.2",
-        })
-      )}
-    />
-
-    <div
-      class={css({
-        position: "relative",
-        marginInline: "auto",
-        paddingInline: 6,
-        textAlign: "center",
-        maxInlineSize: "3xl",
-      })}
-    >
-      <h2
-        class={css({
-          fontFamily: "sansserif",
-          color: "warning",
-          marginBlockEnd: 5,
-          letterSpacing: "tight",
-          fontWeight: "black",
-          fontSize: { base: "5xl", sm: "6xl" },
-        })}
+  <footer class={footerClass}>
+    <div class={footerInnerClass}>
+      <a
+        aria-label="Dollar Holler home"
+        class={footerBrandClass}
+        href={resolve("/")}
       >
-        Ready to get paid faster?
-      </h2>
-      <p
-        class={css({
-          marginBlockEnd: 10,
-          fontSize: "lg",
-          letterSpacing: "relaxed",
-          color: "foregroundInverse/80",
-        })}
-      >
-        Join thousands of freelancers and small businesses who use Dollar Holler
-        to streamline their invoicing.
-      </p>
-      <div class={vstack({ gap: 4 })}>
+        <img
+          alt=""
+          class={footerLogoClass}
+          height="32"
+          src={asset("images/logo.svg")}
+          width="32"
+        />
+        <span>Dollar Holler</span>
+      </a>
+      <p class={footerTagClass}>More making. Less muddle.</p>
+      <nav aria-label="Footer navigation" class={footerLinksClass}>
         {#if data?.user}
-          <Button
-            class={css({ fontSize: "lg", minInlineSize: 56 })}
-            href={resolve("invoices")}
-            size="lg"
-            variant="auth"
-          >
-            Go to Dashboard
-          </Button>
+          <a class={heroLoginClass} href={resolve("invoices")}>Invoices</a>
+          <a class={heroLoginClass} href={resolve("clients")}>Clients</a>
         {:else}
-          <Button
-            class={css({ fontSize: "lg", minInlineSize: 56 })}
-            href={resolve("signup")}
-            size="lg"
-            variant="auth"
-          >
-            Create Free Account
+          <a class={heroLoginClass} href={resolve("login")}>Log in</a>
+          <Button class={primaryButtonClass} href={resolve("signup")} size="sm">
+            Create an account
+            <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
           </Button>
-          <a
-            class={css({
-              color: {
-                base: "foregroundInverse/60",
-                _hover: "foregroundInverse/90",
-              },
-              fontSize: "sm",
-              textDecoration: "underline",
-              textUnderlineOffset: 4,
-              transitionProperty: "colors",
-              transitionDuration: "normal",
-            })}
-            href={resolve("login")}
-          >
-            Already have an account? Log in
-          </a>
         {/if}
-      </div>
+      </nav>
     </div>
-  </section>
-</main>
-<!-- ══════════════════════════════════════════════ FOOTER -->
-<footer
-  class={css({
-    backgroundColor: "inverse",
-    borderTopWidth: 1,
-    borderColor: "foregroundInverse/10",
-    paddingBlock: 10,
-  })}
->
-  <div
-    class={between({
-      flexDirection: { base: "column", sm: "row" },
-      gap: 4,
-      maxInlineSize: "6xl",
-      paddingInline: 6,
-      marginInline: "auto",
-    })}
-  >
-    <p class={css({ color: "textSubtle", fontSize: "sm" })}>
-      © 2026 Dollar Holler. All rights reserved.
-    </p>
-    <nav
-      class={hstack({
-        gap: 6,
-        fontSize: "sm",
-      })}
-    >
-      {#if data?.user}
-        <a
-          class={css({
-            color: { base: "textSubtle", _hover: "foregroundInverse" },
-            transitionProperty: "colors",
-            transitionDuration: "normal",
-          })}
-          href={resolve("invoices")}>Invoices</a
-        >
-        <a
-          class={css({
-            color: { base: "textSubtle", _hover: "foregroundInverse" },
-            transitionProperty: "colors",
-            transitionDuration: "normal",
-          })}
-          href={resolve("clients")}>Clients</a
-        >
-      {:else}
-        <a
-          class={css({
-            color: { base: "textSubtle", _hover: "foregroundInverse" },
-            transitionProperty: "colors",
-            transitionDuration: "normal",
-          })}
-          href={resolve("login")}>Login</a
-        >
-        <a
-          class={css({
-            color: { base: "warning", _hover: "foregroundInverse" },
-            fontWeight: "semibold",
-            transitionProperty: "colors",
-            transitionDuration: "normal",
-          })}
-          href={resolve("signup")}>Sign Up</a
-        >
-      {/if}
-    </nav>
-  </div>
-</footer>
+  </footer>
+</div>

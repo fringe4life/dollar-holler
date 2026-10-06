@@ -30,7 +30,7 @@ export const invoiceSummaryListClass = grid({
   },
   gridTemplateRows: {
     "@clientTotals/md": "auto auto",
-    "@clientTotals/2xl": "repeat(3, minmax(0, 39px))",
+    "@clientTotals/2xl": "repeat(3, minmax(39px, auto))",
   },
   margin: 0,
 });
@@ -150,14 +150,17 @@ export const invoiceSummaryLabelClass = css({
 
 export const invoiceSummaryAmountClass = css({
   color: "foreground",
-  flexShrink: 0,
+  flexShrink: 1,
   fontSize: "md",
   fontVariantNumeric: "tabular-nums",
   fontWeight: "semibold",
   lineHeight: "tight",
   margin: 0,
+  maxInlineSize: "100%",
+  minInlineSize: 0,
+  overflowWrap: "anywhere",
   textAlign: "right",
-  whiteSpace: "nowrap",
+  whiteSpace: "normal",
   "@clientTotals/md": { fontSize: "md", textAlign: "left" },
   "@clientTotals/2xl": { fontSize: "lg", textAlign: "right" },
 });

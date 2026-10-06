@@ -1,27 +1,21 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/index.js";
+  import {
+    invoiceSummaryAmountClass,
+    invoiceSummaryItemBaseClass,
+    invoiceSummaryLabelClass,
+  } from "#features/invoices/styles/invoice-summary-styles.ts";
 
-  let { title, amount }: { title: string; amount: string } = $props();
+  interface Props {
+    amount: string;
+    class: string;
+    title: string;
+  }
+
+  let { amount, class: className, title }: Props = $props();
 </script>
 
-<dl class={css({ textAlign: "center" })}>
-  <dt
-    class={css({
-      color: "metricLabel",
-      fontSize: "sm",
-      fontWeight: "semibold",
-    })}
-  >
-    {title}
-  </dt>
-  <dd
-    class={css({
-      color: "metric",
-      fontSize: "3xl",
-      fontWeight: "bold",
-      truncate: true,
-    })}
-  >
-    {amount}
-  </dd>
-</dl>
+<div class={cx(invoiceSummaryItemBaseClass, className)}>
+  <dt class={invoiceSummaryLabelClass}>{title}</dt>
+  <dd class={invoiceSummaryAmountClass}>{amount}</dd>
+</div>

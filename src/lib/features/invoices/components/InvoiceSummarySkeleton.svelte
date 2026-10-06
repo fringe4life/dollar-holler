@@ -1,33 +1,20 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/index.js";
   import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
+  import {
+    invoiceSummaryItemBaseClass,
+    invoiceSummarySkeletonAmountClass,
+    invoiceSummarySkeletonLabelClass,
+  } from "#features/invoices/styles/invoice-summary-styles.ts";
+
+  interface Props {
+    class: string;
+  }
+
+  let { class: className }: Props = $props();
 </script>
 
-<div
-  aria-hidden="true"
-  class={css({
-    alignItems: "center",
-    blockSize: "66px",
-    display: "flex",
-    flexDirection: "column",
-    gap: 1,
-    justifyContent: "center",
-  })}
->
-  <Skeleton
-    class={css({
-      bg: "skeletonSubtle/40",
-      blockSize: 4,
-      inlineSize: "70%",
-      maxInlineSize: "9rem",
-    })}
-  />
-  <Skeleton
-    class={css({
-      bg: "skeletonSubtle/40",
-      blockSize: 9,
-      inlineSize: "50%",
-      maxInlineSize: "7rem",
-    })}
-  />
+<div aria-hidden="true" class={cx(invoiceSummaryItemBaseClass, className)}>
+  <Skeleton class={invoiceSummarySkeletonLabelClass} />
+  <Skeleton class={invoiceSummarySkeletonAmountClass} />
 </div>

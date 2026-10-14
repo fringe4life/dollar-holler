@@ -23,7 +23,7 @@ jobs:
       - run: bun install --frozen-lockfile --ignore-scripts
 
       - name: Load environment variables
-        uses: dmno-dev/varlock-action@v1.0.1
+        uses: dmno-dev/varlock-action@v1.0.5
 
       - name: Architecture boundaries
         run: bun run fallow:boundary-violations

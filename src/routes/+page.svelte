@@ -48,8 +48,8 @@
 
   const heroLayoutClass = grid({
     alignItems: "center",
-    columns: { base: 1, lg: 2 },
-    gap: { base: 5, md: 12, lg: 16 },
+    columns: { base: 1, sm: 2 },
+    gap: { base: 5, md: 8, lg: 16 },
     marginInline: "auto",
     maxInlineSize: "6xl",
     paddingInline: { base: 5, md: 6 },
@@ -83,7 +83,7 @@
   const heroTitleClass = css({
     color: "foreground",
     fontFamily: "sansserif",
-    fontSize: { base: "5xl", sm: "6xl", md: "6xl", lg: "7xl" },
+    fontSize: { base: "5xl", sm: "4xl", md: "5xl", lg: "7xl" },
     fontWeight: "black",
     letterSpacing: "tighter",
     lineHeight: "none",

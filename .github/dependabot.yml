@@ -1,0 +1,17 @@
+# Version updates on day-of-month */3 at 09:00 UTC (~every 3 days).
+# Ecosystems: Bun (package.json + bun.lock) and GitHub Actions.
+version: 2
+updates:
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: cron
+      cronjob: "0 9 */3 * *"
+    open-pull-requests-limit: 10
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: cron
+      cronjob: "0 9 */3 * *"
+    open-pull-requests-limit: 5

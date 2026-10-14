@@ -37,7 +37,7 @@ export const invoiceSummaryListClass = grid({
 
 export const invoiceSummaryItemBaseClass = css({ minInlineSize: 0 });
 
-export const invoiceSummaryItemClass = hstack({
+const invoiceSummaryItemClass = hstack({
   alignItems: {
     base: "center",
     "@clientTotals/md": "flex-start",

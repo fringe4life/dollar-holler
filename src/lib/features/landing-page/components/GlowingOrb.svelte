@@ -182,7 +182,7 @@
   const artWordsClass = css({
     color: "foreground",
     fontFamily: "sansserif",
-    fontSize: { base: "5xl", sm: "6xl", lg: "7xl" },
+    fontSize: { base: "5xl", sm: "4xl", md: "5xl", lg: "7xl" },
     fontWeight: "black",
     left: "50%",
     letterSpacing: "tighter",

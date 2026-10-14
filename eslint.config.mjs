@@ -1,4 +1,5 @@
 import js from "@eslint/js";
+import panda from "@pandacss/eslint-plugin";
 import eslintConfigPrettier from "eslint-config-prettier";
 import { defineConfig } from "eslint/config";
 import svelte from "eslint-plugin-svelte";
@@ -56,6 +57,10 @@ export default defineConfig(
       },
     },
   },
+  await panda.configs.recommended({
+    configPath: "./panda.config.ts",
+    files: ["**/*.{ts,js,svelte}"],
+  }),
   {
     rules: {
       "@typescript-eslint/no-unused-vars": [

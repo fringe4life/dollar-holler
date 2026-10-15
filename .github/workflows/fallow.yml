@@ -5,6 +5,13 @@ on:
     branches: [main, master]
   pull_request:
 
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   boundaries:
     runs-on: ubuntu-latest
@@ -12,7 +19,10 @@ jobs:
       # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
       VARLOCK_ENV: test
     steps:
+      # Full history so fallow audit can resolve the pull request base.
       - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
 
       - uses: oven-sh/setup-bun@v2
         with:
@@ -27,3 +37,18 @@ jobs:
 
       - name: Architecture boundaries
         run: bun run fallow:boundary-violations
+
+      # Advisory. --gate new-only fails only on findings this change introduces.
+      # pass and warn exit 0; fail exits 1. continue-on-error until a pull
+      # request shows pass or warn, then drop this and require the check.
+      - name: Audit pull request
+        if: github.event_name == 'pull_request'
+        continue-on-error: true
+        env:
+          FALLOW_AUDIT_BASE: ${{ github.event.pull_request.base.sha }}
+        run: bun run fallow:audit
+
+      - name: Audit push
+        if: github.event_name == 'push'
+        continue-on-error: true
+        run: bun run fallow:audit

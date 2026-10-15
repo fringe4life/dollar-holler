@@ -1,139 +1,206 @@
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
-import type { Maybe } from "#lib/types.ts";
-import { pickDefined } from "#lib/utils/strip-nullish-entries.ts";
 import { DEFAULT_LIMIT, LIMITS, type ListLimit } from "../constants";
-import type {
-  ListDirection,
-  NormalizeListQueryResult,
-  PaginationSearchParams,
-  PaginationSearchParamsRaw,
-} from "../types";
+import type { ListDirection, PaginationSearchParams } from "../types";
 import { tryParseCursorId } from "./parse-cursor-id";
+import {
+  buildListSearchString,
+  type ListSearchParams,
+  type ListPage,
+  visibleListUrl,
+} from "./url";
 
-/**
- * @description Parses a limit parameter from a string.
- * @param raw - The raw limit parameter.
- * @returns The parsed limit parameter.
- */
-const parseLimit = (raw: Maybe<string>): ListLimit => parseLimitParam(raw);
+const LIST_KEYS = ["q", "cursor", "direction", "limit"] as const;
 
-/**
- * @description Parses a direction parameter from a string.
- * @param raw - The raw direction parameter.
- * @returns The parsed direction parameter.
- */
-const parseDirection = (raw: Maybe<string>): ListDirection =>
-  raw === "backward" ? "backward" : "forward";
-
-/** Backward without cursor: first page (same as forward, no cursor). */
-const effectiveDirection = (
-  direction: ListDirection | undefined,
-  cursor: CursorId | undefined
-): ListDirection => {
-  const resolved = direction ?? "forward";
-  return resolved === "backward" && !cursor ? "forward" : resolved;
-};
+const isListKey = (key: string): boolean =>
+  (LIST_KEYS as readonly string[]).includes(key);
 
 const isListLimit = (limit: number): limit is ListLimit =>
   (LIMITS as readonly number[]).includes(limit);
 
-const coerceLimit = (limit?: number): ListLimit =>
-  limit !== undefined && isListLimit(limit) ? limit : DEFAULT_LIMIT;
+/** First value wins, matching `URLSearchParams.get`. Blank is absent. */
+const firstParam = (
+  searchParams: ListSearchParams,
+  key: string
+): string | undefined => {
+  const value = searchParams.get(key);
+  return value === null || value === "" ? undefined : value;
+};
 
 /**
- * Shared list-query normalization for remotes and URL search params.
- * Invalid UUIDv7 `cursor` values are dropped (first-page semantics); sets `listCursorWasNormalized`.
+ * Whole-string integer in the allow-list. `25px`, `25.5`, and `25.0` fall back.
+ * The default is omitted from the canonical URL.
  */
-const normalizeListQuery = (raw: {
-  q?: string;
+export const parseLimitParam = (raw: string | undefined): ListLimit => {
+  if (raw === undefined) {
+    return DEFAULT_LIMIT;
+  }
+  const limit = Number(raw);
+  if (
+    !Number.isInteger(limit) ||
+    String(limit) !== raw ||
+    !isListLimit(limit)
+  ) {
+    return DEFAULT_LIMIT;
+  }
+  return limit;
+};
+
+const parseDirection = (raw: string | undefined): ListDirection =>
+  raw === "backward" ? "backward" : "forward";
+
+/** Backward without a usable cursor is the first page. */
+const effectiveDirection = (
+  direction: ListDirection,
+  cursor: CursorId | undefined
+): ListDirection =>
+  direction === "backward" && cursor === undefined ? "forward" : direction;
+
+const parseQuery = (raw: string | undefined): string | undefined => {
+  const trimmed = raw?.trim();
+  return trimmed ? trimmed : undefined;
+};
+
+const parseCursor = (raw: string | undefined): CursorId | undefined => {
+  if (raw === undefined) {
+    return undefined;
+  }
+  const parsed = tryParseCursorId(raw);
+  return parsed === false ? undefined : parsed;
+};
+
+const toListQuery = (raw: {
   cursor?: string;
   direction?: string;
   limit?: string | number;
-}): NormalizeListQueryResult => {
-  let listCursorWasNormalized = false;
-  const q = raw.q?.trim() || undefined;
-
-  let cursor: CursorId | undefined;
-  if (raw.cursor !== undefined && raw.cursor !== "") {
-    const parsed = tryParseCursorId(String(raw.cursor));
-    if (parsed === false) {
-      listCursorWasNormalized = true;
-    } else {
-      cursor = parsed;
-    }
-  }
-
-  const direction = parseDirection(
-    raw.direction === undefined ? undefined : String(raw.direction)
+  q?: string;
+}): PaginationSearchParams => {
+  const q = parseQuery(raw.q);
+  const cursor = parseCursor(raw.cursor);
+  const direction = effectiveDirection(parseDirection(raw.direction), cursor);
+  const limit = parseLimitParam(
+    raw.limit === undefined ? undefined : String(raw.limit)
   );
-  const limitWire =
-    raw.limit === undefined || raw.limit === "" ? undefined : String(raw.limit);
-  const limit = parseLimit(limitWire);
-
   return {
-    listCursorWasNormalized,
-    // ArkType `"cursor?"` / `"q?"` reject present-but-undefined keys.
-    normalized: pickDefined({
-      cursor,
-      direction: effectiveDirection(direction, cursor),
-      limit,
-      q,
-    }) as PaginationSearchParams,
+    ...(cursor === undefined ? {} : { cursor }),
+    direction,
+    limit,
+    ...(q === undefined ? {} : { q }),
   };
 };
 
-/** Read-only search params (incl. SvelteKit visible list URL searchParams). */
-type SearchParamsReadable = Pick<URLSearchParams, "get">;
-
-export const normalizeListQueryFromUrl = (url: {
-  searchParams: SearchParamsReadable;
-}): NormalizeListQueryResult =>
-  normalizeListQuery(parseSearchParamsToRaw(url.searchParams));
-
-const firstParam = (
-  searchParams: SearchParamsReadable,
-  key: string
-): string | undefined => {
-  const v = searchParams.get(key);
-  return v === null || v === "" ? undefined : v;
+export const readListQuery = (page: ListPage): PaginationSearchParams => {
+  const { searchParams } = visibleListUrl(page);
+  return toListQuery({
+    cursor: firstParam(searchParams, "cursor"),
+    direction: firstParam(searchParams, "direction"),
+    limit: firstParam(searchParams, "limit"),
+    q: firstParam(searchParams, "q"),
+  });
 };
 
-/** First `cursor` wins (matches `URLSearchParams.get`). */
-const parseSearchParamsToRaw = (
-  searchParams: SearchParamsReadable
-): PaginationSearchParamsRaw => ({
-  cursor: firstParam(searchParams, "cursor"),
-  direction: firstParam(searchParams, "direction"),
-  limit: firstParam(searchParams, "limit"),
-  q: firstParam(searchParams, "q"),
-});
+export type ListNav =
+  | { cursor: CursorId; type: "backward" }
+  | { cursor: CursorId; type: "forward" }
+  | { limit: ListLimit; type: "limit" }
+  | { q: string; type: "search" };
 
-/**
- * @description Parses a limit parameter from a string.
- * @param raw - The raw limit parameter.
- * @returns The parsed limit parameter.
- */
-export const parseLimitParam = (raw: Maybe<string>): ListLimit => {
-  if (!raw) {
-    return DEFAULT_LIMIT;
+/** Search and limit changes clear the cursor. Paging keeps `q` and `limit`. */
+export const applyListNav = (
+  current: PaginationSearchParams,
+  nav: ListNav
+): PaginationSearchParams => {
+  switch (nav.type) {
+    case "search":
+      return toListQuery({ limit: current.limit, q: nav.q });
+    case "forward":
+    case "backward":
+      return toListQuery({
+        cursor: nav.cursor,
+        direction: nav.type,
+        limit: current.limit,
+        q: current.q,
+      });
+    case "limit":
+      return toListQuery({ limit: nav.limit, q: current.q });
+    default: {
+      const unreachable: never = nav;
+      return unreachable;
+    }
   }
-  const n = Number(raw);
-  return isListLimit(n) ? n : DEFAULT_LIMIT;
+};
+
+const expectedListPairs = (
+  query: PaginationSearchParams
+): [string, string][] => {
+  const pairs: [string, string][] = [];
+  if (query.q) {
+    pairs.push(["q", query.q]);
+  }
+  if (query.cursor) {
+    pairs.push(["cursor", query.cursor]);
+  }
+  if (query.direction === "backward") {
+    pairs.push(["direction", "backward"]);
+  }
+  if (query.limit !== DEFAULT_LIMIT) {
+    pairs.push(["limit", String(query.limit)]);
+  }
+  return pairs;
+};
+
+/** `null` when a list key is repeated. Order is appearance order. */
+const actualListPairs = (
+  searchParams: ListSearchParams
+): [string, string][] | null => {
+  const pairs: [string, string][] = [];
+  const seen = new Set<string>();
+  for (const [key, value] of searchParams.entries()) {
+    if (!isListKey(key)) {
+      continue;
+    }
+    if (seen.has(key)) {
+      return null;
+    }
+    seen.add(key);
+    pairs.push([key, value]);
+  }
+  return pairs;
+};
+
+const listKeysAreCanonical = (
+  searchParams: ListSearchParams,
+  query: PaginationSearchParams
+): boolean => {
+  const actual = actualListPairs(searchParams);
+  if (actual === null) {
+    return false;
+  }
+  const expected = expectedListPairs(query);
+  if (actual.length !== expected.length) {
+    return false;
+  }
+  return actual.every(
+    (pair, index) =>
+      pair[0] === expected[index]?.[0] && pair[1] === expected[index]?.[1]
+  );
 };
 
 /**
- * @description Builds a normalized query from URL/search args (defaults match remotes).
- * @param q - The query parameter.
- * @param options - The options parameter.
- * @returns The normalized query.
+ * Search suffix to `replace` onto, or `null` when the list keys already match
+ * the canonical query. `""` means the list keys should be removed.
+ * Keys other than `q`, `cursor`, `direction`, and `limit` are kept.
  */
-export const toNormalizedListQuery = (
-  q: Maybe<string>,
-  options?: Partial<PaginationSearchParams>
-): PaginationSearchParams =>
-  pickDefined({
-    cursor: options?.cursor,
-    direction: effectiveDirection(options?.direction, options?.cursor),
-    limit: coerceLimit(options?.limit),
-    q: q?.trim() || undefined,
-  }) as PaginationSearchParams;
+export const nextCanonicalSearch = (url: {
+  searchParams: ListSearchParams;
+}): string | null => {
+  const query = toListQuery({
+    cursor: firstParam(url.searchParams, "cursor"),
+    direction: firstParam(url.searchParams, "direction"),
+    limit: firstParam(url.searchParams, "limit"),
+    q: firstParam(url.searchParams, "q"),
+  });
+  if (listKeysAreCanonical(url.searchParams, query)) {
+    return null;
+  }
+  return buildListSearchString(query, url.searchParams);
+};

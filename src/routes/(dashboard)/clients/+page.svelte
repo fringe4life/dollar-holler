@@ -21,9 +21,8 @@
   import NoSearchResults from "#features/pagination/components/NoSearchResults.svelte";
   import PaginatedList from "#features/pagination/components/PaginatedList.svelte";
   import PaginatedListSkeleton from "#features/pagination/components/PaginatedListSkeleton.svelte";
-  import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
+  import { readListQuery } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
-  import { visibleListUrl } from "#features/pagination/utils/url.ts";
   import { buttonIcon } from "#lib/styles.ts";
   import {
     ItemPanel,
@@ -36,9 +35,7 @@
   import { getErrorMessage } from "#lib/utils/error-message.ts";
 
   const toast = getToast();
-  const listArg = $derived(
-    normalizeListQueryFromUrl(visibleListUrl(page)).normalized
-  );
+  const listArg = $derived(readListQuery(page));
   const list = $derived(await listClients(listArg));
 
   const formPanel = new ItemPanel<UpsertTarget<ClientSelect>>();

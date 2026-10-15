@@ -1,54 +1,12 @@
 <script generics="T extends CursorRow" lang="ts">
-  import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
-  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-  import Rows2Icon from "@lucide/svelte/icons/rows-2";
-  import Rows3Icon from "@lucide/svelte/icons/rows-3";
-  import Rows4Icon from "@lucide/svelte/icons/rows-4";
-  import { css, cx } from "#styled-system/css/index.js";
-  import {
-    between,
-    hstack,
-    square,
-    visuallyHidden,
-  } from "#styled-system/patterns/index.js";
-  /**
-   * Keyset pagination: changing `limit` resets cursor/direction (first page at new size).
-   */
-  import { goto } from "$app/navigation";
-  import { page } from "$app/state";
+  import { css } from "#styled-system/css/index.js";
+  import { between } from "#styled-system/patterns/index.js";
   import type {
     CursorRow,
     PaginationMetadata,
-    PaginationSearchParams,
   } from "#features/pagination/types.ts";
-  import {
-    parseLimitParam,
-    toNormalizedListQuery,
-  } from "#features/pagination/utils/list-query.ts";
-  import {
-    buildListSearchString,
-    visibleListUrl,
-  } from "#features/pagination/utils/url.ts";
-  import { supportsBaseSelect } from "#lib/client/supports.ts";
-  import { withViewTransition } from "#lib/client/view-transition.ts";
-  import Button from "#lib/components/primitives/button/button.svelte";
-  import Select from "#lib/components/primitives/select/Select.svelte";
-  import { directionalArrow } from "#lib/styles.ts";
-  import { LIMITS, type ListLimit } from "../constants";
-  import type { ListDirection } from "../types";
-
-  /** Row-density icon per page-size option (enhanced select only). */
-  const LIMIT_ICONS: Record<ListLimit, typeof Rows2Icon> = {
-    10: Rows2Icon,
-    25: Rows3Icon,
-    50: Rows4Icon,
-  };
-
-  // Lucide icons are stroke-based; undo the global `svg { fill }` rule.
-  const limitIconClass = cx(
-    square({ size: 4 }),
-    css({ color: "textMuted", fill: "none", flexShrink: 0 })
-  );
+  import PaginationControl from "./PaginationControl.svelte";
+  import PaginationLimit from "./PaginationLimit.svelte";
 
   interface Props {
     items: T[];
@@ -58,67 +16,6 @@
   let { items, paginationMetadata }: Props = $props();
 
   const pending = $derived($effect.pending() > 0);
-
-  const listUrl = $derived(visibleListUrl(page));
-  const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
-  const limitFromUrl = $derived(
-    parseLimitParam(listUrl.searchParams.get("limit"))
-  );
-  // Base-select `change` reports the old value; keep a local binding for display.
-  // svelte-ignore state_referenced_locally
-  let limitSelectValue = $state(String(limitFromUrl));
-
-  const navigateWithQuery = async (next: PaginationSearchParams) => {
-    await goto(`${listUrl.pathname}${buildListSearchString(next)}`, {
-      shallow: true,
-    });
-  };
-
-  const navigateWithTransition = async (
-    next: PaginationSearchParams,
-    direction: ListDirection
-  ) => {
-    await withViewTransition({
-      types: [direction],
-      update: () => navigateWithQuery(next),
-    });
-  };
-  const handleForward = async () => {
-    const last = items.at(-1);
-    if (!last) {
-      return;
-    }
-    const q = searchQuery || undefined;
-    const next = toNormalizedListQuery(q, {
-      cursor: last.id,
-      direction: "forward",
-      limit: limitFromUrl,
-    });
-    await navigateWithTransition(next, "forward");
-  };
-
-  const handleBackward = async () => {
-    const first = items.at(0);
-    if (!first) {
-      return;
-    }
-    const q = searchQuery || undefined;
-    const next = toNormalizedListQuery(q, {
-      cursor: first.id,
-      direction: "backward",
-      limit: limitFromUrl,
-    });
-    await navigateWithTransition(next, "backward");
-  };
-
-  const handleLimitChange = async (newLimit: ListLimit) => {
-    if (newLimit === limitFromUrl) {
-      return;
-    }
-    limitSelectValue = String(newLimit);
-    const q = searchQuery || undefined;
-    await navigateWithQuery(toNormalizedListQuery(q, { limit: newLimit }));
-  };
 </script>
 
 {#if items.length === 0 && !pending}
@@ -140,69 +37,7 @@
       gap: 4,
     })}
   >
-    <Select
-      class={css({
-        _supportsBaseSelect: { aspectRatio: "auto" },
-        aspectRatio: "2/1",
-        maxInlineSize: "fit-content",
-      })}
-      bind:value={limitSelectValue}
-      disabled={pending}
-      name="limit"
-      onchange={(e) =>
-        handleLimitChange(parseLimitParam(e.currentTarget.value))}
-    >
-      {#each LIMITS as limitOption (limitOption)}
-        {@const LimitIcon = LIMIT_ICONS[limitOption]}
-        <option
-          onclick={() => handleLimitChange(limitOption)}
-          value={String(limitOption)}
-        >
-          {#if supportsBaseSelect}
-            <LimitIcon aria-hidden="true" class={limitIconClass} />
-          {/if}
-          {limitOption}
-        </option>
-      {/each}
-    </Select>
-    <nav aria-busy={pending} aria-label="Pagination" class={hstack({ gap: 2 })}>
-      <span aria-atomic="true" aria-live="polite" class={visuallyHidden()}>
-        {#if pending}Loading page…{/if}
-      </span>
-      <Button
-        aria-label="Go to previous page"
-        class="group"
-        disabled={!paginationMetadata.hasPreviousPage || pending}
-        onclick={handleBackward}
-        size="default"
-        type="button"
-        variant="outline"
-      >
-        <ChevronLeftIcon
-          aria-hidden="true"
-          class={cx(
-            square({ size: 4 }),
-            directionalArrow({ direction: "backward" })
-          )}
-        />
-      </Button>
-      <Button
-        aria-label="Go to next page"
-        class="group"
-        disabled={!paginationMetadata.hasNextPage || pending}
-        onclick={handleForward}
-        size="default"
-        type="button"
-        variant="outline"
-      >
-        <ChevronRightIcon
-          aria-hidden="true"
-          class={cx(
-            square({ size: 4 }),
-            directionalArrow({ direction: "forward" })
-          )}
-        />
-      </Button>
-    </nav>
+    <PaginationLimit />
+    <PaginationControl {items} {paginationMetadata} />
   </div>
 {/if}

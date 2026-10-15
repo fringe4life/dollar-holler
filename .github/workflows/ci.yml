@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    env:
+      # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
+      VARLOCK_ENV: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      # Install packages first so @varlock/bitwarden-plugin is available.
+      # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
+      - run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Load environment variables
+        uses: dmno-dev/varlock-action@v1.0.5
+
+      - name: ESLint
+        run: bun run lint
+
+      - name: Prettier
+        run: bun run format:check
+
+      - name: Stylelint
+        run: bun run stylelint
+
+  typecheck:
+    runs-on: ubuntu-latest
+    env:
+      VARLOCK_ENV: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Load environment variables
+        uses: dmno-dev/varlock-action@v1.0.5
+
+      # styled-system/ is gitignored. bun run check does not generate it.
+      - name: Typecheck
+        run: bun run typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+      VARLOCK_ENV: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - run: bun install --frozen-lockfile --ignore-scripts
+
+      - name: Load environment variables
+        uses: dmno-dev/varlock-action@v1.0.5
+
+      - name: Unit tests
+        run: bun run test

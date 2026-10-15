@@ -10,18 +10,10 @@
   /**
    * Search input: shallow `goto` only. List pages re-query from the URL.
    */
-  import { goto } from "$app/navigation";
   import { page } from "$app/state";
-  import {
-    parseLimitParam,
-    toNormalizedListQuery,
-  } from "#features/pagination/utils/list-query.ts";
-  import {
-    buildListSearchString,
-    visibleListUrl,
-  } from "#features/pagination/utils/url.ts";
+  import { gotoList } from "#features/pagination/utils/goto-list.ts";
+  import { readListQuery } from "#features/pagination/utils/list-query.ts";
   import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
-  import { withViewTransition } from "#lib/client/view-transition.ts";
   import Search from "#lib/components/primitives/icons/Search.svelte";
 
   const searchIconVt = viewTransition({
@@ -33,26 +25,27 @@
     new: { mixBlendMode: "normal" },
   });
 
-  const listUrl = $derived(visibleListUrl(page));
-
-  const searchQuery = $derived(listUrl.searchParams.get("q") ?? "");
+  const query = $derived(readListQuery(page));
 
   const loading = new Toggle();
 
   // svelte-ignore state_referenced_locally
-  let search = $state<string>(searchQuery);
+  let search = $state(query.q ?? "");
+  // svelte-ignore state_referenced_locally
+  let syncedQuery = query.q;
 
-  let searchTerm = $derived(search.trim());
+  // Draft stays while typing. Submit and back/forward change the committed `q`.
+  $effect(() => {
+    if (query.q !== syncedQuery) {
+      syncedQuery = query.q;
+      search = query.q ?? "";
+    }
+  });
 
   const runSearch = async () => {
     loading.toggle();
-    const limit = parseLimitParam(listUrl.searchParams.get("limit"));
-    const n = toNormalizedListQuery(searchTerm || undefined, { limit });
-    const url = `${listUrl.pathname}${buildListSearchString(n)}`;
     try {
-      await withViewTransition({
-        update: () => goto(url, { shallow: true }),
-      });
+      await gotoList(page, { q: search, type: "search" });
     } finally {
       loading.off();
     }

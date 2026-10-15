@@ -50,7 +50,7 @@
 
   const label = $derived(getLabel(invoiceStatus, dueDate.toISOString()));
   const isOptionsDisabled = $derived(label !== "draft");
-  const resolved = $derived(resolve("/(dashboard)/invoices/[id=uuid]", { id }));
+  const invoiceDetailPath = "/(dashboard)/invoices/[id=uuid]" as const;
 
   const INVOICE_OPTIONS = $derived([
     {
@@ -151,7 +151,7 @@
             _hover: "foreground",
           },
         })}
-        href={resolved}><View /></a
+        href={resolve(invoiceDetailPath, { id })}><View /></a
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
@@ -181,6 +181,8 @@
       <Trash height={32} width={32} />
       Delete
     </button>
-    <a class={actionButton} href={resolved}><View height={32} width={32} /></a>
+    <a class={actionButton} href={resolve(invoiceDetailPath, { id })}
+      ><View height={32} width={32} /></a
+    >
   {/snippet}
 </Swipeable>

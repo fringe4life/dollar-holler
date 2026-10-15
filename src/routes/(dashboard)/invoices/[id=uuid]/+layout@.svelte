@@ -2,6 +2,7 @@
   import { css, cx } from "#styled-system/css/index.js";
   import { afterNavigate, goto, onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { listReturnHrefFor } from "#features/pagination/utils/list-return-href.ts";
   import Arrow from "#lib/components/primitives/icons/Arrow.svelte";
   import type { Maybe } from "#lib/types.ts";
 
@@ -14,9 +15,14 @@
       return;
     }
     const fromUrl = navigation.from?.url;
-    previousPageLink = fromUrl
-      ? `${fromUrl.pathname}${fromUrl.search}`
-      : undefined;
+    if (!fromUrl) {
+      previousPageLink = undefined;
+      return;
+    }
+    // Prefer the shallow-visible list href; Kit's from.url is the load URL.
+    previousPageLink =
+      listReturnHrefFor(fromUrl.pathname) ??
+      `${fromUrl.pathname}${fromUrl.search}`;
   });
   // actual derived url
   const getBackUrl = $derived(previousPageLink ?? resolve("invoices"));

@@ -7,6 +7,7 @@ import {
   readListQuery,
   type ListNav,
 } from "./list-query";
+import { rememberListHref } from "./list-return-href";
 import { buildListSearchString, type ListPage, visibleListUrl } from "./url";
 
 const listHref = (page: ListPage, nav: ListNav): string => {
@@ -15,9 +16,18 @@ const listHref = (page: ListPage, nav: ListNav): string => {
   return `${url.pathname}${buildListSearchString(next, url.searchParams)}`;
 };
 
+/** Keep invoice Back/Escape aligned with the shallow-visible list query. */
+const rememberVisibleList = (page: ListPage): void => {
+  const url = visibleListUrl(page);
+  rememberListHref(
+    `${url.pathname}${buildListSearchString(readListQuery(page), url.searchParams)}`
+  );
+};
+
 /** Shallow list navigation. Forward and backward run the directional view transition. */
 export const gotoList = async (page: ListPage, nav: ListNav): Promise<void> => {
   const href = listHref(page, nav);
+  rememberListHref(href);
   const update = () => {
     // `page.url.pathname` is already resolved. `resolve()` would prefix base again.
     // eslint-disable-next-line svelte/no-navigation-without-resolve -- visible list URL, not a route id
@@ -43,10 +53,13 @@ export const canonicalizeListUrl = (page: ListPage): void => {
     return;
   }
   const url = visibleListUrl(page);
+  rememberVisibleList(page);
   const search = nextCanonicalSearch(url);
   if (search === null) {
     return;
   }
+  const href = `${url.pathname}${search}`;
+  rememberListHref(href);
   // eslint-disable-next-line svelte/no-navigation-without-resolve -- visible list URL, not a route id
-  void goto(`${url.pathname}${search}`, { replace: true, shallow: true });
+  void goto(href, { replace: true, shallow: true });
 };

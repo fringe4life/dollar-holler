@@ -207,6 +207,8 @@
 </script>
 
 {#if href}
+  <!-- Callers pass resolve()'d hrefs; this primitive cannot call resolve itself. -->
+  <!-- eslint-disable svelte/no-navigation-without-resolve -->
   <a
     class={cx(buttonVariants({ variant, size }), className)}
     {href}
@@ -214,6 +216,7 @@
   >
     {@render children?.()}
   </a>
+  <!-- eslint-enable svelte/no-navigation-without-resolve -->
 {:else}
   <button
     class={cx(buttonVariants({ variant, size }), className)}

@@ -11,6 +11,8 @@
 </script>
 
 <li class={navItemLiClass}>
+  <!-- href is already resolve()'d by the parent navbar -->
+  <!-- eslint-disable-next-line svelte/no-navigation-without-resolve -->
   <a aria-current={isActive} class={navItemControlClass} {href}>
     {title}
   </a>

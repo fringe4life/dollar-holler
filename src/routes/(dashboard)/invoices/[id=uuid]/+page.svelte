@@ -50,7 +50,6 @@
   const invoice = $derived(detail.invoice);
   const lineItems = $derived(detail.lineItems ?? []);
   const client = $derived(detail.client);
-  const settingsLink = $derived(resolve("settings"));
 
   const canSendInvoice = $derived(invoice.invoiceStatus === "draft");
   const canPayInvoice = $derived(invoice.invoiceStatus === "sent");
@@ -155,7 +154,7 @@
             color: "linkMuted",
             textDecoration: { base: "underline", _hover: "none" },
           })}
-          href={settingsLink}>Add your contact information.</a
+          href={resolve("settings")}>Add your contact information.</a
         >
       </div>
     {/if}

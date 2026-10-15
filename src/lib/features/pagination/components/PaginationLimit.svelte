@@ -56,6 +56,7 @@
 </script>
 
 <Select
+  aria-label="Items per page"
   class={css({
     _supportsBaseSelect: { aspectRatio: "auto" },
     aspectRatio: "2/1",

@@ -51,4 +51,7 @@ jobs:
       - name: Audit push
         if: github.event_name == 'push'
         continue-on-error: true
+        env:
+          # Compare against the parent commit, not HEAD vs itself.
+          FALLOW_AUDIT_BASE: ${{ github.event.before }}
         run: bun run fallow:audit

@@ -4,18 +4,22 @@ import type { ListDirection, PaginationSearchParams } from "../types";
 import { tryParseCursorId } from "./parse-cursor-id";
 import {
   buildListSearchString,
+  LIST_QUERY_KEYS,
   type ListSearchParams,
   type ListPage,
   visibleListUrl,
 } from "./url";
 
-const LIST_KEYS = ["q", "cursor", "direction", "limit"] as const;
+const isListKey = (key: string): boolean => LIST_QUERY_KEYS.has(key);
 
-const isListKey = (key: string): boolean =>
-  (LIST_KEYS as readonly string[]).includes(key);
-
-const isListLimit = (limit: number): limit is ListLimit =>
-  (LIMITS as readonly number[]).includes(limit);
+const isListLimit = (limit: number): limit is ListLimit => {
+  for (const allowed of LIMITS) {
+    if (allowed === limit) {
+      return true;
+    }
+  }
+  return false;
+};
 
 /** First value wins, matching `URLSearchParams.get`. Blank is absent. */
 const firstParam = (
@@ -30,16 +34,16 @@ const firstParam = (
  * Whole-string integer in the allow-list. `25px`, `25.5`, and `25.0` fall back.
  * The default is omitted from the canonical URL.
  */
+/** Whole-string integer only — rejects `25px`, `25.5`, and `25.0`. */
+const isExactIntegerString = (raw: string, value: number): boolean =>
+  Number.isInteger(value) && String(value) === raw;
+
 export const parseLimitParam = (raw: string | undefined): ListLimit => {
   if (raw === undefined) {
     return DEFAULT_LIMIT;
   }
   const limit = Number(raw);
-  if (
-    !Number.isInteger(limit) ||
-    String(limit) !== raw ||
-    !isListLimit(limit)
-  ) {
+  if (!(isExactIntegerString(raw, limit) && isListLimit(limit))) {
     return DEFAULT_LIMIT;
   }
   return limit;

@@ -1,7 +1,8 @@
 import { DEFAULT_LIMIT } from "../constants";
 import type { PaginationSearchParams } from "../types";
 
-const LIST_KEYS = new Set(["q", "cursor", "direction", "limit"]);
+/** List query keys shared by read/write and canonicalize. */
+export const LIST_QUERY_KEYS = new Set(["q", "cursor", "direction", "limit"]);
 
 export interface ListSearchParams {
   entries(): Iterable<[string, string]>;
@@ -48,7 +49,7 @@ export const buildListSearchString = (
   }
   if (searchParams) {
     for (const [key, value] of searchParams.entries()) {
-      if (LIST_KEYS.has(key)) {
+      if (LIST_QUERY_KEYS.has(key)) {
         continue;
       }
       parts.push(encodePair(key, value));

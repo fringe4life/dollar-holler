@@ -44,9 +44,7 @@
   // DERIVED STATE
   const receivedDisplay = $derived(centsToDollars(client.received));
   const balanceDisplay = $derived(centsToDollars(client.balance));
-  const resolved = $derived(
-    resolve("/(dashboard)/clients/[id=uuid]", { id: client.id })
-  );
+  const clientDetailPath = "/(dashboard)/clients/[id=uuid]" as const;
   const optionsPopoverId = $derived(`client-options-${client.id}`);
   const optionsAnchorName = $derived(`--${optionsPopoverId}-anchor`);
 
@@ -160,7 +158,7 @@
           transitionProperty: "colors",
           transitionDuration: "normal",
         })}
-        href={resolved}><View /></a
+        href={resolve(clientDetailPath, { id: client.id })}><View /></a
       >
     </div>
     <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
@@ -192,6 +190,8 @@
       <Trash height={32} width={32} />
       Delete
     </button>
-    <a class={actionButton} href={resolved}><View height={32} width={32} /></a>
+    <a class={actionButton} href={resolve(clientDetailPath, { id: client.id })}
+      ><View height={32} width={32} /></a
+    >
   {/snippet}
 </Swipeable>

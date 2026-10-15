@@ -2,6 +2,7 @@
   import { css, cx } from "#styled-system/css/index.js";
   import { afterNavigate, goto, onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { listReturnHrefFor } from "#features/pagination/utils/list-return-href.ts";
   import Arrow from "#lib/components/primitives/icons/Arrow.svelte";
   import type { Maybe } from "#lib/types.ts";
 
@@ -13,7 +14,15 @@
     if (navigation.shallow) {
       return;
     }
-    previousPageLink = navigation?.from?.url?.pathname;
+    const fromUrl = navigation.from?.url;
+    if (!fromUrl) {
+      previousPageLink = undefined;
+      return;
+    }
+    // Prefer the shallow-visible list href; Kit's from.url is the load URL.
+    previousPageLink =
+      listReturnHrefFor(fromUrl.pathname) ??
+      `${fromUrl.pathname}${fromUrl.search}`;
   });
   // actual derived url
   const getBackUrl = $derived(previousPageLink ?? resolve("invoices"));
@@ -39,10 +48,13 @@
 <svelte:window
   onkeydown={(e) => {
     if (e.key === "Escape") {
+      // pathname+search from the opener, or already-resolved invoices index
+      // eslint-disable-next-line svelte/no-navigation-without-resolve -- not a route id
       goto(getBackUrl, { replace: true });
     }
   }}
 />
+<!-- eslint-disable svelte/no-navigation-without-resolve -- pathname+search or resolved index -->
 <a
   class={css({
     zIndex: 1000,
@@ -58,6 +70,7 @@
   data-sveltekit-replacestate
   href={getBackUrl}><Arrow /></a
 >
+<!-- eslint-enable svelte/no-navigation-without-resolve -->
 <div
   class={css({
     backgroundColor: { base: "background", _print: "transparent" },

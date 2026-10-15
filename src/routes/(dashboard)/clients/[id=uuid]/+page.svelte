@@ -23,9 +23,8 @@
     applySentInvoiceToSummary,
   } from "#features/invoices/utils/client-invoice-summary.ts";
   import ItemsHeader from "#features/pagination/components/ItemsHeader.svelte";
-  import { normalizeListQueryFromUrl } from "#features/pagination/utils/list-query.ts";
+  import { readListQuery } from "#features/pagination/utils/list-query.ts";
   import { omitListItem } from "#features/pagination/utils/omit-list-item.ts";
-  import { visibleListUrl } from "#features/pagination/utils/url.ts";
   import { buttonIcon } from "#lib/styles.ts";
   import {
     ItemPanel,
@@ -49,9 +48,7 @@
   const toast = getToast();
   const clientId = $derived(params.id); // CursorId, no assert
 
-  const listArg = $derived(
-    normalizeListQueryFromUrl(visibleListUrl(page)).normalized
-  );
+  const listArg = $derived(readListQuery(page));
   const summaryArg = $derived(
     listArg.q === undefined ? { clientId } : { clientId, q: listArg.q }
   );

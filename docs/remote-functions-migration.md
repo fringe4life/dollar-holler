@@ -24,16 +24,15 @@ Opt-in: `kit.experimental.remoteFunctions` and `compilerOptions.experimental.asy
 
 Auth on remotes: `requireUser()` (`locals.user`) for queries; `requireUserMutation()` (cookie cache off) for writes. Both live in `src/lib/features/auth/require-user.server.ts` (feature zone — remotes cannot import `src/lib/server/**` under Fallow).
 
-List args match `listQuerySchema` / `PaginationSearchParams` (numeric `limit` 10 \| 25 \| 50). URL still goes through `normalizeListQueryFromUrl` / `visibleListUrl` (shallow `goto`).
+List args match `listQuerySchema` / `PaginationSearchParams` (numeric `limit` 10 \| 25 \| 50). URL still goes through `readListQuery` (shallow `goto` via `gotoList`).
 
 ## UI
 
 List pages:
 
 ```svelte
-const listArg =
-$derived(normalizeListQueryFromUrl(visibleListUrl(page)).normalized); const list
-= $derived(await listInvoices(listArg));
+const listArg = $derived(readListQuery(page)); const list = $derived(await
+listInvoices(listArg));
 ```
 
 - First resolve → boundary `{#snippet pending()}` (row skeletons).

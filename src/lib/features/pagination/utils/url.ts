@@ -1,37 +1,59 @@
 import { DEFAULT_LIMIT } from "../constants";
 import type { PaginationSearchParams } from "../types";
 
-/** Fixed key order for stable equality (not alphabetical — avoids splitting pairs). */
-const serializeNormalizedForKey = (n: PaginationSearchParams): string => {
-  const parts: string[] = [];
-  if (n.q) {
-    parts.push(`q=${encodeURIComponent(n.q)}`);
-  }
-  if (n.cursor) {
-    parts.push(`cursor=${encodeURIComponent(n.cursor)}`);
-  }
-  if (n.direction === "backward") {
-    parts.push("direction=backward");
-  }
-  if (n.limit !== DEFAULT_LIMIT) {
-    parts.push(`limit=${String(n.limit)}`);
-  }
-  return parts.join("&");
-};
+/** List query keys shared by read/write and canonicalize. */
+export const LIST_QUERY_KEYS = new Set(["q", "cursor", "direction", "limit"]);
+
+export interface ListSearchParams {
+  entries(): Iterable<[string, string]>;
+  get(key: string): string | null;
+}
+
+export interface ListLocation {
+  pathname: string;
+  searchParams: ListSearchParams;
+}
+
+export interface ListPage {
+  shallow: { url: ListLocation } | null;
+  url: ListLocation;
+}
+
+const encodePair = (key: string, value: string): string =>
+  `${encodeURIComponent(key)}=${encodeURIComponent(value)}`;
 
 /**
  * Browser-visible list URL after shallow `goto`. Prefer over `page.url` when reading
  * search/pagination query params on the client.
  */
-export const visibleListUrl = <
-  T extends { pathname: string; searchParams: Pick<URLSearchParams, "get"> },
->(page: {
-  url: T;
-  shallow: { url: T } | null;
-}): T => page.shallow?.url ?? page.url;
+export const visibleListUrl = (page: ListPage): ListLocation =>
+  page.shallow?.url ?? page.url;
 
-/** Build `?foo=bar` for shallow `goto` after a successful fetch. */
-export const buildListSearchString = (n: PaginationSearchParams): string => {
-  const s = serializeNormalizedForKey(n);
-  return s === "" ? "" : `?${s}`;
+/** `?q=&cursor=&direction=&limit=` with defaults omitted. Other keys are appended. */
+export const buildListSearchString = (
+  query: PaginationSearchParams,
+  searchParams?: ListSearchParams
+): string => {
+  const parts: string[] = [];
+  if (query.q) {
+    parts.push(encodePair("q", query.q));
+  }
+  if (query.cursor) {
+    parts.push(encodePair("cursor", query.cursor));
+  }
+  if (query.direction === "backward") {
+    parts.push(encodePair("direction", "backward"));
+  }
+  if (query.limit !== DEFAULT_LIMIT) {
+    parts.push(encodePair("limit", String(query.limit)));
+  }
+  if (searchParams) {
+    for (const [key, value] of searchParams.entries()) {
+      if (LIST_QUERY_KEYS.has(key)) {
+        continue;
+      }
+      parts.push(encodePair(key, value));
+    }
+  }
+  return parts.length === 0 ? "" : `?${parts.join("&")}`;
 };

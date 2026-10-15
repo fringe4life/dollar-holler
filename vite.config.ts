@@ -6,6 +6,7 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
 import { DevTools } from "@vitejs/devtools";
 import { visualizer } from "rollup-plugin-visualizer";
+import { svelteSitemap } from "svelte-sitemap/vite";
 import { defineConfig, type Plugin } from "vite";
 import { svelteDevtools } from "vite-devtools-svelte";
 // Chrome DevTools workspace (com.chrome.devtools.json) — separate from @vitejs/devtools
@@ -18,6 +19,9 @@ import {
   SERVER_OUTPUT_DIR,
   stubCloudflareWorkersInDir,
 } from "./scripts/cloudflare-workers-specifier.ts";
+
+/** Public site origin used in robots.txt and the build-time sitemap. */
+const SITE_ORIGIN = "https://dolla-holla.org";
 
 const FILE_REGEX = /[/\\]/;
 const ADAPTER_VIRTUAL_WORKERS_PLUGIN =
@@ -141,6 +145,11 @@ export default defineConfig({
         platformProxy: {
           persist: true,
         },
+        // Serve build-time sitemap.xml as a static asset, not via the Worker.
+        routes: {
+          exclude: ["<all>", "/sitemap.xml"],
+          include: ["/*"],
+        },
       }),
       compilerOptions: {
         experimental: {
@@ -158,6 +167,17 @@ export default defineConfig({
       tracing: {
         server: true,
       },
+    }),
+    // After sveltekit so the Cloudflare adapt output exists under outDir.
+    svelteSitemap({
+      additional: ["/"],
+      changeFreq: "weekly",
+      domain: SITE_ORIGIN,
+      ignore: ["404.html"],
+      outDir: ".svelte-kit/cloudflare",
+      // Keep parity with the old PUBLIC_PATHS allowlist (`/` only).
+      transform: (_config, path) =>
+        path === "/" ? { priority: 1 } : null,
     }),
     // After sveltekit — required for SFC pipeline.
     /**

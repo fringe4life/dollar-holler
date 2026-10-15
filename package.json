@@ -55,6 +55,7 @@
     "svelte": "5.57.2",
     "svelte-check": "4.7.6",
     "svelte-eslint-parser": "1.9.0",
+    "svelte-sitemap": "4.1.2",
     "tsx": "4.23.15",
     "typescript": "6.0.2",
     "typescript-eslint": "8.71.1",
@@ -86,6 +87,7 @@
     "stylelint": "stylelint \"src/**/*.css\"",
     "check": "bun run lint && bun run format:check && bun run stylelint && svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
     "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "typecheck": "bun run panda:build && svelte-check --tsconfig ./tsconfig.json",
     "tsc": "./node_modules/@typescript/native/bin/tsc --noEmit",
     "tsc6": "./node_modules/typescript/bin/tsc --noEmit",
     "db:seed": "varlock run -- bun ./src/lib/server/db/seed.ts",
@@ -110,6 +112,7 @@
     "fallow:dead-code": "bun run fallow:prepare && fallow dead-code",
     "fallow:boundaries": "bun run fallow:prepare && fallow list --boundaries",
     "fallow:boundary-violations": "bun run fallow:prepare && fallow dead-code --boundary-violations",
+    "fallow:audit": "bun run fallow:prepare && fallow audit --gate new-only",
     "fallow:dupes": "bun run fallow:prepare && fallow dupes"
   },
   "type": "module",

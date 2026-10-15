@@ -8,7 +8,7 @@
     paginatedListRows,
     paginatedListStack,
   } from "../styles";
-  import { visibleListUrl } from "../utils/url";
+  import { readListQuery } from "../utils/list-query";
   import Pagination from "./Pagination.svelte";
 
   interface Props {
@@ -33,9 +33,7 @@
     footer,
   }: Props = $props();
 
-  const searchQuery = $derived(
-    visibleListUrl(page).searchParams.get("q") ?? ""
-  );
+  const searchQuery = $derived(readListQuery(page).q ?? "");
   const isBlank = $derived(items.length === 0 && !searchQuery);
   const isNoResults = $derived(items.length === 0 && Boolean(searchQuery));
 </script>

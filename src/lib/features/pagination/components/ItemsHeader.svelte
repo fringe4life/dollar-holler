@@ -2,7 +2,9 @@
   import { css } from "#styled-system/css/index.js";
   import { flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
+  import { page } from "$app/state";
   import Search from "#features/pagination/components/Search.svelte";
+  import { canonicalizeListUrl } from "#features/pagination/utils/goto-list.ts";
   import Button from "#lib/components/primitives/button/button.svelte";
 
   interface ItemsHeaderProps {
@@ -11,6 +13,11 @@
   }
 
   let { open, button }: ItemsHeaderProps = $props();
+
+  // Every list page mounts this header. Rewrite non-canonical list keys once.
+  $effect(() => {
+    canonicalizeListUrl(page);
+  });
 </script>
 
 <div

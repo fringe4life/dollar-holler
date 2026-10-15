@@ -80,6 +80,7 @@ A modern invoice management application built with SvelteKit 3 and Svelte 5, fea
 - `bun run stylelint` - Lint CSS under `src/**/*.css`
 - `bun run check` - ESLint, Prettier check, Stylelint, then `svelte-check`
 - `bun run check:watch` - `svelte-kit sync` then `svelte-check --watch`
+- `bun run typecheck` - `panda:build` then `svelte-check` (CI typecheck; generates gitignored `styled-system/`)
 - `bun run tsc` - Type-check with native TypeScript 7 preview (`@typescript/native`)
 - `bun run tsc6` - Type-check with TypeScript 6
 - `bun run test` - Run Bun unit tests (`*.test.ts`); [`bunfig.toml`](./bunfig.toml) `[test].preload` mocks `$app/env` via [`src/test/app-env-preload.ts`](./src/test/app-env-preload.ts)
@@ -104,6 +105,7 @@ A modern invoice management application built with SvelteKit 3 and Svelte 5, fea
 - `bun run fallow:dead-code` - Dead code analysis (after prepare)
 - `bun run fallow:boundaries` - List configured boundaries
 - `bun run fallow:boundary-violations` - Dead-code with boundary violations
+- `bun run fallow:audit` - Fallow `audit --gate new-only` (CI advisory on PRs)
 - `bun run fallow:dupes` - Fallow duplicate detection
 - `bun run prepare` (auto) - `svelte-kit sync` and Husky after install
 

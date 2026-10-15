@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
-  import { between, hstack, square } from "#styled-system/patterns/index.js";
-  import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
+  import { between } from "#styled-system/patterns/index.js";
+  import PaginationControlSkeleton from "./PaginationControlSkeleton.svelte";
+  import PaginationLimitSkeleton from "./PaginationLimitSkeleton.svelte";
 </script>
 
 <div
@@ -10,11 +10,6 @@
   class={between({ marginBlockEnd: 6, gap: 4 })}
   role="status"
 >
-  <Skeleton
-    class={css({ aspectRatio: "2/1", inlineSize: 20, rounded: "sm" })}
-  />
-  <div class={hstack({ gap: 2 })}>
-    <Skeleton class={square({ size: 9, rounded: "sm" })} />
-    <Skeleton class={square({ size: 9, rounded: "sm" })} />
-  </div>
+  <PaginationLimitSkeleton />
+  <PaginationControlSkeleton />
 </div>

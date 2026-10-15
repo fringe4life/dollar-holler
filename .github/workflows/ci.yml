@@ -32,6 +32,10 @@ jobs:
       - name: Load environment variables
         uses: dmno-dev/varlock-action@v1.0.5
 
+      # --ignore-scripts skips prepare. Panda's ESLint plugin needs $app/tsconfig.
+      - name: Sync SvelteKit
+        run: bun x svelte-kit sync
+
       - name: ESLint
         run: bun run lint
 

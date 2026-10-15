@@ -14,7 +14,10 @@ import {
   verifyOracleAgainstGolden,
 } from "./sql-list-oracle.ts";
 
-describe("sql-list-oracle vs local D1 seed", () => {
+/** Local Miniflare D1 + seed only. CI has neither; keep unit tests green there. */
+const hasLocalOracleD1 = process.env.CI !== "true";
+
+describe.skipIf(!hasLocalOracleD1)("sql-list-oracle vs local D1 seed", () => {
   it("matches golden hash for list/money/summary fixture pack", async () => {
     const golden = readOracleGolden();
     expect(golden.hash).toHaveLength(64);

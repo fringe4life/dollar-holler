@@ -48,9 +48,14 @@ export default defineConfig({
   presets: [presetBase, presetPanda],
   // Useful for theme customization
   theme: {
-    containerSizes: { xs: "20ch" },
     extend: {
       containerNames: ["clientTotals", "item-row"],
+      containers: {
+        xs: "20ch",
+        md: "28rem",
+        xl: "36rem",
+        "2xl": "42rem",
+      },
       keyframes,
       semanticTokens,
       tokens,

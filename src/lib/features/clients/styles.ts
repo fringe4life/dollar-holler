@@ -71,7 +71,7 @@ export const clientReceived = grid({
 export const clientBalance = grid({
   alignItems: "baseline",
   columnGap: 1.5,
-  color: "success",
+  color: "destructive",
   display: "flex",
   fontSize: { base: "sm", "@item-row/md": "lg", "@item-row/xl": "md" },
   fontVariantNumeric: "tabular-nums",

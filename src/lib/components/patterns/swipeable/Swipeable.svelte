@@ -107,11 +107,10 @@
   <div
     class={cx(frontLayerClass, contentClass)}
     {@attach swipe({
-      maxInlineSize: 448,
+      getTriggerReveal: () => isRevealed,
       onSwipeLeft: handleSwipeLeft,
       onSwipeModeChange: handleSwipeModeChange,
       onSwipeRight: handleSwipeRight,
-      triggerReveal: isRevealed,
     })}
   >
     {@render content(showActions, isRevealed)}

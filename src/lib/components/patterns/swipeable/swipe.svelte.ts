@@ -2,17 +2,20 @@ import type { Attachment } from "svelte/attachments";
 import { on } from "svelte/events";
 import { Spring, type SpringOptions } from "svelte/motion";
 import { supportsCssTypedOm } from "#lib/client/supports.ts";
+import { getItemRowMdBreakpointPx } from "./item-row-breakpoint.ts";
 
 interface SwipeConfig {
+  getMaxInlineSize?: () => number;
+  getTriggerReveal?: () => boolean;
   maxInlineSize?: number;
   onResetComplete?: () => void;
   onSwipeLeft?: () => void;
   onSwipeModeChange?: (swipeEnabled: boolean) => void;
   onSwipeRight?: () => void;
   threshold?: number;
-  triggerReveal?: boolean;
 }
 
+const SWIPE_REVEAL_RATIO = -0.95;
 const DEFAULT_MAX_INLINE_SIZE = 448;
 const INITIAL_SPRING_STATE = { x: 0, y: 0 };
 const SPRING_CONFIG: SpringOptions = {
@@ -38,14 +41,18 @@ const transformElement = (x: number, element: HTMLElement): void => {
  */
 export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
   const {
+    getMaxInlineSize = getItemRowMdBreakpointPx,
+    getTriggerReveal,
     maxInlineSize = DEFAULT_MAX_INLINE_SIZE,
     onResetComplete,
     onSwipeLeft,
     onSwipeModeChange,
     onSwipeRight,
     threshold = 20,
-    triggerReveal = false,
   } = config;
+
+  const resolveMaxInlineSize = (): number =>
+    getMaxInlineSize() ?? maxInlineSize;
 
   const spring = new Spring(INITIAL_SPRING_STATE, SPRING_CONFIG);
 
@@ -104,7 +111,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
       }
 
       const movement = startX - currentX;
-      const leftSnapX = elementWidth * -0.95;
+      const leftSnapX = elementWidth * SWIPE_REVEAL_RATIO;
       if (movement > threshold) {
         spring.set({ x: leftSnapX, y: 0 });
         onSwipeLeft?.();
@@ -193,7 +200,7 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     };
 
     const updateSwipeMode = (inlineSize: number): void => {
-      if (inlineSize < maxInlineSize) {
+      if (inlineSize < resolveMaxInlineSize()) {
         enableSwipe();
       } else {
         disableSwipe();
@@ -206,13 +213,19 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
     });
 
     $effect(() => {
+      const triggerReveal = getTriggerReveal?.() ?? false;
       if (triggerReveal && isSwipeEnabled) {
-        spring.set({ x: element.clientWidth * -0.95, y: 0 });
+        spring.set({
+          x: element.clientWidth * SWIPE_REVEAL_RATIO,
+          y: 0,
+        });
         return;
       }
 
-      reset();
-      onResetComplete?.();
+      if (!triggerReveal) {
+        reset();
+        onResetComplete?.();
+      }
     });
 
     const rowContainer = element.parentElement;

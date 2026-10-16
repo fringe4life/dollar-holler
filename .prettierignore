@@ -8,4 +8,3 @@ tsconfig.json
 styled-system/**
 src/env-varlock.d.ts
 src/worker-configuration.d.ts
-update-readme.md

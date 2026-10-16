@@ -20,7 +20,7 @@
     "@fontsource-variable/source-sans-3": "5.3.1",
     "@fontsource/kalam": "5.3.0",
     "@fontsource/source-code-pro": "5.3.1",
-    "@lucide/svelte": "1.55.0",
+    "@lucide/svelte": "1.56.0",
     "@pandacss/dev": "2.2.0",
     "@pandacss/eslint-plugin": "2.2.0",
     "@pandacss/mcp": "2.2.0",

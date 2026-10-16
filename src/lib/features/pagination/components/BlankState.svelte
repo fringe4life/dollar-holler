@@ -1,15 +1,13 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
-  import type { Snippet } from "svelte";
   import { asset } from "$app/paths";
   import BlankRow from "#features/pagination/components/BlankRow.svelte";
 
   interface Props {
-    header: Snippet;
     message: string;
   }
 
-  let { message, header }: Props = $props();
+  let { message }: Props = $props();
 </script>
 
 <div
@@ -39,9 +37,6 @@
     {message}
   </h2>
 </div>
-
-<!-- row header -->
-{@render header()}
 
 <!-- blank rows -->
 <BlankRow />

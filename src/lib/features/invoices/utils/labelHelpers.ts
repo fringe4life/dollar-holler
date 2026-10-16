@@ -2,11 +2,13 @@ import type { BadgeVariant } from "#lib/components/primitives/badge/badge.types.
 import type { Maybe } from "#lib/types.ts";
 import { isLate } from "#lib/utils/dateHelpers.ts";
 
+type InvoiceLabel = Extract<BadgeVariant, "draft" | "late" | "paid" | "sent">;
+
 // Pure: only returns the label, no mutations
 export const getLabel = (
-  label: Maybe<BadgeVariant>,
+  label: Maybe<InvoiceLabel>,
   dueDate: Maybe<string>
-): Exclude<BadgeVariant, undefined> => {
+): InvoiceLabel => {
   if (label === "sent" && isLate?.(dueDate)) {
     return "late";
   }

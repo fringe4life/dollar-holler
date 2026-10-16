@@ -1,23 +1,34 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
-  import { gridItem } from "#styled-system/patterns/index.js";
+  import { cx } from "#styled-system/css/index.js";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import { getLabel } from "#features/invoices/utils/labelHelpers.ts";
-  import AdditionalOptions from "#lib/components/patterns/additionaloptions/AdditionalOptions.svelte";
-  import AdditionalOptionsButton from "#lib/components/patterns/additionaloptions/AdditionalOptionsButton.svelte";
-  import type { Option } from "#lib/components/patterns/additionaloptions/AdditionalOptionsItem.svelte";
-  import AdditionalOptionsList from "#lib/components/patterns/additionaloptions/AdditionalOptionsList.svelte";
+  import Swipeable from "#lib/components/patterns/swipeable/Swipeable.svelte";
+  import Badge from "#lib/components/primitives/badge/badge.svelte";
   import Edit from "#lib/components/primitives/icons/Edit.svelte";
   import Send from "#lib/components/primitives/icons/Send.svelte";
   import Trash from "#lib/components/primitives/icons/Trash.svelte";
   import View from "#lib/components/primitives/icons/View.svelte";
-  import Swipeable from "#lib/components/patterns/swipeable/Swipeable.svelte";
-  import Badge from "#lib/components/primitives/badge/badge.svelte";
-  import { actionButton, tableRowBase, tableRowHover } from "#lib/styles.ts";
+  import {
+    rowActionButton,
+    rowActionDangerButton,
+    rowSwipeTrigger,
+    tableRowBase,
+  } from "#lib/styles.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
-  import { invoiceRow, invoiceTable } from "../styles";
+  import {
+    invoiceAmount,
+    invoiceClientName,
+    invoiceDueDate,
+    invoiceIdentity,
+    invoiceNumber,
+    invoiceRow,
+    invoiceStateSignal,
+    invoiceStatus,
+    invoiceSwipeHint,
+    invoiceTable,
+  } from "../styles";
   import type { InvoiceListResponse } from "../types";
 
   interface Props {
@@ -31,158 +42,124 @@
 
   const handleDelete: MouseEventHandler<HTMLButtonElement> = () =>
     onDelete(invoice);
-
   const handleEdit: MouseEventHandler<HTMLButtonElement> = () =>
     onEdit(invoice);
-
   const handleSendInvoice: MouseEventHandler<HTMLButtonElement> = () =>
     onSendInvoice(invoice);
 
   const id = $derived(invoice.id);
-  const optionsPopoverId = $derived(`invoice-options-${id}`);
-  const optionsAnchorName = $derived(`--${optionsPopoverId}-anchor`);
   const dueDate = $derived(invoice.dueDate);
-  const invoiceNumber = $derived(invoice.invoiceNumber);
-  const client = $derived(invoice.name);
-  const total = $derived(invoice.total);
-  const totalDisplay = $derived(formatTotal(total));
-  const invoiceStatus = $derived(invoice.invoiceStatus);
-
-  const label = $derived(getLabel(invoiceStatus, dueDate.toISOString()));
-  const isOptionsDisabled = $derived(label !== "draft");
+  const invoiceNumberDisplay = $derived(invoice.invoiceNumber);
+  const totalDisplay = $derived(formatTotal(invoice.total));
+  const label = $derived(
+    getLabel(invoice.invoiceStatus, dueDate.toISOString())
+  );
+  const isDraft = $derived(label === "draft");
   const invoiceDetailPath = "/(dashboard)/invoices/[id=uuid]" as const;
-
-  const INVOICE_OPTIONS = $derived([
-    {
-      disabled: isOptionsDisabled,
-      icon: Edit,
-      label: "Edit",
-      onclick: handleEdit,
-    },
-
-    {
-      disabled: false,
-      icon: Trash,
-      label: "Delete",
-      onclick: handleDelete,
-    },
-
-    {
-      disabled: isOptionsDisabled,
-      icon: Send,
-      label: "Send",
-      onclick: handleSendInvoice,
-    },
-  ] satisfies Option[]);
+  const invoiceStateClass = $derived(invoiceStateSignal({ state: label }));
 </script>
 
 <Swipeable
-  contentClass={cx(
-    "group",
-    invoiceTable,
-    invoiceRow,
-    tableRowHover,
-    tableRowBase
-  )}
+  contentClass={cx(invoiceTable, invoiceRow, invoiceStateClass, tableRowBase)}
   contentViewTransitionName={`invoice-${id}`}
 >
-  {#snippet content()}
-    <div class={gridItem({ justifySelf: "end", gridArea: "status" })}>
-      <Badge
-        class={css({ marginInlineStart: { base: "auto", md: 0 } })}
-        size="small"
-        variant={label}>{label}</Badge
+  {#snippet content(showActions: () => void, isRevealed: boolean)}
+    <div
+      aria-label={`Invoice number ${invoiceNumberDisplay}`}
+      class={invoiceIdentity}
+      role="group"
+    >
+      <span class={invoiceNumber}>{invoiceNumberDisplay}</span>
+    </div>
+    <div class={invoiceClientName}>{invoice.name}</div>
+    <div class={invoiceDueDate}>
+      <span>Due date</span>
+      <time datetime={dueDate.toISOString()}>
+        {convertDate(dueDate.toISOString())}
+      </time>
+    </div>
+    <div class={invoiceAmount}>{totalDisplay}</div>
+    <div class={invoiceStatus}>
+      <Badge size="small" variant={label}>{label}</Badge>
+    </div>
+    <div class={invoiceSwipeHint}>
+      <button
+        aria-controls={`invoice-${id}-actions`}
+        aria-expanded={isRevealed}
+        aria-label={`Show actions for invoice ${invoiceNumberDisplay}`}
+        class={rowSwipeTrigger}
+        onclick={showActions}
+        type="button"
       >
+        <span aria-hidden="true">←</span>
+        Swipe
+      </button>
+      <span>{label} · View · Delete</span>
     </div>
-    <div
-      class={gridItem({
-        gridArea: "duedate",
-        truncate: true,
-        fontSize: { base: "sm", lg: "lg" },
-        textAlign: { base: "left", lg: "center" },
-      })}
-    >
-      {convertDate(dueDate.toISOString())}
-    </div>
-    <div
-      class={gridItem({
-        gridArea: "invoicenumber",
-        truncate: true,
-        fontSize: { base: "sm", lg: "lg" },
-      })}
-    >
-      {invoiceNumber}
-    </div>
-    <div
-      class={gridItem({
-        gridArea: "clientName",
-        truncate: true,
-        fontSize: { lg: "xl" },
-        fontWeight: "bold",
-      })}
-    >
-      {client}
-    </div>
-    <div
-      class={gridItem({
-        gridArea: "amount",
-        justifySelf: "end",
-        fontSize: { base: "sm", lg: "lg" },
-        fontWeight: "bold",
-      })}
-    >
-      {totalDisplay}
-    </div>
-    <div
-      class={gridItem({
-        gridArea: "view",
-        display: { base: "none", lg: "block" },
-        placeSelf: { md: "center" },
-      })}
-    >
-      <a
-        class={css({
-          fontSize: { base: "sm", lg: "lg" },
-          transitionProperty: "colors",
-          transitionDuration: "normal",
-          color: {
-            base: "mutedAction",
-            _groupHover: "foreground/50",
-            _hover: "foreground",
-          },
-        })}
-        href={resolve(invoiceDetailPath, { id })}><View /></a
-      >
-    </div>
-    <AdditionalOptions classes={gridItem({ gridArea: "threeDots" })}>
-      <AdditionalOptionsButton
-        anchorName={optionsAnchorName}
-        commandFor={optionsPopoverId}
-      />
-      <AdditionalOptionsList
-        anchorName={optionsAnchorName}
-        options={INVOICE_OPTIONS}
-        id={optionsPopoverId}
-      />
-    </AdditionalOptions>
   {/snippet}
-  {#snippet revealed()}
-    {#if !isOptionsDisabled}
-      <button class={actionButton} onclick={handleEdit} type="button">
-        <Edit height={32} width={32} />
+
+  {#snippet actions()}
+    {#if isDraft}
+      <button
+        aria-label={`Edit invoice ${invoiceNumberDisplay}`}
+        class={rowActionButton}
+        onclick={handleEdit}
+        type="button"
+      >
+        <Edit height={16} width={16} />
         Edit
       </button>
-      <button class={actionButton} onclick={handleSendInvoice} type="button">
-        <Send height={32} width={32} />
+      <button
+        aria-label={`Send invoice ${invoiceNumberDisplay}`}
+        class={rowActionButton}
+        onclick={handleSendInvoice}
+        type="button"
+      >
+        <Send height={16} width={16} />
         Send
       </button>
     {/if}
-    <button class={actionButton} onclick={handleDelete} type="button">
-      <Trash height={32} width={32} />
+    <button
+      aria-label={`Delete invoice ${invoiceNumberDisplay}`}
+      class={cx(rowActionButton, rowActionDangerButton)}
+      onclick={handleDelete}
+      type="button"
+    >
+      <Trash height={16} width={16} />
       Delete
     </button>
-    <a class={actionButton} href={resolve(invoiceDetailPath, { id })}
-      ><View height={32} width={32} /></a
+    <a
+      aria-label={`View invoice ${invoiceNumberDisplay}`}
+      class={rowActionButton}
+      href={resolve(invoiceDetailPath, { id })}
     >
+      <View height={16} width={16} />
+      View
+    </a>
+  {/snippet}
+
+  {#snippet revealed()}
+    {#if isDraft}
+      <button class={rowActionButton} onclick={handleEdit} type="button">
+        <Edit height={24} width={24} />
+        Edit
+      </button>
+      <button class={rowActionButton} onclick={handleSendInvoice} type="button">
+        <Send height={24} width={24} />
+        Send
+      </button>
+    {/if}
+    <button
+      class={cx(rowActionButton, rowActionDangerButton)}
+      onclick={handleDelete}
+      type="button"
+    >
+      <Trash height={24} width={24} />
+      Delete
+    </button>
+    <a class={rowActionButton} href={resolve(invoiceDetailPath, { id })}>
+      <View height={24} width={24} />
+      View
+    </a>
   {/snippet}
 </Swipeable>

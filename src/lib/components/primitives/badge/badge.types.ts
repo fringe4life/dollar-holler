@@ -1,2 +1,3 @@
 export type BadgeSize = "default" | "small";
-export type BadgeVariant = "draft" | "late" | "paid" | "sent";
+export type BadgeVariant =
+  "active" | "archive" | "draft" | "late" | "paid" | "sent";

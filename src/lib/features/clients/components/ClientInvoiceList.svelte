@@ -3,7 +3,6 @@
   import { listClientInvoices } from "#features/clients/clients.remote.ts";
   import BlankState from "#features/clients/components/BlankState.svelte";
   import InvoiceRow from "#features/invoices/components/InvoiceRow.svelte";
-  import InvoiceRowHeader from "#features/invoices/components/InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "#features/invoices/components/InvoiceRowSkeleton.svelte";
   import type { InvoiceListResponse } from "#features/invoices/types.ts";
   import NoSearchResults from "#features/pagination/components/NoSearchResults.svelte";
@@ -29,9 +28,6 @@
 <svelte:boundary>
   {#snippet pending()}
     <PaginatedListSkeleton>
-      {#snippet header()}
-        <InvoiceRowHeader />
-      {/snippet}
       {#snippet skeleton()}
         <InvoiceRowSkeleton />
       {/snippet}
@@ -50,9 +46,6 @@
     items={invoices.items}
     paginationMetadata={invoices.paginationMetadata}
   >
-    {#snippet header()}
-      <InvoiceRowHeader />
-    {/snippet}
     {#snippet row(item)}
       <InvoiceRow invoice={item} {onDelete} {onEdit} {onSendInvoice} />
     {/snippet}
@@ -60,11 +53,7 @@
       <BlankState />
     {/snippet}
     {#snippet noResults()}
-      <NoSearchResults>
-        {#snippet header()}
-          <InvoiceRowHeader emptyState={true} />
-        {/snippet}
-      </NoSearchResults>
+      <NoSearchResults />
     {/snippet}
   </PaginatedList>
 </svelte:boundary>

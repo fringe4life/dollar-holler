@@ -6,7 +6,6 @@
   import BlankState from "#features/invoices/components/BlankState.svelte";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
   import InvoiceRow from "#features/invoices/components/InvoiceRow.svelte";
-  import InvoiceRowHeader from "#features/invoices/components/InvoiceRowHeader.svelte";
   import InvoiceRowSkeleton from "#features/invoices/components/InvoiceRowSkeleton.svelte";
   import {
     deleteInvoice,
@@ -81,9 +80,6 @@
 <svelte:boundary>
   {#snippet pending()}
     <PaginatedListSkeleton>
-      {#snippet header()}
-        <InvoiceRowHeader />
-      {/snippet}
       {#snippet skeleton()}
         <InvoiceRowSkeleton />
       {/snippet}
@@ -102,9 +98,6 @@
     items={list.items}
     paginationMetadata={list.paginationMetadata}
   >
-    {#snippet header()}
-      <InvoiceRowHeader />
-    {/snippet}
     {#snippet row(invoice)}
       <InvoiceRow
         {invoice}
@@ -117,11 +110,7 @@
       <BlankState />
     {/snippet}
     {#snippet noResults()}
-      <NoSearchResults>
-        {#snippet header()}
-          <InvoiceRowHeader emptyState={true} />
-        {/snippet}
-      </NoSearchResults>
+      <NoSearchResults />
     {/snippet}
   </PaginatedList>
 </svelte:boundary>

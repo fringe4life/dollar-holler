@@ -11,14 +11,12 @@
 
   interface Props {
     class?: string;
-    header: Snippet;
     skeleton: Snippet;
     skeletonCount?: number;
   }
 
   let {
     class: extraClass,
-    header,
     skeleton,
     skeletonCount = DEFAULT_LIMIT,
   }: Props = $props();
@@ -31,7 +29,6 @@
   role="status"
 >
   <div class={cx(paginatedListGrid, extraClass)}>
-    {@render header()}
     <div class={paginatedListRows}>
       {#each { length: skeletonCount } as _, i (i)}
         {@render skeleton()}

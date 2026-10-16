@@ -50,7 +50,7 @@ export default defineConfig({
   theme: {
     containerSizes: { xs: "20ch" },
     extend: {
-      containerNames: ["clientTotals"],
+      containerNames: ["clientTotals", "item-row"],
       keyframes,
       semanticTokens,
       tokens,

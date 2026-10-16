@@ -1,18 +1,25 @@
 import type { Attachment } from "svelte/attachments";
 import { on } from "svelte/events";
 import { Spring, type SpringOptions } from "svelte/motion";
-import { MediaQuery } from "svelte/reactivity";
 import { supportsCssTypedOm } from "#lib/client/supports.ts";
 
 interface SwipeConfig {
+  maxInlineSize?: number;
   onResetComplete?: () => void;
   onSwipeLeft?: () => void;
+  onSwipeModeChange?: (swipeEnabled: boolean) => void;
   onSwipeRight?: () => void;
   threshold?: number;
-  triggerReset?: boolean;
+  triggerReveal?: boolean;
 }
 
-const MOBILE_MEDIA_QUERY = new MediaQuery("(max-width: 1024px)");
+const DEFAULT_MAX_INLINE_SIZE = 448;
+const INITIAL_SPRING_STATE = { x: 0, y: 0 };
+const SPRING_CONFIG: SpringOptions = {
+  damping: 0.4,
+  stiffness: 0.2,
+};
+
 const transformElement = (x: number, element: HTMLElement): void => {
   if (supportsCssTypedOm) {
     element.attributeStyleMap.set(
@@ -24,87 +31,100 @@ const transformElement = (x: number, element: HTMLElement): void => {
   element.style.transform = `translateX(${x}px)`;
 };
 
-// Initial spring state
-const INITIAL_SPRING_STATE = { x: 0, y: 0 };
-// Spring configuration
-const SPRING_CONFIG: SpringOptions = {
-  damping: 0.4,
-  stiffness: 0.2,
-};
-
 /**
- * Modern Svelte 5 swipe attachment using @attach directive
- * Uses the new Spring class for smooth animations
- *
- * Performance: Prefer stable callback references for onResetComplete, onSwipeLeft, and
- * onSwipeRight (e.g. defined in script or bound with a stable wrapper). If inline
- * functions are passed, the attachment re-runs whenever those references change;
- * wrapping the config in $derived can reduce churn by only updating when triggerReset
- * (or other chosen deps) change. Prefer avoiding inline callbacks over relying on $derived.
+ * Enables horizontal swipe only while the row itself is narrower than the
+ * button-row threshold. ResizeObserver keeps the behavior aligned with the
+ * CSS container queries even when a sidebar changes the available width.
  */
 export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
   const {
-    triggerReset = false,
+    maxInlineSize = DEFAULT_MAX_INLINE_SIZE,
     onResetComplete,
     onSwipeLeft,
+    onSwipeModeChange,
     onSwipeRight,
     threshold = 20,
+    triggerReveal = false,
   } = config;
-  const isMobile = MOBILE_MEDIA_QUERY.current;
 
-  // Use the new Spring class for smooth animations
   const spring = new Spring(INITIAL_SPRING_STATE, SPRING_CONFIG);
+
   return (element) => {
     let startX = 0;
     let currentX = 0;
     let isDragging = false;
+    let isSwipeEnabled = false;
     let elementWidth = 0;
-    /** Cleanups for document listeners (drag); cleared when drag ends or on attachment cleanup */
     let documentCleanups: (() => void)[] = [];
+    let startListenerCleanups: (() => void)[] = [];
 
-    $effect(() => {
-      const { x } = spring.current;
-      transformElement(x, element);
-    });
-
-    // Reset function
-    function reset() {
+    const reset = (): void => {
       spring.set(INITIAL_SPRING_STATE);
+    };
+
+    const clearCleanups = (cleanups: (() => void)[]): void => {
+      for (const cleanup of cleanups) {
+        cleanup();
+      }
+      cleanups.length = 0;
+    };
+
+    const clearDocumentListeners = (): void => {
+      clearCleanups(documentCleanups);
+    };
+
+    function handleMouseMove(event: MouseEvent): void {
+      if (!isDragging) {
+        return;
+      }
+
+      const deltaX = event.clientX - currentX;
+      currentX = event.clientX;
+      spring.set({ x: spring.current.x + deltaX, y: 0 });
     }
 
-    // Handle swipe completion
-    function handleSwipeEnd() {
+    function handleTouchMove(event: TouchEvent): void {
+      if (!isDragging) {
+        return;
+      }
+
+      event.preventDefault();
+      const touch = event.touches[0];
+      if (!touch) {
+        return;
+      }
+      const deltaX = touch.clientX - currentX;
+      currentX = touch.clientX;
+      spring.set({ x: spring.current.x + deltaX, y: 0 });
+    }
+
+    function handleSwipeEnd(): void {
       if (!isDragging) {
         return;
       }
 
       const movement = startX - currentX;
       const leftSnapX = elementWidth * -0.95;
-
       if (movement > threshold) {
-        // Swiped left
         spring.set({ x: leftSnapX, y: 0 });
         onSwipeLeft?.();
       } else {
-        // Swiped right or insufficient movement
-        spring.set(INITIAL_SPRING_STATE);
+        reset();
         onSwipeRight?.();
       }
-
       isDragging = false;
     }
 
-    // Mouse event handlers
-    function handleMouseDown(event: MouseEvent) {
-      if (!isMobile) {
+    const isInteractiveTarget = (target: EventTarget | null): boolean =>
+      target instanceof Element &&
+      target.closest("button, a, input, select, textarea") !== null;
+
+    function handleMouseDown(event: MouseEvent): void {
+      if (!isSwipeEnabled || isInteractiveTarget(event.target)) {
         return;
       }
 
-      for (const off of documentCleanups) {
-        off();
-      }
-      documentCleanups = [];
-
+      clearDocumentListeners();
       event.preventDefault();
       startX = event.clientX;
       currentX = event.clientX;
@@ -113,42 +133,26 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
 
       const offMove = on(document, "mousemove", handleMouseMove);
       const offUp = on(document, "mouseup", () => {
-        if (!isDragging) {
-          return;
-        }
         handleSwipeEnd();
-        offMove();
-        offUp();
-        documentCleanups = [];
+        clearDocumentListeners();
       });
       documentCleanups = [offMove, offUp];
     }
 
-    function handleMouseMove(event: MouseEvent) {
-      if (!isDragging) {
+    function handleTouchStart(event: TouchEvent): void {
+      if (!isSwipeEnabled || isInteractiveTarget(event.target)) {
         return;
       }
 
-      const dx = event.clientX - currentX;
-      currentX = event.clientX;
-
-      spring.set({ x: spring.current.x + dx, y: 0 });
-    }
-
-    // Touch event handlers
-    function handleTouchStart(event: TouchEvent) {
-      if (!isMobile) {
+      const touch = event.touches[0];
+      if (!touch) {
         return;
       }
 
-      for (const off of documentCleanups) {
-        off();
-      }
-      documentCleanups = [];
-
+      clearDocumentListeners();
       event.preventDefault();
-      startX = event.touches[0].clientX;
-      currentX = event.touches[0].clientX;
+      startX = touch.clientX;
+      currentX = touch.clientX;
       isDragging = true;
       elementWidth = element.clientWidth;
 
@@ -156,58 +160,94 @@ export function swipe(config: SwipeConfig = {}): Attachment<HTMLElement> {
         passive: false,
       });
       const offEnd = on(document, "touchend", () => {
-        if (!isDragging) {
-          return;
-        }
         handleSwipeEnd();
-        offMove();
-        offEnd();
-        documentCleanups = [];
+        clearDocumentListeners();
       });
       documentCleanups = [offMove, offEnd];
     }
 
-    function handleTouchMove(event: TouchEvent) {
-      if (!isDragging) {
+    const enableSwipe = (): void => {
+      if (isSwipeEnabled) {
         return;
       }
 
-      event.preventDefault();
-      const dx = event.touches[0].clientX - currentX;
-      currentX = event.touches[0].clientX;
+      isSwipeEnabled = true;
+      startListenerCleanups = [
+        on(element, "mousedown", handleMouseDown),
+        on(element, "touchstart", handleTouchStart),
+      ];
+      onSwipeModeChange?.(true);
+    };
 
-      spring.set({ x: spring.current.x + dx, y: 0 });
+    const disableSwipe = (): void => {
+      if (!isSwipeEnabled) {
+        return;
+      }
+
+      isSwipeEnabled = false;
+      isDragging = false;
+      clearDocumentListeners();
+      clearCleanups(startListenerCleanups);
+      reset();
+      onSwipeModeChange?.(false);
+    };
+
+    const updateSwipeMode = (inlineSize: number): void => {
+      if (inlineSize < maxInlineSize) {
+        enableSwipe();
+      } else {
+        disableSwipe();
+      }
+    };
+
+    $effect(() => {
+      const { x } = spring.current;
+      transformElement(x, element);
+    });
+
+    $effect(() => {
+      if (triggerReveal && isSwipeEnabled) {
+        spring.set({ x: element.clientWidth * -0.95, y: 0 });
+        return;
+      }
+
+      reset();
+      onResetComplete?.();
+    });
+
+    const rowContainer = element.parentElement;
+    if (!rowContainer) {
+      return;
     }
 
-    // Watch for reset trigger
-    $effect(() => {
-      if (triggerReset) {
-        reset();
-        onResetComplete?.();
-      }
-    });
-
-    // Watch for mobile breakpoint changes: use on() so cleanup is returned and order matches declarative handlers
-    $effect(() => {
-      if (!isMobile) {
-        reset();
+    let resizeFrame = 0;
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (!entry) {
         return;
       }
-      const offMouse = on(element, "mousedown", handleMouseDown);
-      const offTouch = on(element, "touchstart", handleTouchStart);
-      return () => {
-        offMouse();
-        offTouch();
-      };
+
+      const inlineSize = entry.contentRect.width;
+      if (resizeFrame !== 0) {
+        cancelAnimationFrame(resizeFrame);
+      }
+      resizeFrame = requestAnimationFrame(() => {
+        updateSwipeMode(inlineSize);
+        resizeFrame = 0;
+      });
     });
 
-    // Cleanup: remove any active document listeners (e.g. drag in progress) when attachment is detached
+    resizeObserver.observe(rowContainer);
+    updateSwipeMode(rowContainer.getBoundingClientRect().width);
+
     return () => {
       isDragging = false;
-      for (const off of documentCleanups) {
-        off();
+      clearDocumentListeners();
+      clearCleanups(startListenerCleanups);
+      resizeObserver.disconnect();
+      if (resizeFrame !== 0) {
+        cancelAnimationFrame(resizeFrame);
       }
-      documentCleanups = [];
     };
   };
 }

@@ -15,7 +15,6 @@
     blankState?: Snippet;
     class?: string;
     footer?: Snippet;
-    header: Snippet;
     items: T[];
     noResults?: Snippet;
     paginationMetadata: PaginationMetadata;
@@ -26,7 +25,6 @@
     items,
     paginationMetadata,
     class: extraClass,
-    header,
     row,
     blankState,
     noResults,
@@ -45,7 +43,6 @@
     {@render noResults?.()}
   {:else}
     <div class={cx(paginatedListGrid, extraClass)}>
-      {@render header()}
       <div
         class={paginatedListRows}
         style:view-transition-name="paginated-list-rows"

@@ -1,5 +1,5 @@
 import { css, cva, cx } from "#styled-system/css/index.js";
-import { flex, grid, hoverShadow } from "#styled-system/patterns/index.js";
+import { flex } from "#styled-system/patterns/index.js";
 
 export const directionalArrow = cva({
   base: {
@@ -60,12 +60,6 @@ export const buttonIcon = cva({
       },
     },
   },
-});
-
-export const actionButton = grid({
-  color: "foreground",
-  fontWeight: "bold",
-  justifyItems: "center",
 });
 
 export const rowActionRail = css({
@@ -209,18 +203,6 @@ export const rowActionDangerButton = css({
     },
   },
 });
-
-export const tableRowHover = cx(
-  css({
-    _hover: {
-      translate: "0 -2px",
-    },
-    transitionDuration: "normal",
-    transitionProperty: "translate",
-    transitionTimingFunction: "anticipate",
-  }),
-  hoverShadow({ shadow: "tableRowHover" })
-);
 
 export const tableRowBase = css({
   alignItems: "center",

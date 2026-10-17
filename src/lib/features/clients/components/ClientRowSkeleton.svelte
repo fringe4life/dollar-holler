@@ -1,83 +1,47 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
-  import { circle, gridItem } from "#styled-system/patterns/index.js";
+  import { cq } from "#styled-system/patterns/index.js";
   import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
-  import { tableRowBase } from "#lib/styles.ts";
-  import { clientRow, clientTable } from "../styles";
+  import {
+    rowActionButtonGroup,
+    rowActionLabel,
+    rowActionRail,
+    tableRowBase,
+  } from "#lib/styles.ts";
+  import {
+    clientBalance,
+    clientName,
+    clientReceived,
+    clientRow,
+    clientStatus,
+    clientSwipeHint,
+    clientTable,
+  } from "../styles";
 </script>
 
-<div class={css({ position: "relative", isolation: "isolate" })}>
-  <div class={cx(clientTable, clientRow, tableRowBase)}>
-    <!-- status: badge-shaped pill ~54px wide -->
-    <div
-      class={gridItem({
-        gridArea: "status",
-        justifySelf: { base: "end", lg: "start" },
-      })}
-    >
-      <Skeleton
-        class={css({
-          bg: "skeletonSubtle/40",
-          rounded: "full",
-          blockSize: 6,
-          inlineSize: 15,
-        })}
-      />
-    </div>
-
-    <!-- clientname: ~160px -->
-    <div class={gridItem({ gridArea: "clientName" })}>
-      <Skeleton
-        class={css({
-          bg: "skeletonSubtle/40",
-          aspectRatio: "5/1",
-          inlineSize: 20,
-        })}
-      />
-    </div>
-
-    <!-- received: right-aligned, ~80px -->
-    <div class={gridItem({ gridArea: "received" })}>
-      <Skeleton
-        class={css({
-          bg: "skeletonSubtle/40",
-          aspectRatio: "5/1",
-          inlineSize: 20,
-        })}
-      />
-    </div>
-
-    <!-- balance: right-aligned, ~80px -->
-    <div class={gridItem({ gridArea: "balance", justifySelf: "end" })}>
-      <Skeleton
-        class={css({
-          bg: "skeletonSubtle/40",
-          aspectRatio: "5/1",
-          inlineSize: 20,
-        })}
-      />
-    </div>
-
-    <!-- view button: 32px circle, hidden on mobile -->
-    <div
-      class={gridItem({
-        gridArea: "view",
-        display: { base: "none", lg: "block" },
-        placeSelf: "center",
-      })}
-    >
-      <Skeleton class={circle({ bg: "skeletonSubtle/40", size: 8 })} />
-    </div>
-
-    <!-- three dots: 32px circle, hidden on mobile -->
-    <div
-      class={gridItem({
-        gridArea: "threeDots",
-        display: { base: "none", lg: "block" },
-        placeSelf: "center",
-      })}
-    >
-      <Skeleton class={circle({ bg: "skeletonSubtle/40", size: 8 })} />
+<div class={cx(cq({ name: "item-row" }), clientTable, clientRow, tableRowBase)}>
+  <div class={clientName}>
+    <Skeleton class={css({ blockSize: 5, inlineSize: 28 })} />
+  </div>
+  <div class={clientStatus}>
+    <Skeleton class={css({ blockSize: 5, inlineSize: 16, rounded: "full" })} />
+  </div>
+  <div class={clientReceived}>
+    <Skeleton class={css({ blockSize: 4, inlineSize: 20 })} />
+  </div>
+  <div class={clientBalance}>
+    <Skeleton class={css({ blockSize: 4, inlineSize: 16 })} />
+  </div>
+  <div class={clientSwipeHint}>
+    <Skeleton class={css({ blockSize: 2.5, inlineSize: 28 })} />
+    <Skeleton class={css({ blockSize: 2.5, inlineSize: 18 })} />
+  </div>
+  <div class={cx(rowActionRail, css({ pointerEvents: "none" }))}>
+    <span class={rowActionLabel}>Actions</span>
+    <div class={rowActionButtonGroup}>
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
     </div>
   </div>
 </div>

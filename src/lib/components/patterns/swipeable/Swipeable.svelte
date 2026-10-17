@@ -1,46 +1,72 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
-  import { flex } from "#styled-system/patterns/index.js";
+  import { cq, flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
+  import Button from "#lib/components/primitives/button/button.svelte";
   import { swipe } from "./swipe.svelte.ts";
-  import { Toggle } from "#lib/client/runes/Toggle.svelte.ts";
   import Cancel from "#lib/components/primitives/icons/Cancel.svelte";
-  import { actionButton } from "#lib/styles.ts";
+  import {
+    rowActionButtonGroup,
+    rowActionLabel,
+    rowActionRail,
+  } from "#lib/styles.ts";
 
   interface Props {
-    content: Snippet;
+    actions: Snippet;
+    content: Snippet<[showActions: () => void, isRevealed: boolean]>;
     contentClass: string;
-    /** Stable name for View Transitions API (e.g. `client-${id}`) so rows morph instead of cross-fading. */
+    /** Stable name for View Transitions API so rows morph instead of cross-fading. */
     contentViewTransitionName: string;
     revealed: Snippet;
   }
 
-  let { content, revealed, contentClass, contentViewTransitionName }: Props =
-    $props();
-  const swipeReset = new Toggle();
-</script>
+  let {
+    actions,
+    content,
+    revealed,
+    contentClass,
+    contentViewTransitionName,
+  }: Props = $props();
+  let isSwipeEnabled = $state(false);
+  let isRevealed = $state(false);
 
-<div
-  class={css({
-    isolation: "isolate",
+  const showActions = (): void => {
+    if (isSwipeEnabled) {
+      isRevealed = true;
+    }
+  };
+
+  const closeActions = (): void => {
+    isRevealed = false;
+  };
+
+  const handleSwipeModeChange = (swipeEnabled: boolean): void => {
+    isSwipeEnabled = swipeEnabled;
+    if (!swipeEnabled) {
+      isRevealed = false;
+    }
+  };
+
+  const handleSwipeLeft = (): void => {
+    isRevealed = true;
+  };
+
+  const handleSwipeRight = (): void => {
+    isRevealed = false;
+  };
+
+  let swipeActionsId = $derived(`${contentViewTransitionName}-actions`);
+  const rowContainerClass = cx(
+    css({ isolation: "isolate", inlineSize: "full", position: "relative" }),
+    cq({ name: "item-row" })
+  );
+  const frontLayerClass = css({
+    inlineSize: "full",
     position: "relative",
-  })}
-  data-swipeable
-  style:view-transition-name={contentViewTransitionName}
->
-  <!-- CONTENT displayed by default -->
-  <div
-    class={cx(css({ zIndex: 5 }), contentClass)}
-    {@attach swipe({
-      triggerReset: swipeReset.isOn,
-      onResetComplete: swipeReset.off,
-    })}
-  >
-    {@render content()}
-  </div>
-  <!-- REVEALED CONTENT displayed when the user swipes the card -->
-  <div
-    class={flex({
+    zIndex: 5,
+  });
+  const revealedLayerClass = cx(
+    flex({
       align: "center",
       blockSize: "full",
       inlineSize: "full",
@@ -48,12 +74,70 @@
       justify: "space-around",
       position: "absolute",
       zIndex: 1,
+    }),
+    css({ "@item-row/md": { display: "none" } })
+  );
+  const cancelButtonClass = css({
+    backgroundColor: "surfaceMuted",
+    color: "foreground",
+    flexDirection: "column",
+    fontSize: "2xs",
+    gap: 1,
+    minBlockSize: 12,
+    minInlineSize: 12,
+    padding: 1,
+    _hover: {
+      backgroundColor: "warning/20",
+      color: "foreground",
+    },
+    _dark: {
+      backgroundColor: "surface",
+      color: "foreground",
+      _hover: { backgroundColor: "surfaceSecondary" },
+      _active: { backgroundColor: "success/15", color: "success" },
+    },
+  });
+</script>
+
+<div
+  class={rowContainerClass}
+  data-swipeable
+  style:view-transition-name={contentViewTransitionName}
+>
+  <div
+    class={cx(frontLayerClass, contentClass)}
+    {@attach swipe({
+      getTriggerReveal: () => isRevealed,
+      onSwipeLeft: handleSwipeLeft,
+      onSwipeModeChange: handleSwipeModeChange,
+      onSwipeRight: handleSwipeRight,
     })}
   >
-    <button class={actionButton} onclick={swipeReset.toggle} type="button">
-      <Cancel height={32} width={32} />
+    {@render content(showActions, isRevealed)}
+    <div class={rowActionRail} data-button-actions>
+      <span class={rowActionLabel}>Actions</span>
+      <div class={rowActionButtonGroup}>{@render actions()}</div>
+    </div>
+  </div>
+  <div
+    id={swipeActionsId}
+    aria-hidden={!isSwipeEnabled || !isRevealed}
+    class={revealedLayerClass}
+    data-swipe-actions
+    inert={!isSwipeEnabled || !isRevealed}
+  >
+    <Button
+      aria-controls={swipeActionsId}
+      aria-expanded={isRevealed}
+      aria-label="Close row actions"
+      class={cancelButtonClass}
+      onclick={closeActions}
+      size="icon"
+      variant="outline"
+    >
+      <Cancel height={24} width={24} />
       Cancel
-    </button>
+    </Button>
     {@render revealed()}
   </div>
 </div>

@@ -6,7 +6,6 @@
   import BlankState from "#features/clients/components/BlankState.svelte";
   import ClientForm from "#features/clients/components/ClientForm.svelte";
   import ClientRow from "#features/clients/components/ClientRow.svelte";
-  import ClientRowHeader from "#features/clients/components/ClientRowHeader.svelte";
   import ClientRowSkeleton from "#features/clients/components/ClientRowSkeleton.svelte";
   import {
     deleteClient,
@@ -90,9 +89,6 @@
 <svelte:boundary>
   {#snippet pending()}
     <PaginatedListSkeleton>
-      {#snippet header()}
-        <ClientRowHeader />
-      {/snippet}
       {#snippet skeleton()}
         <ClientRowSkeleton />
       {/snippet}
@@ -111,9 +107,6 @@
     items={list.items}
     paginationMetadata={list.paginationMetadata}
   >
-    {#snippet header()}
-      <ClientRowHeader />
-    {/snippet}
     {#snippet row(client)}
       <ClientRow
         {client}
@@ -127,11 +120,7 @@
       <BlankState />
     {/snippet}
     {#snippet noResults()}
-      <NoSearchResults>
-        {#snippet header()}
-          <ClientRowHeader emptyState={true} />
-        {/snippet}
-      </NoSearchResults>
+      <NoSearchResults />
     {/snippet}
   </PaginatedList>
 </svelte:boundary>

@@ -1,15 +1,12 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
-  import type { Snippet } from "svelte";
   import { asset } from "$app/paths";
   import BlankRow from "./BlankRow.svelte";
 
   let {
     message = "We didn't find anything that you were looking for.",
-    header,
   }: {
     message?: string;
-    header: Snippet;
   } = $props();
 </script>
 
@@ -46,8 +43,6 @@
     {message}
   </p>
 </div>
-
-{@render header()}
 
 <BlankRow />
 <BlankRow />

@@ -4,14 +4,20 @@
 
   const badgeVariants = cva({
     base: {
-      blockSize: 20,
+      alignItems: "center",
       borderRadius: "full",
       borderWidth: "1px",
-      fontSize: "md",
+      display: "inline-flex",
+      fontSize: "sm",
       fontWeight: "bold",
-      inlineSize: 20,
+      inlineSize: "fit-content",
+      justifyContent: "center",
+      lineHeight: "tight",
+      minBlockSize: 5,
+      paddingBlock: 0.5,
       textAlign: "center",
       textTransform: "capitalize",
+      whiteSpace: "nowrap",
     },
     defaultVariants: {
       size: "small",
@@ -20,9 +26,19 @@
     variants: {
       size: {
         default: { paddingBlock: 1, paddingInline: 3 },
-        small: { paddingInline: 2 },
+        small: { paddingBlock: 0.5, paddingInline: 2 },
       },
       variant: {
+        active: {
+          backgroundColor: "success/15",
+          borderColor: "success/40",
+          color: "success",
+        },
+        archive: {
+          backgroundColor: "surfaceMuted",
+          borderColor: "borderMuted",
+          color: "textMuted",
+        },
         draft: {
           borderColor: "statusDraft",
           color: "statusDraft",

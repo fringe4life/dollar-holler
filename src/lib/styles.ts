@@ -1,5 +1,5 @@
 import { css, cva, cx } from "#styled-system/css/index.js";
-import { grid, hoverShadow } from "#styled-system/patterns/index.js";
+import { flex } from "#styled-system/patterns/index.js";
 
 export const directionalArrow = cva({
   base: {
@@ -62,28 +62,176 @@ export const buttonIcon = cva({
   },
 });
 
-export const actionButton = grid({
+export const rowActionRail = css({
+  alignItems: "center",
+  backgroundColor: "surfaceMuted",
+  borderBlockStartColor: "borderSubtle",
+  borderBlockStartStyle: "solid",
+  borderBlockStartWidth: "1px",
   color: "foreground",
-  fontWeight: "bold",
-  justifyItems: "center",
+  display: "none",
+  gridArea: "actions",
+  justifyContent: "space-between",
+  minInlineSize: 0,
+  paddingBlock: 2,
+  paddingInline: { base: 3, "@item-row/xl": 4 },
+  "@item-row/md": { display: "flex" },
 });
 
-export const tableRowHover = cx(
-  css({
+export const rowActionLabel = css({
+  color: "textMuted",
+  flexShrink: 0,
+  fontSize: "2xs",
+  fontWeight: "bold",
+  letterSpacing: "widest",
+  textTransform: "uppercase",
+});
+
+export const rowActionButtonGroup = flex({
+  align: "center",
+  gap: 2,
+  justify: "end",
+  wrap: "wrap",
+});
+
+export const rowSwipeTrigger = css({
+  alignItems: "center",
+  backgroundColor: "transparent",
+  borderRadius: "sm",
+  color: "mutedAction",
+  cursor: "pointer",
+  display: "inline-flex",
+  fontSize: "2xs",
+  fontWeight: "bold",
+  gap: 1,
+  letterSpacing: "wider",
+  paddingBlock: 1,
+  paddingInline: 1,
+  textTransform: "uppercase",
+  transitionDuration: "normal",
+  transitionProperty: "background-color, color, translate",
+  _hover: {
+    backgroundColor: "warning/20",
+    color: "foreground",
+    translate: "2px 0",
+  },
+  _focusVisible: {
+    outlineColor: "ring",
+    outlineOffset: 2,
+    outlineStyle: "solid",
+    outlineWidth: 2,
+  },
+  _active: { translate: "0 0" },
+  _dark: {
+    color: "mutedAction",
     _hover: {
-      translate: "0 -2px",
+      backgroundColor: "surfaceSecondary",
+      color: "success",
+      translate: "none",
     },
+    _active: { backgroundColor: "success/15", color: "success" },
+  },
+});
+
+export const rowActionButton = cx(
+  css({
+    alignItems: "center",
+    backgroundColor: "surface",
+    borderColor: "borderSubtle",
+    borderRadius: "md",
+    borderStyle: "solid",
+    borderWidth: "1px",
+    color: "foreground",
+    cursor: "pointer",
+    display: "inline-flex",
+    flexShrink: 0,
+    fontSize: "sm",
+    fontWeight: "bold",
+    gap: 1.5,
+    justifyContent: "center",
+    minBlockSize: 10,
+    minInlineSize: 11,
+    paddingInline: 2.5,
+    textDecoration: "none",
     transitionDuration: "normal",
-    transitionProperty: "translate",
-    transitionTimingFunction: "anticipate",
-  }),
-  hoverShadow({ shadow: "tableRowHover" })
+    transitionProperty:
+      "background-color, border-color, box-shadow, color, rotate, translate",
+    transitionTimingFunction: "glide",
+    _hover: {
+      backgroundColor: "warning/20",
+      borderColor: "warning/70",
+      boxShadow: "colored",
+      rotate: "-0.5deg",
+      translate: "0 -1px",
+    },
+    _focusVisible: {
+      outlineColor: "ring",
+      outlineOffset: 2,
+      outlineStyle: "solid",
+      outlineWidth: 2,
+    },
+    _active: {
+      boxShadow: "none",
+      translate: "0 0",
+    },
+    _dark: {
+      _hover: {
+        backgroundColor: "surfaceSecondary",
+        borderColor: "ring/70",
+        boxShadow: "none",
+        rotate: "none",
+        translate: "none",
+      },
+      _active: {
+        backgroundColor: "success/15",
+        borderColor: "success",
+        color: "success",
+      },
+    },
+    _motionReduce: { transitionDuration: "0.01ms" },
+  })
 );
+
+export const rowActionDangerButton = css({
+  color: "destructive",
+  _hover: { backgroundColor: "destructive/10", borderColor: "destructive/50" },
+  _dark: {
+    color: "destructive",
+    _hover: {
+      backgroundColor: "destructive/15",
+      borderColor: "destructive/60",
+    },
+  },
+});
 
 export const tableRowBase = css({
   alignItems: "center",
   backgroundColor: "surface",
-  paddingBlock: { base: 3, lg: 6 },
-  rounded: "lg",
+  borderColor: "borderSubtle",
+  borderRadius: "lg",
+  borderStyle: "solid",
+  borderWidth: "1px",
+  overflow: "hidden",
   shadow: "tableRow",
+  transitionDuration: "normal",
+  transitionProperty: "background-color, border-color, box-shadow",
+  transitionTimingFunction: "glide",
+  _hover: {
+    backgroundColor: "surfaceSecondary",
+    boxShadow: "tableRowHover",
+  },
+  _focusWithin: {
+    outlineColor: "ring",
+    outlineOffset: 2,
+    outlineStyle: "solid",
+    outlineWidth: "1px",
+  },
+  _dark: {
+    _hover: {
+      backgroundColor: "surface",
+      boxShadow: "none",
+    },
+    _focusWithin: { outlineColor: "success" },
+  },
+  _motionReduce: { transitionDuration: "0.01ms" },
 });

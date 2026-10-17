@@ -57,7 +57,7 @@
     "svelte-eslint-parser": "1.9.0",
     "svelte-sitemap": "4.1.2",
     "tsx": "4.23.15",
-    "typescript": "6.0.2",
+    "typescript": "7.0.2",
     "typescript-eslint": "8.71.2",
     "vite": "8.3.4",
     "vite-devtools-svelte": "0.6.2",

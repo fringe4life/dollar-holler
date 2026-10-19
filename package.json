@@ -62,7 +62,7 @@
     "vite": "8.3.4",
     "vite-devtools-svelte": "0.6.2",
     "vite-plugin-devtools-json": "1.1.2",
-    "wrangler": "4.149.0"
+    "wrangler": "4.151.0"
   },
   "imports": {
     "#lib": "./src/lib",

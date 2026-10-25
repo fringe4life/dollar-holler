@@ -1,5 +1,5 @@
 import { getRequestEvent } from "$app/server";
-import { and, eq, like, or, type SQL, sql } from "drizzle-orm";
+import { and, eq, like, or, sql } from "drizzle-orm";
 import {
   rollClientInvoiceSummary,
   type ClientInvoiceTotalRow,
@@ -16,12 +16,16 @@ import type {
   CursorPaginatedList,
   PaginationSearchParams,
 } from "#features/pagination/types.ts";
-import { withUserAndSearch } from "#features/pagination/utils/base-filter.ts";
+import {
+  andFilters,
+  withUserAndSearch,
+} from "#features/pagination/utils/base-filter.ts";
 import {
   type FetchPageArgs,
   fetchCursorPaginatedList,
 } from "#features/pagination/utils/cursor-paginated-fetch.server.ts";
-import { db } from "#lib/server/db/index.ts";
+import type { AppDatabase } from "#lib/server/db/create-db.ts";
+import { db, getDb } from "#lib/server/db/index.ts";
 import {
   clients as clientsTable,
   invoices as invoicesTable,
@@ -39,6 +43,8 @@ type InvoicesQueryColumnSelection = NonNullable<
  * Substring search. RQB `like` (not `ilike`): SQLite/D1 `LIKE` is ASCII
  * case-insensitive by default — same practical UX as Postgres `ILIKE` for
  * Latin text. See clients-list search note.
+ *
+ * Early-return when `q` is empty so we never pass `OR: []` (rc.5 throws).
  */
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();
@@ -60,15 +66,12 @@ const clientInvoiceListWhere = (
   userId: string,
   clientId: CursorId,
   q: Maybe<string>
-) => {
-  const sw = searchWhere(q);
-  const parts = [
+) =>
+  andFilters(
     { userId: { eq: userId } },
     { clientId: { eq: clientId } },
-    ...(sw ? [sw] : []),
-  ];
-  return { AND: parts };
-};
+    searchWhere(q)
+  );
 
 /** RQB `columns`: booleans only; keys checked against `InvoicesQueryColumnSelection`. */
 const invoiceListColumns = {
@@ -154,63 +157,41 @@ export const fetchPaginatedInvoices = async (
 };
 
 /**
- * Same search as `searchWhere` / `clientInvoiceListWhere`, including client name.
- * A narrower CTE drops name-only hits and the list then maps those ids to total 0.
+ * Client-detail money CTE select fields (shared by with-q / without-q prepares).
+ * Search `q` changes SQL shape (extra OR LIKE), so we keep two prepared variants
+ * rather than one query with optional filters (rc.5 EmptyFilter omits clauses and
+ * still changes shape; undefined in RQB throws).
  */
-const clientInvoiceSearchFilters = (
-  userId: string,
-  clientId: CursorId,
-  q: Maybe<string>
-): SQL[] => {
-  const filters: SQL[] = [
-    eq(invoicesTable.userId, userId),
-    eq(invoicesTable.clientId, clientId),
-  ];
-  const trimmed = q?.trim();
-  if (trimmed) {
-    const pattern = `%${trimmed}%`;
-    const search = or(
-      like(invoicesTable.invoiceNumber, pattern),
-      like(invoicesTable.subject, pattern),
-      like(clientsTable.name, pattern)
-    );
-    if (search) {
-      filters.push(search);
-    }
-  }
-  return filters;
-};
+const clientInvoiceTotalsSelect = {
+  discount: invoicesTable.discount,
+  dueDate: invoicesTable.dueDate,
+  id: invoicesTable.id,
+  invoiceStatus: invoicesTable.invoiceStatus,
+  subtotal: sql<number>`COALESCE(SUM(${lineItemsTable.amount}), 0)`.as(
+    "subtotal"
+  ),
+} as const;
 
-/**
- * One SUM per invoice for a client (+ optional search).
- * List rows and summary buckets both use {@link invoiceTotalFromSubtotal}.
- */
-const fetchClientInvoiceTotalRows = async (
-  userId: string,
-  clientId: CursorId,
-  q: Maybe<string>
-): Promise<ClientInvoiceTotalRow[]> => {
-  const filters = clientInvoiceSearchFilters(userId, clientId, q);
+const clientInvoiceTotalsJoins = (database: AppDatabase) =>
+  database
+    .select(clientInvoiceTotalsSelect)
+    .from(invoicesTable)
+    .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
+    .leftJoin(clientsTable, eq(clientsTable.id, invoicesTable.clientId));
 
-  const invoiceTotals = db.$with("invoice_totals").as(
-    db
-      .select({
-        discount: invoicesTable.discount,
-        dueDate: invoicesTable.dueDate,
-        id: invoicesTable.id,
-        invoiceStatus: invoicesTable.invoiceStatus,
-        subtotal: sql<number>`COALESCE(SUM(${lineItemsTable.amount}), 0)`.as(
-          "subtotal"
-        ),
-      })
-      .from(invoicesTable)
-      .leftJoin(lineItemsTable, eq(lineItemsTable.invoiceId, invoicesTable.id))
-      .leftJoin(clientsTable, eq(clientsTable.id, invoicesTable.clientId))
-      .where(and(...filters))
+/** Prepared: tenant + client only (no search). */
+const prepareClientInvoiceTotalsWithoutQ = (database: AppDatabase) => {
+  const invoiceTotals = database.$with("invoice_totals").as(
+    clientInvoiceTotalsJoins(database)
+      .where(
+        and(
+          eq(invoicesTable.userId, sql.placeholder("userId")),
+          eq(invoicesTable.clientId, sql.placeholder("clientId"))
+        )
+      )
       .groupBy(invoicesTable.id)
   );
-
-  const rows = await db
+  return database
     .with(invoiceTotals)
     .select({
       discount: invoiceTotals.discount,
@@ -219,9 +200,79 @@ const fetchClientInvoiceTotalRows = async (
       invoiceStatus: invoiceTotals.invoiceStatus,
       subtotal: invoiceTotals.subtotal,
     })
-    .from(invoiceTotals);
+    .from(invoiceTotals)
+    .prepare();
+};
 
-  return rows.map((row) => {
+/**
+ * Prepared: tenant + client + substring search (invoiceNumber / subject / client.name).
+ * Single `pattern` placeholder name; `%…%` is built in JS before execute.
+ */
+const prepareClientInvoiceTotalsWithQ = (database: AppDatabase) => {
+  const pattern = sql.placeholder("pattern");
+  const invoiceTotals = database.$with("invoice_totals").as(
+    clientInvoiceTotalsJoins(database)
+      .where(
+        and(
+          eq(invoicesTable.userId, sql.placeholder("userId")),
+          eq(invoicesTable.clientId, sql.placeholder("clientId")),
+          or(
+            like(invoicesTable.invoiceNumber, pattern),
+            like(invoicesTable.subject, pattern),
+            like(clientsTable.name, pattern)
+          )
+        )
+      )
+      .groupBy(invoicesTable.id)
+  );
+  return database
+    .with(invoiceTotals)
+    .select({
+      discount: invoiceTotals.discount,
+      dueDate: invoiceTotals.dueDate,
+      id: invoiceTotals.id,
+      invoiceStatus: invoiceTotals.invoiceStatus,
+      subtotal: invoiceTotals.subtotal,
+    })
+    .from(invoiceTotals)
+    .prepare();
+};
+
+type ClientInvoiceTotalsPrepared = {
+  withQ: ReturnType<typeof prepareClientInvoiceTotalsWithQ>;
+  withoutQ: ReturnType<typeof prepareClientInvoiceTotalsWithoutQ>;
+};
+
+const clientInvoiceTotalsPreparedByDb = new WeakMap<
+  AppDatabase,
+  ClientInvoiceTotalsPrepared
+>();
+
+const getClientInvoiceTotalsPrepared = (
+  database: AppDatabase
+): ClientInvoiceTotalsPrepared => {
+  const cached = clientInvoiceTotalsPreparedByDb.get(database);
+  if (cached) {
+    return cached;
+  }
+  const prepared = {
+    withQ: prepareClientInvoiceTotalsWithQ(database),
+    withoutQ: prepareClientInvoiceTotalsWithoutQ(database),
+  };
+  clientInvoiceTotalsPreparedByDb.set(database, prepared);
+  return prepared;
+};
+
+const mapClientInvoiceTotalRows = (
+  rows: ReadonlyArray<{
+    discount: unknown;
+    dueDate: Date;
+    id: CursorId;
+    invoiceStatus: string | null;
+    subtotal: unknown;
+  }>
+): ClientInvoiceTotalRow[] =>
+  rows.map((row) => {
     const subtotal = Number(row.subtotal ?? 0);
     const discountPercent = Number(row.discount ?? 0);
     return {
@@ -232,6 +283,29 @@ const fetchClientInvoiceTotalRows = async (
       total: invoiceTotalFromSubtotal(subtotal, discountPercent),
     };
   });
+
+/**
+ * One SUM per invoice for a client (+ optional search).
+ * List rows and summary buckets both use {@link invoiceTotalFromSubtotal}.
+ * RQB list findMany paths are left unprepared (cursor + search shape explosion).
+ */
+const fetchClientInvoiceTotalRows = async (
+  userId: string,
+  clientId: CursorId,
+  q: Maybe<string>
+): Promise<ClientInvoiceTotalRow[]> => {
+  const prepared = getClientInvoiceTotalsPrepared(getDb());
+  const trimmed = q?.trim();
+  if (trimmed) {
+    const rows = await prepared.withQ.all({
+      clientId,
+      pattern: `%${trimmed}%`,
+      userId,
+    });
+    return mapClientInvoiceTotalRows(rows);
+  }
+  const rows = await prepared.withoutQ.all({ clientId, userId });
+  return mapClientInvoiceTotalRows(rows);
 };
 
 type TotalsCache = Map<string, Promise<ClientInvoiceTotalRow[]>>;

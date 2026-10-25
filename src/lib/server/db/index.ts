@@ -4,7 +4,13 @@ import { createDb, type AppDatabase } from "./create-db";
 
 const cache = new WeakMap<D1Database, AppDatabase>();
 
-const getDb = (): AppDatabase => {
+/**
+ * Real `createDb` instance for the current request’s D1 binding.
+ * Prefer this over preparing against the Proxy so WeakMap caches key by
+ * AppDatabase (not the singleton Proxy) and never capture a missing env at
+ * module load.
+ */
+export const getDb = (): AppDatabase => {
   const d1 = env.DB;
   if (!d1) {
     throw new Error("D1 binding DB missing from cloudflare:workers env");

@@ -1,4 +1,5 @@
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
+import { andFilters } from "./base-filter";
 import type { ListDirection } from "../types";
 
 type CursorListQueryResolved =
@@ -15,22 +16,13 @@ const mergeBaseAndCursor = (
   cursor: CursorId | undefined,
   direction: "forward" | "backward"
 ): Record<string, unknown> => {
-  const parts: Record<string, unknown>[] = [];
-  if (baseWhere) {
-    parts.push(baseWhere);
+  if (cursor === undefined) {
+    return andFilters(baseWhere);
   }
-  if (cursor) {
-    parts.push(
-      direction === "forward" ? { id: { gt: cursor } } : { id: { lt: cursor } }
-    );
-  }
-  if (parts.length === 0) {
-    return {};
-  }
-  if (parts.length === 1) {
-    return parts[0];
-  }
-  return { AND: parts };
+
+  const cursorWhere =
+    direction === "forward" ? { id: { gt: cursor } } : { id: { lt: cursor } };
+  return andFilters(baseWhere, cursorWhere);
 };
 
 /**

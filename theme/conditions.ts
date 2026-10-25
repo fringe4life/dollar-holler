@@ -3,9 +3,9 @@ import { defineConditions } from "@pandacss/dev";
 export const conditions = defineConditions({
   extend: {
     dark: {
-      ".dark &": "@slot",
+      "[data-theme=dark] &": "@slot",
       "@media (prefers-color-scheme: dark)": {
-        ":root:not(.light) &": "@slot",
+        ":root:not([data-theme=light]) &": "@slot",
       },
     },
     groupDataExpanded: ".group[data-expanded='true'] &",

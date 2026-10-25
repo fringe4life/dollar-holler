@@ -19,6 +19,8 @@ Existing local seed kept (not re-seeded). Migrations already applied (`bun run d
 
 Fixture: one auth user (~15 invoices), page of clients for that user = **2** (seed: each user gets `users−1` clients). List `limit=10`, cursor `take=11`.
 
+**Denser seed (post this baseline):** `src/lib/server/db/seed.ts` targets **8–25** line items per invoice (was 1–3). After reseed: **3 / 6 / 45 / 725** (+ settings 3); oracle hash `ecac6c54…555da8`. The 94 above is historical for this BEFORE capture only.
+
 **Scale note:** seed-scale only. Wall times dominated by Miniflare/D1 RTT (~30ms floor), not SQLite scan cost. Useful for EXPLAIN shape + RTT count; not for extrapolating prod latency.
 
 ## Machine caveat

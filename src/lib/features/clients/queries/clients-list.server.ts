@@ -14,6 +14,8 @@ import type { Maybe } from "#lib/types.ts";
  * Substring search. Use RQB `like` (not `ilike`): SQLite/D1 have no `ILIKE`,
  * and `LIKE` is already case-insensitive for ASCII (SQLite default).
  * `lower(col) LIKE lower(?)` does not buy more — SQLite `lower()` is ASCII-only too.
+ *
+ * Early-return when `q` is empty so we never pass `OR: []` (rc.5 throws).
  */
 const searchWhere = (q: Maybe<string>) => {
   const trimmed = q?.trim();

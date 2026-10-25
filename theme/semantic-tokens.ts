@@ -1,10 +1,8 @@
 import { defineSemanticTokens } from "@pandacss/dev";
 
+/** Single CSS color; `light-dark()` follows used `color-scheme` (OS or `data-theme`). */
 const color = (base: string, dark = base) => ({
-  value: {
-    _dark: dark,
-    base,
-  },
+  value: dark === base ? base : `light-dark(${base}, ${dark})`,
 });
 
 export const semanticTokens = defineSemanticTokens({

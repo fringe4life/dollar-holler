@@ -13,7 +13,7 @@
 | --- | --- |
 | Date | 2026-10-03 (UTC) |
 | Lane / change summary | Group A (#119–#121) + Group B: **#122 kept**, **#123 discarded**, **#125 skip** |
-| Seed counts (user / clients / invoices / line_items) | 3 / 6 / 45 / 94 (+ settings 3) — match BEFORE |
+| Seed counts (user / clients / invoices / line_items) | 3 / 6 / 45 / 94 (+ settings 3) — match BEFORE (historical). Denser seed: 8–25 items/invoice → **725** line_items; re-oracle `ecac6c54…555da8` |
 | Machine | Linux `fedora 7.2.8-200.fc44.x86_64`, x64, **4** CPUs, ~7.5 GiB RAM, Bun **1.4.2** |
 
 **Absolute ms note:** this host ran ~2× faster than the BEFORE capture day (correlated list ~15 ms vs ~34 ms). Prefer same-run Δ and EXPLAIN / RTT shape over cross-day wall ms.

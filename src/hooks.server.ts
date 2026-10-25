@@ -56,7 +56,7 @@ const authGuard: Handle = ({ event, resolve }) => {
   return resolve(event);
 };
 
-/** Stamp `.dark` / `.light` on `<html>` when the theme cookie is set. */
+/** Stamp `data-theme` on `<html>` when the theme cookie is set. */
 const themeHandler: Handle = ({ event, resolve }) => {
   const stored = parseStoredTheme(event.cookies.get(THEME_COOKIE_NAME));
 

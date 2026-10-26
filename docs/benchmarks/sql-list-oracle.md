@@ -36,6 +36,8 @@ bun test scripts/sql-list-oracle.hash.test.ts scripts/sql-list-oracle.test.ts
 
 Reseed or different local D1 → fixture ids/counts drift → oracle fails. Re-capture with `--write-oracle` only after intentional seed change (not to “fix” a bad rewrite).
 
+**Line-item density:** seed uses **8–25** items per invoice (wider description pool). Post-reseed fixture example: 3 users / 6 clients / 45 invoices / **725** line_items; golden rewritten via `bun run oracle:sql-list:write`.
+
 ## Group B (#122 / #123) — how to use
 
 1. Run `--oracle` (or the bun tests) **before** editing query shapes; confirm green on current helpers.

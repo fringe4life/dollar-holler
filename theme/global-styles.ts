@@ -7,7 +7,15 @@ export const globalCss = defineGlobalStyles({
     fontFamily: "sansserif",
   },
   html: {
+    colorScheme: "light dark",
     scrollbarGutter: "stable",
+    // Attribute on `:root`, or `:has` if `data-theme` is on a descendant.
+    "&[data-theme=dark], &:has([data-theme=dark])": {
+      colorScheme: "dark",
+    },
+    "&[data-theme=light], &:has([data-theme=light])": {
+      colorScheme: "light",
+    },
   },
   "input[type='number']": {
     appearance: "textfield",

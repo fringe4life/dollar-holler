@@ -1,25 +1,17 @@
 import { describe, expect, it } from "bun:test";
 import {
-  colorSchemeForTheme,
-  htmlThemeClassName,
+  applyDocumentTheme,
+  htmlThemeAttribute,
   parseThemeCookieHeader,
   serializeThemeCookie,
   stampHtmlTheme,
   withThemeViewTransition,
 } from "./theme.ts";
 
-describe("colorSchemeForTheme", () => {
-  it("maps stored themes 1:1 and system to both", () => {
-    expect(colorSchemeForTheme("dark")).toBe("dark");
-    expect(colorSchemeForTheme("light")).toBe("light");
-    expect(colorSchemeForTheme(null)).toBe("light dark");
-  });
-});
-
-describe("htmlThemeClassName", () => {
+describe("htmlThemeAttribute", () => {
   it("is undefined for system (no cookie)", () => {
-    expect(htmlThemeClassName(null)).toBeUndefined();
-    expect(htmlThemeClassName("dark")).toBe("dark");
+    expect(htmlThemeAttribute(null)).toBeUndefined();
+    expect(htmlThemeAttribute("dark")).toBe("dark");
   });
 });
 
@@ -29,15 +21,49 @@ describe("stampHtmlTheme", () => {
     expect(stampHtmlTheme(html, null)).toBe(html);
   });
 
-  it("adds class and color-scheme on a bare html tag", () => {
+  it("adds data-theme on a bare html tag", () => {
     expect(stampHtmlTheme('<html lang="en">', "dark")).toBe(
-      '<html class="dark" style="color-scheme: dark" lang="en">'
+      '<html data-theme="dark" lang="en">'
     );
   });
 
   it("does not double-stamp an already themed tag", () => {
-    const html = '<html class="light" lang="en">';
+    const html = '<html data-theme="light" lang="en">';
     expect(stampHtmlTheme(html, "dark")).toBe(html);
+  });
+});
+
+describe("applyDocumentTheme", () => {
+  it("sets data-theme and clears legacy class / inline color-scheme", () => {
+    const root = {
+      classList: { remove: (...names: string[]) => names },
+      style: { removeProperty: (name: string) => name },
+      attributes: new Map<string, string>(),
+      setAttribute(name: string, value: string) {
+        this.attributes.set(name, value);
+      },
+      removeAttribute(name: string) {
+        this.attributes.delete(name);
+      },
+    };
+    const original = Object.getOwnPropertyDescriptor(globalThis, "document");
+
+    try {
+      Object.defineProperty(globalThis, "document", {
+        configurable: true,
+        value: { documentElement: root },
+      });
+      applyDocumentTheme("dark");
+      expect(root.attributes.get("data-theme")).toBe("dark");
+      applyDocumentTheme("system");
+      expect(root.attributes.has("data-theme")).toBe(false);
+    } finally {
+      if (original === undefined) {
+        Reflect.deleteProperty(globalThis, "document");
+      } else {
+        Object.defineProperty(globalThis, "document", original);
+      }
+    }
   });
 });
 

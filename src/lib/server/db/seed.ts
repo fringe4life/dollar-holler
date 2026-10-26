@@ -239,6 +239,7 @@ async function main() {
     clientsByUserId.set(clientRow.userId, list);
   }
 
+  // Wide pool so SUM/discount stress rows are not near-identical.
   const descriptions = [
     "Development Hours",
     "Design Work",
@@ -248,9 +249,36 @@ async function main() {
     "Quality Assurance",
     "Documentation",
     "Training",
+    "API integration",
+    "Code review",
+    "Performance audit",
+    "Accessibility remediation",
+    "CI/CD setup",
+    "Database migration",
+    "Security hardening",
+    "Copywriting",
+    "Illustration",
+    "Video editing",
+    "SEO research",
+    "Analytics setup",
+    "Support retainer hours",
+    "On-call coverage",
+    "Workshop facilitation",
+    "Stakeholder interviews",
+    "Wireframing",
+    "Prototype iteration",
+    "Localization",
+    "Email template design",
+    "Invoice system tweaks",
+    "Legacy cleanup",
   ];
 
   const invoicesPerUser = 15;
+  /** Stress SUM(line_items) / discount: denser rows, varied counts (prefer over exploding invoice count). */
+  const lineItemsPerInvoiceMin = 8;
+  const lineItemsPerInvoiceMax = 25;
+  const lineItemsPerInvoiceSpan =
+    lineItemsPerInvoiceMax - lineItemsPerInvoiceMin + 1;
 
   for (const u of users) {
     const ownedClients = clientsByUserId.get(u.id) ?? [];
@@ -289,7 +317,9 @@ async function main() {
         ] as InvoiceStatus,
       });
 
-      const lineItemCount = Math.floor(Math.random() * 3) + 1;
+      const lineItemCount =
+        Math.floor(Math.random() * lineItemsPerInvoiceSpan) +
+        lineItemsPerInvoiceMin;
       for (let j = 0; j < lineItemCount; j++) {
         lineItemsData.push({
           amount: Math.floor(Math.random() * 5000) + 100,

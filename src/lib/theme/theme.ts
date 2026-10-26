@@ -8,19 +8,9 @@ import {
 } from "./schema.ts";
 
 const HTML_OPEN_TAG = /<html\b[^>]*>/;
-const THEME_CLASS = /\bclass=(["'])(?:dark|light)\b/;
+const THEME_ATTR = /\bdata-theme=(["'])(?:dark|light)\1/;
 
-export const colorSchemeForTheme = (
-  theme: StoredTheme | null
-): "dark" | "light" | "light dark" => {
-  if (theme === "dark" || theme === "light") {
-    return theme;
-  }
-
-  return "light dark";
-};
-
-export const htmlThemeClassName = (
+export const htmlThemeAttribute = (
   theme: StoredTheme | null
 ): StoredTheme | undefined => (theme === null ? undefined : theme);
 
@@ -33,24 +23,24 @@ export const stampHtmlTheme = (
   }
 
   return html.replace(HTML_OPEN_TAG, (tag) => {
-    if (THEME_CLASS.test(tag)) {
+    if (THEME_ATTR.test(tag)) {
       return tag;
     }
 
-    return tag.replace(
-      "<html",
-      `<html class="${stored}" style="color-scheme: ${stored}"`
-    );
+    return tag.replace("<html", `<html data-theme="${stored}"`);
   });
 };
 
 export const applyDocumentTheme = (theme: ThemeChoice): void => {
   const root = document.documentElement;
-  root.classList.toggle("dark", theme === "dark");
-  root.classList.toggle("light", theme === "light");
-  root.style.colorScheme = colorSchemeForTheme(
-    theme === "system" ? null : theme
-  );
+  root.classList.remove("dark", "light");
+  root.style.removeProperty("color-scheme");
+  if (theme === "system") {
+    root.removeAttribute("data-theme");
+    return;
+  }
+
+  root.setAttribute("data-theme", theme);
 };
 
 export const withThemeViewTransition = (update: () => void): void => {

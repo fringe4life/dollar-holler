@@ -33,6 +33,7 @@ import {
 } from "#lib/server/db/schema.ts";
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
 import type { Maybe } from "#lib/types.ts";
+import { tryCatch } from "#lib/utils/try-catch.ts";
 
 /** Keys allowed in RQB `columns` for `invoices` (matches Drizzle’s `findMany` config). */
 type InvoicesQueryColumnSelection = NonNullable<
@@ -296,15 +297,18 @@ const fetchClientInvoiceTotalRows = async (
 ): Promise<ClientInvoiceTotalRow[]> => {
   const prepared = getClientInvoiceTotalsPrepared(getDb());
   const trimmed = q?.trim();
-  if (trimmed) {
-    const rows = await prepared.withQ.all({
-      clientId,
-      pattern: `%${trimmed}%`,
-      userId,
-    });
-    return mapClientInvoiceTotalRows(rows);
+  const { data: rows } = await tryCatch(() =>
+    trimmed
+      ? prepared.withQ.all({
+          clientId,
+          pattern: `%${trimmed}%`,
+          userId,
+        })
+      : prepared.withoutQ.all({ clientId, userId })
+  );
+  if (!rows) {
+    return [];
   }
-  const rows = await prepared.withoutQ.all({ clientId, userId });
   return mapClientInvoiceTotalRows(rows);
 };
 

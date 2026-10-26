@@ -30,6 +30,7 @@ import {
   lineItems as lineItemsTable,
 } from "#lib/server/db/schema.ts";
 import type { CursorId } from "#lib/schemas/cursor-id.ts";
+import { tryCatch } from "#lib/utils/try-catch.ts";
 
 interface ClientReceivedBalance {
   balance: number;
@@ -125,10 +126,15 @@ export const fetchClientReceivedBalanceForIds = async (
     return result;
   }
 
-  const rows = await getClientReceivedBalancePrepared(getDb()).all({
-    clientIdsJson: JSON.stringify(clientIds),
-    userId,
-  });
+  const { data: rows } = await tryCatch(() =>
+    getClientReceivedBalancePrepared(getDb()).all({
+      clientIdsJson: JSON.stringify(clientIds),
+      userId,
+    })
+  );
+  if (!rows) {
+    return result;
+  }
 
   for (const row of rows) {
     result.set(row.clientId, {

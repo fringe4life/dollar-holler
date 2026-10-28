@@ -29,7 +29,7 @@
         "@pandacss/dev": "2.3.0",
         "@pandacss/eslint-plugin": "2.3.0",
         "@pandacss/mcp": "2.3.0",
-        "@pandacss/preset-base": "2.3.0",
+        "@pandacss/preset-base": "2.4.0",
         "@pandacss/preset-panda": "2.3.0",
         "@pandacss/vite": "2.3.0",
         "@sveltejs/adapter-cloudflare": "8.0.1",
@@ -454,7 +454,7 @@
 
     "@pandacss/postcss": ["@pandacss/postcss@2.3.0", "", { "dependencies": { "@pandacss/compiler": "2.3.0", "@pandacss/compiler-shared": "2.3.0" }, "peerDependencies": { "postcss": ">=8" } }, "sha512-t93rQuU/+qljqDSFcUIso/yIHZE61xwmK8jlxIF2ZN95inoc83ncGHuF9/Rg6SunxwCVHNpefeJX76wwHfc7cw=="],
 
-    "@pandacss/preset-base": ["@pandacss/preset-base@2.3.0", "", { "dependencies": { "@pandacss/types": "2.3.0" } }, "sha512-huimT/+2rE5VIVBCTzkx+z8qMge/KrDK1Zc8RX02qetFVpZc2xQJGVI0EKrzhxR6/R93slAbSFIwPJ8Do5BKCA=="],
+    "@pandacss/preset-base": ["@pandacss/preset-base@2.4.0", "", { "dependencies": { "@pandacss/types": "2.4.0" } }, "sha512-0tQx1ltwgD1WawROrYQMK7BnWJu8U9nnuJJxmwVq86hD+6A3uhWp9O55WiHL8YJZGC1j1dSRORYpFjYg2KVfZA=="],
 
     "@pandacss/preset-panda": ["@pandacss/preset-panda@2.3.0", "", { "dependencies": { "@pandacss/types": "2.3.0" } }, "sha512-ulG3z/aV4vcjNkX8RsycYLEjAtDlVZl1hNCWcqwMJHL6DC9/xuhRvZu4MlMJTf0olG1oZDC2MAGSdtCYzNBjmQ=="],
 
@@ -1489,6 +1489,8 @@
     "@pandacss/cli/string-width": ["string-width@7.2.0", "", { "dependencies": { "emoji-regex": "^10.3.0", "get-east-asian-width": "^1.0.0", "strip-ansi": "^7.1.0" } }, "sha512-tsaTIkKW9b4N+AEj+SVA+WhJzV7/zMhcSu78mLKWSk7cXMOSHsBKFWUs0fWwq8QyK3MgJBQRX6Gbi4kYbdvGkQ=="],
 
     "@pandacss/config/magic-string": ["magic-string@0.30.21", "", { "dependencies": { "@jridgewell/sourcemap-codec": "^1.5.5" } }, "sha512-vd2F4YUyEXKGcLHoq+TEyCjxueSeHnFxyyjNp80yg0XV4vUhnDer/lvvlqM/arB5bXQN5K2/3oinyCRyx8T2CQ=="],
+
+    "@pandacss/preset-base/@pandacss/types": ["@pandacss/types@2.4.0", "", {}, "sha512-W2ELCg6MjSyHXOa5/Z9pQ+S39jKcYWRQIC0bu3Ycg6NPDh/qOz8cc9Kr5LMO9Iskd3F8a2MdBl3BuUR+PvR6oQ=="],
 
     "@sentry/bundler-plugins/supports-color": ["supports-color@8.1.1", "", { "dependencies": { "has-flag": "^4.0.0" } }, "sha512-MpUEN2OodtUzxvKQl72cUF7RQ5EiHsGvSsVG0ia9c5RbWGL2CI4C7EpPS8UTBIplnlzZiNuV56w+FuNxy3ty2Q=="],
 

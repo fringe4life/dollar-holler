@@ -1,6 +1,10 @@
 <script lang="ts">
+  import { css } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
-  import Navbar from "#lib/components/patterns/navbar/Navbar.svelte";
+  import Navbar from "#lib/components/patterns/navbar/Navbar.svelte" with {
+    wake: "load",
+    keep: "navbar",
+  };
 
   let { children } = $props();
 </script>
@@ -19,7 +23,10 @@
     },
   })}
 >
-  <Navbar />
+  <!-- contents: the header inside Navbar stays the grid item for area "nav" -->
+  <div class={css({ display: "contents" })} data-ogygia-keep="navbar">
+    <Navbar />
+  </div>
   <main
     class={gridItem({
       display: "flex",

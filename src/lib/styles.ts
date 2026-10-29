@@ -1,6 +1,32 @@
 import { css, cva, cx } from "#styled-system/css/index.js";
 import { flex } from "#styled-system/patterns/index.js";
 
+/**
+ * Corner system — Panda 2.4 `cornerShape` (CSS `corner-shape`).
+ *
+ * One superellipse family for every surface that already rounds, stepped by
+ * size so the shape reads at each scale instead of being one blanket token. The
+ * shape only earns its keep from ~6px up, so 2–4px corners (flag thumbnails,
+ * the swipe hint chip) stay plain `round` — this ladder is the whole inventory:
+ *
+ * - sheet   24px free / square edge   side panel (lg and up)
+ * - dialog  16px                      modal dialog
+ * - card    12px → 16px hover         rows, summary + error cards, options menu
+ * - control  8px → 12px hover, 8px pressed    buttons
+ * - field    8px                      input, date shell, select, textarea
+ * - action   6px → 8px hover          inline row action buttons
+ * - chip     6px                      badges, skeletons
+ *
+ * The shape scale is the layer scale: the further a surface floats from the
+ * page, the softer its corner (sheet 24 → dialog 16 → card 12 → control/field 8
+ * → chip 6). One asymmetry is rule-driven, never decorative: a panel pinned to
+ * the viewport edge squares the corners that touch that edge.
+ *
+ * Browsers without `corner-shape` keep the radii and simply draw round corners;
+ * print flattens to a hairline `round` corner so invoices stay legible on paper.
+ */
+export const CORNER_SHAPE = "squircle" as const;
+
 export const directionalArrow = cva({
   base: {
     fill: "none",
@@ -142,6 +168,7 @@ export const rowActionButton = cx(
     borderStyle: "solid",
     borderWidth: "1px",
     color: "foreground",
+    cornerShape: CORNER_SHAPE,
     cursor: "pointer",
     display: "inline-flex",
     flexDirection: { base: "column", "@item-row/md": "row" },
@@ -157,11 +184,12 @@ export const rowActionButton = cx(
     textDecoration: "none",
     transitionDuration: "normal",
     transitionProperty:
-      "background-color, border-color, box-shadow, color, rotate, translate",
+      "background-color, border-color, border-radius, box-shadow, color, corner-shape, rotate, translate",
     transitionTimingFunction: "glide",
     _hover: {
       backgroundColor: "warning/20",
       borderColor: "warning/70",
+      borderRadius: "lg",
       boxShadow: "colored",
       rotate: "-0.5deg",
       translate: "0 -1px",
@@ -210,19 +238,23 @@ export const tableRowBase = css({
   alignItems: "center",
   backgroundColor: "surface",
   borderColor: "borderSubtle",
-  borderRadius: "lg",
+  borderRadius: "xl",
   borderStyle: "solid",
   borderWidth: "1px",
+  cornerShape: CORNER_SHAPE,
   overflow: "hidden",
   shadow: "tableRow",
   transitionDuration: "normal",
-  transitionProperty: "background-color, border-color, box-shadow",
+  transitionProperty:
+    "background-color, border-color, border-radius, box-shadow, corner-shape",
   transitionTimingFunction: "glide",
   _hover: {
     backgroundColor: "surfaceSecondary",
+    borderRadius: "2xl",
     boxShadow: "tableRowHover",
   },
   _focusWithin: {
+    borderRadius: "2xl",
     outlineColor: "ring",
     outlineOffset: 2,
     outlineStyle: "solid",
@@ -234,6 +266,11 @@ export const tableRowBase = css({
       boxShadow: "none",
     },
     _focusWithin: { outlineColor: "success" },
+  },
+  _print: {
+    borderRadius: "sm",
+    boxShadow: "none",
+    cornerShape: "round",
   },
   _motionReduce: { transitionDuration: "0.01ms" },
 });

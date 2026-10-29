@@ -2,6 +2,7 @@ import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
+import { ogygia } from "ogygia/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
 import { DevTools } from "@vitejs/devtools";
@@ -19,6 +20,7 @@ import {
   SERVER_OUTPUT_DIR,
   stubCloudflareWorkersInDir,
 } from "./scripts/cloudflare-workers-specifier.ts";
+import { ogygiaKit3RefreshAllPatch } from "./scripts/ogygia-kit-3-refresh-all-patch.ts";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -140,6 +142,9 @@ export default defineConfig({
       org: "coinnich",
       project: "javascript-sveltekit",
     }),
+    // Before sveltekit so island import attributes are rewritten first.
+    ogygia(),
+    ogygiaKit3RefreshAllPatch(),
     sveltekit({
       adapter: adapter({
         platformProxy: {

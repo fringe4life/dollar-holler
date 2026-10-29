@@ -1,5 +1,6 @@
 <script lang="ts" module>
   import { css, cva } from "#styled-system/css/index.js";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
   import type { ToastType } from "./toaster.svelte.ts";
 
   const TOAST_TOP = "1rem";
@@ -13,11 +14,12 @@
   const toastRecipe = cva({
     base: {
       alignItems: "center",
-      borderRadius: "lg",
+      borderRadius: "xl",
       borderStyle: "solid",
       borderWidth: "2px",
       boxShadow: "md",
       columnGap: 4,
+      cornerShape: CORNER_SHAPE,
       fontFamily: "sansserif",
       fontSize: { base: "md", md: "lg" },
       fontWeight: "bold",

@@ -24,7 +24,7 @@
     <Skeleton class={css({ blockSize: 5, inlineSize: 28 })} />
   </div>
   <div class={clientStatus}>
-    <Skeleton class={css({ blockSize: 5, inlineSize: 16, rounded: "full" })} />
+    <Skeleton class={css({ blockSize: 5, inlineSize: 16 })} />
   </div>
   <div class={clientReceived}>
     <Skeleton class={css({ blockSize: 4, inlineSize: 20 })} />
@@ -39,9 +39,9 @@
   <div class={cx(rowActionRail, css({ pointerEvents: "none" }))}>
     <span class={rowActionLabel}>Actions</span>
     <div class={rowActionButtonGroup}>
-      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
-      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
-      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14 })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14 })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14 })} />
     </div>
   </div>
 </div>

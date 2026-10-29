@@ -5,6 +5,7 @@
   import type { MouseEventHandler } from "svelte/elements";
   import View from "#lib/components/primitives/icons/View.svelte";
   import type { IconProps } from "#lib/components/primitives/Icon.svelte";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   export interface Option {
     disabled: boolean;
@@ -33,18 +34,23 @@
   >
     <button
       class={flex({
+        // surfaceSecondary (not inputBackground) so the row tint is visible on
+        // popover in dark mode, where both map to the same gray.
+        _hover: { backgroundColor: "surfaceSecondary" },
+        borderRadius: "md",
         color: {
           _hover: "foreground",
           base: "mutedAction",
           _groupHover: "foreground/50",
         },
         columnGap: 2,
+        cornerShape: CORNER_SHAPE,
         cursor: "pointer",
         fontWeight: "bold",
         inlineSize: "full",
         padding: 4,
         transitionDuration: "normal",
-        transitionProperty: "colors",
+        transitionProperty: "background-color, color",
       })}
       command="hide-popover"
       commandfor={commandFor}

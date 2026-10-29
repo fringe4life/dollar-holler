@@ -1,5 +1,6 @@
 import { css, cx } from "#styled-system/css/index.js";
 import { cq, grid, gridItem, hstack } from "#styled-system/patterns/index.js";
+import { CORNER_SHAPE } from "#lib/styles.ts";
 
 export const invoiceSummaryContainerClass = cx(
   css({ marginBlockEnd: 10 }),
@@ -9,10 +10,11 @@ export const invoiceSummaryContainerClass = cx(
 export const invoiceSummaryCardClass = css({
   backgroundColor: "surfaceSecondary",
   borderColor: "borderSubtle",
-  borderRadius: "lg",
+  borderRadius: "xl",
   borderStyle: "solid",
   borderWidth: "1px",
   boxShadow: "colored",
+  cornerShape: CORNER_SHAPE,
   overflow: "hidden",
 });
 

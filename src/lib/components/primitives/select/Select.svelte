@@ -2,15 +2,17 @@
   import { css, cx } from "#styled-system/css/index.js";
   import type { HTMLSelectAttributes } from "svelte/elements";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   const selectClass = css({
     "&::picker(select)": {
       appearance: "base-select",
       backgroundColor: "popover",
       borderColor: "border",
-      borderRadius: "lg",
+      borderRadius: "xl",
       borderWidth: 2,
       boxShadow: "tableRowHover",
+      cornerShape: CORNER_SHAPE,
       marginBlockStart: 1,
       minInlineSize: "anchor-size(self-inline)",
       opacity: 0,
@@ -73,6 +75,7 @@
         },
         alignItems: "center",
         borderRadius: "md",
+        cornerShape: CORNER_SHAPE,
         display: "flex",
         gap: 2,
         paddingBlock: 2,
@@ -114,6 +117,7 @@
     borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
+    cornerShape: CORNER_SHAPE,
     inlineSize: "full",
     paddingInline: 4,
     transitionDuration: "normal",

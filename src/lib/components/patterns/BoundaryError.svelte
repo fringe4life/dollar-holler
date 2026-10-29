@@ -3,6 +3,7 @@
   import RefreshCw from "@lucide/svelte/icons/refresh-cw";
   import { css } from "#styled-system/css/index.js";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
 
   interface Props {
@@ -21,21 +22,38 @@
 
   const message = $derived(getErrorMessage(error, fallbackMessage));
 
+  /*
+   * Speaks the same corner language as a failed list row: card-tier squircle
+   * plus the top-end status marker instead of the old 4px inline-start stripe
+   * (a thick side accent fights a rounded corner and reads generic).
+   */
   const rootClass = css({
+    _before: {
+      backgroundColor: "destructive",
+      clipPath: "polygon(0 0, 100% 0, 100% 100%)",
+      content: '""',
+      height: 3,
+      insetBlockStart: 0,
+      insetInlineEnd: 0,
+      position: "absolute",
+      width: 3,
+    },
     alignItems: { base: "stretch", sm: "center" },
     backgroundColor: "card",
     borderColor: "destructive/30",
-    borderInlineStartColor: "destructive",
-    borderInlineStartWidth: 4,
+    borderRadius: "xl",
     borderStyle: "solid",
     borderWidth: 1,
-    borderRadius: "lg",
     boxShadow: "colored",
+    cornerShape: CORNER_SHAPE,
     display: "flex",
     flexDirection: { base: "column", sm: "row" },
     gap: { base: 4, sm: 5 },
     inlineSize: "full",
+    isolation: "isolate",
+    overflow: "hidden",
     padding: { base: 5, sm: 6 },
+    position: "relative",
   });
 
   const iconWrapperClass = css({

@@ -3,6 +3,7 @@
   import type { Snippet } from "svelte";
   import Cancel from "#lib/components/primitives/icons/Cancel.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   const modalRecipe = sva({
     base: {
@@ -69,8 +70,9 @@
               translate: "-50% -50%",
             },
             backgroundColor: "surface",
-            borderRadius: "lg",
+            borderRadius: "2xl",
             boxShadow: "md",
+            cornerShape: CORNER_SHAPE,
             display: "flex",
             flexDirection: "column",
             inlineSize: "full",
@@ -97,7 +99,14 @@
               translate: "0 0",
             },
             backgroundColor: "surface",
+            // Pinned to the viewport edge: the edge-side corners stay square, the
+            // free side takes the softest corner in the system.
+            borderEndEndRadius: 0,
+            borderEndStartRadius: { base: 0, lg: "3xl" },
+            borderStartEndRadius: 0,
+            borderStartStartRadius: { base: 0, lg: "3xl" },
             boxShadow: "addInvoice",
+            cornerShape: CORNER_SHAPE,
             inlineSize: { base: "full", lg: "3/4" },
             insetBlockStart: 0,
             insetInlineEnd: 0,
@@ -170,7 +179,6 @@
       insetBlockStart: 4,
       insetInlineEnd: 4,
       position: "absolute",
-      rounded: "md",
     })}
     onclick={onClose}
     size="sm"

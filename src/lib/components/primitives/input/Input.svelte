@@ -1,6 +1,7 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
   import type { HTMLInputAttributes } from "svelte/elements";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   const inputClass = css({
     _ariaInvalid: {
@@ -14,6 +15,7 @@
     borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
+    cornerShape: CORNER_SHAPE,
     fontFamily: "sansserif",
     inlineSize: "full",
     minInlineSize: 0,
@@ -43,6 +45,7 @@
     borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
+    cornerShape: CORNER_SHAPE,
     display: "flex",
     inlineSize: "full",
     minInlineSize: 0,

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { css } from "#styled-system/css/index.js";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
   import type { Option } from "./AdditionalOptionsItem.svelte";
   import AdditionalOptionsItem from "./AdditionalOptionsItem.svelte";
 
@@ -19,10 +20,12 @@
     inset: "auto",
     insetBlockStart: "anchor(bottom)",
     insetInlineEnd: "anchor(right)",
+    cornerShape: CORNER_SHAPE,
     margin: 1,
     opacity: 0,
+    overflow: "hidden",
     position: "fixed",
-    rounded: "lg",
+    rounded: "xl",
     shadow: "lg",
     scale: 0.98,
     transformOrigin: "top right",

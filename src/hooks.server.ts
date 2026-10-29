@@ -50,7 +50,9 @@ const authGuard: Handle = ({ event, resolve }) => {
     throw redirect(303, "/login");
   }
 
-  // if logged in an attempting to access login or signup, redirect to invoices
+  // Logged-in visitors hitting /login or /signup: this branch only runs when the
+  // request hits the worker (not prerendered static assets). Prerendered auth
+  // shells use AuthEntryGuard (deferred island) for the same redirect.
   if (
     event.locals.user &&
     UNPROTECTED_ROUTES.some((route) => path.startsWith(route))

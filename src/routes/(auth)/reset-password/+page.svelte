@@ -3,6 +3,8 @@
     wake: "load",
   };
   import { authHeading } from "#features/auth/styles.ts";
+
+  let { data } = $props();
 </script>
 
 <svelte:head>
@@ -15,4 +17,4 @@
 
 <h1 class={authHeading}>Reset my Password</h1>
 
-<ResetPasswordForm />
+<ResetPasswordForm token={data.token} />

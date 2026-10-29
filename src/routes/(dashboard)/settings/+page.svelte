@@ -2,9 +2,8 @@
   import { css } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
-  import PasswordForm from "#features/auth/components/PasswordForm.svelte" with {
-    wake: "visible",
-  };
+  // Not an ogygia island: PasswordForm calls getToast() (Svelte context from Toaster).
+  import PasswordForm from "#features/auth/components/PasswordForm.svelte";
   import {
     getSettings,
     saveSettings,

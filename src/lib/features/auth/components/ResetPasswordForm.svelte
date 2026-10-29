@@ -1,6 +1,4 @@
 <script lang="ts">
-  import type { RequestEvent } from "@sveltejs/kit";
-  import { requestEvent } from "ogygia";
   import { css } from "#styled-system/css/index.js";
   import { browser } from "$app/env";
   import { resolve } from "$app/paths";
@@ -10,14 +8,21 @@
   import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
   import Input from "#lib/components/primitives/input/Input.svelte";
 
+  interface Props {
+    /** From page load (`?token=`); required for native submit before/without wake. */
+    token?: string;
+  }
+
+  let { token: tokenProp = "" }: Props = $props();
+
   // Per-mount instance. Drop `.for()` when sveltejs/kit#14802 is fixed.
   const uid = $props.id();
   const resetPassword = resetPasswordForm.for(uid);
-  // Island SSR gets ?token= via requestEvent; client keeps location in sync after wake.
   const token = $derived(
     browser
-      ? (new URL(globalThis.location.href).searchParams.get("token") ?? "")
-      : (requestEvent<RequestEvent>()?.url.searchParams.get("token") ?? "")
+      ? (new URL(globalThis.location.href).searchParams.get("token") ??
+          tokenProp)
+      : tokenProp
   );
 </script>
 

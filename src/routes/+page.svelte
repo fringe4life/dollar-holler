@@ -5,12 +5,16 @@
   import { asset, resolve } from "$app/paths";
   import Features from "#features/landing-page/components/Features.svelte";
   import GlowingOrb from "#features/landing-page/components/GlowingOrb.svelte";
+  import LandingFooterSession from "#features/landing-page/components/LandingFooterSession.svelte" with {
+    render: "deferred",
+  };
+  import LandingHeroSession from "#features/landing-page/components/LandingHeroSession.svelte" with {
+    render: "deferred",
+  };
   import LandingNav from "#features/landing-page/components/LandingNav.svelte";
   import Reviews from "#features/landing-page/components/Reviews.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
   import { directionalArrow } from "#lib/styles.ts";
-
-  let { data } = $props();
 
   const arrowClass = cx(
     css({ flexShrink: 0, height: 4, width: 4 }),
@@ -133,7 +137,6 @@
   });
 
   const primaryButtonClass = css({
-    borderRadius: "full",
     boxShadow: "colored",
     paddingBlock: { base: 2.5, md: 3 },
     paddingInline: { base: 5, md: 6 },
@@ -298,7 +301,7 @@
 </svelte:head>
 
 <div class={pageClass}>
-  <LandingNav user={data?.user} />
+  <LandingNav />
 
   <main>
     <section aria-labelledby="hero-title" class={heroSectionClass} id="top">
@@ -315,21 +318,23 @@
             Create invoices, keep client details close, and decide when each one
             moves from draft to sent to paid.
           </p>
-          <div class={heroActionsClass}>
-            <Button
-              class={cx("group", primaryButtonClass)}
-              href={resolve(data?.user ? "invoices" : "signup")}
-              size="lg"
-            >
-              {data?.user ? "Go to your invoices" : "Create your account"}
-              <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
-            </Button>
-            {#if !data?.user}
-              <a class={heroLoginClass} href={resolve("login")}
-                >Already have an account?</a
-              >
-            {/if}
-          </div>
+          <LandingHeroSession>
+            {#snippet ogygiaFallback()}
+              <div class={heroActionsClass}>
+                <Button
+                  class={cx("group", primaryButtonClass)}
+                  href={resolve("signup")}
+                  size="lg"
+                >
+                  Create your account
+                  <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
+                </Button>
+                <a class={heroLoginClass} href={resolve("login")}
+                  >Already have an account?</a
+                >
+              </div>
+            {/snippet}
+          </LandingHeroSession>
           <p class={heroNoteClass}>For the work you love doing.</p>
         </div>
         <GlowingOrb />
@@ -378,18 +383,21 @@
         <span>Dollar Holler</span>
       </a>
       <p class={footerTagClass}>More making. Less muddle.</p>
-      <nav aria-label="Footer navigation" class={footerLinksClass}>
-        {#if data?.user}
-          <a class={heroLoginClass} href={resolve("invoices")}>Invoices</a>
-          <a class={heroLoginClass} href={resolve("clients")}>Clients</a>
-        {:else}
-          <a class={heroLoginClass} href={resolve("login")}>Log in</a>
-          <Button class={primaryButtonClass} href={resolve("signup")} size="sm">
-            Create an account
-            <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
-          </Button>
-        {/if}
-      </nav>
+      <LandingFooterSession>
+        {#snippet ogygiaFallback()}
+          <nav aria-label="Footer navigation" class={footerLinksClass}>
+            <a class={heroLoginClass} href={resolve("login")}>Log in</a>
+            <Button
+              class={primaryButtonClass}
+              href={resolve("signup")}
+              size="sm"
+            >
+              Create an account
+              <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
+            </Button>
+          </nav>
+        {/snippet}
+      </LandingFooterSession>
     </div>
   </footer>
 </div>

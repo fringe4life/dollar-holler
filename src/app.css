@@ -28,6 +28,11 @@ html {
  * These rules stay inside no-preference so that UA rule wins.
  * No !important here: it would beat reduced motion.
  */
+
+/*
+ * theme-circle-reveal on ::view-transition-new(theme) lives in
+ * theme/global-styles.ts so Panda extract keeps the keyframe.
+ */
 @media (prefers-reduced-motion: no-preference) {
   :active-view-transition-type(theme-change)::view-transition-group(theme) {
     animation-duration: 500ms;
@@ -38,12 +43,6 @@ html {
   :active-view-transition-type(theme-change)::view-transition-old(theme) {
     display: block;
     animation: none;
-    mix-blend-mode: normal;
-  }
-
-  :active-view-transition-type(theme-change)::view-transition-new(theme) {
-    display: block;
-    animation: theme-circle-reveal 500ms var(--easings-glide) both;
     mix-blend-mode: normal;
   }
 }

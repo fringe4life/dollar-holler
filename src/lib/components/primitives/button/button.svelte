@@ -4,16 +4,24 @@
     HTMLAnchorAttributes,
     HTMLButtonAttributes,
   } from "svelte/elements";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   export const buttonVariants = cva({
     base: {
+      // Press deflates the hover inflate: 8 → 12 on hover, back to 8 on press.
+      _active: { borderRadius: "lg" },
+      _disabled: { _hover: { borderRadius: "lg" } },
       _focusVisible: {
         outlineColor: "ring",
         outlineOffset: "2px",
         outlineStyle: "solid",
         outlineWidth: "2px",
       },
+      _hover: { borderRadius: "xl" },
+      _motionReduce: { transitionDuration: "0.01ms" },
+      _print: { borderRadius: "sm", cornerShape: "round" },
       alignItems: "center",
+      cornerShape: CORNER_SHAPE,
       cursor: "pointer",
       display: "inline-flex",
       fontFamily: "sansserif",
@@ -82,7 +90,7 @@
           position: "relative",
           rounded: "lg",
           transitionDuration: "normal",
-          transitionProperty: "translate",
+          transitionProperty: "border-radius, corner-shape, translate",
         },
         default: {
           _after: {
@@ -106,7 +114,7 @@
           fontWeight: "black",
           position: "relative",
           transitionDuration: "normal",
-          transitionProperty: "translate",
+          transitionProperty: "border-radius, corner-shape, translate",
           transitionTimingFunction: "anticipate",
         },
         destructive: {
@@ -114,13 +122,13 @@
           color: "destructiveForeground",
           shadow: "xs",
           transitionDuration: "normal",
-          transitionProperty: "colors",
+          transitionProperty: "border-radius, colors, corner-shape",
         },
         ghost: {
           color: { _hover: "foreground", base: "mutedAction" },
           shadow: "xs",
           transitionDuration: "normal",
-          transitionProperty: "colors",
+          transitionProperty: "border-radius, colors, corner-shape",
         },
         link: {
           _hover: {
@@ -148,7 +156,7 @@
           borderWidth: 2,
           color: { _hover: "foregroundInverse", base: "outline" },
           transitionDuration: "normal",
-          transitionProperty: "colors",
+          transitionProperty: "border-radius, colors, corner-shape",
         },
         secondary: {
           _hover: {
@@ -160,7 +168,7 @@
           fontWeight: "bold",
           shadow: "colored",
           transitionDuration: "normal",
-          transitionProperty: "colors",
+          transitionProperty: "border-radius, colors, corner-shape",
         },
         textOnly: {
           _hover: {

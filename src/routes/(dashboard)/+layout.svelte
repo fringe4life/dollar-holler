@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { css } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
   import Navbar from "#lib/components/patterns/navbar/Navbar.svelte";
 
@@ -19,7 +20,10 @@
     },
   })}
 >
-  <Navbar />
+  <!-- contents: the header inside Navbar stays the grid item for area "nav" -->
+  <div class={css({ display: "contents" })}>
+    <Navbar />
+  </div>
   <main
     class={gridItem({
       display: "flex",

@@ -7,12 +7,17 @@ import { building } from "$app/env";
 import { getAuth } from "#lib/auth.server.ts";
 import { THEME_COOKIE_NAME, parseStoredTheme } from "#lib/theme/schema.ts";
 import { stampHtmlTheme } from "#lib/theme/theme.ts";
+import { handle as ogygiaHandle } from "ogygia/server";
 
 const SENTRY_DSN =
   "https://09af8526419b32d328f0c046d2ee5d09@o4511356309536768.ingest.us.sentry.io/4511356313010176";
 
 // get session from better auth and populate locals
 const localsHandler: Handle = async ({ event, resolve }) => {
+  if (building) {
+    return resolve(event);
+  }
+
   const auth = getAuth();
   const result = await auth.api.getSession({
     headers: event.request.headers,
@@ -45,7 +50,9 @@ const authGuard: Handle = ({ event, resolve }) => {
     throw redirect(303, "/login");
   }
 
-  // if logged in an attempting to access login or signup, redirect to invoices
+  // Logged-in visitors hitting /login or /signup: this branch only runs when the
+  // request hits the worker (not prerendered static assets). Prerendered auth
+  // shells use AuthEntryGuard (deferred island) for the same redirect.
   if (
     event.locals.user &&
     UNPROTECTED_ROUTES.some((route) => path.startsWith(route))
@@ -58,7 +65,9 @@ const authGuard: Handle = ({ event, resolve }) => {
 
 /** Stamp `data-theme` on `<html>` when the theme cookie is set. */
 const themeHandler: Handle = ({ event, resolve }) => {
-  const stored = parseStoredTheme(event.cookies.get(THEME_COOKIE_NAME));
+  const stored = building
+    ? null
+    : parseStoredTheme(event.cookies.get(THEME_COOKIE_NAME));
 
   return resolve(event, {
     transformPageChunk: ({ html }) => stampHtmlTheme(html, stored),
@@ -96,6 +105,7 @@ const fontPreloadHandler: Handle = async ({ event, resolve }) =>
   });
 
 // Order: Sentry instruments the request first; session/locals before auth; preload last on resolve.
+// ogygia is last so /__ogygia__ still receives the session and theme cookie, then serves the island.
 export const handle: Handle = sequence(
   Sentry.initCloudflareSentryHandle({
     dsn: SENTRY_DSN,
@@ -105,7 +115,8 @@ export const handle: Handle = sequence(
   localsHandler,
   authGuard,
   themeHandler,
-  fontPreloadHandler
+  fontPreloadHandler,
+  ogygiaHandle()
 );
 
 export const handleError = Sentry.handleErrorWithSentry();

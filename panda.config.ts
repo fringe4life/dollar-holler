@@ -29,10 +29,9 @@ export default defineConfig({
   include: ["./src/**/*.svelte", "./src/**/*.ts", "./src/**/*.js"],
   minify: true,
   optimize: {
-    // Typed view-transition CSS (PaginatedList) names theme keyframes from raw
-    // <style> blocks. Panda extract never sees those refs, so tree-shake drops
-    // fade-in / fade-out / slide-in / slide-out and pagination anims no-op.
-    removeUnusedKeyframes: false,
+    // VT keyframe refs live in theme/global-styles.ts (pagination + theme-change)
+    // so extract counts them; safe to tree-shake unused theme keyframes.
+    removeUnusedKeyframes: true,
     removeUnusedTokens: true,
     smartCompoundVariants: true,
     treeshakeDesignSystem: true,

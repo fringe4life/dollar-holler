@@ -1,6 +1,7 @@
 <script lang="ts">
   import { css, cx } from "#styled-system/css/index.js";
   import type { HTMLTextareaAttributes } from "svelte/elements";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   const textareaClass = css({
     _ariaInvalid: {
@@ -17,7 +18,9 @@
     },
     blockSize: 32,
     borderColor: "input",
+    borderRadius: "lg",
     borderWidth: 2,
+    cornerShape: CORNER_SHAPE,
     fontFamily: "sansserif",
     inlineSize: "full",
     p: 4,

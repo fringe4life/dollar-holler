@@ -2,9 +2,14 @@
   import { css } from "#styled-system/css/index.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
   import { asset } from "$app/paths";
+  import ThemeCookieHydrate from "#lib/theme/ThemeCookieHydrate.svelte" with {
+    wake: "load",
+  };
 
   let { children } = $props();
 </script>
+
+<ThemeCookieHydrate />
 
 <div
   class={css({

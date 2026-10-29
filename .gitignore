@@ -31,6 +31,7 @@ vite.config.ts.timestamp-*
 seedDb.js
 stats.html
 ## Panda
+/dist
 styled-system
 styled-system-studio
 # Sentry Config File

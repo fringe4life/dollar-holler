@@ -36,7 +36,7 @@
     <Skeleton class={css({ blockSize: 5, inlineSize: 16 })} />
   </div>
   <div class={invoiceStatus}>
-    <Skeleton class={css({ blockSize: 5, inlineSize: 14, rounded: "full" })} />
+    <Skeleton class={css({ blockSize: 5, inlineSize: 14 })} />
   </div>
   <div class={invoiceSwipeHint}>
     <Skeleton class={css({ blockSize: 2.5, inlineSize: 28 })} />
@@ -45,9 +45,9 @@
   <div class={cx(rowActionRail, css({ pointerEvents: "none" }))}>
     <span class={rowActionLabel}>Actions</span>
     <div class={rowActionButtonGroup}>
-      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
-      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
-      <Skeleton class={css({ blockSize: 8, inlineSize: 14, rounded: "md" })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14 })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14 })} />
+      <Skeleton class={css({ blockSize: 8, inlineSize: 14 })} />
       <Skeleton class={circle({ size: 8 })} />
     </div>
   </div>

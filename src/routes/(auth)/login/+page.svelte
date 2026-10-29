@@ -1,18 +1,11 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
-  import { between } from "#styled-system/patterns/index.js";
-  import { resolve } from "$app/paths";
-  import { login as loginForm } from "#features/auth/auth.remote.ts";
+  import AuthEntryGuard from "#features/auth/components/AuthEntryGuard.svelte" with {
+    render: "deferred",
+  };
+  import LoginForm from "#features/auth/components/LoginForm.svelte" with {
+    wake: "load",
+  };
   import { authHeading } from "#features/auth/styles.ts";
-  import Form from "#lib/components/patterns/form/Form.svelte";
-  import FormField from "#lib/components/patterns/form/FormField.svelte";
-  import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
-  import Input from "#lib/components/primitives/input/Input.svelte";
-  import Label from "#lib/components/primitives/label/Label.svelte";
-
-  // Per-mount instance. Drop `.for()` when sveltejs/kit#14802 is fixed.
-  const uid = $props.id();
-  const login = loginForm.for(uid);
 </script>
 
 <svelte:head>
@@ -23,65 +16,8 @@
   />
 </svelte:head>
 
+<AuthEntryGuard />
+
 <h1 class={authHeading}>Login</h1>
 
-<Form remote={login}>
-  <FormField
-    forId="email"
-    issues={login.fields.email.issues()}
-    label="Email"
-    labelClass={css({ color: "authLabel" })}
-  >
-    {#snippet children({ errorId })}
-      <Input
-        id="email"
-        placeholder="john@email.com"
-        required
-        aria-describedby={errorId}
-        {...login.fields.email.as("email")}
-      />
-    {/snippet}
-  </FormField>
-  <FormField forId="password" issues={login.fields._password.issues()}>
-    {#snippet children({ errorId })}
-      <div class={between()}>
-        <Label class={css({ color: "authLabel" })} for="password"
-          >Password</Label
-        >
-        <a
-          class={css({
-            color: "authLink",
-            fontSize: "sm",
-            textDecoration: { base: "underline", _hover: "none" },
-          })}
-          href={resolve("forgot-password")}>Forgot Password</a
-        >
-      </div>
-      <Input
-        id="password"
-        minlength={6}
-        required
-        aria-describedby={errorId}
-        {...login.fields._password.as("password")}
-      />
-    {/snippet}
-  </FormField>
-  {#snippet submit({ pending })}
-    <LoaderButton {pending} variant="auth">Let's do this!</LoaderButton>
-  {/snippet}
-  {#snippet footer()}
-    <p
-      class={css({
-        marginBlockStart: 4,
-        textAlign: "center",
-        fontSize: "sm",
-        color: "authForeground",
-      })}
-    >
-      <a
-        class={css({ textDecoration: { base: "underline", _hover: "none" } })}
-        href={resolve("signup")}>Don't have an account yet?</a
-      >
-    </p>
-  {/snippet}
-</Form>
+<LoginForm />

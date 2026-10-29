@@ -1,12 +1,15 @@
 <script lang="ts" module>
   import { cva, cx } from "#styled-system/css/index.js";
   import type { HTMLAnchorAttributes } from "svelte/elements";
+  import { CORNER_SHAPE } from "#lib/styles.ts";
 
   const badgeVariants = cva({
     base: {
+      _print: { borderRadius: "sm", cornerShape: "round" },
       alignItems: "center",
-      borderRadius: "full",
+      borderRadius: "md",
       borderWidth: "1px",
+      cornerShape: CORNER_SHAPE,
       display: "inline-flex",
       fontSize: "sm",
       fontWeight: "bold",
@@ -66,12 +69,11 @@
 <script lang="ts">
   import type { BadgeSize, BadgeVariant } from "./badge.types";
 
-  type BadgeProps = HTMLAnchorAttributes &
-    HTMLAnchorAttributes & {
-      variant?: BadgeVariant;
-      size?: BadgeSize;
-      class?: string;
-    };
+  type BadgeProps = HTMLAnchorAttributes & {
+    variant?: BadgeVariant;
+    size?: BadgeSize;
+    class?: string;
+  };
   let {
     href,
     class: className,

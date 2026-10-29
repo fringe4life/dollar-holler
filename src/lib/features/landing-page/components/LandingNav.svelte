@@ -1,20 +1,16 @@
 <script lang="ts">
-  import type { User } from "better-auth";
   import { css, keyframes } from "#styled-system/css/index.js";
   import { between, hstack, square } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";
-  import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
   import LogIn from "@lucide/svelte/icons/log-in";
   import UserPlus from "@lucide/svelte/icons/user-plus";
   import Button from "#lib/components/primitives/button/button.svelte";
-  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
-  import type { Maybe } from "#lib/types.ts";
-
-  interface Props {
-    user: Maybe<User>;
-  }
-
-  let { user = null }: Props = $props();
+  import LandingNavSession from "#features/landing-page/components/LandingNavSession.svelte" with {
+    render: "deferred",
+  };
+  import LandingThemeControl from "#features/landing-page/components/LandingThemeControl.svelte" with {
+    wake: "load",
+  };
 
   const navSolidify = keyframes({
     from: {
@@ -125,45 +121,38 @@
 
     <div class={landingActions}>
       <div class={landingModeSelect}>
-        <ModeSelect />
+        <LandingThemeControl />
       </div>
-      {#if user}
-        <Button
-          aria-label="Go to dashboard"
-          class={landingActionButton}
-          href={resolve("invoices")}
-          size="default"
-          variant="default"
-        >
-          <LayoutDashboard
-            aria-hidden="true"
-            class={landingActionIcon}
-            size={18}
-          />
-          <span class={landingActionLabel}>Go to Dashboard</span>
-        </Button>
-      {:else}
-        <Button
-          aria-label="Log in"
-          class={landingActionButton}
-          href={resolve("login")}
-          size="default"
-          variant="outline"
-        >
-          <LogIn aria-hidden="true" class={landingActionIcon} size={18} />
-          <span class={landingActionLabel}>Log in</span>
-        </Button>
-        <Button
-          aria-label="Sign up free"
-          class={landingActionButton}
-          href={resolve("signup")}
-          size="default"
-          variant="default"
-        >
-          <UserPlus aria-hidden="true" class={landingActionIcon} size={18} />
-          <span class={landingActionLabel}>Sign Up Free</span>
-        </Button>
-      {/if}
+      <LandingNavSession>
+        {#snippet ogygiaFallback()}
+          <div class={landingActions}>
+            <Button
+              aria-label="Log in"
+              class={landingActionButton}
+              href={resolve("login")}
+              size="default"
+              variant="outline"
+            >
+              <LogIn aria-hidden="true" class={landingActionIcon} size={18} />
+              <span class={landingActionLabel}>Log in</span>
+            </Button>
+            <Button
+              aria-label="Sign up free"
+              class={landingActionButton}
+              href={resolve("signup")}
+              size="default"
+              variant="default"
+            >
+              <UserPlus
+                aria-hidden="true"
+                class={landingActionIcon}
+                size={18}
+              />
+              <span class={landingActionLabel}>Sign Up Free</span>
+            </Button>
+          </div>
+        {/snippet}
+      </LandingNavSession>
     </div>
   </div>
 </nav>

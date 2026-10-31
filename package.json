@@ -4,7 +4,7 @@
     "@opentelemetry/api": "1.10.0",
     "@sentry/sveltekit": "11.9.0",
     "@varlock/bitwarden-plugin": "2.0.2",
-    "better-auth": "1.7.12",
+    "better-auth": "1.7.14",
     "drizzle-orm": "1.0.0-rc.5",
     "marked": "18.1.1",
     "ogygia": "0.8.6",

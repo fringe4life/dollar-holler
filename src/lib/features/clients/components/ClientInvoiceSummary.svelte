@@ -1,88 +1,65 @@
 <script lang="ts">
+  import { visuallyHidden } from "#styled-system/patterns/index.js";
   import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
-  import { clientInvoiceSummary } from "#features/clients/clients.remote.ts";
-  import InvoiceSummaryItem from "#features/invoices/components/InvoiceSummaryItem.svelte";
-  import InvoiceSummarySkeleton from "#features/invoices/components/InvoiceSummarySkeleton.svelte";
-  import {
-    invoiceSummaryCardClass,
-    invoiceSummaryContainerClass,
-    invoiceSummaryDraftClass,
-    invoiceSummaryListClass,
-    invoiceSummaryOutstandingClass,
-    invoiceSummaryOverdueClass,
-    invoiceSummaryPaidClass,
-  } from "#features/invoices/styles/invoice-summary-styles.ts";
   import type { CursorId } from "#lib/schemas/cursor-id.ts";
-  import { centsToDollars } from "#lib/utils/moneyHelpers.ts";
+  import type { BitsButton } from "#lib/types.ts";
+  import ClientInvoiceOverview from "#features/clients/components/ClientInvoiceOverview.svelte";
+  import { clientInvoiceSummary } from "#features/clients/clients.remote.ts";
+  import type { ClientSelect } from "#features/clients/types.ts";
 
   interface Props {
+    client: ClientSelect;
     clientId: CursorId;
+    onEdit: BitsButton;
     q?: string;
   }
 
-  let { clientId, q }: Props = $props();
+  let { client, clientId, onEdit, q }: Props = $props();
 
   const summaryArg = $derived(q === undefined ? { clientId } : { clientId, q });
   const summary = $derived(await clientInvoiceSummary(summaryArg));
-  const totals = $derived({
-    draft: centsToDollars(summary.draft),
-    outstanding: centsToDollars(summary.outstanding),
-    overdue: centsToDollars(summary.overdue),
-    paid: centsToDollars(summary.paid),
+
+  /** Identity renders in every state, so the name survives a pending/failed summary. */
+  const identity = $derived({
+    address: {
+      city: client.city,
+      state: client.state,
+      street: client.street,
+      zip: client.zip,
+    },
+    clientStatus: client.clientStatus,
+    createdAt: client.createdAt,
+    email: client.email,
+    name: client.name,
   });
 </script>
 
+<!--
+  #207 boundary choice: keep Kit `<svelte:boundary>` around the summary query.
+  No ogygia lake/island — the hero streams with the page; navbar toast context
+  still requires Kit on the dashboard shell.
+-->
 <svelte:boundary>
   {#snippet pending()}
-    <div
-      aria-label="Loading client totals"
-      aria-live="polite"
-      class={invoiceSummaryContainerClass}
-      role="status"
-    >
-      <div aria-hidden="true" class={invoiceSummaryCardClass}>
-        <div class={invoiceSummaryListClass}>
-          <InvoiceSummarySkeleton class={invoiceSummaryOverdueClass} />
-          <InvoiceSummarySkeleton class={invoiceSummaryOutstandingClass} />
-          <InvoiceSummarySkeleton class={invoiceSummaryDraftClass} />
-          <InvoiceSummarySkeleton class={invoiceSummaryPaidClass} />
-        </div>
-      </div>
+    <div aria-busy="true" aria-live="polite" role="status">
+      <span class={visuallyHidden()}>Loading client totals</span>
+      <ClientInvoiceOverview client={identity} {onEdit} />
     </div>
   {/snippet}
-  {#snippet failed(err, reset)}
+  {#snippet failed(error, reset)}
+    <ClientInvoiceOverview client={identity} {onEdit} />
     <BoundaryError
-      error={err}
+      {error}
       fallbackMessage="Failed to load summary"
       onRetry={reset}
-      title="We couldn't load the invoice summary"
+      title="We couldn't load {client.name}'s totals"
     />
   {/snippet}
 
-  <section aria-label="Client totals" class={invoiceSummaryContainerClass}>
-    <div class={invoiceSummaryCardClass}>
-      <dl class={invoiceSummaryListClass}>
-        <InvoiceSummaryItem
-          amount={totals.overdue}
-          class={invoiceSummaryOverdueClass}
-          title="Overdue"
-        />
-        <InvoiceSummaryItem
-          amount={totals.outstanding}
-          class={invoiceSummaryOutstandingClass}
-          title="Outstanding"
-        />
-        <InvoiceSummaryItem
-          amount={totals.draft}
-          class={invoiceSummaryDraftClass}
-          title="Draft"
-        />
-        <InvoiceSummaryItem
-          amount={totals.paid}
-          class={invoiceSummaryPaidClass}
-          title="Paid"
-        />
-      </dl>
-    </div>
-  </section>
+  <ClientInvoiceOverview
+    client={identity}
+    hasQuery={Boolean(q)}
+    {onEdit}
+    {summary}
+  />
 </svelte:boundary>

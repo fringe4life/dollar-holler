@@ -3,9 +3,13 @@ import type { Prettify } from "#lib/types.ts";
 
 export interface ClientInvoiceSummaryInitial {
   draft: number;
+  draftCount: number;
   outstanding: number;
+  outstandingCount: number;
   overdue: number;
+  overdueCount: number;
   paid: number;
+  paidCount: number;
 }
 
 export type ClientInvoiceSummaryFinal = Prettify<
@@ -30,10 +34,16 @@ export const applySentInvoiceToSummary = (
   const isOverdue = isInvoiceOverdue(invoice.dueDate);
   return {
     draft: summary.draft - total,
+    draftCount: summary.draftCount - 1,
     grandTotal: summary.grandTotal,
     outstanding: isOverdue ? summary.outstanding : summary.outstanding + total,
+    outstandingCount: isOverdue
+      ? summary.outstandingCount
+      : summary.outstandingCount + 1,
     overdue: isOverdue ? summary.overdue + total : summary.overdue,
+    overdueCount: isOverdue ? summary.overdueCount + 1 : summary.overdueCount,
     paid: summary.paid,
+    paidCount: summary.paidCount,
   };
 };
 
@@ -45,17 +55,25 @@ export const applyDeletedInvoiceToSummary = (
   const { total } = invoice;
   const status = invoice.invoiceStatus ?? "draft";
   const isOverdue = isInvoiceOverdue(invoice.dueDate);
+  const isDraft = status === "draft";
+  const isOutstanding = status === "sent" && !isOverdue;
+  const isOverdueBucket = status === "sent" && isOverdue;
+  const isPaid = status === "paid";
   return {
-    draft: status === "draft" ? summary.draft - total : summary.draft,
+    draft: isDraft ? summary.draft - total : summary.draft,
+    draftCount: isDraft ? summary.draftCount - 1 : summary.draftCount,
     grandTotal: summary.grandTotal - total,
-    outstanding:
-      status === "sent" && !isOverdue
-        ? summary.outstanding - total
-        : summary.outstanding,
-    overdue:
-      status === "sent" && isOverdue
-        ? summary.overdue - total
-        : summary.overdue,
-    paid: status === "paid" ? summary.paid - total : summary.paid,
+    outstanding: isOutstanding
+      ? summary.outstanding - total
+      : summary.outstanding,
+    outstandingCount: isOutstanding
+      ? summary.outstandingCount - 1
+      : summary.outstandingCount,
+    overdue: isOverdueBucket ? summary.overdue - total : summary.overdue,
+    overdueCount: isOverdueBucket
+      ? summary.overdueCount - 1
+      : summary.overdueCount,
+    paid: isPaid ? summary.paid - total : summary.paid,
+    paidCount: isPaid ? summary.paidCount - 1 : summary.paidCount,
   };
 };

@@ -18,6 +18,33 @@
     U+2215, U+FEFF, U+FFFD;
 }
 
+/*
+ * Gauge intro fill (client invoice summary). The horseshoe is revealed under a
+ * conic mask whose leading edge has to interpolate, so the sweep angle is a
+ * registered <angle>. The element's own value is the *end* state (full ring)
+ * and only the keyframes move it, so a browser without @property, without the
+ * keyframes, or with reduced motion still paints the finished ring.
+ */
+@property --arc-sweep {
+  inherits: false;
+  initial-value: 90deg;
+  syntax: "<angle>";
+}
+
+/* Keyframes live under no-preference: with reduce they do not exist, so the
+   animation name resolves to nothing and the mask never leaves its end state. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes arc-fill {
+    from {
+      --arc-sweep: var(--arc-start, 90deg);
+    }
+
+    to {
+      --arc-sweep: var(--arc-end, 360deg);
+    }
+  }
+}
+
 html {
   view-transition-name: theme;
 }

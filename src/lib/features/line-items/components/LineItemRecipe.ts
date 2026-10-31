@@ -42,9 +42,8 @@ export const lineItemFieldRecipe = sva({
       right: { input: { textAlign: "right" }, label: { textAlign: "right" } },
     },
     inputType: {
-      number: {
-        input: { fontFamily: "mono" },
-      },
+      // Money voice (`money()` CVA) is composed at the input call site (#210).
+      number: {},
       text: {
         input: { fontFamily: "sansserif", fontSize: "xl", fontWeight: "bold" },
       },

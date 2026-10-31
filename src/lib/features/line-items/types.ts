@@ -35,6 +35,8 @@ interface InvoiceFormEditProps extends InvoiceFormPanel {
 type InvoiceFormCreateProps = InvoiceFormPanel & {
   mode: "create";
   invoiceId?: undefined;
+  /** Preselects the client, e.g. "+ Invoice" on a client's own page. */
+  clientId?: CursorId;
 };
 
 export type InvoiceFormProps = InvoiceFormEditProps | InvoiceFormCreateProps;

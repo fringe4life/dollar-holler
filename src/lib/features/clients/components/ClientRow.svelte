@@ -16,6 +16,7 @@
     rowSwipeTrigger,
     tableRowBase,
   } from "#lib/styles.ts";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import { centsToDollars } from "#lib/utils/moneyHelpers.ts";
   import {
     clientBalance,
@@ -68,11 +69,11 @@
     </div>
     <div class={clientReceived}>
       <span>Received</span>
-      {receivedDisplay}
+      <span class={money()}>{receivedDisplay}</span>
     </div>
     <div class={clientBalance}>
       <span>Balance</span>
-      {balanceDisplay}
+      <span class={money()}>{balanceDisplay}</span>
     </div>
     <div class={clientSwipeHint}>
       <button

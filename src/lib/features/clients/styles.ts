@@ -54,12 +54,12 @@ export const clientReceived = grid({
   columnGap: 1.5,
   display: "flex",
   fontSize: { base: "sm", "@item-row/md": "lg", "@item-row/xl": "md" },
-  fontVariantNumeric: "tabular-nums",
   fontWeight: "bold",
   gridArea: "received",
   minInlineSize: 0,
   whiteSpace: "nowrap",
-  "& span": {
+  // Label only — amount is a second span (money() CVA, #210).
+  "& > span:first-child": {
     color: "textMuted",
     fontSize: "2xs",
     fontWeight: "bold",
@@ -74,13 +74,12 @@ export const clientBalance = grid({
   color: "destructive",
   display: "flex",
   fontSize: { base: "sm", "@item-row/md": "lg", "@item-row/xl": "md" },
-  fontVariantNumeric: "tabular-nums",
   fontWeight: "bold",
   gridArea: "balance",
   justifyContent: "end",
   minInlineSize: 0,
   whiteSpace: "nowrap",
-  "& span": {
+  "& > span:first-child": {
     color: "textMuted",
     fontSize: "2xs",
     fontWeight: "bold",

@@ -16,6 +16,7 @@
     tableRowBase,
   } from "#lib/styles.ts";
   import { convertDate } from "#lib/utils/dateHelpers.ts";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import { formatTotal } from "#lib/utils/moneyHelpers.ts";
   import {
     invoiceAmount,
@@ -78,7 +79,7 @@
         {convertDate(dueDate.toISOString())}
       </time>
     </div>
-    <div class={invoiceAmount}>{totalDisplay}</div>
+    <div class={cx(invoiceAmount, money())}>{totalDisplay}</div>
     <div class={invoiceStatus}>
       <Badge size="small" variant={label}>{label}</Badge>
     </div>

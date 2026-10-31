@@ -1,8 +1,9 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css, cx } from "#styled-system/css/index.js";
   import { flex } from "#styled-system/patterns/index.js";
   import { onDestroy } from "svelte";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import { clientPickerOptions } from "#features/clients/clients.remote.ts";
   import type { ClientInsert } from "#features/clients/types.ts";
   import { newClient } from "#features/clients/utils/new-client.ts";
@@ -38,12 +39,19 @@
   import { newInvoice } from "../utils/new-invoice";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
-  let { mode = "create", closePanel, invoiceId }: InvoiceFormProps = $props();
+  let props: InvoiceFormProps = $props();
   const toast = getToast();
 
   const picker = await clientPickerOptions();
-  // svelte-ignore state_referenced_locally -- parent remounts via {#key}
-  const editInvoiceId = mode === "edit" ? invoiceId : undefined;
+  // Parent remounts via {#key}; seed once from the create/edit discriminant.
+  // svelte-ignore state_referenced_locally
+  const mode = props.mode;
+  // svelte-ignore state_referenced_locally
+  const { closePanel } = props;
+  // svelte-ignore state_referenced_locally
+  const editInvoiceId = props.mode === "edit" ? props.invoiceId : undefined;
+  // svelte-ignore state_referenced_locally
+  const initialClientId = props.mode === "create" ? props.clientId : undefined;
   // One RQB load (invoice + lineItems); was getInvoice + listLineItems (+ verify). #121
   const editDetail = editInvoiceId
     ? await getInvoiceDetail(editInvoiceId)
@@ -65,7 +73,9 @@
   });
 
   let invoice: NewInvoice = $state(
-    loadedInvoice ? toEditableInvoice(loadedInvoice) : newInvoice()
+    loadedInvoice
+      ? toEditableInvoice(loadedInvoice)
+      : { ...newInvoice(), clientId: initialClientId }
   );
 
   const counter = new Counter();
@@ -179,7 +189,9 @@
       This will delete the invoice to
       <span class={css({ color: "destructive" })}>{clientName}</span>
       for
-      <span class={css({ color: "destructive" })}>{totalDisplay}</span>
+      <span class={cx(money(), css({ color: "destructive" }))}
+        >{totalDisplay}</span
+      >
     {/snippet}
   </ConfirmDelete>
 {/if}

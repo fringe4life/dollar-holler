@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
-  import { between } from "#styled-system/patterns/index.js";
+  import { css, cx } from "#styled-system/css/index.js";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import ClientForm from "#features/clients/components/ClientForm.svelte";
   import ClientInvoiceList from "#features/clients/components/ClientInvoiceList.svelte";
   import ClientInvoiceSummary from "#features/clients/components/ClientInvoiceSummary.svelte";
@@ -34,9 +34,7 @@
   import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
   import ConfirmDelete from "#lib/components/patterns/ConfirmDelete.svelte";
   import FormPanel from "#lib/components/patterns/form/FormPanel.svelte";
-  import Edit from "#lib/components/primitives/icons/Edit.svelte";
   import Spinner from "#lib/components/primitives/Spinner.svelte";
-  import Button from "#lib/components/primitives/button/button.svelte";
   import type { BitsButton } from "#lib/types.ts";
   import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
@@ -54,14 +52,16 @@
   );
   const client = $derived(await getClient(clientId));
 
-  const formPanel = new ItemPanel<UpsertTarget<ClientSelect>>();
-  const invoicePanel = new ItemPanel<CursorId>();
+  // Creating clients belongs to /clients; this route only edits the one client.
+  const formPanel = new ItemPanel<ClientSelect>();
+  const invoicePanel = new ItemPanel<UpsertTarget<CursorId>>();
   const deleteModal = new ItemPanel<InvoiceListResponse>();
-  const formTarget = $derived(formPanel.item);
-  const isEdit = $derived(formTarget?.kind === "edit");
+  const editTarget = $derived(formPanel.item);
+  const invoiceTarget = $derived(invoicePanel.item);
+  const isInvoiceEdit = $derived(invoiceTarget?.kind === "edit");
 
   const handleEdit: BitsButton = () => {
-    formPanel.open({ kind: "edit", item: client });
+    formPanel.open(client);
   };
 
   const handleSendInvoice = async (inv: InvoiceListResponse) => {
@@ -98,10 +98,10 @@
     name="description"
   />
 </svelte:head>
-<ItemsHeader open={() => formPanel.open({ kind: "create" })}>
+<ItemsHeader open={() => invoicePanel.open({ kind: "create" })}>
   {#snippet button()}
     <span aria-hidden="true" class={buttonIcon({ icon: "plus" })}>+</span>
-    Client
+    Invoice
   {/snippet}
 </ItemsHeader>
 
@@ -118,63 +118,56 @@
     />
   {/snippet}
 
-  <div class={between({ marginBlockEnd: 7, inlineSize: "full" })}>
-    <h1
-      class={css({ color: "foreground", fontSize: "3xl", fontWeight: "bold" })}
-    >
-      {client.name}
-    </h1>
-    <Button onclick={handleEdit} variant="textOnly"><Edit /> Edit</Button>
-  </div>
+  <ClientInvoiceSummary {client} {clientId} onEdit={handleEdit} q={listArg.q} />
+  <ClientInvoiceList
+    {clientId}
+    listQuery={listArg}
+    onDelete={deleteModal.open}
+    onEdit={(inv) => invoicePanel.open({ item: inv.id, kind: "edit" })}
+    onSendInvoice={handleSendInvoice}
+  />
 </svelte:boundary>
-
-<ClientInvoiceSummary {clientId} q={listArg.q} />
-<ClientInvoiceList
-  {clientId}
-  listQuery={listArg}
-  onDelete={deleteModal.open}
-  onEdit={(inv) => invoicePanel.open(inv.id)}
-  onSendInvoice={handleSendInvoice}
-/>
 
 <FormPanel
   attach={formPanel.attach}
-  descriptionText={isEdit ? "Edit a client" : "Create a new client"}
+  descriptionText="Edit this client's details"
   onClose={formPanel.close}
-  titleText={isEdit ? "Edit a Client" : "Add a Client"}
+  titleText="Edit a Client"
 >
-  {#if formTarget}
-    {#key upsertKey(formTarget, (selected) => selected.id)}
-      {#if formTarget.kind === "edit"}
-        <ClientForm
-          closePanel={formPanel.close}
-          edit={formTarget.item}
-          formState="edit"
-        />
-      {:else}
-        <ClientForm
-          closePanel={formPanel.close}
-          edit={undefined}
-          formState="create"
-        />
-      {/if}
+  {#if editTarget}
+    {#key editTarget.id}
+      <ClientForm
+        closePanel={formPanel.close}
+        edit={editTarget}
+        formState="edit"
+      />
     {/key}
   {/if}
 </FormPanel>
 
 <FormPanel
   attach={invoicePanel.attach}
-  descriptionText="Edit an invoice"
+  descriptionText={isInvoiceEdit
+    ? "Edit an invoice"
+    : "Create a new invoice for this client"}
   onClose={invoicePanel.close}
-  titleText="Edit an Invoice"
+  titleText={isInvoiceEdit ? "Edit an Invoice" : "Add an Invoice"}
 >
-  {#if invoicePanel.item}
-    {#key invoicePanel.item}
-      <InvoiceForm
-        closePanel={invoicePanel.close}
-        invoiceId={invoicePanel.item}
-        mode="edit"
-      />
+  {#if invoiceTarget}
+    {#key upsertKey(invoiceTarget, (id) => String(id))}
+      {#if invoiceTarget.kind === "edit"}
+        <InvoiceForm
+          closePanel={invoicePanel.close}
+          invoiceId={invoiceTarget.item}
+          mode="edit"
+        />
+      {:else}
+        <InvoiceForm
+          clientId={client.id}
+          closePanel={invoicePanel.close}
+          mode="create"
+        />
+      {/if}
     {/key}
   {/if}
 </FormPanel>
@@ -209,7 +202,7 @@
     This will delete the invoice to
     <span class={css({ color: "destructive" })}>{item?.name ?? "Unknown"}</span>
     for
-    <span class={css({ color: "destructive" })}
+    <span class={cx(money(), css({ color: "destructive" }))}
       >{formatTotal(item?.total ?? 0)}</span
     >
   {/snippet}

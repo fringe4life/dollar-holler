@@ -8,6 +8,7 @@
   } from "#features/line-items/types.ts";
   import Trash from "#lib/components/primitives/icons/Trash.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import { invoiceLineItem } from "../styles";
   import { lineItemFieldRecipe } from "./LineItemRecipe";
 
@@ -117,7 +118,7 @@
       >Unit Price</label
     >
     <input
-      class={priceStyles.input}
+      class={cx(priceStyles.input, money())}
       disabled={!isEditable}
       id="unitPrice-{props.lineItem.id}"
       min={isEditable ? "0" : undefined}
@@ -153,7 +154,7 @@
       >Amount</label
     >
     <input
-      class={amountStyles.input}
+      class={cx(amountStyles.input, money())}
       disabled={props.mode === "view"}
       id="amount-{props.lineItem.id}"
       readonly={isEditable}

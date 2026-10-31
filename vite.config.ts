@@ -20,7 +20,7 @@ import {
   SERVER_OUTPUT_DIR,
   stubCloudflareWorkersInDir,
 } from "./scripts/cloudflare-workers-specifier.ts";
-import { ogygiaKit3RefreshAllPatch } from "./scripts/ogygia-kit-3-refresh-all-patch.ts";
+import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -142,9 +142,32 @@ export default defineConfig({
       org: "coinnich",
       project: "javascript-sveltekit",
     }),
+    /**
+     * Workaround: Vite `resolveSubpathImports` rebases `#…` imports against
+     * `dirname(importer)`. For ogygia’s `virtual:ogygia/island/…` that yields
+     * `../../styled-system/…`, then `path.normalize(join(virtualDir, …))` collapses to
+     * bare `styled-system/css/cx.js`. Ogygia’s `resolve(source, host)` then fails
+     * (checks package `exports` only). Bridge remaps every `#bare` / `#bare/*`
+     * imports entry (retries `#id`, else on-disk path). Prod `vite build` skips
+     * import-analysis (`isBundled`) so the collapse does not show there.
+     *
+     * Plugin order before `ogygia()` is required so island resolve sees the remap.
+     *
+     * @remarks
+     * Still required on `vite@8.3.5` + `ogygia@0.9.0` with `@sveltejs/kit@3.1.0` for
+     * `bun vite dev` → `/invoices` (InvoiceRow island). Drop when Vite stops emitting
+     * bare ids for virtual importers **and/or** ogygia honors `package.json`
+     * `"imports"`; re-verify `/invoices` in **dev** before deleting. No upstream
+     * Vite/ogygia issue filed yet.
+     *
+     * @see https://github.com/fringe4life/dollar-holler/issues/228 — this upgrade + bridge
+     * @see https://github.com/fringe4life/dollar-holler/issues/215 — Vite tracking
+     * @see https://github.com/fringe4life/dollar-holler/issues/209 — ogygia tracking
+     * @see https://github.com/fringe4life/dollar-holler/issues/208 — related Kit 3 env rename
+     */
+    ogygiaNodeImportsBridge(),
     // Before sveltekit so island import attributes are rewritten first.
     ogygia(),
-    ogygiaKit3RefreshAllPatch(),
     sveltekit({
       adapter: adapter({
         platformProxy: {

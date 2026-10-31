@@ -1,7 +1,8 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css, cx } from "#styled-system/css/index.js";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";
   import BlankState from "#features/invoices/components/BlankState.svelte";
   import InvoiceForm from "#features/invoices/components/InvoiceForm.svelte";
@@ -165,7 +166,7 @@
       >{invoice?.name ?? "Unknown"}</span
     >
     for
-    <span class={css({ color: "destructive" })}
+    <span class={cx(money(), css({ color: "destructive" }))}
       >{formatTotal(invoice?.total ?? 0)}</span
     >
   {/snippet}

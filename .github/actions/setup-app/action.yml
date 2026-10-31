@@ -20,7 +20,8 @@ runs:
       shell: bash
 
     - name: Load environment variables
-      uses: dmno-dev/varlock-action@v1.0.5
+      # Pin to commit (Sonar: avoid floating tag installs).
+      uses: dmno-dev/varlock-action@7141115d0060616e398c5fa9035e67d7820ab2b6 # v1.0.5
 
     - name: Sync SvelteKit
       if: inputs.svelte-kit-sync == 'true'

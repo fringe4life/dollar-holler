@@ -1,7 +1,7 @@
 # Research: Varlock secrets in CI/CD (PR test env → restricted deploy)
 
 **Date:** 2026-11-01  
-**Status:** research only — no workflow or schema changes in this note  
+**Status:** research (strategy still valid). **Update (PR #235):** `@varlock/cloudflare-integration` installed; `ssrInjectMode: "resolved-env"` removed; local deploy is `varlock-wrangler deploy`; Sentry `autoUploadSourceMaps` off when `VARLOCK_ENV=test`; proof CI (audit + build/BundleWatch) ships without Bitwarden/Cloudflare secrets. Deploy-from-CI still deferred (#234).  
 **Question:** How should this project avoid exposing secrets when using Varlock in CI/CD—especially as it moves from test-env PR checks toward production builds/deploys?
 
 Sources are official Varlock docs and packages (`varlock.dev`, `dmno-dev/varlock-action`, installed `@varlock/vite-integration@1.5.4`), GitHub Docs (Actions secrets / environments / `pull_request_target`), Cloudflare Workers secrets and GitHub Actions CI docs, Bitwarden Secrets Manager machine-account docs, and paths in this repo. Related issues: [#148](https://github.com/fringe4life/dollar-holler/issues/148), [#234](https://github.com/fringe4life/dollar-holler/issues/234), [#233](https://github.com/fringe4life/dollar-holler/issues/233). Extends [docs/sveltekit-ci-pipeline-research.md](./sveltekit-ci-pipeline-research.md); does not reverse its “do not deploy from PRs” / test-env CI stance.
@@ -39,17 +39,17 @@ Sources are official Varlock docs and packages (`varlock.dev`, `dmno-dev/varlock
 
 ## What this repo does today
 
-Grounded in tree files (2026-11-01):
+Grounded in tree files after PR #235 (2026-11-01):
 
 | Piece | Behavior |
 | --- | --- |
 | [`.env.schema`](../.env.schema) | `# @currentEnv=$VARLOCK_ENV`; Bitwarden plugin; `# @encryptInjectedEnv=forEnv(production)`; sensitive items via `bitwarden("…")` / `@sensitive`; `BITWARDEN_ACCESS_TOKEN` required |
 | [`.env.test`](../.env.test) | Dummy literals for CI; comment states never real secrets; overrides schema defaults when `VARLOCK_ENV=test` |
 | [`bunfig.toml`](../bunfig.toml) | `env = false`; `preload = ["varlock/auto-load"]` so Bun does not race Varlock ([Bun integration](https://varlock.dev/integrations/bun/)) |
-| [`vite.config.ts`](../vite.config.ts) | `varlockVitePlugin({ ssrInjectMode: "resolved-env" })`; `@sveltejs/adapter-cloudflare` via `sveltekit({ adapter: … })`; Sentry plugin reads `process.env.SENTRY_AUTH_TOKEN` |
-| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) / [`fallow.yml`](../.github/workflows/fallow.yml) | `VARLOCK_ENV: test`; `bun install --frozen-lockfile --ignore-scripts`; `dmno-dev/varlock-action@v1.0.5`; `permissions: contents: read`; triggers `push` to `main`/`master` and `pull_request` |
-| [`package.json`](../package.json) | `varlock@1.23.0`, `@varlock/vite-integration@1.5.4`, `@varlock/bitwarden-plugin@2.0.2`; **no** `@varlock/cloudflare-integration` |
-| Deploy | `bun run build && wrangler deploy` locally; **no** GitHub deploy workflow yet ([README](../README.md), [#234](https://github.com/fringe4life/dollar-holler/issues/234)) |
+| [`vite.config.ts`](../vite.config.ts) | `varlockVitePlugin()` (no forced `resolved-env`); `@sveltejs/adapter-cloudflare` via `sveltekit({ adapter: … })`; Sentry `autoUploadSourceMaps` off when `VARLOCK_ENV=test` |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) / [`fallow.yml`](../.github/workflows/fallow.yml) / [`bundlewatch.yml`](../.github/workflows/bundlewatch.yml) | `VARLOCK_ENV: test`; shared setup-app; audit + build/BundleWatch; **no** Bitwarden/Cloudflare deploy secrets |
+| [`package.json`](../package.json) | `varlock@1.23.0`, `@varlock/vite-integration@1.5.4`, `@varlock/bitwarden-plugin@2.0.2`, `@varlock/cloudflare-integration@1.6.2` |
+| Deploy | `bun run build && varlock-wrangler deploy` locally; **no** GitHub deploy workflow yet ([README](../README.md), [#234](https://github.com/fringe4life/dollar-holler/issues/234)) |
 
 [#148](https://github.com/fringe4life/dollar-holler/issues/148) already states the critical product rule: test-env `bun run build` proves compile; it must not deploy; `ssrInjectMode: "resolved-env"` means a CI artifact embeds dummy secrets and must not be shipped. [#234](https://github.com/fringe4life/dollar-holler/issues/234) elevates that to a cross-cutting Varlock/secrets blocker before deploy-from-CI.
 

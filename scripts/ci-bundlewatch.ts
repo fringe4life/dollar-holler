@@ -7,17 +7,22 @@
  *
  * @see https://bundlewatch.io/guide/using-bundlewatch
  */
-import bundlewatch, {
-  type BundlewatchConfig,
-  type FileConfig,
-} from "bundlewatch";
-import config from "../bundlewatch.config.mjs";
+import bundlewatch, { type FileConfig } from "bundlewatch";
+import config from "../bundlewatch.config.ts";
 
-const base = config as BundlewatchConfig;
-const rules = base.files ?? [];
+const rules = config.files;
+if (!Array.isArray(rules) || rules.length === 0) {
+  throw new Error("bundlewatch.config.ts: files must be a non-empty array");
+}
+
 const expanded: FileConfig[] = [];
 
 for (const rule of rules) {
+  if (typeof rule.path !== "string" || rule.path.length === 0) {
+    throw new Error(
+      "bundlewatch.config.ts: each file rule needs a non-empty path"
+    );
+  }
   const pattern = rule.path.replace(/^\.\//, "");
   const matches = [...new Bun.Glob(pattern).scanSync()];
   if (matches.length === 0) {
@@ -27,16 +32,12 @@ for (const rule of rules) {
   }
   for (const match of matches) {
     const path = match.startsWith("./") ? match : `./${match}`;
-    expanded.push({
-      path,
-      maxSize: rule.maxSize,
-      compression: rule.compression,
-    });
+    expanded.push({ ...rule, path });
   }
 }
 
 const result = await bundlewatch({
-  ...base,
+  ...config,
   files: expanded,
 });
 

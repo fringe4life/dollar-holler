@@ -35,8 +35,9 @@ jobs:
 
       - name: BundleWatch
         run: |
-          set -o pipefail
+          set +e
           bun run ci:bundlewatch 2>&1 | tee bundlewatch.log
+          status=${PIPESTATUS[0]}
           {
             echo "## BundleWatch"
             echo
@@ -49,5 +50,6 @@ jobs:
             tail -n 40 bundlewatch.log
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
+          exit "$status"
         env:
           BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,8 +1,14 @@
 [install]
 linker = "isolated"
 minimumReleaseAge=259200
-# Security override pins (glob/minimatch) may be newer than minimumReleaseAge.
-minimumReleaseAgeExcludes = ["ogygia", "glob", "minimatch"]
+# Temporary: security pins for @sentry/bundler-plugins (glob 14 + minimatch 11)
+# and their fresh transitive. Drop excludes once pins are ≥3 days old (2026-11-04+).
+minimumReleaseAgeExcludes = [
+  "ogygia",
+  "glob",
+  "minimatch",
+  "@isaacs/nonrecursive-glob-match",
+]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).
 env = false

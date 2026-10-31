@@ -1,3 +1,5 @@
+import type { BundlewatchConfig } from "bundlewatch";
+
 /**
  * Bundle size gate + baseline deltas (gzip).
  * @see https://bundlewatch.io/guide/using-bundlewatch
@@ -6,7 +8,7 @@
  * maxSize fails the job; growth vs main baseline is reported on the
  * `bundlewatch` commit status / results page (no fail-on-percent default).
  */
-export default {
+const config = {
   defaultCompression: "gzip",
   // Strip Vite/Rolldown 8-char content hashes: entry/app.XXXX.js → entry/app.js
   normalizeFilenames: /^.*(\.[A-Za-z0-9_-]{8})\.js$/,
@@ -32,4 +34,6 @@ export default {
   ci: {
     trackBranches: ["main"],
   },
-};
+} satisfies BundlewatchConfig;
+
+export default config;

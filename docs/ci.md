@@ -19,10 +19,11 @@ Shared setup: [`.github/actions/setup-app`](../.github/actions/setup-app/action.
 
 ## BundleWatch
 
-- Config: [`bundlewatch.config.mjs`](../bundlewatch.config.mjs)
+- Config: [`bundlewatch.config.ts`](../bundlewatch.config.ts) (`satisfies BundlewatchConfig`)
 - Runner: `bun run ci:bundlewatch` ([`scripts/ci-bundlewatch.ts`](../scripts/ci-bundlewatch.ts)) expands globs with Bun (BundleWatch’s `glob@7` breaks on cwd paths with spaces)
 - Uses workflow `GITHUB_TOKEN` as `BUNDLEWATCH_GITHUB_TOKEN` — no extra secret ([docs](https://bundlewatch.io/guide/using-bundlewatch))
 - Fail on `maxSize` only; deltas vs `main` baseline appear on the `bundlewatch` commit status / results page
+- **Fork PRs:** GitHub’s read-only token cannot post the BundleWatch commit status (403); the workflow check still fails on `maxSize`. Same-repo PRs get full status + deltas.
 - First green **push to `main`** seeds the baseline
 - Deeper “what module grew”: local `ANALYZE=true bun run build` → `stats.html`
 - Panda hard-fail: `bun run ci:panda-fingerprint` rejects `createSerializeCss` in production output

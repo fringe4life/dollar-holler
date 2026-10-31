@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@better-auth/drizzle-adapter": "1.7.12",
+    "@better-auth/drizzle-adapter": "1.7.14",
     "@opentelemetry/api": "1.10.0",
     "@sentry/sveltekit": "11.9.0",
     "@varlock/bitwarden-plugin": "2.0.2",

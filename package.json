@@ -6,7 +6,7 @@
     "@varlock/bitwarden-plugin": "2.0.2",
     "better-auth": "1.7.12",
     "drizzle-orm": "1.0.0-rc.5",
-    "marked": "18.1.1",
+    "marked": "18.1.2",
     "ogygia": "0.8.6",
     "prismjs": "1.30.0",
     "sanitize-html": "2.18.1",

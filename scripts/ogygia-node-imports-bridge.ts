@@ -66,6 +66,10 @@ const matchesImportsBridge = (id: string, bridges: ImportsBridge[]): boolean =>
     ({ bare, star }) => id === bare || (star && id.startsWith(`${bare}/`))
   );
 
+/** Only remap from ogygia’s virtual island modules (where `#` collapses). */
+const isOgygiaVirtualImporter = (importer: string | undefined): boolean =>
+  typeof importer === "string" && importer.includes("virtual:ogygia/");
+
 /**
  * Vite `resolveId` bridge used from `vite.config.ts` (pin-comment lives there).
  * Remaps bare names derived from `package.json` `"imports"` so ogygia island
@@ -82,8 +86,12 @@ export const ogygiaNodeImportsBridge = (): Plugin => {
       root = config.root;
       bridges = readImportsBridges(root);
     },
-    async resolveId(id) {
-      if (shouldSkipBareId(id) || !matchesImportsBridge(id, bridges)) {
+    async resolveId(id, importer) {
+      if (
+        !isOgygiaVirtualImporter(importer) ||
+        shouldSkipBareId(id) ||
+        !matchesImportsBridge(id, bridges)
+      ) {
         return undefined;
       }
       // Prefer re-attaching `#` so Vite's native imports map can win.

@@ -161,7 +161,7 @@
   </p>
   <div class={gridItem({ gridArea: "discountInput", position: "relative" })}>
     <input
-      class={cx(discountStyles.input, money(), css({ paddingInlineEnd: 3 }))}
+      class={cx(discountStyles.input, css({ paddingInlineEnd: 3 }))}
       disabled={!isEditable}
       max="100"
       min="0"
@@ -171,14 +171,11 @@
         : props.discountAttrs}
     />
     <span
-      class={cx(
-        money(),
-        css({
-          insetBlockStart: 2,
-          insetInlineEnd: 0,
-          position: "absolute",
-        })
-      )}>%</span
+      class={css({
+        insetBlockStart: 2,
+        insetInlineEnd: 0,
+        position: "absolute",
+      })}>%</span
     >
   </div>
   <div

@@ -80,7 +80,7 @@ describe("rollClientInvoiceSummary", () => {
     });
   });
 
-  it("ignores null / unknown status (same as SQL CASE buckets)", () => {
+  it("buckets null / unknown status as draft", () => {
     const rows = [
       row({
         dueDate: new Date(nowMs),
@@ -88,11 +88,17 @@ describe("rollClientInvoiceSummary", () => {
         invoiceStatus: null,
         total: 999,
       }),
+      row({
+        dueDate: new Date(nowMs),
+        id: id("f2"),
+        invoiceStatus: "weird",
+        total: 1,
+      }),
     ];
     expect(rollClientInvoiceSummary(rows, nowMs)).toEqual({
-      draft: 0,
-      draftCount: 0,
-      grandTotal: 0,
+      draft: 1000,
+      draftCount: 2,
+      grandTotal: 1000,
       outstanding: 0,
       outstandingCount: 0,
       overdue: 0,

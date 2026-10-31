@@ -31,20 +31,23 @@
     return `${count} ${unit}`;
   });
 
-  /**
-   * Named button so keyboard focus drives CSS `:focus-visible` card↔arc sync.
-   * Activate is a no-op: highlight is the affordance (#207); filtering by bucket
-   * is out of scope.
-   */
   const cardLabel = $derived(
     [label, countLabel || undefined, amount].filter(Boolean).join(", ")
   );
+
+  /** Activate scrolls the matching mouth readout into view (`ClientInvoicePlate`). */
+  const focusReadout = (): void => {
+    document
+      .getElementById(`client-summary-${bucket}`)
+      ?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  };
 </script>
 
 <button
   aria-label={cardLabel || label}
   class={cx(clientTotalsCard({ bucket }), className)}
   data-bucket={amount === undefined ? undefined : bucket}
+  onclick={focusReadout}
   type="button"
 >
   <span class={clientTotalsTerm} data-role="term">

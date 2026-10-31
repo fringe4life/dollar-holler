@@ -48,7 +48,7 @@ const RING_META = "clamp(11.5px, 3.1cqw, 12px)";
 const RING_READOUT = "clamp(15px, 4.4cqw, 19px)";
 
 /** Ring stroke as a mask, so each arc can carry its own thickness. */
-const ringMask = (thickness: string) =>
+const ringMask = (thickness: string): string =>
   `radial-gradient(farthest-side, transparent calc(100% - ${thickness}), #000 calc(100% - ${thickness}) 100%)`;
 
 export const clientSummarySection = cx(
@@ -540,7 +540,7 @@ export const clientTotalsCard = cva({
     containerName: "bucketCard",
     containerType: "inline-size",
     cornerShape: CORNER_SHAPE,
-    cursor: "default",
+    cursor: "pointer",
     display: "flex",
     flexDirection: "column",
     font: "inherit",
@@ -822,9 +822,13 @@ export const clientTotalsAmount = cva({
     letterSpacing: "tight",
     lineHeight: 1.1,
     margin: 0,
+    // Narrow two-column cards: shrink rather than spill past the tile.
+    maxInlineSize: "100%",
+    minInlineSize: 0,
+    overflowWrap: "anywhere",
     transitionDuration: "normal",
     transitionProperty: "color",
-    whiteSpace: "nowrap",
+    whiteSpace: "normal",
     // A row reserves the amount column, so the number sits on its right edge and
     // every count above it lands on one shared line. Scaling from that same edge
     // keeps the hover from pushing 2px past the card. Rows only — the flank tier
@@ -833,6 +837,7 @@ export const clientTotalsAmount = cva({
       "@clientTotals/3xlDown": {
         textAlign: "end",
         transformOrigin: "right center",
+        whiteSpace: "nowrap",
       },
     },
   },

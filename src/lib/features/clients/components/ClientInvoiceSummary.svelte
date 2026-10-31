@@ -47,6 +47,7 @@
     </div>
   {/snippet}
   {#snippet failed(error, reset)}
+    <ClientInvoiceOverview client={identity} {onEdit} />
     <BoundaryError
       {error}
       fallbackMessage="Failed to load summary"

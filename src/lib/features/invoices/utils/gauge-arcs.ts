@@ -43,22 +43,23 @@ export const gaugeWeights = (
 /**
  * @abstract splits the horseshoe into one arc per non-empty bucket, weighted by money
  * @param {GaugeWeights} weights per-bucket cents
- * @returns {GaugeArc[]} arcs in reading order; empty when every bucket is ≤ 0
+ * @returns {GaugeArc[]} arcs in reading order; empty when every |weight| is 0
  *
- * Negative bucket totals (e.g. discount > 100%) stay on the amount cards but
- * cannot claim positive arc length — clamp out of the chart rather than invent
- * a signed-geometry story. Schema-side discount caps are a separate follow-up.
+ * Negative bucket totals (e.g. discount > 100%) still claim arc length via
+ * magnitude so the chart matches the cards; schema-side discount caps stay #229.
  */
 export const buildGaugeArcs = (weights: GaugeWeights): GaugeArc[] => {
-  const filled = SUMMARY_BUCKETS.filter((bucket) => weights[bucket] > 0);
-  const total = filled.reduce((sum, bucket) => sum + weights[bucket], 0);
+  const magnitude = (bucket: SummaryBucket): number =>
+    Math.abs(weights[bucket]);
+  const filled = SUMMARY_BUCKETS.filter((bucket) => magnitude(bucket) > 0);
+  const total = filled.reduce((sum, bucket) => sum + magnitude(bucket), 0);
   if (total <= 0) {
     return [];
   }
 
   const usable = ARC_SWEEP_DEG - ARC_GAP_DEG * Math.max(0, filled.length - 1);
   const raw = filled.map((bucket) =>
-    Math.max((usable * weights[bucket]) / total, ARC_MIN_DEG)
+    Math.max((usable * magnitude(bucket)) / total, ARC_MIN_DEG)
   );
   // Minimums can over-subscribe the sweep; scale the set back to fit exactly.
   const scale = Math.min(1, usable / raw.reduce((sum, span) => sum + span, 0));

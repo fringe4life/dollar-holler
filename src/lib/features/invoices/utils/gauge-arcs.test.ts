@@ -20,10 +20,11 @@ describe("buildGaugeArcs", () => {
     expect(buildGaugeArcs(weights({}))).toEqual([]);
   });
 
-  test("omits non-positive buckets from the chart", () => {
-    expect(buildGaugeArcs(weights({ draft: -500, paid: 0 }))).toEqual([]);
+  test("uses magnitude so negative buckets still draw", () => {
+    const alone = buildGaugeArcs(weights({ draft: -500, paid: 0 }));
+    expect(alone.map((arc) => arc.bucket)).toEqual(["draft"]);
     const arcs = buildGaugeArcs(weights({ draft: -500, paid: 100 }));
-    expect(arcs.map((arc) => arc.bucket)).toEqual(["paid"]);
+    expect(arcs.map((arc) => arc.bucket)).toEqual(["draft", "paid"]);
   });
 
   test("keeps reading order even when early buckets are empty", () => {

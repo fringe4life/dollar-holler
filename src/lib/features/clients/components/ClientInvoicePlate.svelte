@@ -125,7 +125,11 @@
       </div>
       {#each buckets as entry (entry.bucket)}
         {#if entry.amount}
-          <div class={clientSummaryReadoutItem} data-readout={entry.bucket}>
+          <div
+            class={clientSummaryReadoutItem}
+            data-readout={entry.bucket}
+            id="client-summary-{entry.bucket}"
+          >
             <span class={clientSummaryReadoutLabel}>
               <span
                 aria-hidden="true"

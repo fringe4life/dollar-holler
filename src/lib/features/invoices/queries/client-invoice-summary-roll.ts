@@ -53,7 +53,9 @@ export const rollClientInvoiceSummary = (
   let paidCount = 0;
   for (const row of rows) {
     const total = row.total;
-    const status = row.invoiceStatus;
+    // Null/unknown match optimistic helpers (`?? "draft"`) so the hero never
+    // claims "No invoices yet" while rows still exist.
+    const status = row.invoiceStatus ?? "draft";
     if (status === "draft") {
       draft += total;
       draftCount += 1;
@@ -72,6 +74,9 @@ export const rollClientInvoiceSummary = (
         overdue += total;
         overdueCount += 1;
       }
+    } else {
+      draft += total;
+      draftCount += 1;
     }
   }
   return createSummary({

@@ -15,54 +15,25 @@
 
 <script lang="ts">
   import { asset } from "$app/paths";
-  import { cx } from "#styled-system/css/index.js";
-  import InitialsAvatar from "#lib/components/primitives/avatar/InitialsAvatar.svelte";
-  import Badge from "#lib/components/primitives/badge/badge.svelte";
-  import Button from "#lib/components/primitives/button/button.svelte";
-  import Edit from "#lib/components/primitives/icons/Edit.svelte";
-  import { money } from "#lib/components/primitives/money/money.ts";
-  import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
   import type { BitsButton } from "#lib/types.ts";
   import { convertMonthYear } from "#lib/utils/dateHelpers.ts";
   import { centsToDollars } from "#lib/utils/moneyHelpers.ts";
   import type { ClientSelect } from "#features/clients/types.ts";
+  import ClientInvoiceGauge from "#features/clients/components/ClientInvoiceGauge.svelte";
+  import ClientInvoicePlate from "#features/clients/components/ClientInvoicePlate.svelte";
   import InvoiceSummaryItem from "#features/invoices/components/InvoiceSummaryItem.svelte";
   import {
-    clientSummaryAddress,
-    clientSummaryArc,
-    clientSummaryArcSweep,
-    clientSummaryAvatar,
-    clientSummaryBadge,
-    clientSummaryEditButton,
-    clientSummaryEmail,
     clientSummaryEmptyBody,
     clientSummaryEmptyPanel,
     clientSummaryEmptyTitle,
-    clientSummaryFields,
     clientSummaryGauge,
     clientSummaryGaugeCol,
-    clientSummaryGhostRing,
-    clientSummaryHead,
     clientSummaryHero,
     clientSummaryHeroEmpty,
-    clientSummaryIdentity,
-    clientSummaryMeta,
-    clientSummaryName,
-    clientSummaryPlate,
-    clientSummaryReadout,
-    clientSummaryReadoutAmount,
-    clientSummaryReadoutItem,
-    clientSummaryReadoutLabel,
     clientSummarySection,
-    clientSummarySince,
-    clientSummarySkeletonLine,
-    clientSummarySkeletonRing,
-    clientTotalsKey,
   } from "#features/invoices/styles/invoice-summary-styles.ts";
   import type { ClientInvoiceSummaryFinal } from "#features/invoices/utils/client-invoice-summary.ts";
   import {
-    ARC_START_DEG,
-    ARC_SWEEP_DEG,
     SUMMARY_BUCKETS,
     buildGaugeArcs,
     gaugeWeights,
@@ -132,134 +103,21 @@
   <div class={isEmpty ? clientSummaryHeroEmpty : clientSummaryHero}>
     <div class={clientSummaryGaugeCol}>
       <div class={clientSummaryGauge}>
-        {#if showGhostRing}
-          <!-- Same 270deg sweep as the arcs, drawn as a dashed ghost. -->
-          <svg
-            aria-hidden="true"
-            class={clientSummaryGhostRing}
-            focusable="false"
-            viewBox="0 0 100 100"
-          >
-            <path d="M18.9 81.1A44 44 0 1 1 81.1 81.1"></path>
-          </svg>
-        {:else if !summary}
-          <div aria-hidden="true" class={clientSummarySkeletonRing}></div>
-        {:else}
-          <!-- One sweep cursor for all arcs: the mask travels the same 270deg the
-               arcs occupy, so buckets light up in reading order on first paint. -->
-          <div
-            class={clientSummaryArcSweep}
-            style="--arc-start: {ARC_START_DEG}deg; --arc-end: {ARC_START_DEG +
-              ARC_SWEEP_DEG}deg; --arc-sweep: {ARC_START_DEG +
-              ARC_SWEEP_DEG}deg"
-          >
-            {#each arcs as arc (arc.bucket)}
-              <div
-                aria-hidden="true"
-                class={clientSummaryArc({
-                  bucket: arc.bucket,
-                  lead: arc.bucket === "overdue",
-                })}
-                data-arc={arc.bucket}
-                style="--arc-from: {arc.from}deg; --arc-to: {arc.to}deg; background: conic-gradient(from 135deg, transparent 0deg var(--arc-from), currentColor var(--arc-from) var(--arc-to), transparent var(--arc-to) 360deg)"
-              ></div>
-            {/each}
-          </div>
-        {/if}
+        <ClientInvoiceGauge
+          {arcs}
+          {showGhostRing}
+          summaryLoaded={summary !== undefined}
+        />
 
-        <div class={clientSummaryPlate}>
-          <div class={clientSummaryIdentity}>
-            <div class={clientSummaryAvatar} data-role="avatar">
-              <InitialsAvatar name={client.name} size="md" />
-            </div>
-            <div class={clientSummaryHead}>
-              <h1
-                class={clientSummaryName}
-                data-role="name"
-                title={client.name}
-              >
-                {client.name}
-              </h1>
-              <Button
-                class={clientSummaryEditButton}
-                onclick={onEdit}
-                size="sm"
-                variant="ghost"
-              >
-                <Edit height={16} width={16} />
-                Edit
-              </Button>
-            </div>
-            <div class={clientSummaryMeta}>
-              <a
-                class={clientSummaryEmail}
-                data-role="email"
-                href="mailto:{client.email}"
-                title={client.email}
-              >
-                {client.email}
-              </a>
-              <Badge
-                class={clientSummaryBadge}
-                size="small"
-                variant={isArchived ? "archive" : "active"}
-              >
-                {isArchived ? "Archived" : "Active"}
-              </Badge>
-            </div>
-          </div>
-
-          <div class={clientSummaryFields}>
-            <div class={clientSummaryAddress} data-role="address">
-              <p title={client.address.street}>{client.address.street}</p>
-              <p>
-                {client.address.city}, {client.address.state}
-                {client.address.zip}
-              </p>
-            </div>
-            <p class={clientSummarySince} data-role="since">
-              <span>Client since</span>
-              <strong>{since}</strong>
-            </p>
-          </div>
-
-          {#if !isEmpty}
-            <div class={clientSummaryReadout}>
-              <div class={clientSummaryReadoutItem} data-readout="total">
-                <span class={clientSummaryReadoutLabel}>Invoice totals</span>
-                {#if summary}
-                  <span class={cx(money(), clientSummaryReadoutAmount)}>
-                    {centsToDollars(summary.grandTotal)}
-                  </span>
-                {:else}
-                  <Skeleton
-                    class={clientSummarySkeletonLine}
-                    style="inline-size: 5.5rem"
-                  />
-                {/if}
-              </div>
-              {#each buckets as entry (entry.bucket)}
-                {#if entry.amount}
-                  <div
-                    class={clientSummaryReadoutItem}
-                    data-readout={entry.bucket}
-                  >
-                    <span class={clientSummaryReadoutLabel}>
-                      <span
-                        aria-hidden="true"
-                        class={clientTotalsKey({ bucket: entry.bucket })}
-                      ></span>
-                      {entry.label}
-                    </span>
-                    <span class={cx(money(), clientSummaryReadoutAmount)}
-                      >{entry.amount}</span
-                    >
-                  </div>
-                {/if}
-              {/each}
-            </div>
-          {/if}
-        </div>
+        <ClientInvoicePlate
+          {buckets}
+          {client}
+          {isArchived}
+          {isEmpty}
+          {onEdit}
+          {since}
+          {summary}
+        />
       </div>
     </div>
 

@@ -25,5 +25,6 @@ runs:
 
     - name: Sync SvelteKit
       if: inputs.svelte-kit-sync == 'true'
-      run: bun x svelte-kit sync
+      # Local binary (lockfile); avoid `bun x` — Sonar githubactions:S8543.
+      run: ./node_modules/.bin/svelte-kit sync
       shell: bash

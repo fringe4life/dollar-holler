@@ -1,5 +1,6 @@
 <script lang="ts">
   import { cx } from "#styled-system/css/index.js";
+  import "#lib/fonts/kalam.css";
   import InitialsAvatar from "#lib/components/primitives/avatar/InitialsAvatar.svelte";
   import Badge from "#lib/components/primitives/badge/badge.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";

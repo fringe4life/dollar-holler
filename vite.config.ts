@@ -1,7 +1,10 @@
+import { createRequire } from "node:module";
+import { dirname, join } from "node:path";
 import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
+import { FontaineTransform } from "fontaine";
 import { ogygia } from "ogygia/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
@@ -24,6 +27,22 @@ import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
+
+const require = createRequire(import.meta.url);
+const FONTSOURCE_SPEC =
+  /^(?<pkg>@fontsource(?:-variable)?\/[^/]+)\/(?<rest>.*)$/;
+
+/** Map Fontsource package URLs in `@font-face` src to files on disk. */
+const resolveFontainePath = (id: string): string | URL => {
+  const match = FONTSOURCE_SPEC.exec(id);
+  const pkg = match?.groups?.pkg;
+  const rest = match?.groups?.rest;
+  if (pkg === undefined || rest === undefined) {
+    return id;
+  }
+
+  return join(dirname(require.resolve(`${pkg}/package.json`)), rest);
+};
 
 const FILE_REGEX = /[/\\]/;
 const ADAPTER_VIRTUAL_WORKERS_PLUGIN =
@@ -123,6 +142,14 @@ export default defineConfig({
   },
   plugins: [
     stubCloudflareWorkersPlugin(),
+    FontaineTransform.vite({
+      fallbacks: {
+        Kalam: ["Comic Sans MS"],
+        "Source Sans 3 Variable": ["Arial", "Roboto"],
+        "Space Mono": ["Courier New"],
+      },
+      resolvePath: resolveFontainePath,
+    }),
     visualizer({
       brotliSize: true,
       filename: "stats.html", // written next to project root by default

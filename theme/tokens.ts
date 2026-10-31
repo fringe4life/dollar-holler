@@ -50,9 +50,18 @@ export const tokens = defineTokens({
     },
   },
   fonts: {
-    handwriting: { value: "Kalam, cursive" },
-    mono: { value: "Source Code Pro, monospace" },
-    sansserif: { value: "Source Sans 3 Variable, sans-serif" },
+    // Fontaine injects `{family} fallback` @font-face (size-adjust / overrides).
+    // Panda stacks live on CSS variables, so the fallback name is listed here.
+    handwriting: {
+      value: 'Kalam, "Kalam fallback", cursive',
+    },
+    mono: {
+      value: '"Space Mono", "Space Mono fallback", monospace',
+    },
+    sansserif: {
+      value:
+        '"Source Sans 3 Variable", "Source Sans 3 Variable fallback", sans-serif',
+    },
   },
   shadows: {
     addInvoice: { value: "-4px 0px 44px oklch(0% 0 none / 0.25)" },

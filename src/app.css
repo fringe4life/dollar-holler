@@ -1,9 +1,5 @@
 @layer reset, base, tokens, recipes, utilities;
 
-@import url("@fontsource/source-code-pro/latin-400.css");
-@import url("@fontsource/source-code-pro/latin-700.css");
-@import url("@fontsource/kalam/latin-700.css");
-
 /* source-sans-3-latin-wght-normal */
 @font-face {
   font-display: swap;

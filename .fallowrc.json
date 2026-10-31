@@ -41,8 +41,9 @@
       { "name": "components", "patterns": ["src/lib/components/**"] },
       { "name": "attachments", "patterns": ["src/lib/attachments/**"] },
       {
-        "name": "shared",
+        "name":         "shared",
         "patterns": [
+          "src/lib/fonts/**",
           "src/lib/runes/**",
           "src/lib/theme/**",
           "src/lib/utils/**"

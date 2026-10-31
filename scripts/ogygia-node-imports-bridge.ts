@@ -11,13 +11,24 @@ type ImportsBridge = {
   star: boolean;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null && !Array.isArray(value);
+
 const readImportsBridges = (root: string): ImportsBridge[] => {
   const pkgPath = path.join(root, "package.json");
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, "utf8")) as {
-    imports?: Record<string, unknown>;
-  };
+  const parsed: unknown = JSON.parse(fs.readFileSync(pkgPath, "utf8"));
+  if (!isRecord(parsed)) {
+    throw new Error(`${pkgPath} must be a JSON object`);
+  }
+  const importsField = parsed.imports;
+  if (importsField === undefined) {
+    return [];
+  }
+  if (!isRecord(importsField)) {
+    throw new Error(`${pkgPath} "imports" must be an object when present`);
+  }
   const bridges: ImportsBridge[] = [];
-  for (const [key, value] of Object.entries(pkg.imports ?? {})) {
+  for (const [key, value] of Object.entries(importsField)) {
     if (typeof value !== "string" || !key.startsWith("#")) {
       continue;
     }

@@ -23,14 +23,26 @@
 
   let { amount, bucket, class: className, count, label }: Props = $props();
 
-  const countLabel = $derived(
-    count === undefined
-      ? ""
-      : `${count} ${count === 1 ? "invoice" : "invoices"}`
+  const countLabel = $derived.by(() => {
+    if (count === undefined) {
+      return "";
+    }
+    const unit = count === 1 ? "invoice" : "invoices";
+    return `${count} ${unit}`;
+  });
+
+  /**
+   * Named button so keyboard focus drives CSS `:focus-visible` card↔arc sync.
+   * Activate is a no-op: highlight is the affordance (#207); filtering by bucket
+   * is out of scope.
+   */
+  const cardLabel = $derived(
+    [label, countLabel || undefined, amount].filter(Boolean).join(", ")
   );
 </script>
 
 <button
+  aria-label={cardLabel || label}
   class={cx(clientTotalsCard({ bucket }), className)}
   data-bucket={amount === undefined ? undefined : bucket}
   type="button"

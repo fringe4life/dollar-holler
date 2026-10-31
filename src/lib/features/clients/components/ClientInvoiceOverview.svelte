@@ -111,6 +111,8 @@
   const isEmpty = $derived(
     summary !== undefined && invoiceCount === 0 && !hasQuery
   );
+  /** Ghost when there is nothing drawable (no invoices, $0-only, or empty search). */
+  const showGhostRing = $derived(summary !== undefined && arcs.length === 0);
 
   const buckets = $derived(
     SUMMARY_BUCKETS.map((bucket) => ({
@@ -130,7 +132,7 @@
   <div class={isEmpty ? clientSummaryHeroEmpty : clientSummaryHero}>
     <div class={clientSummaryGaugeCol}>
       <div class={clientSummaryGauge}>
-        {#if isEmpty}
+        {#if showGhostRing}
           <!-- Same 270deg sweep as the arcs, drawn as a dashed ghost. -->
           <svg
             aria-hidden="true"
@@ -140,6 +142,8 @@
           >
             <path d="M18.9 81.1A44 44 0 1 1 81.1 81.1"></path>
           </svg>
+        {:else if !summary}
+          <div aria-hidden="true" class={clientSummarySkeletonRing}></div>
         {:else}
           <!-- One sweep cursor for all arcs: the mask travels the same 270deg the
                arcs occupy, so buckets light up in reading order on first paint. -->
@@ -161,9 +165,6 @@
               ></div>
             {/each}
           </div>
-          {#if !summary}
-            <div aria-hidden="true" class={clientSummarySkeletonRing}></div>
-          {/if}
         {/if}
 
         <div class={clientSummaryPlate}>

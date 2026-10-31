@@ -847,11 +847,6 @@ export const clientTotalsAmount = cva({
   },
 });
 
-/** Rows reserve the amount column, so the number sits against its right edge. */
-export const clientTotalsAmountRow = css({
-  textAlign: "end",
-});
-
 export const clientSummarySkeletonRing = css({
   aspectRatio: "1",
   borderColor: "borderSubtle",

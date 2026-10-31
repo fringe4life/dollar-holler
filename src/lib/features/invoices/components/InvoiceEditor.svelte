@@ -39,17 +39,19 @@
   import { newInvoice } from "../utils/new-invoice";
   import InvoiceFormLayout from "./InvoiceFormLayout.svelte";
 
-  let {
-    mode = "create",
-    closePanel,
-    invoiceId,
-    clientId: initialClientId,
-  }: InvoiceFormProps = $props();
+  let props: InvoiceFormProps = $props();
   const toast = getToast();
 
   const picker = await clientPickerOptions();
-  // svelte-ignore state_referenced_locally -- parent remounts via {#key}
-  const editInvoiceId = mode === "edit" ? invoiceId : undefined;
+  // Parent remounts via {#key}; seed once from the create/edit discriminant.
+  // svelte-ignore state_referenced_locally
+  const mode = props.mode;
+  // svelte-ignore state_referenced_locally
+  const { closePanel } = props;
+  // svelte-ignore state_referenced_locally
+  const editInvoiceId = props.mode === "edit" ? props.invoiceId : undefined;
+  // svelte-ignore state_referenced_locally
+  const initialClientId = props.mode === "create" ? props.clientId : undefined;
   // One RQB load (invoice + lineItems); was getInvoice + listLineItems (+ verify). #121
   const editDetail = editInvoiceId
     ? await getInvoiceDetail(editInvoiceId)
@@ -70,7 +72,6 @@
     terms: full.terms ?? null,
   });
 
-  // svelte-ignore state_referenced_locally -- parent remounts via {#key}
   let invoice: NewInvoice = $state(
     loadedInvoice
       ? toEditableInvoice(loadedInvoice)

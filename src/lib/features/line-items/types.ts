@@ -25,8 +25,6 @@ export type NewLineItemWithId = Omit<LineItemInsert, "id"> & {
 
 interface InvoiceFormPanel {
   closePanel: () => void;
-  /** Preselects the client, e.g. "+ Invoice" on a client's own page. */
-  clientId?: CursorId;
 }
 
 interface InvoiceFormEditProps extends InvoiceFormPanel {
@@ -37,6 +35,8 @@ interface InvoiceFormEditProps extends InvoiceFormPanel {
 type InvoiceFormCreateProps = InvoiceFormPanel & {
   mode: "create";
   invoiceId?: undefined;
+  /** Preselects the client, e.g. "+ Invoice" on a client's own page. */
+  clientId?: CursorId;
 };
 
 export type InvoiceFormProps = InvoiceFormEditProps | InvoiceFormCreateProps;

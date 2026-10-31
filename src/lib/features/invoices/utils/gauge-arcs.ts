@@ -43,7 +43,11 @@ export const gaugeWeights = (
 /**
  * @abstract splits the horseshoe into one arc per non-empty bucket, weighted by money
  * @param {GaugeWeights} weights per-bucket cents
- * @returns {GaugeArc[]} arcs in reading order; empty when every bucket is zero
+ * @returns {GaugeArc[]} arcs in reading order; empty when every bucket is ≤ 0
+ *
+ * Negative bucket totals (e.g. discount > 100%) stay on the amount cards but
+ * cannot claim positive arc length — clamp out of the chart rather than invent
+ * a signed-geometry story. Schema-side discount caps are a separate follow-up.
  */
 export const buildGaugeArcs = (weights: GaugeWeights): GaugeArc[] => {
   const filled = SUMMARY_BUCKETS.filter((bucket) => weights[bucket] > 0);

@@ -34,6 +34,11 @@
   });
 </script>
 
+<!--
+  #207 boundary choice: keep Kit `<svelte:boundary>` around the summary query.
+  No ogygia lake/island — the hero streams with the page; navbar toast context
+  still requires Kit on the dashboard shell.
+-->
 <svelte:boundary>
   {#snippet pending()}
     <div aria-busy="true" aria-live="polite" role="status">

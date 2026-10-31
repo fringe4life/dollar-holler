@@ -134,7 +134,7 @@
     <label class={qtyStyles.label} for="quantity-{props.lineItem.id}">Qty</label
     >
     <input
-      class={cx(qtyStyles.input, money())}
+      class={qtyStyles.input}
       disabled={!isEditable}
       id="quantity-{props.lineItem.id}"
       min="0"

@@ -24,16 +24,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      # Install packages first so @varlock/bitwarden-plugin is available.
-      # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
-      - run: bun install --frozen-lockfile --ignore-scripts
-
-      - name: Load environment variables
-        uses: dmno-dev/varlock-action@v1.0.5
+      - name: Setup app
+        uses: ./.github/actions/setup-app
 
       - name: Architecture boundaries
         run: bun run fallow:boundary-violations

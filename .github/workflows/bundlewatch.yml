@@ -1,0 +1,53 @@
+name: bundlewatch
+
+on:
+  push:
+    # Only tracked branches — avoids double-run when a PR branch is also pushed
+    # https://bundlewatch.io/guide/using-bundlewatch
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  statuses: write
+
+concurrency:
+  group: bundlewatch-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundlewatch:
+    runs-on: ubuntu-latest
+    env:
+      # Test env + .env.test — no Bitwarden / Cloudflare / Sentry deploy secrets
+      VARLOCK_ENV: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup app
+        uses: ./.github/actions/setup-app
+
+      - name: Build
+        run: bun run build
+
+      - name: Panda fingerprint (createSerializeCss)
+        run: bun run ci:panda-fingerprint
+
+      - name: BundleWatch
+        run: |
+          set -o pipefail
+          bun run ci:bundlewatch 2>&1 | tee bundlewatch.log
+          {
+            echo "## BundleWatch"
+            echo
+            # Results link when the service returns one
+            grep -E 'Result breakdown at:|https://service\.bundlewatch\.io/' bundlewatch.log \
+              | head -5 \
+              || echo "_No results URL in log (baseline or maxSize-only run)._"
+            echo
+            echo '```'
+            tail -n 40 bundlewatch.log
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          BUNDLEWATCH_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -10,6 +10,8 @@ const config: Configuration = {
     // Function form: no staged filenames (project-wide). Array = sequential, no shell.
     () => ["svelte-kit sync", "svelte-check --tsconfig ./tsconfig.json"],
   ],
+  // Fast lockfile gate only — do not hang off the svelte-check path (#233).
+  "{package.json,bun.lock}": () => ["bun run audit:deps"],
   "*.{json,md,yml,yaml,html}": "prettier --write --experimental-cli",
   "*.css": ["stylelint --fix", "prettier --write --experimental-cli"],
 };

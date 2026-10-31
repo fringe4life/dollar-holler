@@ -4,6 +4,10 @@ on:
   push:
     branches: [main, master]
   pull_request:
+  schedule:
+    # Mondays 09:00 UTC — catch advisories published against an unchanged lockfile
+    - cron: "0 9 * * 1"
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,6 +18,7 @@ concurrency:
 
 jobs:
   lint:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     env:
       # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
@@ -21,20 +26,10 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
+      - name: Setup app
+        uses: ./.github/actions/setup-app
         with:
-          bun-version: latest
-
-      # Install packages first so @varlock/bitwarden-plugin is available.
-      # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
-      - run: bun install --frozen-lockfile --ignore-scripts
-
-      - name: Load environment variables
-        uses: dmno-dev/varlock-action@v1.0.5
-
-      # --ignore-scripts skips prepare. Panda's ESLint plugin needs $app/tsconfig.
-      - name: Sync SvelteKit
-        run: bun x svelte-kit sync
+          svelte-kit-sync: "true"
 
       - name: ESLint
         run: bun run lint
@@ -46,29 +41,36 @@ jobs:
         run: bun run stylelint
 
   typecheck:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     env:
       VARLOCK_ENV: test
     steps:
       - uses: actions/checkout@v7
 
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: latest
-
-      - run: bun install --frozen-lockfile --ignore-scripts
-
-      - name: Load environment variables
-        uses: dmno-dev/varlock-action@v1.0.5
+      - name: Setup app
+        uses: ./.github/actions/setup-app
 
       # styled-system/ is gitignored. bun run check does not generate it.
       - name: Typecheck
         run: bun run typecheck
 
   test:
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     env:
       VARLOCK_ENV: test
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup app
+        uses: ./.github/actions/setup-app
+
+      - name: Unit tests
+        run: bun run test
+
+  audit:
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
 
@@ -76,10 +78,6 @@ jobs:
         with:
           bun-version: latest
 
-      - run: bun install --frozen-lockfile --ignore-scripts
-
-      - name: Load environment variables
-        uses: dmno-dev/varlock-action@v1.0.5
-
-      - name: Unit tests
-        run: bun run test
+      # bun audit reads bun.lock only — no install / Varlock needed
+      - name: Dependency audit (prod, moderate+)
+        run: bun run audit:deps

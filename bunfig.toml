@@ -1,7 +1,8 @@
 [install]
 linker = "isolated"
 minimumReleaseAge=259200
-minimumReleaseAgeExcludes = ["ogygia"]
+# Security override pins (glob/minimatch) may be newer than minimumReleaseAge.
+minimumReleaseAgeExcludes = ["ogygia", "glob", "minimatch"]
 
 # Varlock: disable Bun’s automatic `.env` loading so resolution order matches the schema (see https://varlock.dev/integrations/bun/).
 env = false

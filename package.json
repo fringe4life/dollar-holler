@@ -107,7 +107,7 @@
     "oracle:sql-list:write": "bun ./scripts/sql-list-baseline.ts --write-oracle",
     "cf:types": "wrangler types ./src/worker-configuration.d.ts --include-runtime false",
     "cf:restore-workers": "bun scripts/restore-cloudflare-workers.ts",
-    "fonts:subset-money": "bun ./scripts/subset-money-font.ts",
+    "fonts:subset-money": "bun ./scripts/subset-money-font.ts && prettier --write src/lib/fonts/money/money.css --experimental-cli",
     "deploy": "bun run build && varlock-wrangler deploy",
     "deploy:project": "varlock-wrangler deploy",
     "audit:deps": "bun audit --prod --audit-level=moderate",

@@ -54,24 +54,26 @@ describe("shouldPreloadAsset", () => {
     ).toBe(false);
   });
 
-  it("preloads money only on invoice and client routes", () => {
+  it("preloads money on invoice and client routes, not thanks or auth", () => {
     expect(shouldPreloadAsset(moneyFont, "/invoices")).toBe(true);
+    expect(shouldPreloadAsset(moneyFont, "/invoices/abc")).toBe(true);
     expect(shouldPreloadAsset(moneyFont, "/clients/abc")).toBe(true);
+    expect(shouldPreloadAsset(moneyFont, "/invoices/thanks")).toBe(false);
     expect(shouldPreloadAsset(moneyFont, "/login")).toBe(false);
     expect(shouldPreloadAsset(moneyFont, "/")).toBe(false);
     expect(shouldPreloadAsset(moneyFont, "/settings")).toBe(false);
   });
 
-  it("preloads Kalam on landing, lists, and client detail", () => {
+  it("preloads Kalam only on the landing page", () => {
     expect(shouldPreloadAsset(kalamFont, "/")).toBe(true);
-    expect(shouldPreloadAsset(kalamFont, "/invoices")).toBe(true);
-    expect(shouldPreloadAsset(kalamFont, "/clients")).toBe(true);
+    expect(shouldPreloadAsset(kalamFont, "/invoices")).toBe(false);
+    expect(shouldPreloadAsset(kalamFont, "/clients")).toBe(false);
     expect(
       shouldPreloadAsset(
         kalamFont,
         "/clients/01234567-89ab-cdef-0123-456789abcdef"
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(shouldPreloadAsset(kalamFont, "/invoices/thanks")).toBe(false);
     expect(shouldPreloadAsset(kalamFont, "/login")).toBe(false);
     expect(shouldPreloadAsset(kalamWoff, "/")).toBe(false);

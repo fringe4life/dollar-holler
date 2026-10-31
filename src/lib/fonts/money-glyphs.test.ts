@@ -27,6 +27,12 @@ describe("MONEY_GLYPHS", () => {
       }
     }
   });
+
+  it("covers HTML number-input exponent notation", () => {
+    for (const glyph of "1e3E-2") {
+      expect(MONEY_GLYPHS.includes(glyph)).toBe(true);
+    }
+  });
 });
 
 describe("toUnicodeRange", () => {

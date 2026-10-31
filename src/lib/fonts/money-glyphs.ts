@@ -3,10 +3,11 @@
  *
  * Covers `Intl.NumberFormat("en", { currency: "USD", style: "currency" })`
  * plus numeric inputs: digits, `$`, grouping/decimal, signs, parens, `%`,
- * NBSP, Unicode minus, and en dash. Letters stay out so labels fall back
- * to Source Sans via `unicode-range`.
+ * `e`/`E` (HTML `type="number"` exponents), NBSP, Unicode minus, and en
+ * dash. Other characters stay outside `unicode-range` and paint with the
+ * next faces in the `mono` stack (`Space Mono fallback` / monospace).
  */
-export const MONEY_GLYPHS = "$%()+,-./0123456789 \u00A0\u2013\u2212";
+export const MONEY_GLYPHS = "$%()+,-./0123456789Ee \u00A0\u2013\u2212";
 
 const hexCodePoint = (codePoint: number): string =>
   codePoint.toString(16).toUpperCase().padStart(4, "0");

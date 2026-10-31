@@ -4,7 +4,9 @@
  * Body (Source Sans 3 Variable) is on every page via `src/app.css`.
  * Money (Space Mono subset) is pulled in by `money()` CSS, so Kit only
  * offers those files on routes that import the CVA. Handwriting (Kalam)
- * is imported next to landing / empty-state UI.
+ * is imported next to landing / empty-state UI; dashboard empty states
+ * still discover it via `@font-face` when they paint (not preloaded —
+ * most list visits have rows).
  *
  * Path checks keep a global CSS import from preloading money or Kalam on
  * auth and other unused routes. Match `filename` (source path), not the
@@ -12,8 +14,9 @@
  *
  * Face → routes:
  * - Source Sans 3 Variable — every page
- * - Space Mono 400/700 subset — `/invoices`, `/clients` (and nested)
- * - Kalam 700 — `/`, invoice/client lists, client detail empty summary
+ * - Space Mono 400/700 subset — `/invoices/*` and `/clients/*` except
+ *   `/invoices/thanks` (no money UI)
+ * - Kalam 700 — `/` only (above-the-fold landing); elsewhere lazy
  *
  * This filter does not run in vite dev.
  */
@@ -22,21 +25,21 @@ export const BODY_FONT_FILE = "@fontsource-variable/source-sans-3/";
 export const HANDWRITING_FONT_FILE = "@fontsource/kalam/";
 export const MONEY_FONT_FILE = "src/lib/fonts/money/space-mono-";
 
-const CLIENT_DETAIL_PATH =
-  /^\/clients\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
 export type PreloadInput =
   | { path: string; type: "asset" | "css" | "js" }
   | { filename: string; path: string; type: "font" };
 
-const isMoneyFontRoute = (pathname: string): boolean =>
-  pathname.startsWith("/invoices") || pathname.startsWith("/clients");
+const isMoneyFontRoute = (pathname: string): boolean => {
+  if (
+    pathname === "/invoices/thanks" ||
+    pathname.startsWith("/invoices/thanks/")
+  ) {
+    return false;
+  }
+  return pathname.startsWith("/invoices") || pathname.startsWith("/clients");
+};
 
-const isHandwritingFontRoute = (pathname: string): boolean =>
-  pathname === "/" ||
-  pathname === "/invoices" ||
-  pathname === "/clients" ||
-  CLIENT_DETAIL_PATH.test(pathname);
+const isHandwritingFontRoute = (pathname: string): boolean => pathname === "/";
 
 export const shouldPreloadAsset = (
   input: PreloadInput,

@@ -12,13 +12,15 @@ import "#lib/fonts/money/money.css";
  * lining + tabular figures. Tabular is mostly redundant on a true mono face
  * but keeps columns stable if the stack ever falls back, and matches the
  * finance-UI convention. Prefer `font-variant-numeric` over
- * `font-feature-settings`. The woff2s are a money-glyph subset (#211); other
- * characters fall back to sans via `unicode-range`.
+ * `font-feature-settings`. The woff2s are a money-glyph subset (#211); glyphs
+ * outside that range use the next `mono` faces (`Space Mono fallback` /
+ * monospace), not Source Sans.
  *
- * Face pick (#212): keep a dedicated mono stack (not Source Sans + tnum) so
- * amounts stay visually distinct from labels. Space Mono replaces Source
- * Code Pro — same 400/700 pair the UI uses, less “IDE”, still tabular by
- * being mono. `money()` call sites and API stay unchanged.
+ * Face pick (#212): compared keeping Code Pro, IBM Plex Mono / JetBrains Mono
+ * (clearer `$`/figures but still “editor”), Source Sans 3 + `tnum` alone (no
+ * second family; amounts blend into labels), and Space Mono. Kept a dedicated
+ * mono stack; Space Mono wins on ledger feel vs Code Pro, ships only 400/700
+ * (what recipes use), OFL via Fontsource. `money()` API / call sites unchanged.
  *
  * Left out of base on purpose (see #210):
  * - `slashed-zero` — busy on currency; use the `zero` variant when O/0

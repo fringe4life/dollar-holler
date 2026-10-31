@@ -15,6 +15,11 @@ import "#lib/fonts/money/money.css";
  * `font-feature-settings`. The woff2s are a money-glyph subset (#211); other
  * characters fall back to sans via `unicode-range`.
  *
+ * Face pick (#212): keep a dedicated mono stack (not Source Sans + tnum) so
+ * amounts stay visually distinct from labels. Space Mono replaces Source
+ * Code Pro — same 400/700 pair the UI uses, less “IDE”, still tabular by
+ * being mono. `money()` call sites and API stay unchanged.
+ *
  * Left out of base on purpose (see #210):
  * - `slashed-zero` — busy on currency; use the `zero` variant when O/0
  *   ambiguity matters (no-op if the face lacks `zero`)

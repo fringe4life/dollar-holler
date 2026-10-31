@@ -142,6 +142,14 @@ export default defineConfig({
   },
   plugins: [
     stubCloudflareWorkersPlugin(),
+    /**
+     * Fontaine (#213): metric-matched `{family} fallback` @font-face
+     * (size-adjust / overrides). Panda stacks are CSS variables, so tokens
+     * list the fallback name too. Kept after a qualitative swap check on `/`
+     * (body + Kalam) and a money route (Space Mono) in Vite preview —
+     * interim stacks sit close enough that list rows / hero copy do not
+     * reflow when the woff2 arrives. Pure CSS; does not speed downloads.
+     */
     FontaineTransform.vite({
       fallbacks: {
         Kalam: ["Comic Sans MS"],

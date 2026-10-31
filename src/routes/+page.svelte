@@ -1,5 +1,6 @@
 <script lang="ts">
   import { ArrowUpRightIcon } from "@lucide/svelte";
+  import "#lib/fonts/kalam.css";
   import { css, cx } from "#styled-system/css/index.js";
   import { grid, hstack, stack } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";

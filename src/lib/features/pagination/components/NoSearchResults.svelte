@@ -2,6 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { asset } from "$app/paths";
   import BlankRow from "./BlankRow.svelte";
+  import "#lib/fonts/kalam.css";
 
   let {
     message = "We didn't find anything that you were looking for.",

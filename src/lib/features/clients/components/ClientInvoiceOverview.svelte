@@ -15,6 +15,7 @@
 
 <script lang="ts">
   import { asset } from "$app/paths";
+  import "#lib/fonts/kalam.css";
   import type { BitsButton } from "#lib/types.ts";
   import { convertMonthYear } from "#lib/utils/dateHelpers.ts";
   import { centsToDollars } from "#lib/utils/moneyHelpers.ts";

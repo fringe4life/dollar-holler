@@ -2,6 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { asset } from "$app/paths";
   import BlankRow from "#features/pagination/components/BlankRow.svelte";
+  import "#lib/fonts/kalam.css";
 
   interface Props {
     message: string;

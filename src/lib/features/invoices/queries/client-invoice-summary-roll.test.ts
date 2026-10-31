@@ -47,10 +47,14 @@ describe("rollClientInvoiceSummary", () => {
 
     expect(rollClientInvoiceSummary(rows, nowMs)).toEqual({
       draft: 100,
+      draftCount: 1,
       grandTotal: 425,
       outstanding: 200,
+      outstandingCount: 1,
       overdue: 50,
+      overdueCount: 1,
       paid: 75,
+      paidCount: 1,
     });
   });
 
@@ -65,10 +69,14 @@ describe("rollClientInvoiceSummary", () => {
     ];
     expect(rollClientInvoiceSummary(rows, nowMs)).toEqual({
       draft: 0,
+      draftCount: 0,
       grandTotal: 10,
       outstanding: 10,
+      outstandingCount: 1,
       overdue: 0,
+      overdueCount: 0,
       paid: 0,
+      paidCount: 0,
     });
   });
 
@@ -83,10 +91,42 @@ describe("rollClientInvoiceSummary", () => {
     ];
     expect(rollClientInvoiceSummary(rows, nowMs)).toEqual({
       draft: 0,
+      draftCount: 0,
       grandTotal: 0,
       outstanding: 0,
+      outstandingCount: 0,
       overdue: 0,
+      overdueCount: 0,
       paid: 0,
+      paidCount: 0,
+    });
+  });
+
+  it("counts multiple invoices in the same bucket", () => {
+    const rows = [
+      row({
+        dueDate: new Date(nowMs - 1),
+        id: id("g"),
+        invoiceStatus: "sent",
+        total: 10,
+      }),
+      row({
+        dueDate: new Date(nowMs - 2),
+        id: id("h"),
+        invoiceStatus: "sent",
+        total: 20,
+      }),
+    ];
+    expect(rollClientInvoiceSummary(rows, nowMs)).toEqual({
+      draft: 0,
+      draftCount: 0,
+      grandTotal: 30,
+      outstanding: 0,
+      outstandingCount: 0,
+      overdue: 30,
+      overdueCount: 2,
+      paid: 0,
+      paidCount: 0,
     });
   });
 });

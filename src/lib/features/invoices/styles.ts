@@ -93,7 +93,6 @@ export const invoiceDueDate = grid({
 export const invoiceAmount = grid({
   color: "foreground",
   fontSize: { base: "2xl", "@item-row/md": "3xl", "@item-row/xl": "xl" },
-  fontVariantNumeric: "tabular-nums",
   fontWeight: "black",
   gridArea: "amount",
   justifyItems: "end",

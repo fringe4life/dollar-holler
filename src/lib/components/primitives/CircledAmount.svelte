@@ -2,6 +2,7 @@
   import { css } from "#styled-system/css/index.js";
   import { center } from "#styled-system/patterns/index.js";
   import { asset } from "$app/paths";
+  import { money } from "#lib/components/primitives/money/money.ts";
 
   interface Props {
     amount: string;
@@ -25,5 +26,5 @@
   style:--circle={`url(${asset("images/circle.svg")})`}
 >
   <div class={css({ fontWeight: "bold" })}>{label}</div>
-  <div class={css({ fontSize: "xl" })}>{amount}</div>
+  <div class={money({ size: "lg" })}>{amount}</div>
 </div>

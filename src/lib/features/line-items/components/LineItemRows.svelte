@@ -5,6 +5,7 @@
   import type { LineItemRowsProps } from "#features/line-items/types.ts";
   import CircledAmount from "#lib/components/primitives/CircledAmount.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import { money } from "#lib/components/primitives/money/money.ts";
   import { centsToDollars, sumLineItems } from "#lib/utils/moneyHelpers.ts";
   import {
     invoiceLineItem,
@@ -133,12 +134,14 @@
     Subtotal
   </div>
   <div
-    class={gridItem({
-      gridArea: "amount",
-      paddingBlock: 5,
-      textAlign: "right",
-      fontFamily: "mono",
-    })}
+    class={cx(
+      money(),
+      gridItem({
+        gridArea: "amount",
+        paddingBlock: 5,
+        textAlign: "right",
+      })
+    )}
   >
     {subTotal}
   </div>
@@ -158,7 +161,7 @@
   </p>
   <div class={gridItem({ gridArea: "discountInput", position: "relative" })}>
     <input
-      class={cx(discountStyles.input, css({ paddingInlineEnd: 3 }))}
+      class={cx(discountStyles.input, money(), css({ paddingInlineEnd: 3 }))}
       disabled={!isEditable}
       max="100"
       min="0"
@@ -168,21 +171,25 @@
         : props.discountAttrs}
     />
     <span
-      class={css({
-        position: "absolute",
-        insetInlineEnd: 0,
-        insetBlockStart: 2,
-        fontFamily: "mono",
-      })}>%</span
+      class={cx(
+        money(),
+        css({
+          insetBlockStart: 2,
+          insetInlineEnd: 0,
+          position: "absolute",
+        })
+      )}>%</span
     >
   </div>
   <div
-    class={gridItem({
-      gridArea: "amount",
-      paddingBlock: 5,
-      textAlign: "right",
-      fontFamily: "mono",
-    })}
+    class={cx(
+      money(),
+      gridItem({
+        gridArea: "amount",
+        paddingBlock: 5,
+        textAlign: "right",
+      })
+    )}
   >
     {centsToDollars(discountAmount)}
   </div>

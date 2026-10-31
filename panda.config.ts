@@ -48,12 +48,19 @@ export default defineConfig({
   // Useful for theme customization
   theme: {
     extend: {
-      containerNames: ["clientTotals", "item-row"],
+      containerNames: ["clientTotals", "item-row", "bucketCard"],
       containers: {
         xs: "20ch",
+        sm: "24rem",
         md: "28rem",
         xl: "36rem",
+        // Beside-ring arrangement starts here (cards still boxed tiles).
+        ledger: "36rem",
+        // Same arrangement, but the cards have enough width to become ledger rows.
+        rows: "40rem",
         "2xl": "42rem",
+        "3xl": "48rem",
+        "4xl": "56rem",
       },
       keyframes,
       semanticTokens,

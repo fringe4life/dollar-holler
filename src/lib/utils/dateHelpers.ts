@@ -1,6 +1,25 @@
 import type { Maybe } from "#lib/types.ts";
 
 const DATE_FORMATTER = new Intl.DateTimeFormat();
+const MONTH_YEAR_FORMATTER = new Intl.DateTimeFormat("en", {
+  month: "long",
+  year: "numeric",
+});
+
+/**
+ * @abstract formats a date as the month and year it started, e.g. "March 2024"
+ * @param {Maybe<Date | string>} myDate the date to present
+ * @returns {string} unknown when the value is missing or unparseable
+ */
+export const convertMonthYear = (myDate: Maybe<Date | string>): string => {
+  if (!myDate) {
+    return "Unknown";
+  }
+  const date = new Date(myDate);
+  return Number.isNaN(date.getTime())
+    ? "Unknown"
+    : MONTH_YEAR_FORMATTER.format(date);
+};
 /**
  * @abstract converts the date to one to be presented to a user
  * @param {Maybe<string>} myDate a string representation of a date

@@ -1,0 +1,30 @@
+name: Setup app
+description: Bun install, Varlock test env, optional svelte-kit sync
+
+inputs:
+  svelte-kit-sync:
+    description: Run svelte-kit sync after Varlock loads (needed for ESLint / $app)
+    required: false
+    default: "false"
+
+runs:
+  using: composite
+  steps:
+    - uses: oven-sh/setup-bun@v2
+      with:
+        bun-version: latest
+
+    # Install first so @varlock/bitwarden-plugin is available.
+    # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
+    - run: bun install --frozen-lockfile --ignore-scripts
+      shell: bash
+
+    - name: Load environment variables
+      # Pin to commit (Sonar: avoid floating tag installs).
+      uses: dmno-dev/varlock-action@7141115d0060616e398c5fa9035e67d7820ab2b6 # v1.0.5
+
+    - name: Sync SvelteKit
+      if: inputs.svelte-kit-sync == 'true'
+      # Local binary (lockfile); avoid `bun x` — Sonar githubactions:S8543.
+      run: ./node_modules/.bin/svelte-kit sync
+      shell: bash

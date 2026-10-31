@@ -134,10 +134,12 @@ export default defineConfig({
     svelteDevtools(),
     DevTools(),
     devToolsJson(),
-    varlockVitePlugin({
-      ssrInjectMode: "resolved-env",
-    }),
+    // Cloudflare adapter detected → runtime loader via @varlock/cloudflare-integration
+    // (do not force ssrInjectMode: "resolved-env"; plugin rejects that on CF builds).
+    varlockVitePlugin(),
     sentrySvelteKit({
+      // Dummy .env.test token must not upload or fail CI builds (#148).
+      autoUploadSourceMaps: process.env.VARLOCK_ENV !== "test",
       authToken: process.env.SENTRY_AUTH_TOKEN,
       org: "coinnich",
       project: "javascript-sveltekit",

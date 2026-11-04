@@ -16,7 +16,7 @@
     "varlock": "1.24.0"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "5.20261029.1",
+    "@cloudflare/workers-types": "5.20261101.1",
     "@eslint/js": "10.0.1",
     "@eslint/mcp": "0.3.16",
     "@fontsource-variable/source-sans-3": "5.3.1",

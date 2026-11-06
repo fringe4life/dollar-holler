@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { grid } from "#styled-system/patterns/index.js";
   import { reviews } from "#features/landing-page/constants/reviews.ts";
   import ReviewItem from "./ReviewItem.svelte";

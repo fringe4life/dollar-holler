@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   import BoundaryError from "#lib/components/patterns/BoundaryError.svelte";

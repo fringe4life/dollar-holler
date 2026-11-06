@@ -1,12 +1,12 @@
 <script lang="ts">
-  import { ArrowUpRightIcon } from "@lucide/svelte";
   import type { Snippet } from "svelte";
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { hstack } from "#styled-system/patterns/index.js";
   import { resolve } from "$app/paths";
   import { keepAnonymousLandingFallback } from "#features/landing-page/landing-session.ts";
   import Button from "#lib/components/primitives/button/button.svelte";
-  import { directionalArrow } from "#lib/styles.ts";
+  import ArrowUpRight from "#lib/components/primitives/icons/ArrowUpRight.svelte";
 
   interface Props {
     ogygiaFallback?: Snippet;
@@ -15,10 +15,8 @@
   let { ogygiaFallback: _ogygiaFallback }: Props = $props();
   keepAnonymousLandingFallback();
 
-  const arrowClass = cx(
-    css({ flexShrink: 0, height: 4, width: 4 }),
-    directionalArrow({ direction: "forward" })
-  );
+  /* The glyph owns its push; `directionalArrow` would fight it along X. */
+  const arrowClass = css({ flexShrink: 0, height: 4, width: 4 });
 
   const heroActionsClass = hstack({
     alignItems: "center",
@@ -41,6 +39,6 @@
     size="lg"
   >
     Go to your invoices
-    <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
+    <ArrowUpRight aria-hidden="true" class={arrowClass} />
   </Button>
 </div>

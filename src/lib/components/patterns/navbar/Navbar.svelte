@@ -1,11 +1,12 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { cq, gridItem } from "#styled-system/patterns/index.js";
   import { afterNavigate } from "$app/navigation";
   import { asset, resolve } from "$app/paths";
   import { page } from "$app/state";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
-  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
+  import ThemeControl from "#lib/components/patterns/ThemeControl.svelte";
   import { logout } from "#features/auth/auth.remote.ts";
   import { isActive } from "#lib/utils/is-active.ts";
   import NavbarItem from "./NavbarItem.svelte";
@@ -120,7 +121,7 @@
     />
     <div class={navDrawer}>
       <div class={css({ marginBlock: 10, marginBlockEnd: 24 })}>
-        <a href={resolve("/")}>
+        <a data-sveltekit-reload href={resolve("/")}>
           <img
             alt="Doller Holla company logo"
             class={css({ marginInline: "auto", zIndex: 0 })}
@@ -137,8 +138,6 @@
             listStyle: "none",
           })
         )}
-        style:--active-nav-left={`url(${asset("images/active-nav--left.svg")})`}
-        style:--active-nav-right={`url(${asset("images/active-nav--right.svg")})`}
       >
         {#each navItems as { href, title } (title)}
           <NavbarItem {href} isActive={isActive(href, path)} {title} />
@@ -171,7 +170,7 @@
           paddingBlockEnd: 8,
         })}
       >
-        <ModeSelect />
+        <ThemeControl />
       </div>
     </div>
   </nav>

@@ -1,3 +1,67 @@
+<script lang="ts" module>
+  import { css } from "#styled-system/css/css.js";
+
+  /**
+   * The one glyph that carries colour: a wooden pencil is yellow with a red
+   * eraser, and the point is ink. Body, ferrule, eraser and point are separate
+   * nodes so the squish lands on the whole pencil without the eraser sliding.
+   *
+   * At rest the parts are washed tones of the same ink, like the plane's shaded
+   * fold — a solid pencil sat too loud next to the monochrome set. Colour only
+   * arrives with the owner.
+   *
+   * The 45° stance is an attribute on an inner group; the outer group is what
+   * CSS transforms, because a CSS transform would override the attribute.
+   */
+  const pencilClass = css({
+    transformBox: "fill-box",
+    transformOrigin: "center",
+    transitionDuration: "normal",
+    transitionProperty: "rotate, scale",
+    transitionTimingFunction: {
+      base: "anticipate",
+      _supportsLinear: "elastic",
+    },
+    _focusVisible: { rotate: "-7deg", scale: "1.05 0.95" },
+    _groupFocusVisible: { rotate: "-7deg", scale: "1.05 0.95" },
+    _groupHoverEnabled: { rotate: "-7deg", scale: "1.05 0.95" },
+    _hover: { rotate: "-7deg", scale: "1.05 0.95" },
+    ".group:active:not(:disabled) &": { rotate: "3deg", scale: "1.14 0.84" },
+    _motionReduce: { transitionDuration: "0.01ms" },
+  });
+
+  const tintClass = {
+    transitionDuration: "normal",
+    transitionProperty: "fill, opacity",
+  } as const;
+
+  const bodyClass = css({
+    ...tintClass,
+    _focusVisible: { fill: "warning", opacity: 1 },
+    _groupFocusVisible: { fill: "warning", opacity: 1 },
+    _groupHoverEnabled: { fill: "warning", opacity: 1 },
+    _hover: { fill: "warning", opacity: 1 },
+    ".group:active:not(:disabled) &": { fill: "warning", opacity: 1 },
+    fill: "currentColor",
+    opacity: 0.78,
+  });
+
+  const ferruleClass = css({ fill: "currentColor", opacity: 0.45 });
+
+  const eraserClass = css({
+    ...tintClass,
+    _focusVisible: { fill: "destructive", opacity: 1 },
+    _groupFocusVisible: { fill: "destructive", opacity: 1 },
+    _groupHoverEnabled: { fill: "destructive", opacity: 1 },
+    _hover: { fill: "destructive", opacity: 1 },
+    ".group:active:not(:disabled) &": { fill: "destructive", opacity: 1 },
+    fill: "currentColor",
+    opacity: 0.86,
+  });
+
+  const pointClass = css({ fill: "currentColor" });
+</script>
+
 <script lang="ts">
   import Icon, { type IconProps } from "#lib/components/primitives/Icon.svelte";
 
@@ -5,7 +69,20 @@
 </script>
 
 <Icon {...props}>
-  <path
-    d="M20.821 3.179C20.061 2.418 19.049 2 17.974 2C16.9 2 15.888 2.418 15.128 3.179L3.71905 14.587C3.71905 14.587 3.71805 14.59 3.71605 14.591C3.63505 14.673 3.49705 14.889 3.45505 15.052L2.03005 20.756C1.94405 21.096 2.04505 21.458 2.29305 21.705L2.29405 21.706L2.29505 21.707C2.54305 21.955 2.90305 22.056 3.24405 21.971L8.94805 20.544C9.11105 20.502 9.32805 20.364 9.40905 20.283C9.41005 20.282 9.41305 20.28 9.41305 20.28L20.822 8.873C21.582 8.112 22.001 7.102 22 6.026C22 4.951 21.582 3.94 20.822 3.179H20.821ZM14.411 6.728L17.274 9.591L8.70605 18.159L5.84305 15.296L14.411 6.728ZM4.37505 19.626L4.97005 17.252L6.75005 19.033L4.37505 19.626ZM19.409 4.594C20.173 5.359 20.173 6.693 19.409 7.458L18.69 8.178L15.824 5.313L16.545 4.594C17.31 3.83 18.644 3.829 19.409 4.594Z"
-  />
+  <g class={pencilClass}>
+    <g transform="rotate(45 12 12)">
+      <rect class={bodyClass} height="10.8" width="3.4" x="10.3" y="5.6" />
+      <path class={bodyClass} d="M10.3 16.4h3.4l-1.2 3.2h-1Z" />
+      <rect class={ferruleClass} height="1.4" width="3.4" x="10.3" y="4.2" />
+      <rect
+        class={eraserClass}
+        height="2.8"
+        rx="1.2"
+        width="3.4"
+        x="10.3"
+        y="1.4"
+      />
+      <path class={pointClass} d="M11.5 19.6h1L12 22.1Z" />
+    </g>
+  </g>
 </Icon>

@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import Swipeable from "#lib/components/patterns/swipeable/Swipeable.svelte";
@@ -7,7 +7,7 @@
   import Activate from "#lib/components/primitives/icons/Activate.svelte";
   import Archive from "#lib/components/primitives/icons/Archive.svelte";
   import Edit from "#lib/components/primitives/icons/Edit.svelte";
-  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import Shredder from "#lib/components/primitives/icons/Shredder.svelte";
   import View from "#lib/components/primitives/icons/View.svelte";
   import type { CursorId } from "#lib/schemas/cursor-id.ts";
   import {
@@ -132,12 +132,12 @@
       onclick={handleDelete}
       type="button"
     >
-      <Trash height={16} width={16} />
+      <Shredder height={16} width={16} />
       Delete
     </button>
     <a
       aria-label={`View ${client.name}`}
-      class={rowActionButton}
+      class={cx("group", rowActionButton)}
       href={resolve(clientDetailPath, { id: client.id })}
     >
       <View height={16} width={16} />
@@ -166,11 +166,11 @@
       onclick={handleDelete}
       type="button"
     >
-      <Trash height={24} width={24} />
+      <Shredder height={24} width={24} />
       Delete
     </button>
     <a
-      class={rowActionButton}
+      class={cx("group", rowActionButton)}
       href={resolve(clientDetailPath, { id: client.id })}
     >
       <View height={24} width={24} />

@@ -1,5 +1,5 @@
 <script generics="T extends CursorRow" lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { between } from "#styled-system/patterns/index.js";
   import type {
     CursorRow,

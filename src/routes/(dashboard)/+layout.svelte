@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
   import Navbar from "#lib/components/patterns/navbar/Navbar.svelte";
 

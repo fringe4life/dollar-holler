@@ -1,5 +1,5 @@
 <script generics="T extends CursorRow" lang="ts">
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { Snippet } from "svelte";
   import { page } from "$app/state";
   import type { CursorRow, PaginationMetadata } from "../types";

@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { css, cx, keyframes } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
+  import { keyframes } from "#styled-system/css/keyframes.js";
   import { visuallyHidden } from "#styled-system/patterns/index.js";
 
   const violetDrift = keyframes({
@@ -48,7 +50,7 @@
 
   const posterClass = css({
     backgroundImage:
-      "linear-gradient(140deg, color-mix(in srgb, var(--colors-feature-primary) 22%, transparent), color-mix(in srgb, var(--colors-warning) 18%, transparent) 56%, color-mix(in srgb, var(--colors-feature-primary) 20%, transparent))",
+      "linear-gradient(140deg, color-mix(in srgb, {colors.featurePrimary} 22%, transparent), color-mix(in srgb, {colors.warning} 18%, transparent) 56%, color-mix(in srgb, {colors.featurePrimary} 20%, transparent))",
     clipPath: "polygon(12% 0, 91% 6%, 100% 44%, 84% 91%, 46% 100%, 0 71%)",
     inset: "11% 7% 9% 8%",
     position: "absolute",
@@ -56,14 +58,14 @@
     zIndex: -1,
     _dark: {
       backgroundImage:
-        "linear-gradient(140deg, color-mix(in srgb, var(--colors-primary) 18%, var(--colors-background)), color-mix(in srgb, var(--colors-warning) 12%, var(--colors-background)) 54%, color-mix(in srgb, var(--colors-feature-primary) 16%, var(--colors-background)))",
+        "linear-gradient(140deg, color-mix(in srgb, {colors.primary} 18%, {colors.background}), color-mix(in srgb, {colors.warning} 12%, {colors.background}) 54%, color-mix(in srgb, {colors.featurePrimary} 16%, {colors.background}))",
       opacity: 0.85,
     },
   });
 
   const orbClass = css({
     backgroundImage:
-      "radial-gradient(ellipse at 52% 48%, color-mix(in srgb, var(--colors-background) 88%, var(--colors-feature-primary)) 0%, color-mix(in srgb, var(--colors-feature-primary) 15%, var(--colors-background)) 55%, color-mix(in srgb, var(--colors-warning) 8%, var(--colors-background)) 100%)",
+      "radial-gradient(ellipse at 52% 48%, color-mix(in srgb, {colors.background} 88%, {colors.featurePrimary}) 0%, color-mix(in srgb, {colors.featurePrimary} 15%, {colors.background}) 55%, color-mix(in srgb, {colors.warning} 8%, {colors.background}) 100%)",
     borderColor: "featurePrimary/25",
     borderRadius: "53% 47% 45% 55% / 43% 49% 51% 57%",
     borderStyle: "solid",
@@ -75,7 +77,7 @@
     rotate: "-6deg",
     _dark: {
       backgroundImage:
-        "radial-gradient(ellipse at 52% 48%, color-mix(in srgb, var(--colors-gray-800) 92%, var(--colors-primary)) 0%, color-mix(in srgb, var(--colors-gray-900) 91%, var(--colors-primary)) 60%, var(--colors-gray-950) 100%)",
+        "radial-gradient(ellipse at 52% 48%, color-mix(in srgb, {colors.gray.800} 92%, {colors.primary}) 0%, color-mix(in srgb, {colors.gray.900} 91%, {colors.primary}) 60%, {colors.gray.950} 100%)",
       boxShadow: "0 28px 66px oklch(0% 0 0 / 45%)",
     },
   });
@@ -99,7 +101,7 @@
   const violetBlobClass = css({
     animation: `${violetDrift} 31s cubic-bezier(.48,.07,.42,.94) infinite alternate`,
     background:
-      "radial-gradient(ellipse at 48% 48%, color-mix(in srgb, var(--colors-feature-primary) 92%, transparent) 0 18%, color-mix(in srgb, var(--colors-feature-primary) 74%, transparent) 39%, transparent 76%)",
+      "radial-gradient(ellipse at 48% 48%, color-mix(in srgb, {colors.featurePrimary} 92%, transparent) 0 18%, color-mix(in srgb, {colors.featurePrimary} 74%, transparent) 39%, transparent 76%)",
     height: "52%",
     left: "5%",
     opacity: 0.82,
@@ -111,7 +113,7 @@
   const yellowBlobClass = css({
     animation: `${yellowDrift} 37s cubic-bezier(.37,.12,.58,.96) infinite alternate`,
     background:
-      "radial-gradient(ellipse at 45% 48%, color-mix(in srgb, var(--colors-warning) 95%, transparent) 0 17%, color-mix(in srgb, var(--colors-warning) 67%, transparent) 42%, transparent 76%)",
+      "radial-gradient(ellipse at 45% 48%, color-mix(in srgb, {colors.warning} 95%, transparent) 0 17%, color-mix(in srgb, {colors.warning} 67%, transparent) 42%, transparent 76%)",
     height: "42%",
     opacity: 0.82,
     right: "4%",
@@ -123,7 +125,7 @@
   const sageBlobClass = css({
     animation: `${sageDrift} 29s cubic-bezier(.52,.02,.37,.98) infinite alternate`,
     background:
-      "radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--colors-feature-success) 92%, transparent) 0 15%, color-mix(in srgb, var(--colors-feature-success) 67%, transparent) 40%, transparent 77%)",
+      "radial-gradient(ellipse at 50% 50%, color-mix(in srgb, {colors.featureSuccess} 92%, transparent) 0 15%, color-mix(in srgb, {colors.featureSuccess} 67%, transparent) 40%, transparent 77%)",
     bottom: 0,
     height: "48%",
     opacity: 0.76,
@@ -165,7 +167,7 @@
     backgroundColor: "primary",
     borderRadius: "full",
     boxShadow:
-      "22px 5px 0 -4px var(--colors-primary), -7px 20px 0 -4px var(--colors-primary)",
+      "22px 5px 0 -4px {colors.primary}, -7px 20px 0 -4px {colors.primary}",
     height: 4,
     left: "14%",
     position: "absolute",
@@ -175,7 +177,7 @@
     _dark: {
       backgroundColor: "pastelPurple",
       boxShadow:
-        "22px 5px 0 -4px var(--colors-pastel-purple), -7px 20px 0 -4px var(--colors-pastel-purple), 0 0 13px var(--colors-pastel-purple)",
+        "22px 5px 0 -4px {colors.pastelPurple}, -7px 20px 0 -4px {colors.pastelPurple}, 0 0 13px {colors.pastelPurple}",
     },
   });
 
@@ -190,7 +192,7 @@
     position: "absolute",
     textAlign: "center",
     textShadow:
-      "0 2px 16px color-mix(in srgb, var(--colors-background) 70%, transparent)",
+      "0 2px 16px color-mix(in srgb, {colors.background} 70%, transparent)",
     top: "50%",
     transform: "translate(-50%, -50%) rotate(-7deg)",
     width: "55%",

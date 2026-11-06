@@ -1,63 +1,31 @@
-import { css } from "#styled-system/css/index.js";
+import { css } from "#styled-system/css/css.js";
 
 export const navItemLiClass = css({
   "&:not(:last-child)": { marginBlockEnd: 6 },
 });
 
+/**
+ * The label keeps its ink on hover; the accent marks carry the hover state
+ * (see NavbarAccent). Colour on hover was two signals for one fact.
+ *
+ * The current state is an explicit attribute selector rather than the `_current`
+ * condition: this Panda build emits nothing for `_current` inside a colour value
+ * object, which silently left the active label white.
+ */
 export const navItemControlClass = css({
+  "&[aria-current]": { color: "accent" },
   appearance: "none",
   backgroundColor: "transparent",
   borderWidth: 0,
+  color: "navigationForeground",
   cursor: "pointer",
+  display: "inline-block",
   fontFamily: "inherit",
   fontSize: "inherit",
   fontWeight: "inherit",
   lineHeight: "inherit",
-  position: "relative",
-  display: "inline-block",
   paddingInline: 8,
-  color: {
-    base: "navigationForeground",
-    _hover: "warning",
-    _current: "accent",
-  },
+  position: "relative",
   transitionProperty: "colors",
   transitionDuration: "normal",
-  "&::before,&::after": {
-    content: "''",
-    display: "block",
-    position: "absolute",
-    insetBlockStart: 0,
-    opacity: "0",
-    transitionProperty: ["opacity", "translate"],
-    transitionDuration: "normal",
-    transitionTimingFunction: {
-      base: "ease-out",
-      _supportsLinear: "dramatic",
-    },
-    blockSize: 30,
-    inlineSize: 20,
-    backgroundPositionY: "center",
-    backgroundRepeat: "no-repeat",
-    backgroundSize: "contain",
-  },
-  _before: {
-    insetInlineStart: 0,
-    backgroundImage: "var(--active-nav-left)",
-    backgroundPositionX: "left",
-  },
-  _after: {
-    insetInlineEnd: 0,
-    backgroundImage: "var(--active-nav-right)",
-    backgroundPositionX: "right",
-  },
-  _current: {
-    _before: { opacity: "1" },
-    _after: { opacity: "1" },
-    _hover: {
-      color: "accent",
-      _before: { translate: "-1px 0" },
-      _after: { translate: "1px 0" },
-    },
-  },
 });

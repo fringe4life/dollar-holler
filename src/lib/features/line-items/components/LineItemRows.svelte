@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { gridItem } from "#styled-system/patterns/index.js";
   import type { FormEventHandler } from "svelte/elements";
   import type { LineItemRowsProps } from "#features/line-items/types.ts";

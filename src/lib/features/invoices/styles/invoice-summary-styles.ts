@@ -1,6 +1,9 @@
-import { cva, css, cx } from "#styled-system/css/index.js";
+import { css } from "#styled-system/css/css.js";
+import { cx } from "#styled-system/css/cx.js";
 import { cq, grid } from "#styled-system/patterns/index.js";
 import { CORNER_SHAPE } from "#lib/styles.ts";
+
+type SummaryBucket = "draft" | "outstanding" | "overdue" | "paid";
 
 /**
  * Client invoice gauge — Concept A.
@@ -257,30 +260,55 @@ export const clientSummaryArcSweep = css({
   position: "absolute",
 });
 
-export const clientSummaryArc = cva({
-  base: {
-    // Fill comes from the element style (`--arc-from` / `--arc-to` + conic-gradient).
-    borderRadius: "50%",
-    inset: 0,
-    pointerEvents: "none",
-    position: "absolute",
-    transitionDuration: "normal",
-    transitionProperty: "opacity",
-  },
-  defaultVariants: { lead: false },
-  variants: {
-    bucket: {
-      draft: { color: "statusDraft" },
-      outstanding: { color: "primary" },
-      overdue: { color: "statusLate" },
-      paid: { color: "success" },
-    },
-    lead: {
-      false: { maskImage: ringMask(RING_STROKE) },
-      true: { maskImage: ringMask(`calc(${RING_STROKE} * 1.72)`) },
-    },
-  },
+/**
+ * Workaround: top-level `css()` maps instead of `cva` so hashed class names do
+ * not force the full recipe runtime into the client bundle.
+ *
+ * @remarks
+ * Still required on `@pandacss/vite@2.5.0` / `@pandacss/dev@2.5.0` with
+ * `hash: true`. Drop when Panda folds hashed local `cva`/`sva` to string
+ * lookups; re-verify no client chunk with `compoundVariants` / `__cva__`
+ * after clean build.
+ *
+ * @see https://github.com/chakra-ui/panda/issues/3853 — related transform diagnostics
+ * @see https://github.com/fringe4life/van-life/issues/471 — established pattern
+ * @see https://github.com/fringe4life/dollar-holler/issues/109 — tracking
+ */
+const clientSummaryArcBase = css({
+  // Fill comes from the element style (`--arc-from` / `--arc-to` + conic-gradient).
+  borderRadius: "50%",
+  inset: 0,
+  pointerEvents: "none",
+  position: "absolute",
+  transitionDuration: "normal",
+  transitionProperty: "opacity",
 });
+
+const clientSummaryArcByBucket = {
+  draft: css({ color: "statusDraft" }),
+  outstanding: css({ color: "primary" }),
+  overdue: css({ color: "statusLate" }),
+  paid: css({ color: "success" }),
+} as const satisfies Record<SummaryBucket, string>;
+
+const clientSummaryArcByLead = {
+  false: css({ maskImage: ringMask(RING_STROKE) }),
+  true: css({ maskImage: ringMask(`calc(${RING_STROKE} * 1.72)`) }),
+} as const satisfies Record<"false" | "true", string>;
+
+export function clientSummaryArc({
+  bucket,
+  lead = false,
+}: {
+  bucket: SummaryBucket;
+  lead?: boolean;
+}) {
+  return cx(
+    clientSummaryArcBase,
+    clientSummaryArcByBucket[bucket],
+    clientSummaryArcByLead[lead ? "true" : "false"]
+  );
+}
 
 /**
  * Empty gauge: the same 270deg horseshoe the data arcs occupy, drawn as a dashed
@@ -525,208 +553,212 @@ export const clientSummaryReadoutAmount = css({
 });
 
 /** Bucket card: boxed in the 2x2 grid, a ledger row beside the ring, plain in the flanks. */
-export const clientTotalsCard = cva({
-  base: {
-    alignItems: "start",
-    appearance: "none",
-    backgroundColor: "surface",
-    borderColor: "borderSubtle",
-    borderRadius: "xl",
-    borderStyle: "solid",
-    borderWidth: "1px",
-    color: "inherit",
-    // The card is its own container so the count can drop out on its own when
-    // the row gets short, independent of which section tier is active.
-    containerName: "bucketCard",
-    containerType: "inline-size",
-    cornerShape: CORNER_SHAPE,
-    cursor: "pointer",
+const clientTotalsCardBase = css({
+  alignItems: "start",
+  appearance: "none",
+  backgroundColor: "surface",
+  borderColor: "borderSubtle",
+  borderRadius: "xl",
+  borderStyle: "solid",
+  borderWidth: "1px",
+  color: "inherit",
+  // The card is its own container so the count can drop out on its own when
+  // the row gets short, independent of which section tier is active.
+  containerName: "bucketCard",
+  containerType: "inline-size",
+  cornerShape: CORNER_SHAPE,
+  cursor: "pointer",
+  display: "flex",
+  flexDirection: "column",
+  font: "inherit",
+  gap: 1,
+  // Own stacking context, so the `::before` wash paints above the card's own
+  // background and below its text at every tier.
+  isolation: "isolate",
+  inlineSize: "100%",
+  minInlineSize: 0,
+  paddingBlock: 2.5,
+  paddingInline: 3,
+  position: "relative",
+  textAlign: "start",
+  transitionDuration: "normal",
+  transitionProperty:
+    "border-color, border-radius, box-shadow, translate, opacity",
+  _hover: { boxShadow: "sm", translate: "0 -2px" },
+  /**
+   * Hover has to survive three shapes — a boxed tile, a borderless ledger row,
+   * and a bare flank at 3xl. The bucket's own colour does the work, and every
+   * change is a colour, transform or opacity, so nothing reflows.
+   *
+   * The wash (`::before`) is deliberately *bigger* than the padding box on the
+   * borderless tiers: a fill flush to the box squared off against the row
+   * rules, which is what made the old hover look ragged.
+   */
+  _before: {
+    borderRadius: "inherit",
+    content: '""',
+    inset: 0,
+    opacity: 0,
+    pointerEvents: "none",
+    position: "absolute",
+    transitionDuration: "normal",
+    transitionProperty: "opacity",
+    zIndex: -1,
+  },
+  /**
+   * Underline that fills in from the left; on a ledger row it becomes the rule.
+   * It spans exactly the card's inline box so the sweep starts and ends on the
+   * default rule — bleeding it wider (`-10px`) made the hover line begin out of
+   * register with the divider it is supposed to be filling.
+   */
+  _after: {
+    blockSize: "2px",
+    borderRadius: "full",
+    content: '""',
+    insetBlockEnd: "-1px",
+    insetInline: 0,
+    opacity: 0,
+    pointerEvents: "none",
+    position: "absolute",
+    transform: "scaleX(0)",
+    transformOrigin: "left center",
+    transitionDuration: "normal",
+    transitionProperty: "opacity, transform",
+  },
+  // Only a ledger row has a rule for the sweep to fill; the rows band turns the
+  // opacity on, everywhere else it stays invisible.
+  "&:is(:hover, :focus-visible)::after": { transform: "scaleX(1)" },
+  "&:is(:hover, :focus-visible)::before": { opacity: 0.16 },
+  "&:is(:hover, :focus-visible) [data-role='term']": { color: "foreground" },
+  "&:is(:hover, :focus-visible) [data-role='key']": {
+    transform: "scale(1.45)",
+  },
+  "&:is(:hover, :focus-visible) [data-role='amount']": {
+    transform: "scale(1.04)",
+  },
+  _focusVisible: {
+    outlineColor: "primary",
+    outlineStyle: "solid",
+    outlineWidth: "2px",
+    outlineOffset: "2px",
+  },
+  /**
+   * Each chrome mode owns a *disjoint* band, because every rule below is
+   * cumulative otherwise: `3xl` sits inside `rows`, so a row property set on
+   * `rows` also lands on the flanks. That leak is what made the left flank read
+   * as two columns (label left, amount right) and the right flank as one.
+   *
+   * Panda's `*Only` conditions cannot express this: `ledger` is a custom token,
+   * so it emits `>= 36rem and < 36rem` — an impossible band — and `rowsOnly`
+   * resolves against the *scale* neighbour (42rem), not the real next rung. The
+   * `X` + `XDown` pair gives the exact range from named conditions.
+   */
+  // Beside the ring, still narrow (36–40rem): the mobile boxed tile, stacked in
+  // one column. It just needs the count's extra room.
+  "@clientTotals/ledger": {
+    "@clientTotals/rowsDown": { justifyContent: "center" },
+  },
+  // Wide enough for a ledger row (40–48rem): chrome off, one rule below, and
+  // the term/amount pair across the row instead of stacked.
+  "@clientTotals/rows": {
+    "@clientTotals/3xlDown": {
+      // Rows don't lift; a floating row would break the ledger rhythm.
+      _hover: { boxShadow: "none", translate: "none" },
+      backgroundColor: "transparent",
+      borderRadius: 0,
+      borderBlockEndColor: "borderSubtle",
+      borderBlockEndStyle: "solid",
+      borderBlockEndWidth: "1px",
+      borderWidth: 0,
+      columnGap: 2.5,
+      display: "grid",
+      // The amount column is reserved rather than `auto`: with `auto`, a wider
+      // amount pushed its count left and the invoice counts stopped lining up
+      // across rows. 7.5rem covers the usual `$12,345.67` at this size.
+      gridTemplateColumns: "minmax(0, 1fr) minmax(7.5rem, auto)",
+      paddingBlock: 3,
+      paddingInline: 0,
+      // Vertical bleed only: an inline bleed painted past the section's right
+      // edge and added 10px to `scrollWidth`.
+      _before: { borderRadius: "lg", inset: "-6px 0" },
+      "&:is(:hover, :focus-visible)::after": { opacity: 1 },
+    },
+  },
+  /**
+   * Flanks (48rem+): chrome-less by arrangement, not by width — the four
+   * numbers sit bare either side of the ring, mirrored toward it by `alignItems`.
+   * These properties are stated outright rather than inherited from the rows
+   * band, which is what made the flanks sprout borders once the bands were made
+   * disjoint.
+   */
+  "@clientTotals/3xl": {
+    _before: { borderRadius: "lg", inset: "-6px 0" },
+    backgroundColor: "transparent",
+    borderBlockEndWidth: 0,
+    borderRadius: 0,
+    borderWidth: 0,
+    columnGap: 0,
     display: "flex",
     flexDirection: "column",
-    font: "inherit",
-    gap: 1,
-    // Own stacking context, so the `::before` wash paints above the card's own
-    // background and below its text at every tier.
-    isolation: "isolate",
-    inlineSize: "100%",
-    minInlineSize: 0,
     paddingBlock: 2.5,
-    paddingInline: 3,
-    position: "relative",
-    textAlign: "start",
-    transitionDuration: "normal",
-    transitionProperty:
-      "border-color, border-radius, box-shadow, translate, opacity",
-    _hover: { boxShadow: "sm", translate: "0 -2px" },
-    /**
-     * Hover has to survive three shapes — a boxed tile, a borderless ledger row,
-     * and a bare flank at 3xl. The bucket's own colour does the work, and every
-     * change is a colour, transform or opacity, so nothing reflows.
-     *
-     * The wash (`::before`) is deliberately *bigger* than the padding box on the
-     * borderless tiers: a fill flush to the box squared off against the row
-     * rules, which is what made the old hover look ragged.
-     */
-    _before: {
-      borderRadius: "inherit",
-      content: '""',
-      inset: 0,
-      opacity: 0,
-      pointerEvents: "none",
-      position: "absolute",
-      transitionDuration: "normal",
-      transitionProperty: "opacity",
-      zIndex: -1,
-    },
-    /**
-     * Underline that fills in from the left; on a ledger row it becomes the rule.
-     * It spans exactly the card's inline box so the sweep starts and ends on the
-     * default rule — bleeding it wider (`-10px`) made the hover line begin out of
-     * register with the divider it is supposed to be filling.
-     */
-    _after: {
-      blockSize: "2px",
-      borderRadius: "full",
-      content: '""',
-      insetBlockEnd: "-1px",
-      insetInline: 0,
-      opacity: 0,
-      pointerEvents: "none",
-      position: "absolute",
-      transform: "scaleX(0)",
-      transformOrigin: "left center",
-      transitionDuration: "normal",
-      transitionProperty: "opacity, transform",
-    },
-    // Only a ledger row has a rule for the sweep to fill; the rows band turns the
-    // opacity on, everywhere else it stays invisible.
-    "&:is(:hover, :focus-visible)::after": { transform: "scaleX(1)" },
-    "&:is(:hover, :focus-visible)::before": { opacity: 0.16 },
-    "&:is(:hover, :focus-visible) [data-role='term']": { color: "foreground" },
-    "&:is(:hover, :focus-visible) [data-role='key']": {
-      transform: "scale(1.45)",
-    },
-    "&:is(:hover, :focus-visible) [data-role='amount']": {
-      transform: "scale(1.04)",
-    },
-    _focusVisible: {
-      outlineColor: "primary",
-      outlineStyle: "solid",
-      outlineWidth: "2px",
-      outlineOffset: "2px",
-    },
-    /**
-     * Each chrome mode owns a *disjoint* band, because every rule below is
-     * cumulative otherwise: `3xl` sits inside `rows`, so a row property set on
-     * `rows` also lands on the flanks. That leak is what made the left flank read
-     * as two columns (label left, amount right) and the right flank as one.
-     *
-     * Panda's `*Only` conditions cannot express this: `ledger` is a custom token,
-     * so it emits `>= 36rem and < 36rem` — an impossible band — and `rowsOnly`
-     * resolves against the *scale* neighbour (42rem), not the real next rung. The
-     * `X` + `XDown` pair gives the exact range from named conditions.
-     */
-    // Beside the ring, still narrow (36–40rem): the mobile boxed tile, stacked in
-    // one column. It just needs the count's extra room.
-    "@clientTotals/ledger": {
-      "@clientTotals/rowsDown": { justifyContent: "center" },
-    },
-    // Wide enough for a ledger row (40–48rem): chrome off, one rule below, and
-    // the term/amount pair across the row instead of stacked.
-    "@clientTotals/rows": {
-      "@clientTotals/3xlDown": {
-        // Rows don't lift; a floating row would break the ledger rhythm.
-        _hover: { boxShadow: "none", translate: "none" },
-        backgroundColor: "transparent",
-        borderRadius: 0,
-        borderBlockEndColor: "borderSubtle",
-        borderBlockEndStyle: "solid",
-        borderBlockEndWidth: "1px",
-        borderWidth: 0,
-        columnGap: 2.5,
-        display: "grid",
-        // The amount column is reserved rather than `auto`: with `auto`, a wider
-        // amount pushed its count left and the invoice counts stopped lining up
-        // across rows. 7.5rem covers the usual `$12,345.67` at this size.
-        gridTemplateColumns: "minmax(0, 1fr) minmax(7.5rem, auto)",
-        paddingBlock: 3,
-        paddingInline: 0,
-        // Vertical bleed only: an inline bleed painted past the section's right
-        // edge and added 10px to `scrollWidth`.
-        _before: { borderRadius: "lg", inset: "-6px 0" },
-        "&:is(:hover, :focus-visible)::after": { opacity: 1 },
-      },
-    },
-    /**
-     * Flanks (48rem+): chrome-less by arrangement, not by width — the four
-     * numbers sit bare either side of the ring, mirrored toward it by `alignItems`.
-     * These properties are stated outright rather than inherited from the rows
-     * band, which is what made the flanks sprout borders once the bands were made
-     * disjoint.
-     */
-    "@clientTotals/3xl": {
-      _before: { borderRadius: "lg", inset: "-6px 0" },
-      backgroundColor: "transparent",
-      borderBlockEndWidth: 0,
-      borderRadius: 0,
-      borderWidth: 0,
-      columnGap: 0,
-      display: "flex",
-      flexDirection: "column",
-      paddingBlock: 2.5,
-    },
-  },
-  defaultVariants: { bucket: "overdue" },
-  variants: {
-    bucket: {
-      draft: {
-        "&:is(:hover, :focus-visible)": { borderColor: "statusDraft/60" },
-        _after: { backgroundColor: "statusDraft" },
-        _before: { backgroundColor: "statusDraft" },
-        gridArea: "draft",
-        "@clientTotals/3xl": { alignItems: "start" },
-      },
-      outstanding: {
-        "&:is(:hover, :focus-visible)": { borderColor: "primary/60" },
-        _after: { backgroundColor: "primary" },
-        _before: { backgroundColor: "primary" },
-        gridArea: "outstanding",
-        "@clientTotals/3xl": { alignItems: "end" },
-      },
-      overdue: {
-        _after: { backgroundColor: "statusLate" },
-        _before: { backgroundColor: "statusLate" },
-        backgroundColor: {
-          base: "statusLate/8",
-          "@clientTotals/rows": "transparent",
-        },
-        borderColor: {
-          base: "statusLate/25",
-          "@clientTotals/rows": "borderSubtle",
-        },
-        // No borderBlockStartWidth here: the tile tier already inherits the 1px
-        // base border, and at the ledger tier a top rule doubles up against the
-        // previous row's bottom rule — overdue would be the only row with a seam.
-        "&:is(:hover, :focus-visible)": { borderColor: "statusLate/60" },
-        gridArea: "overdue",
-        _dark: {
-          backgroundColor: {
-            base: "statusLate/12",
-            "@clientTotals/rows": "transparent",
-          },
-        },
-        "@clientTotals/3xl": { alignItems: "end" },
-      },
-      paid: {
-        "&:is(:hover, :focus-visible)": { borderColor: "success/60" },
-        _after: { backgroundColor: "success" },
-        _before: { backgroundColor: "success" },
-        gridArea: "paid",
-        "@clientTotals/3xl": { alignItems: "start" },
-      },
-    },
   },
 });
+
+const clientTotalsCardByBucket = {
+  draft: css({
+    "&:is(:hover, :focus-visible)": { borderColor: "statusDraft/60" },
+    _after: { backgroundColor: "statusDraft" },
+    _before: { backgroundColor: "statusDraft" },
+    gridArea: "draft",
+    "@clientTotals/3xl": { alignItems: "start" },
+  }),
+  outstanding: css({
+    "&:is(:hover, :focus-visible)": { borderColor: "primary/60" },
+    _after: { backgroundColor: "primary" },
+    _before: { backgroundColor: "primary" },
+    gridArea: "outstanding",
+    "@clientTotals/3xl": { alignItems: "end" },
+  }),
+  overdue: css({
+    _after: { backgroundColor: "statusLate" },
+    _before: { backgroundColor: "statusLate" },
+    backgroundColor: {
+      base: "statusLate/8",
+      "@clientTotals/rows": "transparent",
+    },
+    borderColor: {
+      base: "statusLate/25",
+      "@clientTotals/rows": "borderSubtle",
+    },
+    // No borderBlockStartWidth here: the tile tier already inherits the 1px
+    // base border, and at the ledger tier a top rule doubles up against the
+    // previous row's bottom rule — overdue would be the only row with a seam.
+    "&:is(:hover, :focus-visible)": { borderColor: "statusLate/60" },
+    gridArea: "overdue",
+    _dark: {
+      backgroundColor: {
+        base: "statusLate/12",
+        "@clientTotals/rows": "transparent",
+      },
+    },
+    "@clientTotals/3xl": { alignItems: "end" },
+  }),
+  paid: css({
+    "&:is(:hover, :focus-visible)": { borderColor: "success/60" },
+    _after: { backgroundColor: "success" },
+    _before: { backgroundColor: "success" },
+    gridArea: "paid",
+    "@clientTotals/3xl": { alignItems: "start" },
+  }),
+} as const satisfies Record<SummaryBucket, string>;
+
+export function clientTotalsCard({
+  bucket = "overdue",
+}: {
+  bucket?: SummaryBucket;
+} = {}) {
+  return cx(clientTotalsCardBase, clientTotalsCardByBucket[bucket]);
+}
 
 export const clientTotalsTerm = css({
   alignItems: "center",
@@ -749,32 +781,36 @@ export const clientTotalsTerm = css({
   },
 });
 
-export const clientTotalsKey = cva({
-  base: {
-    blockSize: "3px",
-    borderRadius: "sm",
-    display: "block",
-    flexShrink: 0,
-    inlineSize: "14px",
-    // Scaled on hover rather than resized, so the label never shifts.
-    transformOrigin: "center",
-    transitionDuration: "normal",
-    transitionProperty: "transform",
-  },
-  defaultVariants: { bucket: "overdue" },
-  variants: {
-    bucket: {
-      draft: { backgroundColor: "statusDraft" },
-      outstanding: { backgroundColor: "primary" },
-      overdue: {
-        backgroundColor: "statusLate",
-        blockSize: "4px",
-        inlineSize: "22px",
-      },
-      paid: { backgroundColor: "success" },
-    },
-  },
+const clientTotalsKeyBase = css({
+  blockSize: "3px",
+  borderRadius: "sm",
+  display: "block",
+  flexShrink: 0,
+  inlineSize: "14px",
+  // Scaled on hover rather than resized, so the label never shifts.
+  transformOrigin: "center",
+  transitionDuration: "normal",
+  transitionProperty: "transform",
 });
+
+const clientTotalsKeyByBucket = {
+  draft: css({ backgroundColor: "statusDraft" }),
+  outstanding: css({ backgroundColor: "primary" }),
+  overdue: css({
+    backgroundColor: "statusLate",
+    blockSize: "4px",
+    inlineSize: "22px",
+  }),
+  paid: css({ backgroundColor: "success" }),
+} as const satisfies Record<SummaryBucket, string>;
+
+export function clientTotalsKey({
+  bucket = "overdue",
+}: {
+  bucket?: SummaryBucket;
+} = {}) {
+  return cx(clientTotalsKeyBase, clientTotalsKeyByBucket[bucket]);
+}
 
 /**
  * The count is the first thing to go when a row narrows — it is secondary to the
@@ -810,47 +846,51 @@ export const clientTotalsCount = css({
   },
 });
 
-export const clientTotalsAmount = cva({
-  base: {
-    color: "foreground",
-    fontSize: {
-      base: "xl",
-      "@clientTotals/ledger": "2xl",
-      "@clientTotals/3xl": "3xl",
-    },
-    fontWeight: "bold",
-    letterSpacing: "tight",
-    lineHeight: 1.1,
-    margin: 0,
-    // Narrow two-column cards: shrink rather than spill past the tile.
-    maxInlineSize: "100%",
-    minInlineSize: 0,
-    overflowWrap: "anywhere",
-    transitionDuration: "normal",
-    transitionProperty: "color",
-    whiteSpace: "normal",
-    // A row reserves the amount column, so the number sits on its right edge and
-    // every count above it lands on one shared line. Scaling from that same edge
-    // keeps the hover from pushing 2px past the card. Rows only — the flank tier
-    // aligns its amount with the card's `alignItems`, not with text-align.
-    "@clientTotals/rows": {
-      "@clientTotals/3xlDown": {
-        textAlign: "end",
-        transformOrigin: "right center",
-        whiteSpace: "nowrap",
-      },
-    },
+const clientTotalsAmountBase = css({
+  color: "foreground",
+  fontSize: {
+    base: "xl",
+    "@clientTotals/ledger": "2xl",
+    "@clientTotals/3xl": "3xl",
   },
-  defaultVariants: { bucket: "overdue" },
-  variants: {
-    bucket: {
-      draft: {},
-      outstanding: {},
-      overdue: { color: "statusLate", fontWeight: "black" },
-      paid: {},
+  fontWeight: "bold",
+  letterSpacing: "tight",
+  lineHeight: 1.1,
+  margin: 0,
+  // Narrow two-column cards: shrink rather than spill past the tile.
+  maxInlineSize: "100%",
+  minInlineSize: 0,
+  overflowWrap: "anywhere",
+  transitionDuration: "normal",
+  transitionProperty: "color",
+  whiteSpace: "normal",
+  // A row reserves the amount column, so the number sits on its right edge and
+  // every count above it lands on one shared line. Scaling from that same edge
+  // keeps the hover from pushing 2px past the card. Rows only — the flank tier
+  // aligns its amount with the card's `alignItems`, not with text-align.
+  "@clientTotals/rows": {
+    "@clientTotals/3xlDown": {
+      textAlign: "end",
+      transformOrigin: "right center",
+      whiteSpace: "nowrap",
     },
   },
 });
+
+const clientTotalsAmountByBucket = {
+  draft: "",
+  outstanding: "",
+  overdue: css({ color: "statusLate", fontWeight: "black" }),
+  paid: "",
+} as const satisfies Record<SummaryBucket, string>;
+
+export function clientTotalsAmount({
+  bucket = "overdue",
+}: {
+  bucket?: SummaryBucket;
+} = {}) {
+  return cx(clientTotalsAmountBase, clientTotalsAmountByBucket[bucket]);
+}
 
 export const clientSummarySkeletonRing = css({
   aspectRatio: "1",

@@ -1,10 +1,12 @@
 <script lang="ts">
-  import { css, keyframes } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
+  import { keyframes } from "#styled-system/css/keyframes.js";
   import { between, hstack, square } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";
-  import LogIn from "@lucide/svelte/icons/log-in";
-  import UserPlus from "@lucide/svelte/icons/user-plus";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import LogIn from "#lib/components/primitives/icons/LogIn.svelte";
+  import UserPlus from "#lib/components/primitives/icons/UserPlus.svelte";
   import LandingNavSession from "#features/landing-page/components/LandingNavSession.svelte" with {
     render: "deferred",
   };
@@ -16,12 +18,13 @@
     from: {
       backdropFilter: "blur(0)",
       backgroundColor: "transparent",
-      boxShadow: "0 0 0 oklch(from var(--colors-black) l c h / 0%)",
+      boxShadow: "none",
     },
     to: {
       backdropFilter: "blur(4px)",
-      backgroundColor: "oklch(from var(--colors-background) l c h / 95%)",
-      boxShadow: "0 1px 3px oklch(from var(--colors-black) l c h / 10%)",
+      // Same opacity path as `_notSupportsScroll` (`background/95` → color-mix).
+      backgroundColor: "background/95",
+      boxShadow: "xs",
     },
   });
 
@@ -103,7 +106,7 @@
 
   const landingModeSelect = css({
     color: "foreground",
-    inlineSize: { base: 24, md: 32 },
+    inlineSize: "fit-content",
   });
 </script>
 
@@ -128,7 +131,7 @@
           <div class={landingActions}>
             <Button
               aria-label="Log in"
-              class={landingActionButton}
+              class={cx("group", landingActionButton)}
               href={resolve("login")}
               size="default"
               variant="outline"
@@ -138,7 +141,7 @@
             </Button>
             <Button
               aria-label="Sign up free"
-              class={landingActionButton}
+              class={cx("group", landingActionButton)}
               href={resolve("signup")}
               size="default"
               variant="default"

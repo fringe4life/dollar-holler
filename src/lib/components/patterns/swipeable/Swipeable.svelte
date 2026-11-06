@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { cq, flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
   import Button from "#lib/components/primitives/button/button.svelte";

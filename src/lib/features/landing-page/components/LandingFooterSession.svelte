@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { hstack } from "#styled-system/patterns/index.js";
   import { resolve } from "$app/paths";
   import { keepAnonymousLandingFallback } from "#features/landing-page/landing-session.ts";

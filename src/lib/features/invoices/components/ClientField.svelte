@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { flex, gridItem } from "#styled-system/patterns/index.js";
   import {
     type ClientInsert,
@@ -52,6 +52,7 @@
           id="client"
           required={!isNewClient}
           aria-describedby={errorId}
+          wrapperClass={css({ inlineSize: "full" })}
           {...saveInvoice.fields.clientId.as("select", invoice.clientId ?? "")}
           bind:value={invoice.clientId}
         >

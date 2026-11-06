@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import Skeleton from "#lib/components/primitives/skeleton/skeleton.svelte";
   import { money } from "#lib/components/primitives/money/money.ts";
   import {

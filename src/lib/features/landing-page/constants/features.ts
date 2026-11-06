@@ -1,4 +1,4 @@
-import { css } from "#styled-system/css/index.js";
+import { css } from "#styled-system/css/css.js";
 
 export const features = [
   {

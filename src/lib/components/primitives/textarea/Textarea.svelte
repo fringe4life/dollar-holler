@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { HTMLTextareaAttributes } from "svelte/elements";
   import { CORNER_SHAPE } from "#lib/styles.ts";
 

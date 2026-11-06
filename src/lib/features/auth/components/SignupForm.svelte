@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { resolve } from "$app/paths";
   import { signup as signupForm } from "#features/auth/auth.remote.ts";
   import Form from "#lib/components/patterns/form/Form.svelte";

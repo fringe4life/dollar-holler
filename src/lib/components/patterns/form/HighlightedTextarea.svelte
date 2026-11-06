@@ -1,6 +1,7 @@
 <script lang="ts">
   /* eslint-disable svelte/no-at-html-tags -- serializer emits escaped text + span.token only */
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { Attachment } from "svelte/attachments";
   import { on } from "svelte/events";
   import type { HTMLTextareaAttributes } from "svelte/elements";

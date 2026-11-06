@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { grid, gridItem } from "#styled-system/patterns/index.js";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
   // Not an ogygia island: PasswordForm calls getToast() (Svelte context from Toaster).
@@ -17,7 +17,7 @@
   import { buttonIcon } from "#lib/styles.ts";
   import Spinner from "#lib/components/primitives/Spinner.svelte";
   import { zipInputAttrs } from "#lib/utils/zip.ts";
-  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
+  import ThemeControl from "#lib/components/patterns/ThemeControl.svelte";
 
   const toast = getToast();
   const loaded = await getSettings();
@@ -53,7 +53,7 @@
   <p class={css({ marginBlockEnd: 8 })}>
     Light, dark, or match the operating system.
   </p>
-  <ModeSelect />
+  <ThemeControl />
 
   <h2
     class={css({

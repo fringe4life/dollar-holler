@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import type { Maybe } from "#lib/types.ts";
   import { CORNER_SHAPE } from "#lib/styles.ts";
 

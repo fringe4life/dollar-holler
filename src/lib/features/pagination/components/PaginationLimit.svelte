@@ -1,8 +1,6 @@
 <script lang="ts">
-  import Rows2Icon from "@lucide/svelte/icons/rows-2";
-  import Rows3Icon from "@lucide/svelte/icons/rows-3";
-  import Rows4Icon from "@lucide/svelte/icons/rows-4";
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { square } from "#styled-system/patterns/index.js";
   import { page } from "$app/state";
   import { gotoList } from "#features/pagination/utils/goto-list.ts";
@@ -11,20 +9,25 @@
     readListQuery,
   } from "#features/pagination/utils/list-query.ts";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
+  import Rows, {
+    type RowCount,
+  } from "#lib/components/primitives/icons/Rows.svelte";
   import Select from "#lib/components/primitives/select/Select.svelte";
   import { LIMITS, type ListLimit } from "../constants";
 
-  /** Row-density icon per page-size option (enhanced select only). */
-  const LIMIT_ICONS: Record<ListLimit, typeof Rows2Icon> = {
-    10: Rows2Icon,
-    25: Rows3Icon,
-    50: Rows4Icon,
+  /**
+   * Density mark per page size. 50 is the "many" mark (five tight bars with a
+   * short last one) rather than a fourth equal stack.
+   */
+  const LIMIT_BARS: Record<ListLimit, RowCount> = {
+    10: 2,
+    25: 3,
+    50: 5,
   };
 
-  // Lucide icons are stroke-based; undo the global `svg { fill }` rule.
   const limitIconClass = cx(
-    square({ size: 4 }),
-    css({ color: "textMuted", fill: "none", flexShrink: 0 })
+    css({ color: "textMuted", flexShrink: 0 }),
+    square({ size: 4 })
   );
 
   const pending = $derived($effect.pending() > 0);
@@ -61,20 +64,25 @@
     _supportsBaseSelect: { aspectRatio: "auto" },
     aspectRatio: "2/1",
     maxInlineSize: "fit-content",
+    paddingInlineEnd: 6,
   })}
+  wrapperClass={css({ inlineSize: "fit-content" })}
   bind:value={limitSelectValue}
   disabled={pending}
   name="limit"
   onchange={(e) => handleLimitChange(parseLimitParam(e.currentTarget.value))}
 >
   {#each LIMITS as limitOption (limitOption)}
-    {@const LimitIcon = LIMIT_ICONS[limitOption]}
     <option
       onclick={() => handleLimitChange(limitOption)}
       value={String(limitOption)}
     >
       {#if supportsBaseSelect}
-        <LimitIcon aria-hidden="true" class={limitIconClass} />
+        <Rows
+          aria-hidden="true"
+          class={limitIconClass}
+          count={LIMIT_BARS[limitOption]}
+        />
       {/if}
       {limitOption}
     </option>

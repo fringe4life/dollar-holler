@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { center } from "#styled-system/patterns/index.js";
   import { asset } from "$app/paths";
 </script>

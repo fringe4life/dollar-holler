@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { Snippet } from "svelte";
   import { DEFAULT_LIMIT } from "../constants";
   import {

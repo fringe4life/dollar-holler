@@ -1,5 +1,7 @@
 <script lang="ts">
-  import { css, cx, viewTransition } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
+  import { viewTransition } from "#styled-system/css/view-transition.js";
   import {
     circle,
     flex,

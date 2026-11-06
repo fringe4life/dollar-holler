@@ -1,4 +1,5 @@
-import { cva } from "#styled-system/css/index.js";
+import { css } from "#styled-system/css/css.js";
+import { cx } from "#styled-system/css/cx.js";
 import { grid } from "#styled-system/patterns/index.js";
 
 const clientColumns = {
@@ -107,42 +108,59 @@ export const clientSwipeHint = grid({
   "@item-row/md": { display: "none" },
 });
 
-export const clientStateSignal = cva({
-  base: {
-    isolation: "isolate",
-    position: "relative",
-    borderColor: "borderSubtle",
-    _before: {
-      clipPath: "polygon(0 0, 100% 0, 100% 100%)",
-      content: '""',
-      height: 3,
-      insetBlockStart: 0,
-      insetInlineEnd: 0,
-      position: "absolute",
-      width: 3,
-      zIndex: 1,
-    },
-  },
-  variants: {
-    state: {
-      active: {
-        borderColor: "success/45",
-        _before: { backgroundColor: "success" },
-        _hover: { borderColor: "success" },
-        _dark: {
-          borderColor: "success/35",
-          _hover: { borderColor: "success" },
-        },
-      },
-      archive: {
-        borderColor: "textMuted/45",
-        _before: { backgroundColor: "textMuted" },
-        _hover: { borderColor: "textMuted" },
-        _dark: {
-          borderColor: "textMuted/35",
-          _hover: { borderColor: "textMuted" },
-        },
-      },
-    },
+type ClientState = "active" | "archive";
+
+/**
+ * Workaround: top-level `css()` maps instead of `cva` so hashed class names do
+ * not force the full recipe runtime into the client bundle.
+ *
+ * @remarks
+ * Still required on `@pandacss/vite@2.5.0` / `@pandacss/dev@2.5.0` with
+ * `hash: true`. Drop when Panda folds hashed local `cva`/`sva` to string
+ * lookups; re-verify no client chunk with `compoundVariants` / `__cva__`
+ * after clean build.
+ *
+ * @see https://github.com/chakra-ui/panda/issues/3853 — related transform diagnostics
+ * @see https://github.com/fringe4life/van-life/issues/471 — established pattern
+ * @see https://github.com/fringe4life/dollar-holler/issues/109 — tracking
+ */
+const clientStateSignalBase = css({
+  isolation: "isolate",
+  position: "relative",
+  borderColor: "borderSubtle",
+  _before: {
+    clipPath: "polygon(0 0, 100% 0, 100% 100%)",
+    content: '""',
+    height: 3,
+    insetBlockStart: 0,
+    insetInlineEnd: 0,
+    position: "absolute",
+    width: 3,
+    zIndex: 1,
   },
 });
+
+const clientStateSignalByState = {
+  active: css({
+    borderColor: "success/45",
+    _before: { backgroundColor: "success" },
+    _hover: { borderColor: "success" },
+    _dark: {
+      borderColor: "success/35",
+      _hover: { borderColor: "success" },
+    },
+  }),
+  archive: css({
+    borderColor: "textMuted/45",
+    _before: { backgroundColor: "textMuted" },
+    _hover: { borderColor: "textMuted" },
+    _dark: {
+      borderColor: "textMuted/35",
+      _hover: { borderColor: "textMuted" },
+    },
+  }),
+} as const satisfies Record<ClientState, string>;
+
+export function clientStateSignal({ state }: { state: ClientState }) {
+  return cx(clientStateSignalBase, clientStateSignalByState[state]);
+}

@@ -5,13 +5,13 @@ Proof gates only — **no deploy from GitHub Actions** yet. Ship stays local (`b
 ## Pre-commit (husky + lint-staged)
 
 - ESLint / Prettier / Stylelint / `svelte-check` on staged sources
-- `bun run audit:deps` (`bun audit --prod --audit-level=moderate`) when `package.json` or `bun.lock` is staged
+- `bun run dedupe` then `bun run audit:deps` when `package.json` or `bun.lock` is staged (`dedupe` collapses removable duplicate versions into `bun.lock`; CI uses `bun run dedupe:check`)
 
 ## Workflows
 
 | Workflow | When | What |
 | --- | --- | --- |
-| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | PR, push to `main`/`master`, weekly cron, `workflow_dispatch` | lint, typecheck, test (`VARLOCK_ENV=test`); **audit** always (including cron) |
+| [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) | PR, push to `main`/`master`, weekly cron, `workflow_dispatch` | lint, typecheck, test (`VARLOCK_ENV=test`); **audit** (`dedupe:check` + `audit:deps`) always (including cron) |
 | [`.github/workflows/bundlewatch.yml`](../.github/workflows/bundlewatch.yml) | PR, push to `main` | `bun run build` → Panda `createSerializeCss` fingerprint → BundleWatch |
 | [`.github/workflows/fallow.yml`](../.github/workflows/fallow.yml) | PR, push | Fallow boundaries + advisory audit |
 

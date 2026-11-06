@@ -1,5 +1,5 @@
 <script generics="T" lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { flex } from "#styled-system/patterns/index.js";
   import type { Snippet } from "svelte";
   import Modal from "#lib/components/patterns/modal/Modal.svelte";

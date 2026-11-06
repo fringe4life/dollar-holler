@@ -1,4 +1,5 @@
-import { cva } from "#styled-system/css/index.js";
+import { css } from "#styled-system/css/css.js";
+import { cx } from "#styled-system/css/cx.js";
 import { grid } from "#styled-system/patterns/index.js";
 
 const invoiceColumns = {
@@ -125,60 +126,77 @@ export const invoiceSwipeHint = grid({
   "@item-row/md": { display: "none" },
 });
 
-export const invoiceStateSignal = cva({
-  base: {
-    isolation: "isolate",
-    position: "relative",
-    borderColor: "borderSubtle",
-    _before: {
-      clipPath: "polygon(0 0, 100% 0, 100% 100%)",
-      content: '""',
-      height: 3,
-      insetBlockStart: 0,
-      insetInlineEnd: 0,
-      position: "absolute",
-      width: 3,
-      zIndex: 1,
-    },
-  },
-  variants: {
-    state: {
-      draft: {
-        borderColor: "statusDraft/50",
-        _before: { backgroundColor: "statusDraft" },
-        _hover: { borderColor: "statusDraft" },
-        _dark: {
-          borderColor: "statusDraft/45",
-          _hover: { borderColor: "statusDraft" },
-        },
-      },
-      late: {
-        borderColor: "statusLate/50",
-        _before: { backgroundColor: "statusLate" },
-        _hover: { borderColor: "statusLate" },
-        _dark: {
-          borderColor: "statusLate/45",
-          _hover: { borderColor: "statusLate" },
-        },
-      },
-      paid: {
-        borderColor: "statusPaid/50",
-        _before: { backgroundColor: "statusPaid" },
-        _hover: { borderColor: "statusPaid" },
-        _dark: {
-          borderColor: "statusPaid/45",
-          _hover: { borderColor: "statusPaid" },
-        },
-      },
-      sent: {
-        borderColor: "statusSent/50",
-        _before: { backgroundColor: "statusSent" },
-        _hover: { borderColor: "statusSent" },
-        _dark: {
-          borderColor: "statusSent/45",
-          _hover: { borderColor: "statusSent" },
-        },
-      },
-    },
+type InvoiceState = "draft" | "late" | "paid" | "sent";
+
+/**
+ * Workaround: top-level `css()` maps instead of `cva` so hashed class names do
+ * not force the full recipe runtime into the client bundle.
+ *
+ * @remarks
+ * Still required on `@pandacss/vite@2.5.0` / `@pandacss/dev@2.5.0` with
+ * `hash: true`. Drop when Panda folds hashed local `cva`/`sva` to string
+ * lookups; re-verify no client chunk with `compoundVariants` / `__cva__`
+ * after clean build.
+ *
+ * @see https://github.com/chakra-ui/panda/issues/3853 — related transform diagnostics
+ * @see https://github.com/fringe4life/van-life/issues/471 — established pattern
+ * @see https://github.com/fringe4life/dollar-holler/issues/109 — tracking
+ */
+const invoiceStateSignalBase = css({
+  isolation: "isolate",
+  position: "relative",
+  borderColor: "borderSubtle",
+  _before: {
+    clipPath: "polygon(0 0, 100% 0, 100% 100%)",
+    content: '""',
+    height: 3,
+    insetBlockStart: 0,
+    insetInlineEnd: 0,
+    position: "absolute",
+    width: 3,
+    zIndex: 1,
   },
 });
+
+const invoiceStateSignalByState = {
+  draft: css({
+    borderColor: "statusDraft/50",
+    _before: { backgroundColor: "statusDraft" },
+    _hover: { borderColor: "statusDraft" },
+    _dark: {
+      borderColor: "statusDraft/45",
+      _hover: { borderColor: "statusDraft" },
+    },
+  }),
+  late: css({
+    borderColor: "statusLate/50",
+    _before: { backgroundColor: "statusLate" },
+    _hover: { borderColor: "statusLate" },
+    _dark: {
+      borderColor: "statusLate/45",
+      _hover: { borderColor: "statusLate" },
+    },
+  }),
+  paid: css({
+    borderColor: "statusPaid/50",
+    _before: { backgroundColor: "statusPaid" },
+    _hover: { borderColor: "statusPaid" },
+    _dark: {
+      borderColor: "statusPaid/45",
+      _hover: { borderColor: "statusPaid" },
+    },
+  }),
+  sent: css({
+    borderColor: "statusSent/50",
+    _before: { backgroundColor: "statusSent" },
+    _hover: { borderColor: "statusSent" },
+    _dark: {
+      borderColor: "statusSent/45",
+      _hover: { borderColor: "statusSent" },
+    },
+  }),
+} as const satisfies Record<InvoiceState, string>;
+
+export function invoiceStateSignal({ state }: { state: InvoiceState }) {
+  return cx(invoiceStateSignalBase, invoiceStateSignalByState[state]);
+}

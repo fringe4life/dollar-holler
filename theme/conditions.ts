@@ -10,6 +10,10 @@ export const conditions = defineConditions({
     },
     groupDataExpanded: ".group[data-expanded='true'] &",
     groupHasToastHover: ".group:has([popover='manual']:hover) &",
+    // Chrome still matches `:hover` on a disabled button, so a glyph inside one
+    // would animate on a control that cannot be used. `:where()` keeps this at
+    // the specificity of a plain group hover, so press states still win.
+    groupHoverEnabled: ":where(.group):hover:not(:disabled) &",
     hoverNone: "@media (hover: none)",
     notSupportsLinear:
       "@supports not (animation-timing-function: linear(0, 1))",

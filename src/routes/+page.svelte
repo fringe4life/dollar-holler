@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { ArrowUpRightIcon } from "@lucide/svelte";
   import "#lib/fonts/kalam.css";
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { grid, hstack, stack } from "#styled-system/patterns/index.js";
   import { asset, resolve } from "$app/paths";
   import Features from "#features/landing-page/components/Features.svelte";
@@ -15,12 +15,10 @@
   import LandingNav from "#features/landing-page/components/LandingNav.svelte";
   import Reviews from "#features/landing-page/components/Reviews.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
-  import { directionalArrow } from "#lib/styles.ts";
+  import ArrowUpRight from "#lib/components/primitives/icons/ArrowUpRight.svelte";
 
-  const arrowClass = cx(
-    css({ flexShrink: 0, height: 4, width: 4 }),
-    directionalArrow({ direction: "forward" })
-  );
+  /* The glyph owns its push along its own diagonal; the recipe travels along X. */
+  const arrowClass = css({ flexShrink: 0, height: 4, width: 4 });
 
   const pageClass = css({
     backgroundColor: "background",
@@ -328,7 +326,7 @@
                   size="lg"
                 >
                   Create your account
-                  <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
+                  <ArrowUpRight aria-hidden="true" class={arrowClass} />
                 </Button>
                 <a class={heroLoginClass} href={resolve("login")}
                   >Already have an account?</a
@@ -394,7 +392,7 @@
               size="sm"
             >
               Create an account
-              <ArrowUpRightIcon aria-hidden="true" class={arrowClass} />
+              <ArrowUpRight aria-hidden="true" class={arrowClass} />
             </Button>
           </nav>
         {/snippet}

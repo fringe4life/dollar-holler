@@ -1,7 +1,7 @@
 <script lang="ts">
-  import FlagIcon from "@lucide/svelte/icons/flag";
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
+  import Flag from "#lib/components/primitives/icons/Flag.svelte";
   import { stateFlag, states } from "#lib/utils/states.ts";
   import Select from "#lib/components/primitives/select/Select.svelte";
   import type { HTMLSelectAttributes } from "svelte/elements";
@@ -20,11 +20,8 @@
 
   // Fallback for states without a flag on flagcdn (District of Columbia).
   const fallbackFlagClass = css({
-    blockSize: "18px",
     color: "textMuted",
-    fill: "none",
     flexShrink: 0,
-    inlineSize: 6,
   });
 </script>
 
@@ -33,6 +30,7 @@
   {name}
   aria-describedby={ariaDescribedby ?? undefined}
   aria-invalid={ariaInvalid}
+  wrapperClass={css({ inlineSize: "full" })}
   bind:value
 >
   {#each states as { value: stateValue, name } (name)}
@@ -55,7 +53,7 @@
             width={24}
           />
         {:else}
-          <FlagIcon aria-hidden="true" class={fallbackFlagClass} />
+          <Flag aria-hidden="true" class={fallbackFlagClass} />
         {/if}
       {/if}
       {name}

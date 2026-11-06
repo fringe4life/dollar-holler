@@ -1,7 +1,7 @@
 <script generics="T extends CursorRow" lang="ts">
-  import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
-  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
+  import ChevronLeftIcon from "#lib/components/primitives/icons/ChevronLeft.svelte";
+  import ChevronRightIcon from "#lib/components/primitives/icons/ChevronRight.svelte";
   import {
     hstack,
     square,

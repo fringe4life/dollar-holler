@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { afterNavigate, goto, onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { listReturnHrefFor } from "#features/pagination/utils/list-return-href.ts";
@@ -56,17 +57,20 @@
 />
 <!-- eslint-disable svelte/no-navigation-without-resolve -- pathname+search or resolved index -->
 <a
-  class={css({
-    zIndex: 1000,
-    color: { base: "mutedAction", _hover: "foreground" },
-    position: "fixed",
-    insetInlineStart: 7,
-    insetBlockStart: 5,
-    transitionProperty: "colors",
-    transitionDuration: "normal",
-    maxInlineSize: "full",
-    _print: { display: "none" },
-  })}
+  class={cx(
+    "group",
+    css({
+      zIndex: 1000,
+      color: { base: "mutedAction", _hover: "foreground" },
+      position: "fixed",
+      insetInlineStart: 7,
+      insetBlockStart: 5,
+      transitionProperty: "colors",
+      transitionDuration: "normal",
+      maxInlineSize: "full",
+      _print: { display: "none" },
+    })
+  )}
   data-sveltekit-replacestate
   href={getBackUrl}><Arrow /></a
 >

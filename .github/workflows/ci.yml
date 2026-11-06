@@ -79,6 +79,9 @@ jobs:
         with:
           bun-version: latest
 
-      # bun audit reads bun.lock only — no install / Varlock needed
+      # bun.lock only — no install / Varlock needed
+      - name: Lockfile dedupe check
+        run: bun run dedupe:check
+
       - name: Dependency audit (prod, moderate+)
         run: bun run audit:deps

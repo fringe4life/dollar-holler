@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import InitialsAvatar from "#lib/components/primitives/avatar/InitialsAvatar.svelte";
   import Badge from "#lib/components/primitives/badge/badge.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
@@ -66,7 +66,7 @@
         {client.name}
       </h1>
       <Button
-        class={clientSummaryEditButton}
+        class={cx("group", clientSummaryEditButton)}
         onclick={onEdit}
         size="sm"
         variant="ghost"

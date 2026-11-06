@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { MouseEventHandler } from "svelte/elements";
   import { resolve } from "$app/paths";
   import { getLabel } from "#features/invoices/utils/labelHelpers.ts";
@@ -7,7 +7,7 @@
   import Badge from "#lib/components/primitives/badge/badge.svelte";
   import Edit from "#lib/components/primitives/icons/Edit.svelte";
   import Send from "#lib/components/primitives/icons/Send.svelte";
-  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import Shredder from "#lib/components/primitives/icons/Shredder.svelte";
   import View from "#lib/components/primitives/icons/View.svelte";
   import {
     rowActionButton,
@@ -112,7 +112,7 @@
       </button>
       <button
         aria-label={`Send invoice ${invoiceNumberDisplay}`}
-        class={rowActionButton}
+        class={cx("group", rowActionButton)}
         onclick={handleSendInvoice}
         type="button"
       >
@@ -126,12 +126,12 @@
       onclick={handleDelete}
       type="button"
     >
-      <Trash height={16} width={16} />
+      <Shredder height={16} width={16} />
       Delete
     </button>
     <a
       aria-label={`View invoice ${invoiceNumberDisplay}`}
-      class={rowActionButton}
+      class={cx("group", rowActionButton)}
       href={resolve(invoiceDetailPath, { id })}
     >
       <View height={16} width={16} />
@@ -145,7 +145,11 @@
         <Edit height={24} width={24} />
         Edit
       </button>
-      <button class={rowActionButton} onclick={handleSendInvoice} type="button">
+      <button
+        class={cx("group", rowActionButton)}
+        onclick={handleSendInvoice}
+        type="button"
+      >
         <Send height={24} width={24} />
         Send
       </button>
@@ -155,10 +159,13 @@
       onclick={handleDelete}
       type="button"
     >
-      <Trash height={24} width={24} />
+      <Shredder height={24} width={24} />
       Delete
     </button>
-    <a class={rowActionButton} href={resolve(invoiceDetailPath, { id })}>
+    <a
+      class={cx("group", rowActionButton)}
+      href={resolve(invoiceDetailPath, { id })}
+    >
       <View height={24} width={24} />
       View
     </a>

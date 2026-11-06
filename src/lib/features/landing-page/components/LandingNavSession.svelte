@@ -1,11 +1,12 @@
 <script lang="ts">
-  import LayoutDashboard from "@lucide/svelte/icons/layout-dashboard";
   import type { Snippet } from "svelte";
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { hstack } from "#styled-system/patterns/index.js";
   import { resolve } from "$app/paths";
   import { keepAnonymousLandingFallback } from "#features/landing-page/landing-session.ts";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import Dashboard from "#lib/components/primitives/icons/Dashboard.svelte";
 
   interface Props {
     ogygiaFallback?: Snippet;
@@ -32,11 +33,11 @@
 <div class={landingActions}>
   <Button
     aria-label="Go to dashboard"
-    class={landingActionButton}
+    class={cx("group", landingActionButton)}
     href={resolve("invoices")}
     size="default"
   >
-    <LayoutDashboard aria-hidden="true" class={landingActionIcon} size={18} />
+    <Dashboard aria-hidden="true" class={landingActionIcon} size={18} />
     <span class={landingActionLabel}>Go to Dashboard</span>
   </Button>
 </div>

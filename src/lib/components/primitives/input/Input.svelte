@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { HTMLInputAttributes } from "svelte/elements";
   import { CORNER_SHAPE } from "#lib/styles.ts";
 
@@ -33,10 +34,8 @@
   });
 
   const dateInputShell = css({
-    "&:has([aria-invalid='true'])": {
-      borderColor: "destructive",
-    },
-    "&:has(:user-invalid)": {
+    // One :has so aria-invalid (remote forms) and :user-invalid share a rule.
+    "&:has(:is(:user-invalid, [aria-invalid='true']))": {
       borderColor: "destructive",
     },
     alignItems: "center",

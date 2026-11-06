@@ -11,7 +11,8 @@ const config: Configuration = {
     () => ["svelte-kit sync", "svelte-check --tsconfig ./tsconfig.json"],
   ],
   // Fast lockfile gate only — do not hang off the svelte-check path (#233).
-  "{package.json,bun.lock}": () => ["bun run audit:deps"],
+  // `dedupe` rewrites bun.lock when ranges already allow collapsing versions; lint-staged re-stages it.
+  "{package.json,bun.lock}": () => ["bun run dedupe", "bun run audit:deps"],
   "*.{json,md,yml,yaml,html}": "prettier --write --experimental-cli",
   "*.css": ["stylelint --fix", "prettier --write --experimental-cli"],
 };

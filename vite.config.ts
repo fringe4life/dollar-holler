@@ -5,6 +5,7 @@ import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { FontaineTransform } from "fontaine";
+import { devtools as ogygiaDevtools } from "@ogygia/devtools/vite";
 import { ogygia } from "ogygia/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { varlockVitePlugin } from "@varlock/vite-integration";
@@ -24,6 +25,7 @@ import {
   stubCloudflareWorkersInDir,
 } from "./scripts/cloudflare-workers-specifier.ts";
 import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts";
+import { varlockSsrUaGuard } from "./scripts/varlock-ssr-ua-guard.ts";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -124,8 +126,7 @@ const stubCloudflareWorkersPlugin = (): Plugin => ({
   },
 });
 
-export default defineConfig({
-
+export default defineConfig(({ mode }) => ({
   build: {
     rolldownOptions: {
       // Enable Rolldown build-analysis metadata for Vite DevTools panels
@@ -172,6 +173,8 @@ export default defineConfig({
     // Cloudflare adapter detected → runtime loader via @varlock/cloudflare-integration
     // (do not force ssrInjectMode: "resolved-env"; plugin rejects that on CF builds).
     varlockVitePlugin(),
+    // After varlock so `\0varlock-ssr-init` exists; restores UA guard (see script).
+    varlockSsrUaGuard(),
     sentrySvelteKit({
       // Dummy .env.test token must not upload or fail CI builds (#148).
       autoUploadSourceMaps: process.env.VARLOCK_ENV !== "test",
@@ -191,20 +194,25 @@ export default defineConfig({
      * Plugin order before `ogygia()` is required so island resolve sees the remap.
      *
      * @remarks
-     * Still required on `vite@8.3.5` + `ogygia@0.9.0` with `@sveltejs/kit@3.1.0` for
-     * `bun vite dev` → `/invoices` (InvoiceRow island). Drop when Vite stops emitting
-     * bare ids for virtual importers **and/or** ogygia honors `package.json`
-     * `"imports"`; re-verify `/invoices` in **dev** before deleting. No upstream
-     * Vite/ogygia issue filed yet.
+     * Still required on `vite@8.3.6` + `ogygia@0.12.1` with `@sveltejs/kit@3.1.1` for
+     * `bun vite dev` → `/invoices` (`InvoiceRow` island → bare `styled-system/css/cx.js`).
+     * Re-checked 8.3.6: its `#` fix is optimizer conditions only
+     * (vitejs/vite#23959 / #23946), not virtual-importer collapse. Drop when Vite
+     * stops emitting bare ids for virtual importers; re-verify `/invoices` in **dev**.
+     * No upstream Vite issue filed yet (filing target is vitejs/vite, not ogygia).
      *
      * @see https://github.com/fringe4life/dollar-holler/issues/228 — this upgrade + bridge
      * @see https://github.com/fringe4life/dollar-holler/issues/215 — Vite tracking
-     * @see https://github.com/fringe4life/dollar-holler/issues/209 — ogygia tracking
+     * @see https://github.com/fringe4life/dollar-holler/issues/209 — Vite collapse tracking
      * @see https://github.com/fringe4life/dollar-holler/issues/208 — related Kit 3 env rename
      */
     ogygiaNodeImportsBridge(),
     // Before sveltekit so island import attributes are rewritten first.
+    // Feature plugins list beside ogygia() (not as ogygia({ plugins })) — 0.11 split.
     ogygia(),
+    ...(mode !== "production"
+      ? [ogygiaDevtools({ profiler: true })]
+      : []),
     sveltekit({
       adapter: adapter({
         platformProxy: {
@@ -276,4 +284,4 @@ export default defineConfig({
       allow: ["styled-system"],
     },
   },
-});
+}));

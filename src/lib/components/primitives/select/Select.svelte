@@ -1,7 +1,48 @@
+<script lang="ts" module>
+  import { css } from "#styled-system/css/css.js";
+
+  /**
+   * Positioned, or the indicator resolves against the page and lands nowhere —
+   * and deliberately unsized. A default `inline-size: full` here beats the
+   * caller's `fit-content` on atomic order, which stretched the page-size box to
+   * the whole pager row and parked the chevron out by the next/previous buttons.
+   * Left auto, the wrapper hugs the select in a flex row and fills a column in
+   * block flow; callers that need full width say so through `wrapperClass`.
+   */
+  const defaultWrapperClass = css({
+    display: "grid",
+    position: "relative",
+  });
+
+  /**
+   * The indicator, not a `background-image`. The old one was a data-URI grey
+   * that could not take `currentColor`, could not be split into parts, and had
+   * to be hidden again the moment `<select>` grew a real picker icon.
+   *
+   * It renders for both branches — classic `<select>` and `appearance:
+   * base-select` — so the mark is the same glyph everywhere. The UA picker icon
+   * is suppressed below; this is the only chevron the control shows.
+   */
+  const indicatorClass = css({
+    color: "textMuted",
+    insetBlockStart: "50%",
+    insetInlineEnd: 2.5,
+    pointerEvents: "none",
+    position: "absolute",
+    transitionDuration: "normal",
+    transitionProperty: "rotate",
+    translate: "0 -50%",
+    ":where(select):disabled ~ &": { opacity: 0.45 },
+    ":where(select):open ~ &": { rotate: "180deg" },
+    _motionReduce: { transitionDuration: "0.01ms" },
+  });
+</script>
+
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { cx } from "#styled-system/css/cx.js";
   import type { HTMLSelectAttributes } from "svelte/elements";
   import { supportsBaseSelect } from "#lib/client/supports.ts";
+  import ChevronDown from "#lib/components/primitives/icons/ChevronDown.svelte";
   import { CORNER_SHAPE } from "#lib/styles.ts";
 
   const selectClass = css({
@@ -22,17 +63,9 @@
       transitionProperty: "opacity, translate, display, overlay",
       translate: "0 -0.5rem",
     },
-    "&::picker-icon": {
-      color: "textMuted",
-      transitionDuration: "normal",
-      transitionProperty: "rotate",
-    },
     "&:open::picker(select)": {
       opacity: 1,
       translate: "0 0",
-    },
-    "&:open::picker-icon": {
-      rotate: "180deg",
     },
     _ariaInvalid: {
       borderColor: "destructive",
@@ -65,6 +98,10 @@
       borderColor: "destructive",
     },
     _supportsBaseSelect: {
+      /* The glyph beside the select is the chevron; the UA's is a second one. */
+      "&::picker-icon": {
+        content: "none",
+      },
       "& option": {
         _checked: {
           color: "foreground",
@@ -105,45 +142,54 @@
       },
       alignItems: "center",
       appearance: "base-select",
-      backgroundImage: "none",
       display: "flex",
       gap: 2,
     },
     appearance: "none",
-    backgroundImage: "url('/images/chevron-down.svg')",
-    backgroundPosition: "97% center",
-    backgroundRepeat: "no-repeat",
     blockSize: 10,
     borderColor: "input",
     borderRadius: "lg",
     borderWidth: 2,
     cornerShape: CORNER_SHAPE,
     inlineSize: "full",
-    paddingInline: 4,
+    paddingInlineEnd: 7,
+    paddingInlineStart: 4,
     transitionDuration: "normal",
     transitionProperty: "colors",
   });
 
   let {
     class: className = "",
+    wrapperClass = "",
     children,
     value = $bindable(),
     ...rest
-  }: Omit<HTMLSelectAttributes, "class"> & { class?: string } = $props();
+  }: Omit<HTMLSelectAttributes, "class"> & {
+    class?: string;
+    /** Sizing for the wrapper that holds the indicator. */
+    wrapperClass?: string;
+  } = $props();
 </script>
 
 <!--
   Progressive enhancement: browsers supporting customizable selects
   (`appearance: base-select`) get a first-child <button><selectedcontent>
   pair (mirroring the selected option's rich content), a styled and animated
-  ::picker(select) popover and a rotating ::picker-icon. The button branch is
+  ::picker(select) popover and the house chevron. The button branch is
   client-only, so SSR and legacy parsers only ever see a classic <select>.
+
+  The wrapper exists so one glyph can sit in the corner in both branches: a
+  classic <select> cannot hold markup, and `::picker-icon` only exists in the
+  enhanced branch.
 -->
-<select class={cx(selectClass, className)} {...rest} bind:value>
-  {#if supportsBaseSelect}
-    <button>
-      <selectedcontent></selectedcontent>
-    </button>
-  {/if}
-  {@render children?.()}
-</select>
+<div class={cx(defaultWrapperClass, wrapperClass)}>
+  <select class={cx(selectClass, className)} {...rest} bind:value>
+    {#if supportsBaseSelect}
+      <button>
+        <selectedcontent></selectedcontent>
+      </button>
+    {/if}
+    {@render children?.()}
+  </select>
+  <ChevronDown aria-hidden="true" class={indicatorClass} size={14} />
+</div>

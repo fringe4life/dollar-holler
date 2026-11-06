@@ -1,12 +1,13 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { gridItem } from "#styled-system/patterns/index.js";
   import type { FocusEventHandler, FormEventHandler } from "svelte/elements";
   import type {
     LineItemRowProps,
     LineItemUpdate,
   } from "#features/line-items/types.ts";
-  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import Shredder from "#lib/components/primitives/icons/Shredder.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
   import { money } from "#lib/components/primitives/money/money.ts";
   import { invoiceLineItem } from "../styles";
@@ -179,17 +180,20 @@
   >
     {#if props.canDelete && isEditable}
       <Button
-        class={css({
-          textAlign: "center",
-          blockSize: "10",
-          inlineSize: "full",
-        })}
+        class={cx(
+          "group",
+          css({
+            textAlign: "center",
+            blockSize: "10",
+            inlineSize: "full",
+          })
+        )}
         onclick={() => {
           if (props.mode !== "view") {
             props.removeLineItem(props.lineItem.id);
           }
         }}
-        variant="ghost"><Trash /></Button
+        variant="ghost"><Shredder /></Button
       >
     {/if}
   </div>

@@ -1,7 +1,7 @@
 <script lang="ts">
-  import ModeSelect from "#lib/components/patterns/ModeSelect.svelte";
+  import ThemeControl from "#lib/components/patterns/ThemeControl.svelte";
   import ThemeCookieHydrate from "#lib/theme/ThemeCookieHydrate.svelte";
 </script>
 
 <ThemeCookieHydrate />
-<ModeSelect />
+<ThemeControl />

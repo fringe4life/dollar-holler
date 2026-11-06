@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { css, cx } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { flex } from "#styled-system/patterns/index.js";
   import { onDestroy } from "svelte";
   import { getToast } from "#lib/components/patterns/toast/toaster.svelte.ts";
@@ -23,7 +24,7 @@
   import ConfirmDelete from "#lib/components/patterns/ConfirmDelete.svelte";
   import Form from "#lib/components/patterns/form/Form.svelte";
   import Check from "#lib/components/primitives/icons/Check.svelte";
-  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import Shredder from "#lib/components/primitives/icons/Shredder.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
   import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
   import { buttonIcon } from "#lib/styles.ts";
@@ -140,6 +141,7 @@
     >
       {#if mode === "edit" && invoice.id}
         <Button
+          class="group"
           onclick={() => {
             if (!invoice.id) {
               return;
@@ -150,7 +152,7 @@
               total: sumLineItems(lineItems),
             });
           }}
-          variant="textOnlyDestructive"><Trash />Delete</Button
+          variant="textOnlyDestructive"><Shredder />Delete</Button
         >
       {:else}
         <span></span>

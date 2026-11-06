@@ -1,6 +1,6 @@
 <script lang="ts">
   import Loader from "#lib/components/primitives/Loader.svelte";
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import Button, { type ButtonProps } from "./button.svelte";
 
   type Props = ButtonProps & {

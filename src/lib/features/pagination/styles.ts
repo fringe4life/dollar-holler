@@ -1,4 +1,4 @@
-import { cx } from "#styled-system/css/index.js";
+import { cx } from "#styled-system/css/cx.js";
 import { cq, flex, grid, stack } from "#styled-system/patterns/index.js";
 
 export const paginatedListStack = cx(

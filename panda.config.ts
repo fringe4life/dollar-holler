@@ -25,6 +25,7 @@ export default defineConfig({
       syntax: "<length>",
     },
   },
+  hash: true,
   // Where to look for your css declarations
   include: ["./src/**/*.svelte", "./src/**/*.ts", "./src/**/*.js"],
   minify: true,
@@ -32,6 +33,7 @@ export default defineConfig({
     // VT keyframe refs live in theme/global-styles.ts (pagination + theme-change)
     // so extract counts them; safe to tree-shake unused theme keyframes.
     removeUnusedKeyframes: true,
+    removeUnusedStyles: true,
     removeUnusedTokens: true,
     smartCompoundVariants: true,
     treeshakeDesignSystem: true,

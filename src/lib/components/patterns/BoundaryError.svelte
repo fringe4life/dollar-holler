@@ -1,8 +1,9 @@
 <script lang="ts">
-  import AlertTriangle from "@lucide/svelte/icons/alert-triangle";
-  import RefreshCw from "@lucide/svelte/icons/refresh-cw";
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import Button from "#lib/components/primitives/button/button.svelte";
+  import AlertTriangle from "#lib/components/primitives/icons/AlertTriangle.svelte";
+  import Retry from "#lib/components/primitives/icons/Retry.svelte";
   import { CORNER_SHAPE } from "#lib/styles.ts";
   import { getErrorMessage } from "#lib/utils/error-message.ts";
 
@@ -106,8 +107,8 @@
     <h2 class={titleClass}>{title}</h2>
     <p class={messageClass}>{message}</p>
   </div>
-  <Button class={actionClass} onclick={onRetry} size="sm">
-    <RefreshCw aria-hidden="true" class={iconClass} />
+  <Button class={cx("group", actionClass)} onclick={onRetry} size="sm">
+    <Retry aria-hidden="true" class={iconClass} />
     Try again
   </Button>
 </div>

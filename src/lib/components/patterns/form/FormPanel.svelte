@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { visuallyHidden } from "#styled-system/patterns/index.js";
   import type { Attachment } from "svelte/attachments";
   import type { Snippet } from "svelte";

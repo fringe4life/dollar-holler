@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { asset } from "$app/paths";
   import BlankRow from "./BlankRow.svelte";
   import "#lib/fonts/kalam.css";

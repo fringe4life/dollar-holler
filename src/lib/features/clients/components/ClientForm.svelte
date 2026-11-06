@@ -8,7 +8,7 @@
   import Form from "#lib/components/patterns/form/Form.svelte";
   import FormField from "#lib/components/patterns/form/FormField.svelte";
   import Check from "#lib/components/primitives/icons/Check.svelte";
-  import Trash from "#lib/components/primitives/icons/Trash.svelte";
+  import Shredder from "#lib/components/primitives/icons/Shredder.svelte";
   import States from "#lib/components/patterns/States.svelte";
   import Button from "#lib/components/primitives/button/button.svelte";
   import LoaderButton from "#lib/components/primitives/button/LoaderButton.svelte";
@@ -177,8 +177,11 @@
       })}
     >
       {#if formState === "edit" && edit}
-        <Button onclick={handleDelete} variant="textOnlyDestructive"
-          ><Trash />
+        <Button
+          class="group"
+          onclick={handleDelete}
+          variant="textOnlyDestructive"
+          ><Shredder />
           Delete</Button
         >
       {:else}

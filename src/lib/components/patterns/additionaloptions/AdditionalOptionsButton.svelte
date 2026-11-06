@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import ThreeDots from "#lib/components/primitives/icons/ThreeDots.svelte";
 
   interface Props {

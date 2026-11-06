@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { css } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
   import { browser } from "$app/env";
   import { resolve } from "$app/paths";
   import { resetPassword as resetPasswordForm } from "#features/auth/auth.remote.ts";

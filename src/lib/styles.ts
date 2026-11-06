@@ -1,4 +1,5 @@
-import { css, cva, cx } from "#styled-system/css/index.js";
+import { css } from "#styled-system/css/css.js";
+import { cx } from "#styled-system/css/cx.js";
 import { flex } from "#styled-system/patterns/index.js";
 
 /**
@@ -27,66 +28,85 @@ import { flex } from "#styled-system/patterns/index.js";
  */
 export const CORNER_SHAPE = "squircle" as const;
 
-export const directionalArrow = cva({
-  base: {
-    fill: "none",
-    flexShrink: 0,
-    paddingInline: 0,
-    transitionDuration: "normal",
-    transitionProperty: "translate",
-    transitionTimingFunction: {
-      base: "anticipate",
-      _supportsLinear: "glide",
-    },
-    _groupDisabled: { translate: "0 0" },
+type ArrowDirection = "backward" | "forward";
+type ButtonIconKind = "check" | "plus";
+
+/**
+ * Workaround: top-level `css()` maps instead of `cva` so hashed class names do
+ * not force the full recipe runtime into the client bundle.
+ *
+ * @remarks
+ * Still required on `@pandacss/vite@2.5.0` / `@pandacss/dev@2.5.0` with
+ * `hash: true`. Drop when Panda folds hashed local `cva`/`sva` to string
+ * lookups; re-verify no client chunk with `compoundVariants` / `__cva__`
+ * after clean build.
+ *
+ * @see https://github.com/chakra-ui/panda/issues/3853 — related transform diagnostics
+ * @see https://github.com/fringe4life/van-life/issues/471 — established pattern
+ * @see https://github.com/fringe4life/dollar-holler/issues/109 — tracking
+ */
+const directionalArrowBase = css({
+  fill: "none",
+  flexShrink: 0,
+  paddingInline: 0,
+  transitionDuration: "normal",
+  transitionProperty: "translate",
+  transitionTimingFunction: {
+    base: "anticipate",
+    _supportsLinear: "glide",
   },
-  variants: {
-    direction: {
-      backward: {
-        _groupActive: { translate: "-0.25rem 0" },
-        _groupHover: { translate: "-0.25rem 0" },
-      },
-      forward: {
-        _groupActive: { translate: "0.25rem 0" },
-        _groupHover: { translate: "0.25rem 0" },
-      },
-    },
-  },
+  _groupDisabled: { translate: "0 0" },
 });
+
+const directionalArrowByDirection = {
+  backward: css({
+    _groupActive: { translate: "-0.25rem 0" },
+    _groupHoverEnabled: { translate: "-0.25rem 0" },
+  }),
+  forward: css({
+    _groupActive: { translate: "0.25rem 0" },
+    _groupHoverEnabled: { translate: "0.25rem 0" },
+  }),
+} as const satisfies Record<ArrowDirection, string>;
+
+export function directionalArrow({ direction }: { direction: ArrowDirection }) {
+  return cx(directionalArrowBase, directionalArrowByDirection[direction]);
+}
 
 const iconRest = { rotate: "0deg", scale: "1" } as const;
 
-export const buttonIcon = cva({
-  base: {
-    display: "inline-block",
-    flexShrink: 0,
-    transformOrigin: "center",
-    transitionDuration: "normal",
-    transitionProperty: "rotate, scale",
-    transitionTimingFunction: {
-      base: "anticipate",
-      _supportsLinear: "elastic",
-    },
-    _disabled: iconRest,
-    _groupDisabled: iconRest,
+const buttonIconBase = css({
+  display: "inline-block",
+  flexShrink: 0,
+  transformOrigin: "center",
+  transitionDuration: "normal",
+  transitionProperty: "rotate, scale",
+  transitionTimingFunction: {
+    base: "anticipate",
+    _supportsLinear: "elastic",
   },
-  variants: {
-    icon: {
-      check: {
-        _active: { rotate: "-4deg", scale: "0.9" },
-        _groupActive: { rotate: "-4deg", scale: "0.9" },
-        _groupHover: { rotate: "4deg", scale: "1.1" },
-        _hover: { rotate: "4deg", scale: "1.1" },
-      },
-      plus: {
-        _active: { rotate: "90deg", scale: "0.9" },
-        _groupActive: { rotate: "90deg", scale: "0.9" },
-        _groupHover: { rotate: "90deg", scale: "1.1" },
-        _hover: { rotate: "90deg", scale: "1.1" },
-      },
-    },
-  },
+  _disabled: iconRest,
+  _groupDisabled: iconRest,
 });
+
+const buttonIconByKind = {
+  check: css({
+    _active: { rotate: "-4deg", scale: "0.9" },
+    _groupActive: { rotate: "-4deg", scale: "0.9" },
+    _groupHoverEnabled: { rotate: "4deg", scale: "1.1" },
+    _hover: { rotate: "4deg", scale: "1.1" },
+  }),
+  plus: css({
+    _active: { rotate: "90deg", scale: "0.9" },
+    _groupActive: { rotate: "90deg", scale: "0.9" },
+    _groupHoverEnabled: { rotate: "90deg", scale: "1.1" },
+    _hover: { rotate: "90deg", scale: "1.1" },
+  }),
+} as const satisfies Record<ButtonIconKind, string>;
+
+export function buttonIcon({ icon }: { icon: ButtonIconKind }) {
+  return cx(buttonIconBase, buttonIconByKind[icon]);
+}
 
 export const rowActionRail = css({
   alignItems: "center",
@@ -160,6 +180,8 @@ export const rowSwipeTrigger = css({
 });
 
 export const rowActionButton = cx(
+  // Every row action owns a glyph, so the owner is the group by construction.
+  "group",
   css({
     alignItems: "center",
     backgroundColor: "surface",

@@ -1,5 +1,6 @@
 <script lang="ts" module>
-  import { css, cva } from "#styled-system/css/index.js";
+  import { css } from "#styled-system/css/css.js";
+  import { cx } from "#styled-system/css/cx.js";
   import { CORNER_SHAPE } from "#lib/styles.ts";
   import type { ToastType } from "./toaster.svelte.ts";
 
@@ -11,77 +12,92 @@
   /** Additional per-index spread on hover, beyond {@link TOAST_STACK_STEP}. */
   const TOAST_HOVER_FAN_STEP = "1.5rem";
 
-  const toastRecipe = cva({
-    base: {
-      alignItems: "center",
-      borderRadius: "xl",
-      borderStyle: "solid",
-      borderWidth: "2px",
-      boxShadow: "md",
-      columnGap: 4,
-      cornerShape: CORNER_SHAPE,
-      fontFamily: "sansserif",
-      fontSize: { base: "md", md: "lg" },
-      fontWeight: "bold",
-      inlineSize: "min(calc(100% - 2rem), 26rem)",
-      inset: "auto",
-      insetBlockStart: `calc(${TOAST_TOP} + var(--i) * ${TOAST_STACK_STEP})`,
-      insetInline: "0",
-      justifyContent: "space-between",
-      margin: 0,
-      marginInline: "auto",
-      maxInlineSize: "26rem",
-      minBlockSize: 12,
-      opacity: 0,
-      paddingBlock: 3,
-      paddingInline: 5,
-      pointerEvents: "auto",
-      position: "fixed",
-      transitionBehavior: "allow-discrete",
-      transitionDuration: "normal",
-      transitionProperty:
-        "opacity, translate, display, overlay, inset-block-start",
-      transitionTimingFunction: "ease-out",
-      translate: "0 0.5rem",
-      _groupHasToastHover: {
-        insetBlockStart: `calc(${TOAST_TOP} + var(--i) * (${TOAST_STACK_STEP} + ${TOAST_HOVER_FAN_STEP}) + ${TOAST_HOVER_LIFT})`,
-      },
-      _open: {
-        display: "flex",
-        opacity: 1,
-        translate: "0 0",
-        _starting: {
-          opacity: 0,
-          translate: "0 -0.5rem",
-        },
-      },
+  /**
+   * Workaround: top-level `css()` maps instead of `cva` so hashed class names do
+   * not force the full recipe runtime into the client bundle.
+   *
+   * @remarks
+   * Still required on `@pandacss/vite@2.5.0` / `@pandacss/dev@2.5.0` with
+   * `hash: true`. Drop when Panda folds hashed local `cva`/`sva` to string
+   * lookups; re-verify no client chunk with `compoundVariants` / `__cva__`
+   * after clean build.
+   *
+   * @see https://github.com/chakra-ui/panda/issues/3853 — related transform diagnostics
+   * @see https://github.com/fringe4life/van-life/issues/471 — established pattern
+   * @see https://github.com/fringe4life/dollar-holler/issues/109 — tracking
+   */
+  const toastBase = css({
+    alignItems: "center",
+    borderRadius: "xl",
+    borderStyle: "solid",
+    borderWidth: "2px",
+    boxShadow: "md",
+    columnGap: 4,
+    cornerShape: CORNER_SHAPE,
+    fontFamily: "sansserif",
+    fontSize: { base: "md", md: "lg" },
+    fontWeight: "bold",
+    inlineSize: "min(calc(100% - 2rem), 26rem)",
+    inset: "auto",
+    insetBlockStart: `calc(${TOAST_TOP} + var(--i) * ${TOAST_STACK_STEP})`,
+    insetInline: "0",
+    justifyContent: "space-between",
+    margin: 0,
+    marginInline: "auto",
+    maxInlineSize: "26rem",
+    minBlockSize: 12,
+    opacity: 0,
+    paddingBlock: 3,
+    paddingInline: 5,
+    pointerEvents: "auto",
+    position: "fixed",
+    transitionBehavior: "allow-discrete",
+    transitionDuration: "normal",
+    transitionProperty:
+      "opacity, translate, display, overlay, inset-block-start",
+    transitionTimingFunction: "ease-out",
+    translate: "0 0.5rem",
+    _groupHasToastHover: {
+      insetBlockStart: `calc(${TOAST_TOP} + var(--i) * (${TOAST_STACK_STEP} + ${TOAST_HOVER_FAN_STEP}) + ${TOAST_HOVER_LIFT})`,
     },
-    variants: {
-      type: {
-        error: {
-          "& [data-description]": { color: "destructiveForeground" },
-          backgroundColor: "destructive",
-          borderColor: "destructive",
-          color: "destructiveForeground",
-        },
-        info: {
-          backgroundColor: "muted",
-          borderColor: "borderSubtle",
-          color: "foreground",
-        },
-        success: {
-          backgroundColor: "surface",
-          borderColor: "success",
-          color: "foreground",
-        },
-        warning: {
-          backgroundColor: "surface",
-          borderColor: "warning",
-          color: "foreground",
-        },
-      } satisfies Record<ToastType, Record<string, unknown>>,
+    _open: {
+      display: "flex",
+      opacity: 1,
+      translate: "0 0",
+      _starting: {
+        opacity: 0,
+        translate: "0 -0.5rem",
+      },
     },
   });
+
+  const toastByType = {
+    error: css({
+      "& [data-description]": { color: "destructiveForeground" },
+      backgroundColor: "destructive",
+      borderColor: "destructive",
+      color: "destructiveForeground",
+    }),
+    info: css({
+      backgroundColor: "muted",
+      borderColor: "borderSubtle",
+      color: "foreground",
+    }),
+    success: css({
+      backgroundColor: "surface",
+      borderColor: "success",
+      color: "foreground",
+    }),
+    warning: css({
+      backgroundColor: "surface",
+      borderColor: "warning",
+      color: "foreground",
+    }),
+  } as const satisfies Record<ToastType, string>;
+
+  function toastRecipe({ type }: { type: ToastType }) {
+    return cx(toastBase, toastByType[type]);
+  }
 
   /** Popover handles top-layer display only; live-region role announces insert to AT. */
   const toastLiveRegion = (type: ToastType) =>

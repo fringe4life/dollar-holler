@@ -38,7 +38,7 @@
     "@types/sanitize-html": "2.16.2",
     "@typescript/native": "npm:typescript@7.0.2",
     "@varlock/vite-integration": "1.5.5",
-    "@vitejs/devtools": "0.8.0",
+    "@vitejs/devtools": "0.8.2",
     "bundlewatch": "1.1.0",
     "drizzle-kit": "1.0.0-rc.5",
     "eslint": "10.14.0",

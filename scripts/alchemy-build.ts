@@ -10,6 +10,11 @@
  *
  * Varlock does not inject the Cloudflare SSR loader for this adapter. That
  * is the accepted `__VARLOCK_ENV` gap.
+ *
+ * This process is the Bun host (`bun run build`). `@effect/platform-bun` is
+ * only the FileSystem/Path layer for that host. The deployed Worker is
+ * workerd. `nodejs_compat` (default-on after 2026-08-04) is what Better Auth's
+ * async local storage needs there. Do not import this file from the Worker.
  */
 import { layer as BunServices } from "@effect/platform-bun/BunServices";
 import { make } from "@alchemy.run/frontend-frameworks/sveltekit";

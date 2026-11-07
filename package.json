@@ -109,7 +109,6 @@
     "bench:sql-list": "bun ./scripts/sql-list-baseline.ts",
     "oracle:sql-list": "bun ./scripts/sql-list-baseline.ts --oracle",
     "oracle:sql-list:write": "bun ./scripts/sql-list-baseline.ts --write-oracle",
-    "cf:types": "bun ./scripts/cf-types.ts",
     "cf:restore-workers": "bun scripts/restore-cloudflare-workers.ts",
     "fonts:subset-money": "bun ./scripts/subset-money-font.ts && prettier --write src/lib/fonts/money/money.css --experimental-cli",
     "deploy": "varlock run -- bun x alchemy deploy --stage dev",

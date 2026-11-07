@@ -13,7 +13,6 @@ export default defineConfig(
       "build/**",
       ".vercel/**",
       ".wrangler/**",
-      "src/worker-configuration.d.ts",
       "dist/**",
       "node_modules/**",
       "styled-system/**",

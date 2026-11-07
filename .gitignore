@@ -6,6 +6,7 @@ node_modules
 .husky
 .netlify
 .wrangler
+.alchemy
 /.svelte-kit
 /build
 .cursor/*.log

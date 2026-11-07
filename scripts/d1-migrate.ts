@@ -1,37 +1,24 @@
 /**
- * Apply flattened D1 SQL with the Wrangler CLI.
- * `wrangler d1 migrations apply` refuses to run without a config file, so
- * this writes `.wrangler/d1.json` from `alchemy.run.ts` and passes `--config`.
- * That file is gitignored. Alchemy deploy applies the same directory via
- * `Cloudflare.D1.Database` `migrations`.
+ * Apply flattened D1 SQL through Alchemy.
+ *
+ * Local: `Cloudflare.D1.Database` `migrations:` on the local simulator
+ * (`.alchemy/local/d1`). Same persist `alchemy dev` binds. Not a live apply.
+ * Remote: D1 HTTP API + Alchemy `__alchemy_migrations` bookkeeping.
  */
-import { spawnSync } from "node:child_process";
-import { join } from "node:path";
 import {
-  LOCAL_D1_PERSIST_DIR,
-  writeEphemeralWranglerConfig,
-} from "./d1-wrangler-config.ts";
-import { SPIKE_NAME } from "../alchemy.run.ts";
+  applyLocalAlchemyD1Migrations,
+  applyRemoteAlchemyD1Migrations,
+} from "./alchemy-d1.ts";
 
 const remote = process.argv.includes("--remote");
-const configPath = await writeEphemeralWranglerConfig({ remote });
-const result = spawnSync(
-  join(process.cwd(), "node_modules/.bin/wrangler"),
-  [
-    "--config",
-    configPath,
-    "d1",
-    "migrations",
-    "apply",
-    SPIKE_NAME,
-    remote ? "--remote" : "--local",
-    ...(remote ? [] : ["--persist-to", LOCAL_D1_PERSIST_DIR]),
-  ],
-  { stdio: "inherit" }
-);
 
-if (result.error) {
-  console.error(result.error.message);
+try {
+  if (remote) {
+    await applyRemoteAlchemyD1Migrations();
+  } else {
+    await applyLocalAlchemyD1Migrations();
+  }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error);
   process.exit(1);
 }
-process.exit(result.status ?? 1);

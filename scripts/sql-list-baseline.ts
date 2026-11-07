@@ -1,7 +1,7 @@
 /**
  * Throwaway BEFORE/AFTER harness for invoice/client list SQL on local D1.
  *
- * Opens Miniflare D1 via getPlatformProxy({ persist: true }) like seed.ts.
+ * Opens Alchemy local D1 (`.alchemy/local`) like seed.ts.
  * Production fetch* helpers import `db` from cloudflare:workers — unavailable
  * under Bun scripts — so this times matching drizzle shapes via createDb(D1)
  * and notes the gap.
@@ -15,8 +15,7 @@
 
 import type { D1Database } from "@cloudflare/workers-types";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
-import { getPlatformProxy } from "wrangler";
-import { writeEphemeralWranglerConfig } from "./d1-wrangler-config.ts";
+import { openAlchemyD1 } from "./alchemy-d1.ts";
 import {
   invoiceTotalFromSubtotalSql,
   lineItemsSubtotalSqlForInvoiceId,
@@ -677,18 +676,13 @@ async function runOracleMode(d1: D1Database): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  console.error("Opening local D1 (Miniflare persist under .wrangler)...");
-  const configPath = await writeEphemeralWranglerConfig({ remote: false });
-  const proxy = await getPlatformProxy<{ DB: D1Database }>({
-    configPath,
-    persist: true,
-    remoteBindings: false,
-  });
+  console.error("Opening local D1 (Alchemy persist under .alchemy/local)...");
+  const proxy = await openAlchemyD1();
 
   try {
     const d1 = proxy.env.DB;
     if (!d1) {
-      throw new Error("D1 binding DB missing from wrangler platform proxy");
+      throw new Error("D1 binding DB missing from Alchemy local D1");
     }
 
     if (runOracle || writeOracle) {

@@ -7,19 +7,16 @@
  * `bun vite dev` alone is Node SSR with no Worker env. This wrapper is
  * `bun run dev` after `panda:build`.
  *
- * D1 stays on Alchemy's local provider (`.alchemy/local`) plus Miniflare
- * persist (`.wrangler/state`). Production D1
- * `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185` is refused.
+ * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). The existing
+ * live UUID is not adopted. No custom domain.
  *
  * If Cloudflare credentials are missing, a gitignored local-only profile
  * is written under `.alchemy/home` so local providers can start. That is
  * not a deploy login.
  */
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
-import { homedir } from "node:os";
-import { join } from "node:path";
-import { LIVE_D1_DATABASE_ID } from "../alchemy.run.ts";
+import { EXISTING_D1_DATABASE_ID } from "../alchemy.run.ts";
+import { ensureLocalAlchemyProfile } from "./alchemy-d1.ts";
 
 export const ALCHEMY_DEV_COMMAND =
   "bun run panda:build && varlock run -- bun x alchemy dev --stage dev";
@@ -32,49 +29,16 @@ if (process.env.__VARLOCK_RUN !== "1") {
 }
 
 const remoteId = process.env.CLOUDFLARE_D1_DATABASE_ID?.trim() ?? "";
-if (remoteId === LIVE_D1_DATABASE_ID) {
+if (remoteId === EXISTING_D1_DATABASE_ID) {
   console.warn(
-    "CLOUDFLARE_D1_DATABASE_ID is the live dollar-holler database. Local alchemy dev ignores it and uses spike D1 persist (.alchemy/local)."
+    "CLOUDFLARE_D1_DATABASE_ID is the existing live dollar-holler UUID. Local alchemy dev ignores it and uses `.alchemy/local/d1`."
   );
 }
 
-const token = process.env.CLOUDFLARE_API_TOKEN?.trim() ?? "";
-const defaultProfile = join(
-  homedir(),
-  ".alchemy",
-  "profiles",
-  "default",
-  "cloudflare.json"
-);
-if (
-  token.length === 0 &&
-  !existsSync(defaultProfile) &&
-  (process.env.ALCHEMY_HOME === undefined || process.env.ALCHEMY_HOME === "")
-) {
-  const alchemyHome = join(process.cwd(), ".alchemy", "home");
-  const profileDir = join(alchemyHome, "profiles", "default");
-  mkdirSync(profileDir, { recursive: true });
-  writeFileSync(
-    join(profileDir, "cloudflare.json"),
-    `${JSON.stringify(
-      {
-        format: "alchemy.profile/v1",
-        provider: "Cloudflare",
-        metadata: {},
-        values: {
-          method: "stored",
-          credentialType: "apiToken",
-          apiToken: "local-dev-not-a-credential",
-          accountId: "00000000000000000000000000000000",
-        },
-      },
-      null,
-      2
-    )}\n`
-  );
-  process.env.ALCHEMY_HOME = alchemyHome;
+ensureLocalAlchemyProfile();
+if (process.env.ALCHEMY_HOME?.endsWith(".alchemy/home") === true) {
   console.warn(
-    "No Cloudflare credentials. Using a local-only Alchemy profile under .alchemy/home. D1 stays on the local provider (not production). If alchemy still asks for login, run that login, then:\n" +
+    "No Cloudflare credentials. Using a local-only Alchemy profile under .alchemy/home. D1 stays on the local provider. If alchemy still asks for login, run that login, then:\n" +
       `  ${ALCHEMY_DEV_COMMAND}`
   );
 }
@@ -93,7 +57,7 @@ if (result.error) {
 
 if (result.status !== 0) {
   console.error(
-    `alchemy dev failed (exit ${String(result.status)}).\nExact command: ${ALCHEMY_DEV_COMMAND}\nLocal D1 persist is .alchemy/local and .wrangler/state. It never uses production D1 ${LIVE_D1_DATABASE_ID}.`
+    `alchemy dev failed (exit ${String(result.status)}).\nExact command: ${ALCHEMY_DEV_COMMAND}\nLocal D1 persist is .alchemy/local/d1. This is not a live apply.`
   );
 }
 

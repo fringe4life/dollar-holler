@@ -11,7 +11,7 @@ A modern invoice management application built with SvelteKit 3 and Svelte 5, fea
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (required)
-- [Cloudflare](https://developers.cloudflare.com/) account (Workers + D1) for deploy; local D1 uses Alchemy’s local provider (`.alchemy/local`) and Miniflare persist (`.wrangler/state`) without a remote database. Production D1 `dollar-holler` is not adopted.
+- [Cloudflare](https://developers.cloudflare.com/) account (Workers + D1) for deploy; local D1 uses Alchemy’s local provider (`.alchemy/local/d1`) without a remote database. Worker and D1 names are `dollar-holler`. This beta cannot adopt an existing D1 by UUID; the first real `alchemy deploy` provisions D1 named `dollar-holler`. No custom domain.
 
 ## CI
 
@@ -36,30 +36,30 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 
    The app resolves configuration from Varlock (`import { ENV } from "varlock/env"`) for Drizzle Kit ([`drizzle.config.ts`](./drizzle.config.ts)) and auth ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Runtime D1 uses Alchemy/Kit `platform.env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)), not env URLs. Bare `vite dev` does not inject that binding.
 
-3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` applies them locally. Remote apply reads `CLOUDFLARE_D1_DATABASE_ID` from Varlock and refuses the live `dollar-holler` database id. Site deploy is Alchemy (`alchemy.run.ts`), not a Wrangler config file.
+3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` reconciles `Cloudflare.D1.Database` locally (Alchemy `migrations:`, persist `.alchemy/local/d1`). Remote apply uses the D1 HTTP API and `CLOUDFLARE_D1_DATABASE_ID` from Varlock. Site deploy is Alchemy (`alchemy.run.ts`); the first live apply provisions D1 named `dollar-holler` (this beta cannot adopt by UUID).
 
    ```bash
-   # Generate Drizzle migrations and flatten for Wrangler
+   # Generate Drizzle migrations and flatten for Alchemy D1
    bun run db:generate
 
-   # Apply to local D1 (Miniflare persist `.wrangler/state`)
+   # Apply to local D1 (Alchemy persist `.alchemy/local/d1`)
    bun run db:migrate
 
-   # Apply to remote D1 (CLOUDFLARE_D1_DATABASE_ID from Varlock; not the live dollar-holler id)
+   # Apply to remote D1 (CLOUDFLARE_D1_DATABASE_ID from Varlock)
    bun run db:migrate:remote
 
    # Optional: drizzle-kit push/studio via D1 HTTP (needs CLOUDFLARE_* vars)
    bun run db:push
    bun run db:studio
 
-   # Seed local D1 via Wrangler platform proxy (create users via Better Auth first)
+   # Seed local D1 via Alchemy platform proxy (create users via Better Auth first)
    bun run db:seed
 
-   # Seed remote Cloudflare D1 (same wipe of clients/invoices/line items/settings)
+   # Seed remote Cloudflare D1 over HTTP (same wipe of clients/invoices/line items/settings)
    bun run db:seed:remote
    ```
 
-4. **Start the development server:** `bun run dev` is `panda:build` then `varlock run -- bun x alchemy dev --stage dev` ([`scripts/alchemy-dev.ts`](./scripts/alchemy-dev.ts)). Port **5173** (same as `PUBLIC_BASE_URL` / `ORIGIN`). Alchemy’s emulator binds local D1 on `platform.env.DB`. If Cloudflare credentials are missing, the wrapper writes a local-only profile under `.alchemy/home`. If Alchemy still refuses to start, the script prints that exact command and exits. Run `bun run db:migrate` first so Better Auth tables exist in Miniflare persist (`.wrangler/state`); Alchemy also persists under `.alchemy/local`. This never uses production D1 `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`.
+4. **Start the development server:** `bun run dev` is `panda:build` then `varlock run -- bun x alchemy dev --stage dev` ([`scripts/alchemy-dev.ts`](./scripts/alchemy-dev.ts)). Port **5173** (same as `PUBLIC_BASE_URL` / `ORIGIN`). Alchemy’s emulator binds local D1 on `platform.env.DB`. If Cloudflare credentials are missing, the wrapper writes a local-only profile under `.alchemy/home`. If Alchemy still refuses to start, the script prints that exact command and exits. Run `bun run db:migrate` first so Better Auth tables exist in `.alchemy/local/d1`.
 
    ```bash
    bun run db:migrate
@@ -91,18 +91,18 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run test` - Run Bun unit tests (`*.test.ts`); [`bunfig.toml`](./bunfig.toml) `[test].preload` mocks `$app/env` via [`src/test/app-env-preload.ts`](./src/test/app-env-preload.ts)
 - `bun run fix` - `lint:fix`, `format`, and Stylelint with `--fix`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
-- `bun run db:generate` - Generate Drizzle migrations and flatten into Wrangler D1 SQL
-- `bun run db:migrate` - Apply D1 migrations locally (ephemeral Wrangler config from `alchemy.run.ts`)
-- `bun run db:migrate:remote` - Apply D1 migrations remotely (`CLOUDFLARE_D1_DATABASE_ID`; refuses the live database)
-- `bun run db:seed` - Seed local D1 via Wrangler `getPlatformProxy` (Varlock `run`)
-- `bun run db:seed:remote` - Seed remote Cloudflare D1 via Node (`tsx` + `getPlatformProxy` + D1 `remote: true`; bun hangs; wrangler login)
+- `bun run db:generate` - Generate Drizzle migrations and flatten into Alchemy D1 SQL
+- `bun run db:migrate` - Apply D1 migrations locally via Alchemy (`migrations:` on `.alchemy/local/d1`)
+- `bun run db:migrate:remote` - Apply D1 migrations remotely (D1 HTTP + Alchemy bookkeeping)
+- `bun run db:seed` - Seed local Alchemy D1 (Varlock `run`)
+- `bun run db:seed:remote` - Seed remote Cloudflare D1 over HTTP (Varlock `run`)
 - `bun run db:studio` - Open Drizzle Studio (D1 HTTP; needs `CLOUDFLARE_*`)
 - `bun run db:push` - Push schema to remote D1 (D1 HTTP; needs `CLOUDFLARE_*`)
 - `bun run bench:sql-list` - Time local D1 invoice and client list SQL (throwaway harness)
 - `bun run oracle:sql-list` - Check those SQL shapes against the golden oracle
 - `bun run oracle:sql-list:write` - Rewrite the sql-list oracle golden fixture
 - `bun run fonts:subset-money` - Rebuild Space Mono 400/700 woff2s (money glyphs only) and `src/lib/fonts/money/money.css`
-- `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (spike Worker; refuses `prod`)
+- `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (Worker + D1 named `dollar-holler`; refuses `prod`)
 - `bun run deploy:project` - same Alchemy deploy
 - `bun run alchemy:plan` - Local Alchemy plan with Varlock test env (never applies)
 - `bun run audit:deps` - `bun audit --prod --audit-level=moderate` (lint-staged + CI)
@@ -154,9 +154,9 @@ src/
 │   │   │   ├── schema.ts    # Drizzle sqlite tables (auth + app)
 │   │   │   ├── types.ts     # Status unions (client/invoice)
 │   │   │   ├── relations.ts # Drizzle relations v2 (`defineRelations`)
-│   │   │   ├── seed.ts      # Local D1 seed via Wrangler platform proxy
+│   │   │   ├── seed.ts      # Local D1 seed via Alchemy platform proxy
 │   │   │   ├── migrations/  # Drizzle Kit folder migrations
-│   │   │   └── d1/          # Flattened SQL for `wrangler d1 migrations apply`
+│   │   │   └── d1/          # Flattened SQL for Alchemy D1 `migrations:`
 │   │   └── utils/           # create-id (UUIDv7), invoice-notes-terms-html, invoice-status-transitions, errors
 │   ├── theme/             # light/dark/system cookie parse, html stamp, persist
 │   ├── client/            # Client-only: @attach helpers (dialogController, swipe), CSS.supports (base-select, view transitions), withViewTransition, shared runes (ItemPanel upsert/create-edit, Toggle, etc.)
@@ -226,7 +226,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application deploys with `varlock run -- bun x alchemy deploy --stage dev`. [`alchemy.run.ts`](./alchemy.run.ts) names the Worker and D1 `dollar-holler-alchemy-spike` (not the live Worker or D1), binds schema env through Effect `Config`, and sets compatibility date `2026-11-02` (was `2026-08-14`). There is no custom domain. Varlock does not upload `__VARLOCK_ENV` on this path.
+The application deploys with `varlock run -- bun x alchemy deploy --stage dev`. [`alchemy.run.ts`](./alchemy.run.ts) names the Worker and D1 `dollar-holler` and binds `DB` on that database. This Alchemy beta cannot adopt an existing D1 by UUID, so the first real apply provisions D1 named `dollar-holler` (seed data is replaceable). There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
 
 ```bash
 bun run deploy
@@ -236,7 +236,7 @@ bun run deploy
 
 ## Notes
 
-- Uses Vite 8.3.5 (`vite` in `package.json`) and Varlock 1.23 (`@varlock/bitwarden-plugin` 2.x, `@varlock/cloudflare-integration`). Varlock’s Vite plugin auto-detects the Cloudflare adapter (no forced `resolved-env`). Production builds use `rolldownOptions` in `vite.config.ts` (`dropConsole`, default Oxc mangling, `devtools: {}` for Rolldown analysis metadata). Wrangler points `tsconfig` at [`tsconfig.wrangler.json`](./tsconfig.wrangler.json) (`alwaysStrict: false`) so esbuild nested-scope sloppy mode does not shadow mangled Svelte helpers ([esbuild#4545](https://github.com/evanw/esbuild/issues/4545), [#114](https://github.com/fringe4life/dollar-holler/issues/114)). Dev: `svelteDevtools()` (`vite-devtools-svelte` 0.7) before `sveltekit()`, then `DevTools()` from `@vitejs/devtools`. [`vite.config.ts`](./vite.config.ts) loads `ogygia()` then `@ogygia/devtools` (non-production) before `sveltekit()` (landing + `(auth)` islands only; logged-in dashboard is Kit CSR). D1 in `bun run dev` comes from Alchemy’s `platform.env` emulator, not a `cloudflare:workers` Vite stub. Tracked [`.cursor/mcp.json`](./.cursor/mcp.json): Fallow (`fallow-mcp`), Panda CSS (`panda-mcp`), ESLint MCP, and svelte-devtools at `http://localhost:5173/__svelte-devtools/mcp` (`x-svelte-devtools-token` from the token printed when `bun run dev` starts; rotates each restart). Tracked [`.kombai/mcp.json`](./.kombai/mcp.json) exposes the same Panda and Fallow stdio servers for Kombai (relative `node_modules/.bin` paths, Panda `--config ./panda.config.ts`); the rest of `.kombai/` stays gitignored. MCP stdio uses `node` + local bins, not `bun x`, because `bunfig.toml` preloads Varlock. Local D1 persist lives under `.wrangler/` (gitignored).
+- Uses Vite 8.3.5 (`vite` in `package.json`) and Varlock 1.23 (`@varlock/bitwarden-plugin` 2.x, `@varlock/cloudflare-integration`). Varlock’s Vite plugin auto-detects the Cloudflare adapter (no forced `resolved-env`). Production builds use `rolldownOptions` in `vite.config.ts` (`dropConsole`, default Oxc mangling, `devtools: {}` for Rolldown analysis metadata). Wrangler points `tsconfig` at [`tsconfig.wrangler.json`](./tsconfig.wrangler.json) (`alwaysStrict: false`) so esbuild nested-scope sloppy mode does not shadow mangled Svelte helpers ([esbuild#4545](https://github.com/evanw/esbuild/issues/4545), [#114](https://github.com/fringe4life/dollar-holler/issues/114)). Dev: `svelteDevtools()` (`vite-devtools-svelte` 0.7) before `sveltekit()`, then `DevTools()` from `@vitejs/devtools`. [`vite.config.ts`](./vite.config.ts) loads `ogygia()` then `@ogygia/devtools` (non-production) before `sveltekit()` (landing + `(auth)` islands only; logged-in dashboard is Kit CSR). D1 in `bun run dev` comes from Alchemy’s `platform.env` emulator, not a `cloudflare:workers` Vite stub. Tracked [`.cursor/mcp.json`](./.cursor/mcp.json): Fallow (`fallow-mcp`), Panda CSS (`panda-mcp`), ESLint MCP, and svelte-devtools at `http://localhost:5173/__svelte-devtools/mcp` (`x-svelte-devtools-token` from the token printed when `bun run dev` starts; rotates each restart). Tracked [`.kombai/mcp.json`](./.kombai/mcp.json) exposes the same Panda and Fallow stdio servers for Kombai (relative `node_modules/.bin` paths, Panda `--config ./panda.config.ts`); the rest of `.kombai/` stays gitignored. MCP stdio uses `node` + local bins, not `bun x`, because `bunfig.toml` preloads Varlock. Local D1 persist lives under `.alchemy/local/d1` (gitignored).
 - Lint and format run through ESLint, Prettier, and Stylelint (`bun run check`, `bun run fix`). ESLint ignores generated paths (`styled-system/`, `.svelte-kit/`) and defers CSS to Stylelint. Cursor `afterFileEdit` runs `bun run fix`; Fallow gates `git` via `beforeShellExecution` and `stop` ([`.cursor/hooks/`](./.cursor/hooks/)).
 - [Fallow](https://docs.fallow.tools) 3.36 resolves `styled-system/*` and `#features/*` via package.json `imports` / tsconfig paths (no `ignoreUnresolvedImports`). Type-aware analysis is `best-effort` in [`.fallowrc.json`](./.fallowrc.json). `@opentelemetry/api` is an ignored dependency (Sentry peer, imported indirectly). Feature `*.server.ts` files live in a `features-server` zone so remotes can import `require-user.server.ts` without crossing into `src/lib/server/**`. [`src/lib/theme/**`](./src/lib/theme/) sits in the `shared` zone. Health ignores [`error-message.ts`](./src/lib/utils/error-message.ts). Run `bun run fallow:prepare` (or any `fallow:*` script) so `styled-system/` exists before analysis; the folder is gitignored and is recreated by `panda build`. See [`docs/fallow-cursor-mcp.md`](./docs/fallow-cursor-mcp.md).
 - Panda CSS 2.4 (`2.4.0`) generates `styled-system/` via `panda build`. [`vite.config.ts`](./vite.config.ts) loads `@pandacss/vite` with `transform: true` after `sveltekit()` (CSS inject + `.ts`/`.svelte` folds; no `postcss.config`). Dynamic pattern props (e.g. Spinner `center`/`circle` size maps) can still pull style runtime — [#109](https://github.com/fringe4life/dollar-holler/issues/109). [`panda.config.ts`](./panda.config.ts) imports `define*` modules from [`theme/`](./theme/). UI should prefer semantic tokens over raw palette names so `light-dark()` swaps with `color-scheme`. `_dark` is defined in [`theme/conditions.ts`](./theme/conditions.ts) (`[data-theme=dark]`, plus `prefers-color-scheme: dark` when `:root` is not `[data-theme=light]`). Shared keyframes live in [`theme/keyframes.ts`](./theme/keyframes.ts) (`defineKeyframes`, including `theme-circle-reveal`); pagination + theme-change VT rules in [`theme/global-styles.ts`](./theme/global-styles.ts) name those keyframes so `optimize.removeUnusedKeyframes` stays on. Root [`tsconfig.json`](./tsconfig.json) extends `$app/tsconfig` and declares `paths` for `#lib`, `#features`, and `styled-system` (also in `package.json` `imports` / `exports`); `theme/**/*.ts` is included. [`vite.config.ts`](./vite.config.ts) sets `resolve.tsconfigPaths: true`. [`bunfig.toml`](./bunfig.toml) excludes `ogygia` / `@ogygia/*` from `minimumReleaseAge` while those packages are younger than three days. ESLint loads `@pandacss/eslint-plugin` recommended against `panda.config.ts`.
@@ -244,7 +244,7 @@ bun run deploy
 - The project uses Svelte 5's `@attach` directive for modern component patterns and the Spring class for smooth animations.
 - Better Auth is configured in `auth.server.ts` as isolate-cached `getAuth()` so `drizzleAdapter` does not read `db._` at import; UUIDv7 (uuidv7 package) for user ID generation; session cookie cache enabled. After upgrading to 1.7.4+, apply `0004_purple_fat_cobra` (drop `account_issuer_accountId_uidx`, then drop `issuer`) and `0005_left_squadron_sinister` (non-unique `(provider_id, account_id)` lookup index) under `src/lib/server/db/d1/` if those have not already been applied. Account identity is `(provider_id, account_id)`, matching 1.6.
 - Invoice `notes` and `terms` accept Markdown. Editor overlay uses Prism `tokenize` + a local serializer (escaped text + `span.token`); create/update remotes derive sanitized HTML via [`invoice-notes-terms-html.server.ts`](./src/lib/server/utils/invoice-notes-terms-html.server.ts) only after auth / ownership checks. Overlay markup is paint-only — never stored as `notes_html` / `terms_html`.
-- SvelteKit configuration lives in the `sveltekit()` Vite plugin in `vite.config.ts` (Alchemy injects its Cloudflare adapter; preprocess, Svelte 5 async compiler option, `experimental.remoteFunctions`, tracing/server instrumentation for Sentry). Local D1 persist is `.alchemy/local` plus `.wrangler/state` (`bun run db:migrate`). Invoice detail [`+layout@.svelte`](<./src/routes/(dashboard)/invoices/[id=uuid]/+layout@.svelte>) uses `paddingBlockEnd` so the visually offset surface stays in the document scroll flow (no nested scrollbar).
+- SvelteKit configuration lives in the `sveltekit()` Vite plugin in `vite.config.ts` (Alchemy injects its Cloudflare adapter; preprocess, Svelte 5 async compiler option, `experimental.remoteFunctions`, tracing/server instrumentation for Sentry). Local D1 persist is `.alchemy/local/d1` (`bun run db:migrate`). Invoice detail [`+layout@.svelte`](<./src/routes/(dashboard)/invoices/[id=uuid]/+layout@.svelte>) uses `paddingBlockEnd` so the visually offset surface stays in the document scroll flow (no nested scrollbar).
 - Form validation uses Valibot (`valibot` 1.5) for remote `form()` schemas in `src/lib/features/*/schemas.ts`; Drizzle Kit uses `drizzle-orm/valibot` for insert/select/update schemas. Invoice create/edit is a single `InvoiceEditor` with server-side persist in `persist-invoice.server.ts` (no client-side edit snapshots).
 
 ## License

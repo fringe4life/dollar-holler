@@ -141,6 +141,10 @@ export default defineConfig(({ mode }) => ({
       },
     },
   },
+  // Vite 8 dev prebundle only. Does not change `vite build` or the Worker.
+  optimizeDeps: {
+    include: ["effect"],
+  },
   plugins: [
     stubCloudflareWorkersPlugin(),
     /**

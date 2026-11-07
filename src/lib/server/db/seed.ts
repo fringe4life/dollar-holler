@@ -1,8 +1,7 @@
-import { mkdir, writeFile } from "node:fs/promises";
-import { join } from "node:path";
 import type { D1Database } from "@cloudflare/workers-types";
 import { getColumns, type Table } from "drizzle-orm";
-import { getPlatformProxy, unstable_readConfig } from "wrangler";
+import { getPlatformProxy } from "wrangler";
+import { writeEphemeralWranglerConfig } from "../../../../scripts/d1-wrangler-config.ts";
 import type { ClientInsert, ClientSelect } from "#features/clients/types.ts";
 import type { LineItemInsert } from "#features/line-items/types.ts";
 import type { SettingsInsert } from "#features/settings/types.ts";
@@ -35,51 +34,15 @@ function d1InsertChunkSize(table: Table): number {
 }
 
 async function createSeedProxy() {
+  const configPath = await writeEphemeralWranglerConfig({ remote: useRemote });
   if (!useRemote) {
     console.log("Seeding local D1 (Miniflare persist under .wrangler)");
     return getPlatformProxy<{ DB: D1Database }>({
+      configPath,
       persist: true,
       remoteBindings: false,
     });
   }
-
-  const wranglerConfig = unstable_readConfig({});
-  const d1Binding = wranglerConfig.d1_databases[0];
-  if (!d1Binding?.database_id) {
-    throw new Error(
-      "wrangler D1 database_id missing; cannot seed remote. Set it in wrangler.jsonc."
-    );
-  }
-
-  const dir = join(process.cwd(), ".wrangler");
-  await mkdir(dir, { recursive: true });
-  const stubMain = join(dir, "seed-remote-stub.js");
-  await writeFile(
-    stubMain,
-    "export default { fetch() { return new Response(''); } };\n"
-  );
-  const configPath = join(dir, "seed-remote.json");
-  await writeFile(
-    configPath,
-    `${JSON.stringify(
-      {
-        compatibility_date: wranglerConfig.compatibility_date,
-        compatibility_flags: wranglerConfig.compatibility_flags,
-        d1_databases: [
-          {
-            binding: d1Binding.binding,
-            database_id: d1Binding.database_id,
-            database_name: d1Binding.database_name,
-            remote: true,
-          },
-        ],
-        main: "./seed-remote-stub.js",
-        name: `${wranglerConfig.name}-seed-remote`,
-      },
-      null,
-      2
-    )}\n`
-  );
 
   console.warn(
     "Seeding REMOTE Cloudflare D1. Wipes clients, invoices, line_items, and settings. Auth users are kept."

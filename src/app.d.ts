@@ -6,6 +6,9 @@ declare global {
   // biome-ignore lint/style/noNamespace: svelte-kit
   namespace App {
     // interface Error {}
+    interface Platform {
+      env: import("../alchemy.run.ts").WebsiteEnv;
+    }
     interface Locals {
       user: Maybe<User>;
     }

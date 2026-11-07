@@ -1,8 +1,8 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
-import adapter from "@sveltejs/adapter-cloudflare";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { FontaineTransform } from "fontaine";
 import { devtools as ogygiaDevtools } from "@ogygia/devtools/vite";
@@ -26,6 +26,7 @@ import {
 } from "./scripts/cloudflare-workers-specifier.ts";
 import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts";
 import { varlockSsrUaGuard } from "./scripts/varlock-ssr-ua-guard.ts";
+import { env as cloudflareWorkersNodeEnv } from "./scripts/cloudflare-workers-node-stub.js";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -47,12 +48,10 @@ const resolveFontainePath = (id: string): string | URL => {
 };
 
 const FILE_REGEX = /[/\\]/;
-const ADAPTER_VIRTUAL_WORKERS_PLUGIN =
-  "vite-plugin-sveltekit-adapter-cloudflare-virtual-workers-module";
-
-type AdapterResolveId = {
-  handler?: (id: string) => { id?: unknown } | undefined;
-};
+const CLOUDFLARE_WORKERS_STUB = join(
+  dirname(fileURLToPath(import.meta.url)),
+  "scripts/cloudflare-workers-node-stub.js"
+);
 
 type BundleChunk = {
   type?: string;
@@ -60,18 +59,7 @@ type BundleChunk = {
 };
 
 let stubImport: string | undefined;
-
-const captureAdapterStubImport = (plugins: readonly Plugin[]) => {
-  const adapterPlugin = plugins.find(
-    (plugin) => plugin.name === ADAPTER_VIRTUAL_WORKERS_PLUGIN
-  );
-  const resolveId = adapterPlugin?.resolveId;
-  if (!resolveId || typeof resolveId !== "object" || typeof resolveId.handler !== "function") {
-    return undefined;
-  }
-  const result = (resolveId as AdapterResolveId).handler?.(CLOUDFLARE_WORKERS);
-  return typeof result?.id === "string" ? result.id : undefined;
-};
+void cloudflareWorkersNodeEnv;
 
 const rewriteSsrBundle = (bundle: Record<string, BundleChunk>, stub: string) => {
   for (const chunk of Object.values(bundle)) {
@@ -104,8 +92,15 @@ const rewriteSsrBundle = (bundle: Record<string, BundleChunk>, stub: string) => 
 const stubCloudflareWorkersPlugin = (): Plugin => ({
   name: "stub-cloudflare-workers",
   enforce: "pre",
-  configResolved(config) {
-    stubImport = captureAdapterStubImport(config.plugins);
+  resolveId(source, importer) {
+    if (source !== CLOUDFLARE_WORKERS) {
+      return undefined;
+    }
+    if (importer?.includes("cloudflare-workers-node-stub")) {
+      return undefined;
+    }
+    stubImport = CLOUDFLARE_WORKERS_STUB;
+    return CLOUDFLARE_WORKERS_STUB;
   },
   generateBundle(_options, bundle) {
     if (this.environment.name === "ssr" && stubImport) {
@@ -218,16 +213,6 @@ export default defineConfig(({ mode }) => ({
       ? [ogygiaDevtools({ profiler: true })]
       : []),
     sveltekit({
-      adapter: adapter({
-        platformProxy: {
-          persist: true,
-        },
-        // Serve build-time sitemap.xml as a static asset, not via the Worker.
-        routes: {
-          exclude: ["<all>", "/sitemap.xml"],
-          include: ["/*"],
-        },
-      }),
       compilerOptions: {
         experimental: {
           async: true,

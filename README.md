@@ -29,14 +29,14 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 
 2. **Set up environment variables ([Varlock](https://varlock.dev/)):** The committed [`.env.schema`](./.env.schema) is the source of truth for variable names, validation, and (optional) [Bitwarden Secrets Manager](https://bitwarden.com/products/secrets-manager/) lookups.
    - **Bun:** [`bunfig.toml`](./bunfig.toml) sets `env = false` and `preload = ["varlock/auto-load"]` so Bun does not load `.env` on its own before Varlock (see [Varlock + Bun](https://varlock.dev/integrations/bun/)). Isolated `linker`, 3-day `minimumReleaseAge`; `minimumReleaseAgeExcludes` is empty now that Kit 3 and Panda 2.2 are stable.
-   - **Vite / SvelteKit / Cloudflare:** [`vite.config.ts`](./vite.config.ts) uses `@varlock/vite-integration` (detects `@sveltejs/adapter-cloudflare`) plus `@varlock/cloudflare-integration` so production secrets hydrate from Worker bindings via `varlock-wrangler deploy` — not baked `resolved-env` ([Varlock + SvelteKit](https://varlock.dev/integrations/sveltekit/), [Cloudflare](https://varlock.dev/integrations/cloudflare/)).
+   - **Vite / SvelteKit / Cloudflare:** [`vite.config.ts`](./vite.config.ts) uses `@varlock/vite-integration` for dev and prerender. Alchemy’s adapter is not `@sveltejs/adapter-cloudflare`, so Varlock does not inject the Cloudflare SSR loader or `__VARLOCK_ENV` ([non-Wrangler deploys](https://varlock.dev/integrations/cloudflare/)).
    - **Bitwarden:** Install the app deps (already in `package.json`), then in Bitwarden Secrets Manager create a **machine account**, copy its **access token** once, and grant it read access to the secrets you need. Put the token in a **gitignored** file such as `.env.local` as `BITWARDEN_ACCESS_TOKEN=...`. In `.env.schema`, replace the placeholder UUIDs in `bitwarden("...")` with your real secret IDs ([Bitwarden plugin](https://varlock.dev/plugins/bitwarden/)).
    - **Without Bitwarden (e.g. quick local setup):** Set `BETTER_AUTH_SECRET`, `PUBLIC_BASE_URL`, `ORIGIN` (Kit CSRF; same URL as the public site), `OGYGIA_SECRET` (≥16 bytes, stable across deploys for PPR holes), and `SENTRY_AUTH_TOKEN` (Sentry auth token used by the Vite plugin for releases when `mode !== "development"`) in `.env` or `.env.local` with literal values instead of `bitwarden(...)` where applicable. Host and CI variables still override resolved values when set. Optional `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, and `CLOUDFLARE_API_TOKEN` are only for drizzle-kit `studio` / `push` against remote D1.
    - **Types:** After changing `.env.schema`, run `bun run env:typegen` to refresh [`src/env-varlock.d.ts`](./src/env-varlock.d.ts).
 
    The app resolves configuration from Varlock (`import { ENV } from "varlock/env"`) for Drizzle Kit ([`drizzle.config.ts`](./drizzle.config.ts)) and auth ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Runtime D1 uses the Wrangler `DB` binding (`import { env } from "cloudflare:workers"`, `env.DB`), not env URLs. Adapter-cloudflare 8 next.7+ dropped `event.platform`.
 
-3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into Wrangler-numbered files under `./src/lib/server/db/d1`. Local/remote apply uses Wrangler. Put the real D1 UUID from `wrangler d1 create dollar-holler` into [`wrangler.jsonc`](./wrangler.jsonc) before remote migrate/deploy.
+3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` applies them locally. Remote apply reads `CLOUDFLARE_D1_DATABASE_ID` from Varlock and refuses the live `dollar-holler` database id. Site deploy is Alchemy (`alchemy.run.ts`), not a Wrangler config file.
 
    ```bash
    # Generate Drizzle migrations and flatten for Wrangler
@@ -45,7 +45,7 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
    # Apply to local D1 (Miniflare / `.wrangler`)
    bun run db:migrate
 
-   # Apply to remote D1 (needs a real database_id in wrangler.jsonc)
+   # Apply to remote D1 (CLOUDFLARE_D1_DATABASE_ID from Varlock; not the live dollar-holler id)
    bun run db:migrate:remote
 
    # Optional: drizzle-kit push/studio via D1 HTTP (needs CLOUDFLARE_* vars)
@@ -91,8 +91,8 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run fix` - `lint:fix`, `format`, and Stylelint with `--fix`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations and flatten into Wrangler D1 SQL
-- `bun run db:migrate` - Apply D1 migrations locally (`wrangler d1 migrations apply --local`)
-- `bun run db:migrate:remote` - Apply D1 migrations to remote
+- `bun run db:migrate` - Apply D1 migrations locally (ephemeral Wrangler config from `alchemy.run.ts`)
+- `bun run db:migrate:remote` - Apply D1 migrations remotely (`CLOUDFLARE_D1_DATABASE_ID`; refuses the live database)
 - `bun run db:seed` - Seed local D1 via Wrangler `getPlatformProxy` (Varlock `run`)
 - `bun run db:seed:remote` - Seed remote Cloudflare D1 via Node (`tsx` + `getPlatformProxy` + D1 `remote: true`; bun hangs; wrangler login)
 - `bun run db:studio` - Open Drizzle Studio (D1 HTTP; needs `CLOUDFLARE_*`)
@@ -100,11 +100,11 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run bench:sql-list` - Time local D1 invoice and client list SQL (throwaway harness)
 - `bun run oracle:sql-list` - Check those SQL shapes against the golden oracle
 - `bun run oracle:sql-list:write` - Rewrite the sql-list oracle golden fixture
-- `bun run cf:types` - Generate Wrangler `Env` types (`src/worker-configuration.d.ts`, gitignored)
-- `bun run cf:restore-workers` - Restore `cloudflare:workers` in `.svelte-kit/output/server` after `vite preview` (Wrangler `build.command`)
+- `bun run cf:restore-workers` - Restore `cloudflare:workers` in `.svelte-kit/output/server` after `vite preview`
 - `bun run fonts:subset-money` - Rebuild Space Mono 400/700 woff2s (money glyphs only) and `src/lib/fonts/money/money.css`
-- `bun run deploy` - Production build then `varlock-wrangler deploy` (uploads Varlock vars/secrets)
-- `bun run deploy:project` - `varlock-wrangler deploy` only (no rebuild)
+- `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (spike Worker; refuses `prod`)
+- `bun run deploy:project` - same Alchemy deploy
+- `bun run alchemy:plan` - Local Alchemy plan with Varlock test env (never applies)
 - `bun run audit:deps` - `bun audit --prod --audit-level=moderate` (lint-staged + CI)
 - `bun run dedupe` - `bun dedupe` (lint-staged when `package.json` / `bun.lock` staged)
 - `bun run dedupe:check` - `bun dedupe --check` (CI; fails if lockfile has removable duplicates)
@@ -119,15 +119,15 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 
 ## Tech Stack
 
-- **Framework:** SvelteKit 3 (`3.1.0`) with `@sveltejs/adapter-cloudflare` 8 and Svelte 5 runes (experimental `remoteFunctions`, async compiler, server instrumentation and tracing in [`vite.config.ts`](./vite.config.ts)); [ogygia](https://ogygiajs.dev/) 0.12 islands on landing + auth (prerender/`csr = false`, deferred session holes; dashboard navbar stays Kit so toast context works); list query updates use shallow `goto(..., { shallow: true })` and `page.shallow?.url` via [`visibleListUrl`](./src/lib/features/pagination/utils/url.ts)
+- **Framework:** SvelteKit 3 (`3.1.0`) with Alchemy’s SvelteKit adapter and Svelte 5 runes (experimental `remoteFunctions`, async compiler, server instrumentation and tracing in [`vite.config.ts`](./vite.config.ts)); [ogygia](https://ogygiajs.dev/) 0.12 islands on landing + auth (prerender/`csr = false`, deferred session holes; dashboard navbar stays Kit so toast context works); list query updates use shallow `goto(..., { shallow: true })` and `page.shallow?.url` via [`visibleListUrl`](./src/lib/features/pagination/utils/url.ts)
 - **Observability:** [Sentry](https://sentry.io/) 11.10 on server ([`src/hooks.server.ts`](./src/hooks.server.ts) `initCloudflareSentryHandle` + `sentryHandle` + `handleErrorWithSentry`) and client ([`src/hooks.client.ts`](./src/hooks.client.ts)); Vite plugin from `@sentry/sveltekit/vite` in [`vite.config.ts`](./vite.config.ts) for releases when `SENTRY_AUTH_TOKEN` is set. [`@opentelemetry/api`](https://opentelemetry.io/) 1.10 is a direct dependency so Sentry tracing resolves at deploy and `vite preview`
 - **Data layer:** SvelteKit remote functions (`query` / `command` / `form`) in [`src/lib/features/*/*.remote.ts`](./src/lib/features); pages `await` queries inside `<svelte:boundary>` (see [`docs/remote-functions-migration.md`](./docs/remote-functions-migration.md)). List/detail mutations use `.updates()` for optimistic cache (clients/invoices). Auth forms including logout in [`auth.remote.ts`](./src/lib/features/auth/auth.remote.ts). Better Auth HTTP remains at `/api/auth` via `svelteKitHandler` in [`src/hooks.server.ts`](./src/hooks.server.ts).
 - **Database:** [Cloudflare D1](https://developers.cloudflare.com/d1/) (SQLite at the edge)
 - **ORM:** Drizzle ORM 1.0 (rc.5) with `drizzle-orm/d1`; per-request client from `cloudflare:workers` `env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)); Drizzle Kit `dialect: "sqlite"` + optional `d1-http`
-- **Authentication:** Better Auth 1.7 (`1.7.7`) with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts) isolate-cached `getAuth()` so `drizzleAdapter` does not construct at import, Drizzle adapter `provider: "sqlite"`, `advanced.database.joins`, `allowedHosts` for `localhost`, `*.workers.dev`, `*.pages.dev`, and `dolla-holla.org`, `@better-auth/drizzle-adapter` relations-v2); login/signup/forgot/reset/change-password/logout via remote forms (logout `redirect`s to login); account rows keyed by `(provider_id, account_id)` (credentials: `provider_id` = `credential`, `account_id` = user id)
+- **Authentication:** Better Auth 1.7 (`1.7.7`) with email/password ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts) isolate-cached Effect `Auth` service (`getAuth()` → `ManagedRuntime.runSync`) so `drizzleAdapter` does not construct at import, Drizzle adapter `provider: "sqlite"`, `advanced.database.joins`, `allowedHosts` for `localhost`, `*.workers.dev`, `*.pages.dev`, and `dolla-holla.org`, `@better-auth/drizzle-adapter` relations-v2); login/signup/forgot/reset/change-password/logout via remote forms (logout `redirect`s to login); account rows keyed by `(provider_id, account_id)` (credentials: `provider_id` = `credential`, `account_id` = user id)
 - **ID generation:** UUIDv7 via the [`uuidv7`](https://github.com/LiosK/uuidv7) package, wrapped in [`create-id.ts`](./src/lib/server/utils/create-id.ts) (cursor-friendly IDs, used by Drizzle defaults and Better Auth `generateId`)
 - **Rich text:** Notes and terms accept Markdown. The invoice form paints a Prism 1.30 overlay on the editor ([`HighlightedTextarea.svelte`](./src/lib/components/patterns/form/HighlightedTextarea.svelte), [`highlight-markdown.ts`](./src/lib/components/patterns/form/highlight-markdown.ts) tokenizes markdown and emits escaped `span.token` only — not `Prism.highlight` / wrap-hook HTML). Persisted HTML is still sanitized server-side with [`marked`](https://marked.js.org/) and [`sanitize-html`](https://github.com/apostrophecms/sanitize-html) ([`markdown.server.ts`](./src/lib/utils/markdown.server.ts)) alongside the source in [`invoice_notes_html` / `invoice_terms_html`](./src/lib/server/db/schema.ts)
-- **Deployment:** Cloudflare Workers + static assets (`@sveltejs/adapter-cloudflare` 8); [`wrangler.jsonc`](./wrangler.jsonc) sets `nodejs_compat`, D1 binding `DB`, `ASSETS`, and `build.command` `cf:restore-workers` so Wrangler does not ingest leftover `file://` stubs from `vite preview`
+- **Deployment:** Cloudflare Workers via Alchemy (`alchemy.run.ts`). Compatibility date `2026-11-03` (`nodejs_compat` is default-on; the flag is not sent). No `wrangler.jsonc` and no `@sveltejs/adapter-cloudflare`
 - **Package manager:** Bun
 - **Validation:** Valibot for remote `form()` payloads and shared client/server schemas (Drizzle valibot for DB insert/select)
 - **Bundler:** Vite 8.3.5 for dev and production builds (Rolldown); production minify keeps `dropConsole` and default Oxc mangling. Wrangler rebundle uses [`tsconfig.wrangler.json`](./tsconfig.wrangler.json) (`alwaysStrict: false`) so esbuild does not leave nested scopes sloppy ([#114](https://github.com/fringe4life/dollar-holler/issues/114))
@@ -226,13 +226,13 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application deploys to Cloudflare Workers with static assets. [`wrangler.jsonc`](./wrangler.jsonc) names the worker `dollar-holler`, enables `nodejs_compat`, binds D1 as `DB`, points `assets` at `.svelte-kit/cloudflare`, and runs `bun run cf:restore-workers` as Wrangler `build.command` so a leftover Vite preview stub cannot break deploy. Custom domain is `dolla-holla.org` (`workers_dev` / `preview_urls` off).
+The application deploys with `varlock run -- bun x alchemy deploy --stage dev`. [`alchemy.run.ts`](./alchemy.run.ts) names the Worker and D1 `dollar-holler-alchemy-spike` (not the live Worker or D1), binds schema env through Effect `Config`, and sets compatibility date `2026-11-03` (was `2026-08-14`). There is no custom domain. Varlock does not upload `__VARLOCK_ENV` on this path.
 
 ```bash
 bun run deploy
 ```
 
-- **Platform env:** Deploy with `varlock-wrangler deploy` so Varlock uploads non-sensitive values as Cloudflare vars and sensitive values as secrets (`__VARLOCK_ENV` binding hydrates the worker at boot). Set `BITWARDEN_ACCESS_TOKEN` locally (e.g. `.env.local`) so deploy can resolve `bitwarden(...)` entries in [`.env.schema`](./.env.schema), and set `PUBLIC_BASE_URL` to your deployment URL (not the localhost default). Add `SENTRY_AUTH_TOKEN` if you use the Sentry Vite plugin for release uploads. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only — no Bitwarden/Cloudflare secrets in Actions ([docs/varlock-ci-secrets-research.md](./docs/varlock-ci-secrets-research.md)). Replace the placeholder `database_id` in `wrangler.jsonc` after `wrangler d1 create dollar-holler`. Better Auth `allowedHosts` covers `*.workers.dev` preview hostnames so sign-in works without changing `PUBLIC_BASE_URL` per deploy.
+- **Platform env:** `varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735). `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.
 
 ## Notes
 

@@ -8,6 +8,7 @@
 import { describe, expect, it } from "bun:test";
 import type { D1Database } from "@cloudflare/workers-types";
 import { getPlatformProxy } from "wrangler";
+import { writeEphemeralWranglerConfig } from "./d1-wrangler-config.ts";
 import {
   formatOracleVerifyFailure,
   readOracleGolden,
@@ -23,7 +24,9 @@ describe.skipIf(!hasLocalOracleD1)("sql-list-oracle vs local D1 seed", () => {
     expect(golden.hash).toHaveLength(64);
     expect(golden.results.invoiceListPage.length).toBeGreaterThan(0);
 
+    const configPath = await writeEphemeralWranglerConfig({ remote: false });
     const proxy = await getPlatformProxy<{ DB: D1Database }>({
+      configPath,
       persist: true,
       remoteBindings: false,
     });

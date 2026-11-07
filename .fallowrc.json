@@ -3,6 +3,7 @@
   "ignoreDependencies": [
     "@opentelemetry/api",
     "@varlock/bitwarden-plugin",
+    "@varlock/effect-plugin",
     "@sveltejs/mcp",
     "@fontsource-variable/source-sans-3",
     "svelte-eslint-parser",

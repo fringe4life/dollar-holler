@@ -16,6 +16,7 @@
 import type { D1Database } from "@cloudflare/workers-types";
 import { and, desc, eq, inArray, sql } from "drizzle-orm";
 import { getPlatformProxy } from "wrangler";
+import { writeEphemeralWranglerConfig } from "./d1-wrangler-config.ts";
 import {
   invoiceTotalFromSubtotalSql,
   lineItemsSubtotalSqlForInvoiceId,
@@ -677,7 +678,9 @@ async function runOracleMode(d1: D1Database): Promise<void> {
 
 async function main(): Promise<void> {
   console.error("Opening local D1 (Miniflare persist under .wrangler)...");
+  const configPath = await writeEphemeralWranglerConfig({ remote: false });
   const proxy = await getPlatformProxy<{ DB: D1Database }>({
+    configPath,
     persist: true,
     remoteBindings: false,
   });

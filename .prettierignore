@@ -2,9 +2,9 @@ vite.config.ts
 drizzle.config.ts
 panda.config.ts
 postcss.config.cjs
-wrangler.jsonc
 tsconfig.json
 .fallowrc.json
 styled-system/**
 src/env-varlock.d.ts
+src/lib/server/env.effect.ts
 src/worker-configuration.d.ts

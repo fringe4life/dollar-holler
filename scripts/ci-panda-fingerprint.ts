@@ -7,7 +7,7 @@ import { join } from "node:path";
 
 const FINGERPRINT = "createSerializeCss";
 
-/** Must exist after `bun run build` (adapter-cloudflare). */
+/** Must exist after `bun run build` (Alchemy SvelteKit adapter). */
 const REQUIRED_ROOTS = [
   ".svelte-kit/output/client",
   ".svelte-kit/cloudflare",

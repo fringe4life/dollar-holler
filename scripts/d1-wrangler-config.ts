@@ -15,13 +15,16 @@ import {
 
 const LOCAL_PLACEHOLDER_ID = "00000000-0000-0000-0000-000000000002";
 
+/** Miniflare persist for local D1 (`db:migrate`, seed). */
+export const LOCAL_D1_PERSIST_DIR = join(process.cwd(), ".wrangler", "state");
+
 const ephemeralConfigPath = join(process.cwd(), ".wrangler", "d1.json");
 
 export const writeEphemeralWranglerConfig = async (options: {
   remote: boolean;
 }): Promise<string> => {
   const fromEnv = process.env.CLOUDFLARE_D1_DATABASE_ID?.trim() ?? "";
-  const databaseId = options.remote ? fromEnv : fromEnv || LOCAL_PLACEHOLDER_ID;
+  const databaseId = options.remote ? fromEnv : LOCAL_PLACEHOLDER_ID;
   if (options.remote && databaseId.length === 0) {
     throw new Error(
       "db:migrate:remote needs CLOUDFLARE_D1_DATABASE_ID from Varlock. No database id is committed."

@@ -1,6 +1,5 @@
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
@@ -12,21 +11,13 @@ import { varlockVitePlugin } from "@varlock/vite-integration";
 import { DevTools } from "@vitejs/devtools";
 import { visualizer } from "rollup-plugin-visualizer";
 import { svelteSitemap } from "svelte-sitemap/vite";
-import { defineConfig, type Plugin } from "vite";
+import { defineConfig } from "vite";
 import { svelteDevtools } from "vite-devtools-svelte";
 // Chrome DevTools workspace (com.chrome.devtools.json) — separate from @vitejs/devtools
 // (Vite/Rolldown UI + vite-devtools-svelte panels). See https://devtools.vite.dev/guide
 import devToolsJson from "vite-plugin-devtools-json";
-import {
-  CLOUDFLARE_WORKERS,
-  restoreCloudflareWorkersInDir,
-  rewriteCloudflareWorkersSpecifier,
-  SERVER_OUTPUT_DIR,
-  stubCloudflareWorkersInDir,
-} from "./scripts/cloudflare-workers-specifier.ts";
 import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts";
 import { varlockSsrUaGuard } from "./scripts/varlock-ssr-ua-guard.ts";
-import { env as cloudflareWorkersNodeEnv } from "./scripts/cloudflare-workers-node-stub.js";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -48,78 +39,6 @@ const resolveFontainePath = (id: string): string | URL => {
 };
 
 const FILE_REGEX = /[/\\]/;
-const CLOUDFLARE_WORKERS_STUB = join(
-  dirname(fileURLToPath(import.meta.url)),
-  "scripts/cloudflare-workers-node-stub.js"
-);
-
-type BundleChunk = {
-  type?: string;
-  code?: string;
-};
-
-let stubImport: string | undefined;
-void cloudflareWorkersNodeEnv;
-
-const rewriteSsrBundle = (bundle: Record<string, BundleChunk>, stub: string) => {
-  for (const chunk of Object.values(bundle)) {
-    if (chunk.type !== "chunk" || typeof chunk.code !== "string") {
-      continue;
-    }
-    chunk.code = rewriteCloudflareWorkersSpecifier(chunk.code, stub);
-  }
-};
-
-/**
- * Workaround: rewrite `cloudflare:workers` to the adapter's Node stub during
- * SSR (prerender) and again at preview (after adapt restores the protocol);
- * restore on preview close. Rolldown leaves the protocol as an external, so
- * Node/Bun cannot load SSR output; bare `vite preview` otherwise leaves
- * `file://...virtual-cloudflare-workers.js?<uuid>` in
- * `.svelte-kit/output/server`, which wrangler cannot resolve.
- *
- * @remarks
- * Still required on `@sveltejs/adapter-cloudflare@8.0.0`
- * (and `@sveltejs/kit@3.0.0`). Drop when `vite build` + `vite preview`
- * work with a bare `import { env } from "cloudflare:workers"` (no leftover
- * protocol specifier in `.svelte-kit/output/server`); re-verify before deleting.
- *
- * @see https://github.com/sveltejs/kit/issues/17271 — open
- * @see https://github.com/sveltejs/kit/issues/16966 — closed (analyse via Vite
- *   so adapter `resolveId` can stub; only proxy dispose landed)
- * @see https://github.com/fringe4life/dollar-holler/issues/105 — tracking
- */
-const stubCloudflareWorkersPlugin = (): Plugin => ({
-  name: "stub-cloudflare-workers",
-  enforce: "pre",
-  resolveId(source, importer) {
-    if (source !== CLOUDFLARE_WORKERS) {
-      return undefined;
-    }
-    if (importer?.includes("cloudflare-workers-node-stub")) {
-      return undefined;
-    }
-    stubImport = CLOUDFLARE_WORKERS_STUB;
-    return CLOUDFLARE_WORKERS_STUB;
-  },
-  generateBundle(_options, bundle) {
-    if (this.environment.name === "ssr" && stubImport) {
-      rewriteSsrBundle(bundle, stubImport);
-    }
-  },
-  configurePreviewServer(server) {
-    if (!stubImport) {
-      return;
-    }
-    stubCloudflareWorkersInDir(SERVER_OUTPUT_DIR, stubImport);
-    return () => {
-      const stub = stubImport;
-      server.httpServer?.once("close", () => {
-        restoreCloudflareWorkersInDir(SERVER_OUTPUT_DIR, stub);
-      });
-    };
-  },
-});
 
 export default defineConfig(({ mode }) => ({
   build: {
@@ -141,7 +60,6 @@ export default defineConfig(({ mode }) => ({
     include: ["effect"],
   },
   plugins: [
-    stubCloudflareWorkersPlugin(),
     /**
      * Fontaine (#213): metric-matched `{family} fallback` @font-face
      * (size-adjust / overrides). Panda stacks are CSS variables, so tokens
@@ -193,11 +111,11 @@ export default defineConfig(({ mode }) => ({
      * Plugin order before `ogygia()` is required so island resolve sees the remap.
      *
      * @remarks
-     * Still required on `vite@8.3.6` + `ogygia@0.12.1` with `@sveltejs/kit@3.1.1` for
-     * `bun vite dev` → `/invoices` (`InvoiceRow` island → bare `styled-system/css/cx.js`).
+     * Still required on `vite@8.3.6` + `ogygia@0.12.2` with `@sveltejs/kit@3.1.1` for
+     * landing/auth islands (`virtual:ogygia/island` → bare `styled-system/css/cx.js`).
      * Re-checked 8.3.6: its `#` fix is optimizer conditions only
      * (vitejs/vite#23959 / #23946), not virtual-importer collapse. Drop when Vite
-     * stops emitting bare ids for virtual importers; re-verify `/invoices` in **dev**.
+     * stops emitting bare ids for virtual importers; re-verify `/` and `/login` in **dev**.
      * No upstream Vite issue filed yet (filing target is vitejs/vite, not ogygia).
      *
      * @see https://github.com/fringe4life/dollar-holler/issues/228 — this upgrade + bridge
@@ -269,6 +187,8 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     forwardConsole: true,
+    host: "127.0.0.1",
+    port: 5173,
     fs: {
       allow: ["styled-system"],
     },

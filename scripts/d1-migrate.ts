@@ -7,7 +7,10 @@
  */
 import { spawnSync } from "node:child_process";
 import { join } from "node:path";
-import { writeEphemeralWranglerConfig } from "./d1-wrangler-config.ts";
+import {
+  LOCAL_D1_PERSIST_DIR,
+  writeEphemeralWranglerConfig,
+} from "./d1-wrangler-config.ts";
 import { SPIKE_NAME } from "../alchemy.run.ts";
 
 const remote = process.argv.includes("--remote");
@@ -22,7 +25,7 @@ const result = spawnSync(
     "apply",
     SPIKE_NAME,
     remote ? "--remote" : "--local",
-    ...(remote ? [] : ["--persist-to", join(process.cwd(), ".wrangler/state")]),
+    ...(remote ? [] : ["--persist-to", LOCAL_D1_PERSIST_DIR]),
   ],
   { stdio: "inherit" }
 );

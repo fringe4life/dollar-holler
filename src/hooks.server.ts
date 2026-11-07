@@ -5,6 +5,7 @@ import { type Handle, sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/env";
 import { getAuth } from "#lib/auth.server.ts";
+import { tryGetD1 } from "#lib/server/db/index.ts";
 import { shouldPreloadAsset } from "#lib/fonts/preload.ts";
 import { THEME_COOKIE_NAME, parseStoredTheme } from "#lib/theme/schema.ts";
 import { stampHtmlTheme } from "#lib/theme/theme.ts";
@@ -15,7 +16,7 @@ const SENTRY_DSN =
 
 // get session from better auth and populate locals
 const localsHandler: Handle = async ({ event, resolve }) => {
-  if (building) {
+  if (building || !tryGetD1()) {
     return resolve(event);
   }
 

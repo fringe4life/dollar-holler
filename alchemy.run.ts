@@ -20,17 +20,14 @@ import * as Cloudflare from "@alchemy.run/cloudflare";
 import * as Alchemy from "alchemy";
 import * as Config from "effect/Config";
 import * as Effect from "effect/Effect";
-import * as Option from "effect/Option";
-import * as Redacted from "effect/Redacted";
 
 const FORBIDDEN_STAGES = new Set(["prod", "production"]);
 
 /**
  * Newest compatibility date this install documents.
- * Wrangler 4.157.0 `DEFAULT_COMPAT_DATE` is `2026-11-03` ("the latest
- * compatibility date supported by this version of Wrangler"). Alchemy's
- * own default is `2026-08-31` and it accepts a later date string.
- * Was `2026-08-14` in wrangler.jsonc.
+ * Local Alchemy workerd here supports through `2026-11-02`. Wrangler
+ * 4.157.0 `DEFAULT_COMPAT_DATE` is `2026-11-03`. Alchemy's own default is
+ * `2026-08-31`. Was `2026-08-14` in wrangler.jsonc.
  *
  * `nodejs_compat` is default-on for dates on or after `2026-08-04`
  * (`NODEJS_COMPAT_DEFAULT_ON`). Alchemy's `withDefaultFlags` does not send
@@ -39,7 +36,7 @@ const FORBIDDEN_STAGES = new Set(["prod", "production"]);
  * addition only happens before the cutoff. Tooling still sees the flag via
  * `getToolingCompatibility`.
  */
-export const COMPATIBILITY_DATE = "2026-11-03";
+export const COMPATIBILITY_DATE = "2026-11-02";
 
 /** Not the production Worker or D1 name `dollar-holler`. */
 export const SPIKE_NAME = "dollar-holler-alchemy-spike";
@@ -51,26 +48,11 @@ export const D1_MIGRATIONS_DIR = "src/lib/server/db/d1";
 export const LIVE_D1_DATABASE_ID = "08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185";
 
 /**
- * Optional schema values. A blank string is absent, so test env does not
- * bind an empty Cloudflare token.
+ * Spike D1 `dollar-holler-alchemy-spike`. `alchemy dev` uses the local
+ * provider (persist under `.alchemy/local`). This resource is never
+ * `Alchemy.remote()` and does not adopt production D1
+ * `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Not applied by `alchemy:plan`.
  */
-const optionalSecret = (name: string) =>
-  Config.String(name).pipe(
-    Config.option,
-    Config.map((value) =>
-      Option.match(value, {
-        onNone: () => Option.none(),
-        onSome: (text) => {
-          const trimmed = text.trim();
-          return trimmed.length === 0
-            ? Option.none()
-            : Option.some(Redacted.make(trimmed));
-        },
-      })
-    )
-  );
-
-/** Not the production database `dollar-holler`. Not applied by `alchemy:plan`. */
 export const Database = Cloudflare.D1.Database("Database", {
   name: SPIKE_NAME,
   migrations: D1_MIGRATIONS_DIR,
@@ -85,6 +67,10 @@ export const Database = Cloudflare.D1.Database("Database", {
 export const Website = Cloudflare.Website.SvelteKit("Website", {
   name: SPIKE_NAME,
   workersDev: false,
+  dev: {
+    host: "127.0.0.1",
+    port: 5173,
+  },
   compatibility: {
     date: COMPATIBILITY_DATE,
   },
@@ -93,9 +79,6 @@ export const Website = Cloudflare.Website.SvelteKit("Website", {
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     OGYGIA_SECRET: Config.Redacted("OGYGIA_SECRET"),
     SENTRY_AUTH_TOKEN: Config.Redacted("SENTRY_AUTH_TOKEN"),
-    CLOUDFLARE_API_TOKEN: optionalSecret("CLOUDFLARE_API_TOKEN"),
-    CLOUDFLARE_ACCOUNT_ID: optionalSecret("CLOUDFLARE_ACCOUNT_ID"),
-    CLOUDFLARE_D1_DATABASE_ID: optionalSecret("CLOUDFLARE_D1_DATABASE_ID"),
     PUBLIC_BASE_URL: Config.String("PUBLIC_BASE_URL"),
     ORIGIN: Config.String("ORIGIN"),
     VARLOCK_ENV: Config.String("VARLOCK_ENV"),

@@ -15,5 +15,7 @@ env = false
 
 preload = ["varlock/auto-load"]
 
+# `bun test` ignores the runtime preload and only uses this list.
+# Varlock must run after VARLOCK_ENV is set (see app-env-preload).
 [test]
-preload = ["./src/test/app-env-preload.ts"]
+preload = ["./src/test/app-env-preload.ts", "varlock/auto-load"]

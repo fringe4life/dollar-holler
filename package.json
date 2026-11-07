@@ -6,7 +6,7 @@
     "@sentry/sveltekit": "11.10.0",
     "@varlock/bitwarden-plugin": "2.0.2",
     "@varlock/cloudflare-integration": "1.6.3",
-    "better-auth": "1.7.15",
+    "better-auth": "1.7.16",
     "drizzle-orm": "1.0.0-rc.5",
     "marked": "18.1.3",
     "ogygia": "0.12.2",

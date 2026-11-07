@@ -149,7 +149,6 @@
                 toast.error("Logout failed");
               }
             })}
-            data-ogygia-speculate="off"
             data-sveltekit-replacestate
           >
             <button

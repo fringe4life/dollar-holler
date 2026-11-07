@@ -1,20 +1,17 @@
 import { describe, expect, it, mock } from "bun:test";
 
 mock.module("$app/server", () => ({
-  getRequestEvent: () => {
-    throw new Error("auth unit test does not read the request");
-  },
-}));
-
-mock.module("cloudflare:workers", () => ({
-  env: {
-    DB: {
-      prepare: () => {
-        throw new Error("auth unit test does not query D1");
+  getRequestEvent: () => ({
+    platform: {
+      env: {
+        DB: {
+          prepare: () => {
+            throw new Error("auth unit test does not query D1");
+          },
+        },
       },
     },
-  },
-  waitUntil() {},
+  }),
 }));
 
 const { Auth, getAuth } = await import("./auth.server.ts");

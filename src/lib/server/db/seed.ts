@@ -1,7 +1,10 @@
 import type { D1Database } from "@cloudflare/workers-types";
 import { getColumns, type Table } from "drizzle-orm";
 import { getPlatformProxy } from "wrangler";
-import { writeEphemeralWranglerConfig } from "../../../../scripts/d1-wrangler-config.ts";
+import {
+  LOCAL_D1_PERSIST_DIR,
+  writeEphemeralWranglerConfig,
+} from "../../../../scripts/d1-wrangler-config.ts";
 import type { ClientInsert, ClientSelect } from "#features/clients/types.ts";
 import type { LineItemInsert } from "#features/line-items/types.ts";
 import type { SettingsInsert } from "#features/settings/types.ts";
@@ -39,7 +42,7 @@ async function createSeedProxy() {
     console.log("Seeding local D1 (Miniflare persist under .wrangler)");
     return getPlatformProxy<{ DB: D1Database }>({
       configPath,
-      persist: true,
+      persist: { path: LOCAL_D1_PERSIST_DIR },
       remoteBindings: false,
     });
   }

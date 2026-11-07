@@ -1,8 +1,20 @@
 import type { D1Database } from "@cloudflare/workers-types";
-import { env } from "cloudflare:workers";
+import { getRequestEvent } from "$app/server";
 import { createDb, type AppDatabase } from "./create-db";
 
 const cache = new WeakMap<D1Database, AppDatabase>();
+
+/**
+ * D1 from Alchemy / Kit `platform.env` (Worker shim and `alchemy dev`
+ * emulator). Missing or prerender-guarded access returns undefined.
+ */
+export const tryGetD1 = (): D1Database | undefined => {
+  try {
+    return getRequestEvent().platform?.env?.DB;
+  } catch {
+    return undefined;
+  }
+};
 
 /**
  * Real `createDb` instance for the current request’s D1 binding.
@@ -11,9 +23,11 @@ const cache = new WeakMap<D1Database, AppDatabase>();
  * module load.
  */
 export const getDb = (): AppDatabase => {
-  const d1 = env.DB;
+  const d1 = tryGetD1();
   if (!d1) {
-    throw new Error("D1 binding DB missing from cloudflare:workers env");
+    throw new Error(
+      "D1 binding DB missing from platform.env. Use `bun run dev` (`varlock run -- bun x alchemy dev --stage dev`), not bare `vite dev`. Local persist is `.alchemy/local` (Alchemy) and `.wrangler/state` (`db:migrate`); never production D1 08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185."
+    );
   }
   const cached = cache.get(d1);
   if (cached) {

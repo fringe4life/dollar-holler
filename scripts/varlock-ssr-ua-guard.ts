@@ -17,17 +17,16 @@ const CF_PROBE_START = /\{\s*let __cfEnv;/;
  * `navigator.userAgent === 'Cloudflare-Workers'` guard that
  * `@varlock/cloudflare-integration@1.5` shipped and docs still describe.
  *
- * Without it, `import('cloudflare:workers')` succeeds under our Node stub /
- * adapter virtual module, then reading `env.__VARLOCK_ENV` either throws
+ * Without it, a Cloudflare env probe can run under Node SSR and throw
  * (`Cannot access cloudflare:workers in a prerenderable route` during
- * Analysing routes) or hits `no __VARLOCK_ENV binding` in `vite eev`.
+ * Analysing routes) or hit `no __VARLOCK_ENV binding`.
  *
  * @remarks
  * Still required on `@varlock/cloudflare-integration@1.6.3` +
- * `@varlock/vite-integration@1.5.5` with `@sveltejs/adapter-cloudflare@8.0.2`
- * and this repo's `stub-cloudflare-workers` rewrite. Drop when upstream
- * restores the UA guard (or equivalent inert-in-Node probe); re-verify
- * `bun run build` (Analysing routes) and `bun run eev` → `/` before deleting.
+ * `@varlock/vite-integration@1.5.5`. Alchemy is the adapter now (no
+ * `@sveltejs/adapter-cloudflare`). Drop when upstream restores the UA
+ * guard (or equivalent inert-in-Node probe); re-verify `bun run build`
+ * (Analysing routes) and `bun run dev` → `/` before deleting.
  * No upstream issue filed yet — say if you want it opened on dmno-dev/varlock.
  *
  * @see https://varlock.dev/integrations/sveltekit/ — docs still claim UA guard

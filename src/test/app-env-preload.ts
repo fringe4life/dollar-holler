@@ -9,3 +9,9 @@ mock.module("$app/env", () => ({
   building: false,
   dev: false,
 }));
+
+mock.module("$app/server", () => ({
+  getRequestEvent: () => {
+    throw new Error("unit test does not read the request");
+  },
+}));

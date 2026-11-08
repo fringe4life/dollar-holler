@@ -71,6 +71,8 @@ export const Database = Cloudflare.D1.Database("Database", {
  * `nodejs_compat` flag (default-on at this date).
  * `BITWARDEN_ACCESS_TOKEN` is secret-zero for Varlock on the deploy
  * machine and is not a Worker binding. No `dolla-holla.org` route.
+ * First live apply (not this PR) uploads Worker `dollar-holler`, the same
+ * physical name as today's Wrangler Worker. Domain is still not attached.
  */
 export const Website = Cloudflare.Website.SvelteKit("Website", {
   name: APP_NAME,

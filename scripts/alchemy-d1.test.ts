@@ -4,6 +4,9 @@ import {
   alchemyDatabaseStatePath,
   ALCHEMY_LOCAL_PERSIST_DIR,
   assertLocalSimulatorD1Id,
+  migrationSqlStatements,
+  parseD1RawResults,
+  serializeD1HttpQueryBody,
 } from "./alchemy-d1.ts";
 
 describe("alchemy local D1", () => {
@@ -18,5 +21,33 @@ describe("alchemy local D1", () => {
     expect(ALCHEMY_LOCAL_PERSIST_DIR.endsWith(".alchemy/local")).toBe(true);
     expect(alchemyDatabaseStatePath()).toContain(APP_NAME);
     expect(alchemyDatabaseStatePath()).toContain("Database.json");
+  });
+
+  it("keeps multi-line CREATE TABLE as one migration statement", () => {
+    const sql = `CREATE TABLE \`account\` (\n\t\`id\` text PRIMARY KEY\n);`;
+    expect(migrationSqlStatements([sql, "  "])).toEqual([sql]);
+  });
+
+  it("serializes D1 HTTP batch as an object, not a bare array", () => {
+    const body = { batch: [{ sql: "SELECT 1" }] };
+    expect(JSON.parse(serializeD1HttpQueryBody(body))).toEqual(body);
+  });
+
+  it("parses D1 /raw packed rows so duplicate column names stay positional", () => {
+    expect(
+      parseD1RawResults({
+        columns: ["id", "id"],
+        rows: [
+          [1, 2],
+          [3, 4],
+        ],
+      })
+    ).toEqual({
+      columns: ["id", "id"],
+      rows: [
+        [1, 2],
+        [3, 4],
+      ],
+    });
   });
 });

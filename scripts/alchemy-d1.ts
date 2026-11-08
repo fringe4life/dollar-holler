@@ -129,6 +129,12 @@ const openLocalAlchemyD1 = async () => {
   });
 };
 
+type RemoteD1Credentials = {
+  accountId: string;
+  databaseId: string;
+  apiToken: string;
+};
+
 type D1HttpQueryBody =
   | { sql: string; params?: unknown[] }
   | { batch: Array<{ sql: string; params?: unknown[] }> };
@@ -143,6 +149,47 @@ type D1HttpEnvelope = {
     error?: string;
   }>;
 };
+
+type D1HttpRawPacked = { columns: string[]; rows: unknown[][] };
+
+/** Cloudflare `/query` and `/raw` take `{ sql }` or `{ batch: [...] }`, never a bare array. */
+export const serializeD1HttpQueryBody = (body: D1HttpQueryBody): string =>
+  JSON.stringify(body);
+
+/** `/raw` returns `{ columns, rows }`. Object-row fallback keeps column order from the first row. */
+export const parseD1RawResults = (results: unknown): D1HttpRawPacked => {
+  if (
+    results !== null &&
+    typeof results === "object" &&
+    "rows" in results &&
+    Array.isArray((results as { rows?: unknown }).rows)
+  ) {
+    const packed = results as { columns?: unknown; rows: unknown[] };
+    return {
+      columns: Array.isArray(packed.columns) ? packed.columns.map(String) : [],
+      rows: packed.rows as unknown[][],
+    };
+  }
+  if (!Array.isArray(results)) {
+    return { columns: [], rows: [] };
+  }
+  const objects = results as Record<string, unknown>[];
+  const columns = objects[0] === undefined ? [] : Object.keys(objects[0]);
+  return {
+    columns,
+    rows: objects.map((row) => columns.map((column) => row[column])),
+  };
+};
+
+export const migrationSqlStatements = (
+  statements: readonly string[]
+): string[] =>
+  statements
+    .map((statement) => statement.trim())
+    .filter((statement) => statement.length > 0)
+    .map((statement) =>
+      statement.endsWith(";") ? statement : `${statement};`
+    );
 
 const normalizeBind = (value: unknown): unknown => {
   if (typeof value === "boolean") return value ? 1 : 0;
@@ -174,7 +221,8 @@ const toResult = <T>(
 
 const queryRemoteD1Http = async (
   credentials: RemoteD1Credentials,
-  body: D1HttpQueryBody
+  body: D1HttpQueryBody,
+  endpoint: "query" | "raw" = "query"
 ): Promise<{
   result: Array<{
     results?: unknown;
@@ -183,14 +231,14 @@ const queryRemoteD1Http = async (
   }>;
 }> => {
   const response = await fetch(
-    `https://api.cloudflare.com/client/v4/accounts/${credentials.accountId}/d1/database/${credentials.databaseId}/query`,
+    `https://api.cloudflare.com/client/v4/accounts/${credentials.accountId}/d1/database/${credentials.databaseId}/${endpoint}`,
     {
       method: "POST",
       headers: {
         Authorization: `Bearer ${credentials.apiToken}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify("batch" in body ? body.batch : body),
+      body: serializeD1HttpQueryBody(body),
     }
   );
   const payload = (await response.json()) as D1HttpEnvelope;
@@ -241,15 +289,19 @@ const makeHttpD1Database = (credentials: RemoteD1Credentials): D1Database => {
       all: (async () => toResult(await exec())) as D1PreparedStatement["all"],
       run: (async () => toResult(await exec())) as D1PreparedStatement["run"],
       raw: (async (options?: { columnNames?: boolean }) => {
-        const rows = ((await exec())?.results ?? []) as Record<
-          string,
-          unknown
-        >[];
-        const arrays = rows.map((row) => Object.values(row));
-        if (options?.columnNames === true && rows[0] !== undefined) {
-          return [Object.keys(rows[0]), ...arrays];
+        const res = await queryRemoteD1Http(
+          credentials,
+          {
+            sql: query,
+            params: binds.length ? binds.map(normalizeBind) : undefined,
+          },
+          "raw"
+        );
+        const packed = parseD1RawResults(res.result[0]?.results);
+        if (options?.columnNames === true) {
+          return [packed.columns, ...packed.rows];
         }
-        return arrays;
+        return packed.rows;
       }) as D1PreparedStatement["raw"],
       __query: query,
       __params: binds,
@@ -279,12 +331,6 @@ const makeHttpD1Database = (credentials: RemoteD1Credentials): D1Database => {
       return res.result.map((row) => toResult<T>(row));
     },
   } as unknown as D1Database;
-};
-
-type RemoteD1Credentials = {
-  accountId: string;
-  databaseId: string;
-  apiToken: string;
 };
 
 const readRemoteD1Credentials = (): RemoteD1Credentials => {
@@ -320,47 +366,55 @@ const openRemoteAlchemyD1 = (): {
 export const openAlchemyD1 = async (remote = false) =>
   remote ? openRemoteAlchemyD1() : openLocalAlchemyD1();
 
-const makeHttpMigrationExecutor = (
-  credentials: RemoteD1Credentials
-): SqlExecutor => ({
+const migrationEffect = <A>(
+  message: string,
+  run: () => Promise<A>
+): Effect.Effect<A, MigrationError> =>
+  Effect.tryPromise({
+    try: run,
+    catch: (cause) =>
+      new MigrationError({
+        message: `${message}: ${String(cause)}`,
+        cause,
+      }),
+  });
+
+const makeSqlExecutor = (driver: {
+  query: (
+    sql: string,
+    params?: readonly unknown[]
+  ) => Promise<Array<Record<string, unknown>>>;
+  batch: (statements: string[]) => Promise<void>;
+}): SqlExecutor => ({
   dialect: "sqlite",
   query: (sql, params) =>
-    Effect.tryPromise({
-      try: async () => {
-        const inlined =
-          params !== undefined && params.length > 0
-            ? inlineSqlParams(sql, params, "sqlite")
-            : sql;
-        const result = await queryRemoteD1Http(credentials, { sql: inlined });
-        return (result.result[0]?.results ?? []) as Array<
-          Record<string, unknown>
-        >;
-      },
-      catch: (cause) =>
-        new MigrationError({
-          message: `D1 query failed: ${String(cause)}`,
-          cause,
-        }),
-    }),
+    migrationEffect("D1 query failed", () => driver.query(sql, params)),
   batch: (statements) =>
-    Effect.tryPromise({
-      try: async () => {
-        const sql = statements
-          .map((statement) => statement.trim())
-          .filter((statement) => statement.length > 0)
-          .map((statement) =>
-            statement.endsWith(";") ? statement : `${statement};`
-          )
-          .join("\n");
-        await queryRemoteD1Http(credentials, { sql });
-      },
-      catch: (cause) =>
-        new MigrationError({
-          message: `D1 migration batch failed: ${String(cause)}`,
-          cause,
-        }),
-    }),
+    migrationEffect("D1 migration batch failed", () =>
+      driver.batch(migrationSqlStatements(statements))
+    ),
 });
+
+const makeHttpMigrationExecutor = (
+  credentials: RemoteD1Credentials
+): SqlExecutor =>
+  makeSqlExecutor({
+    query: async (sql, params) => {
+      const inlined =
+        params !== undefined && params.length > 0
+          ? inlineSqlParams(sql, params, "sqlite")
+          : sql;
+      const result = await queryRemoteD1Http(credentials, { sql: inlined });
+      return (result.result[0]?.results ?? []) as Array<
+        Record<string, unknown>
+      >;
+    },
+    batch: async (statements) => {
+      await queryRemoteD1Http(credentials, {
+        batch: statements.map((sql) => ({ sql })),
+      });
+    },
+  });
 
 const requireVarlock = (command: string): void => {
   if (process.env.__VARLOCK_RUN !== "1") {
@@ -370,43 +424,31 @@ const requireVarlock = (command: string): void => {
   }
 };
 
-const makeD1BindingMigrationExecutor = (d1: D1Database): SqlExecutor => ({
-  dialect: "sqlite",
-  query: (sql, params) =>
-    Effect.tryPromise({
-      try: async () => {
-        const statement =
-          params !== undefined && params.length > 0
-            ? d1.prepare(sql).bind(...params)
-            : d1.prepare(sql);
-        const result = await statement.all();
-        return (result.results ?? []) as Array<Record<string, unknown>>;
-      },
-      catch: (cause) =>
-        new MigrationError({
-          message: `D1 query failed: ${String(cause)}`,
-          cause,
-        }),
-    }),
-  batch: (statements) =>
-    Effect.tryPromise({
-      try: async () => {
-        const sql = statements
-          .map((statement) => statement.trim())
-          .filter((statement) => statement.length > 0)
-          .map((statement) =>
-            statement.endsWith(";") ? statement : `${statement};`
-          )
-          .join("\n");
-        await d1.exec(sql);
-      },
-      catch: (cause) =>
-        new MigrationError({
-          message: `D1 migration batch failed: ${String(cause)}`,
-          cause,
-        }),
-    }),
-});
+const makeD1BindingMigrationExecutor = (d1: D1Database): SqlExecutor =>
+  makeSqlExecutor({
+    query: async (sql, params) => {
+      const statement =
+        params !== undefined && params.length > 0
+          ? d1.prepare(sql).bind(...params)
+          : d1.prepare(sql);
+      const result = await statement.all();
+      return (result.results ?? []) as Array<Record<string, unknown>>;
+    },
+    batch: async (statements) => {
+      await d1.batch(statements.map((sql) => d1.prepare(sql)));
+    },
+  });
+
+const hashedMigrationCount = async (executor: SqlExecutor): Promise<number> => {
+  const run = await Effect.runPromise(
+    runMigrations({
+      input: { dir: D1_MIGRATIONS_DIR },
+      stamped: {},
+      withExecutor: (apply) => apply(executor),
+    }).pipe(Effect.provide(BunServices))
+  );
+  return Object.keys(run.hashes).length;
+};
 
 const applyMigrationsOnLocalBinding = async (): Promise<void> => {
   const proxy = await openLocalAlchemyD1();
@@ -415,16 +457,10 @@ const applyMigrationsOnLocalBinding = async (): Promise<void> => {
     if (!d1) {
       throw new Error("D1 binding DB missing from Alchemy local simulator");
     }
-    const run = await Effect.runPromise(
-      runMigrations({
-        input: { dir: D1_MIGRATIONS_DIR },
-        stamped: {},
-        withExecutor: (apply) => apply(makeD1BindingMigrationExecutor(d1)),
-      }).pipe(Effect.provide(BunServices))
+    const hashed = await hashedMigrationCount(
+      makeD1BindingMigrationExecutor(d1)
     );
-    console.log(
-      `Alchemy local D1 migrations hashed ${String(Object.keys(run.hashes).length)} files`
-    );
+    console.log(`Alchemy local D1 migrations hashed ${String(hashed)} files`);
   } finally {
     await proxy.dispose();
   }
@@ -489,14 +525,8 @@ export const applyRemoteAlchemyD1Migrations = async (): Promise<void> => {
   console.log(
     `Applying Alchemy migrations over D1 HTTP to ${credentials.databaseId}`
   );
-  const run = await Effect.runPromise(
-    runMigrations({
-      input: { dir: D1_MIGRATIONS_DIR },
-      stamped: {},
-      withExecutor: (apply) => apply(makeHttpMigrationExecutor(credentials)),
-    }).pipe(Effect.provide(BunServices))
+  const hashed = await hashedMigrationCount(
+    makeHttpMigrationExecutor(credentials)
   );
-  console.log(
-    `Remote D1 migrations hashed ${String(Object.keys(run.hashes).length)} files`
-  );
+  console.log(`Remote D1 migrations hashed ${String(hashed)} files`);
 };

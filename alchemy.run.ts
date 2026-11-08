@@ -8,10 +8,17 @@
  * Varlock does not yet build one for non-Wrangler deploys
  * (https://github.com/dmno-dev/varlock/issues/735).
  *
- * Physical names stay on the spike. This beta's `Cloudflare.D1.Database`
- * only creates a database (`clone` copies into a new one; `Resource.ref`
- * reads a database Alchemy already deployed). Production D1 `dollar-holler`
- * is not adopted and its id is not passed. No custom domain.
+ * Worker and D1 physical names are `dollar-holler`. `DB` is this D1.
+ * This beta's `Cloudflare.D1.Database` cannot adopt an existing database
+ * by UUID (`clone` copies into a new one; `Resource.ref` only reads a
+ * database Alchemy already deployed). The live UUID
+ * `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185` is therefore not passed. The
+ * first real `alchemy deploy` provisions D1 named `dollar-holler` (create,
+ * or Cloudflare unique-name lookup if that name already exists). Data is
+ * seed-only. No custom domain (`dolla-holla.org` is not attached).
+ *
+ * Local `alchemy dev` / `db:migrate` use the local provider and persist
+ * under `.alchemy/local/d1`. They do not call Cloudflare.
  *
  * `Alchemy.localState()` avoids bootstrapping the account Worker
  * `alchemy-state-store`. Stages `prod` and `production` are refused.
@@ -25,9 +32,8 @@ const FORBIDDEN_STAGES = new Set(["prod", "production"]);
 
 /**
  * Newest compatibility date this install documents.
- * Local Alchemy workerd here supports through `2026-11-02`. Wrangler
- * 4.157.0 `DEFAULT_COMPAT_DATE` is `2026-11-03`. Alchemy's own default is
- * `2026-08-31`. Was `2026-08-14` in wrangler.jsonc.
+ * Local Alchemy workerd here supports through `2026-11-02`. Alchemy's own
+ * default is `2026-08-31`. Was `2026-08-14` in wrangler.jsonc.
  *
  * `nodejs_compat` is default-on for dates on or after `2026-08-04`
  * (`NODEJS_COMPAT_DEFAULT_ON`). Alchemy's `withDefaultFlags` does not send
@@ -38,23 +44,25 @@ const FORBIDDEN_STAGES = new Set(["prod", "production"]);
  */
 export const COMPATIBILITY_DATE = "2026-11-02";
 
-/** Not the production Worker or D1 name `dollar-holler`. */
-export const SPIKE_NAME = "dollar-holler-alchemy-spike";
+/** Worker, D1, and Alchemy stack name. */
+export const APP_NAME = "dollar-holler";
 
-/** Flattened SQL from `scripts/flatten-d1-migrations.ts`. Applied on Alchemy deploy. */
+/** Flattened SQL from `scripts/flatten-d1-migrations.ts`. Applied on Alchemy deploy and local Database reconcile. */
 export const D1_MIGRATIONS_DIR = "src/lib/server/db/d1";
 
-/** Live D1 `dollar-holler`. Remote migrate refuses this id. */
-export const LIVE_D1_DATABASE_ID = "08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185";
+/**
+ * Existing live D1 UUID. Not passed on the Database resource (this beta
+ * cannot adopt by id). Kept so local scripts can ignore it.
+ */
+export const EXISTING_D1_DATABASE_ID = "08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185";
 
 /**
- * Spike D1 `dollar-holler-alchemy-spike`. `alchemy dev` uses the local
- * provider (persist under `.alchemy/local`). This resource is never
- * `Alchemy.remote()` and does not adopt production D1
- * `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Not applied by `alchemy:plan`.
+ * App D1 `dollar-holler`. Local `alchemy dev` uses the local provider
+ * (persist under `.alchemy/local/d1`). First live apply (not this PR)
+ * provisions the named database. No custom domain.
  */
 export const Database = Cloudflare.D1.Database("Database", {
-  name: SPIKE_NAME,
+  name: APP_NAME,
   migrations: D1_MIGRATIONS_DIR,
 });
 
@@ -62,10 +70,12 @@ export const Database = Cloudflare.D1.Database("Database", {
  * SvelteKit site. Compatibility date is `COMPATIBILITY_DATE`. No explicit
  * `nodejs_compat` flag (default-on at this date).
  * `BITWARDEN_ACCESS_TOKEN` is secret-zero for Varlock on the deploy
- * machine and is not a Worker binding.
+ * machine and is not a Worker binding. No `dolla-holla.org` route.
+ * First live apply (not this PR) uploads Worker `dollar-holler`, the same
+ * physical name as today's Wrangler Worker. Domain is still not attached.
  */
 export const Website = Cloudflare.Website.SvelteKit("Website", {
-  name: SPIKE_NAME,
+  name: APP_NAME,
   workersDev: false,
   dev: {
     host: "127.0.0.1",
@@ -88,7 +98,7 @@ export const Website = Cloudflare.Website.SvelteKit("Website", {
 export type WebsiteEnv = Cloudflare.InferEnv<typeof Website>;
 
 export default Alchemy.Stack(
-  SPIKE_NAME,
+  APP_NAME,
   {
     providers: Cloudflare.providers(),
     state: Alchemy.localState(),
@@ -98,7 +108,7 @@ export default Alchemy.Stack(
     if (FORBIDDEN_STAGES.has(stage)) {
       return yield* Effect.die(
         new Error(
-          `alchemy stack refuses stage "${stage}". Deploy with --stage dev. Worker and D1 names stay dollar-holler-alchemy-spike.`
+          `alchemy stack refuses stage "${stage}". Deploy with --stage dev. Worker and D1 names stay ${APP_NAME}.`
         )
       );
     }

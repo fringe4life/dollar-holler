@@ -1,10 +1,5 @@
-import type { D1Database } from "@cloudflare/workers-types";
 import { getColumns, type Table } from "drizzle-orm";
-import { getPlatformProxy } from "wrangler";
-import {
-  LOCAL_D1_PERSIST_DIR,
-  writeEphemeralWranglerConfig,
-} from "../../../../scripts/d1-wrangler-config.ts";
+import { openAlchemyD1 } from "../../../../scripts/alchemy-d1.ts";
 import type { ClientInsert, ClientSelect } from "#features/clients/types.ts";
 import type { LineItemInsert } from "#features/line-items/types.ts";
 import type { SettingsInsert } from "#features/settings/types.ts";
@@ -37,37 +32,18 @@ function d1InsertChunkSize(table: Table): number {
 }
 
 async function createSeedProxy() {
-  const configPath = await writeEphemeralWranglerConfig({ remote: useRemote });
-  if (!useRemote) {
-    console.log("Seeding local D1 (Miniflare persist under .wrangler)");
-    return getPlatformProxy<{ DB: D1Database }>({
-      configPath,
-      persist: { path: LOCAL_D1_PERSIST_DIR },
-      remoteBindings: false,
-    });
+  if (useRemote) {
+    console.warn(
+      "Seeding REMOTE Cloudflare D1 over HTTP. Wipes clients, invoices, line_items, and settings. Auth users are kept."
+    );
   }
-
-  console.warn(
-    "Seeding REMOTE Cloudflare D1. Wipes clients, invoices, line_items, and settings. Auth users are kept."
-  );
-  // getPlatformProxy remote session hangs forever under Bun (workerd/miniflare).
-  // workers-sdk#7718 closed won't-fix: Wrangler does not support Bun.
-  // db:seed:remote must run via Node (tsx). @see https://github.com/cloudflare/workers-sdk/issues/7718
-  console.log(
-    "Starting wrangler remote proxy (needs Node + wrangler login)..."
-  );
-
-  return getPlatformProxy<{ DB: D1Database }>({
-    configPath,
-    persist: false,
-    remoteBindings: true,
-  });
+  return openAlchemyD1(useRemote);
 }
 
 const proxy = await createSeedProxy();
 const d1 = proxy.env.DB;
 if (!d1) {
-  throw new Error("D1 binding DB missing from wrangler platform proxy");
+  throw new Error("D1 binding DB missing from Alchemy D1 client");
 }
 const db = createDb(d1);
 

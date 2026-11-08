@@ -18,7 +18,9 @@
   },
   "devDependencies": {
     "@alchemy.run/cloudflare": "2.0.0-beta.85",
+    "@alchemy.run/cloudflare-runtime": "2.0.0-beta.85",
     "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
+    "@alchemy.run/sql": "2.0.0-beta.85",
     "@cloudflare/workers-types": "5.20261104.1",
     "@effect/platform-bun": "4.1.2",
     "@eslint/js": "10.0.1",
@@ -70,8 +72,7 @@
     "typescript-eslint": "8.72.1",
     "vite": "8.3.6",
     "vite-devtools-svelte": "0.7.0",
-    "vite-plugin-devtools-json": "1.1.2",
-    "wrangler": "4.157.0"
+    "vite-plugin-devtools-json": "1.1.2"
   },
   "imports": {
     "#lib": "./src/lib",
@@ -100,9 +101,9 @@
     "tsc": "./node_modules/@typescript/native/bin/tsc --noEmit",
     "tsc6": "./node_modules/typescript/bin/tsc --noEmit",
     "db:seed": "varlock run -- bun ./src/lib/server/db/seed.ts",
-    "db:seed:remote": "varlock run -- node --import tsx ./src/lib/server/db/seed.ts --remote",
+    "db:seed:remote": "varlock run -- bun ./src/lib/server/db/seed.ts --remote",
     "db:generate": "varlock run -- bun x drizzle-kit generate && bun scripts/flatten-d1-migrations.ts",
-    "db:migrate": "bun ./scripts/d1-migrate.ts",
+    "db:migrate": "varlock run -- bun ./scripts/d1-migrate.ts",
     "db:migrate:remote": "varlock run -- bun ./scripts/d1-migrate.ts --remote",
     "db:studio": "varlock run -- bun x drizzle-kit studio",
     "db:push": "varlock run -- bun x drizzle-kit push",

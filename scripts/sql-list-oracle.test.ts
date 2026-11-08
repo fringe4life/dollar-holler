@@ -1,22 +1,22 @@
 /**
- * Integration: local Miniflare D1 must match scripts/fixtures/sql-list-oracle-golden.json.
+ * Integration: local Alchemy D1 must match scripts/fixtures/sql-list-oracle-golden.json.
  *
  * Requires seeded local D1 (same counts as golden). After intentional reseed:
  *   bun run bench:sql-list -- --write-oracle
  */
 
 import { describe, expect, it } from "bun:test";
-import type { D1Database } from "@cloudflare/workers-types";
-import { getPlatformProxy } from "wrangler";
-import { writeEphemeralWranglerConfig } from "./d1-wrangler-config.ts";
+import { existsSync } from "node:fs";
+import { alchemyDatabaseStatePath, openAlchemyD1 } from "./alchemy-d1.ts";
 import {
   formatOracleVerifyFailure,
   readOracleGolden,
   verifyOracleAgainstGolden,
 } from "./sql-list-oracle.ts";
 
-/** Local Miniflare D1 + seed only. CI has neither; keep unit tests green there. */
-const hasLocalOracleD1 = process.env.CI !== "true";
+/** Local Alchemy D1 + seed only. CI has neither; keep unit tests green there. */
+const hasLocalOracleD1 =
+  process.env.CI !== "true" && existsSync(alchemyDatabaseStatePath());
 
 describe.skipIf(!hasLocalOracleD1)("sql-list-oracle vs local D1 seed", () => {
   it("matches golden hash for list/money/summary fixture pack", async () => {
@@ -24,16 +24,11 @@ describe.skipIf(!hasLocalOracleD1)("sql-list-oracle vs local D1 seed", () => {
     expect(golden.hash).toHaveLength(64);
     expect(golden.results.invoiceListPage.length).toBeGreaterThan(0);
 
-    const configPath = await writeEphemeralWranglerConfig({ remote: false });
-    const proxy = await getPlatformProxy<{ DB: D1Database }>({
-      configPath,
-      persist: true,
-      remoteBindings: false,
-    });
+    const proxy = await openAlchemyD1();
     try {
       const d1 = proxy.env.DB;
       expect(d1).toBeDefined();
-      const result = await verifyOracleAgainstGolden(d1!, golden);
+      const result = await verifyOracleAgainstGolden(d1, golden);
       if (!result.ok) {
         throw new Error(formatOracleVerifyFailure(result));
       }

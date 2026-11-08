@@ -3,9 +3,11 @@
  *
  * Local persist is `.alchemy/local/d1` (the same simulator `alchemy dev`
  * binds). Remote uses the Cloudflare D1 HTTP API against
- * `CLOUDFLARE_D1_DATABASE_ID`. The Database resource in `alchemy.run.ts`
- * names D1 `dollar-holler` and does not pass an existing UUID (this beta
- * cannot adopt by id).
+ * `CLOUDFLARE_D1_DATABASE_ID`, and refuses live UUID
+ * `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185` (`db:seed:remote` /
+ * `db:migrate:remote` exit 1). The Database resource in `alchemy.run.ts`
+ * names D1 `dollar-holler` and does not pass that UUID (this beta cannot
+ * adopt by id).
  */
 import { D1 } from "@alchemy.run/cloudflare-runtime/core/bindings";
 import { getPlatformProxy } from "@alchemy.run/cloudflare-runtime/core/platform-proxy";
@@ -51,6 +53,15 @@ export const assertLocalSimulatorD1Id = (databaseId: string): void => {
   ) {
     throw new Error(
       `Local D1 must be the Alchemy simulator (dev: id under .alchemy/local/d1), not ${databaseId}.`
+    );
+  }
+};
+
+/** Remote CLI must not hit the pre-Alchemy live UUID. No override flag. */
+export const assertRemoteD1DatabaseId = (databaseId: string): void => {
+  if (databaseId === EXISTING_D1_DATABASE_ID) {
+    throw new Error(
+      "Refusing D1 id of live database dollar-holler. Alchemy does not adopt it."
     );
   }
 };
@@ -346,6 +357,7 @@ const readRemoteD1Credentials = (): RemoteD1Credentials => {
       "Remote D1 needs CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_D1_DATABASE_ID, and CLOUDFLARE_API_TOKEN from Varlock. No database id is committed."
     );
   }
+  assertRemoteD1DatabaseId(databaseId);
   return { accountId, databaseId, apiToken };
 };
 

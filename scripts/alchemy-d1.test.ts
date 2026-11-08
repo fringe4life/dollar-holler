@@ -4,6 +4,7 @@ import {
   alchemyDatabaseStatePath,
   ALCHEMY_LOCAL_PERSIST_DIR,
   assertLocalSimulatorD1Id,
+  assertRemoteD1DatabaseId,
   migrationSqlStatements,
   parseD1RawResults,
   serializeD1HttpQueryBody,
@@ -13,6 +14,12 @@ describe("alchemy local D1", () => {
   it("rejects the existing live UUID as a local simulator id", () => {
     expect(() => assertLocalSimulatorD1Id(EXISTING_D1_DATABASE_ID)).toThrow(
       /Alchemy simulator/
+    );
+  });
+
+  it("refuses the live UUID for remote migrate and seed", () => {
+    expect(() => assertRemoteD1DatabaseId(EXISTING_D1_DATABASE_ID)).toThrow(
+      /Refusing D1 id of live database/
     );
   });
 

@@ -36,7 +36,7 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 
    The app resolves configuration from Varlock (`import { ENV } from "varlock/env"`) for Drizzle Kit ([`drizzle.config.ts`](./drizzle.config.ts)) and auth ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Runtime D1 uses Alchemy/Kit `platform.env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)), not env URLs. Bare `vite dev` does not inject that binding.
 
-3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` reconciles `Cloudflare.D1.Database` locally (Alchemy `migrations:`, persist `.alchemy/local/d1`). Remote apply uses the D1 HTTP API and `CLOUDFLARE_D1_DATABASE_ID` from Varlock. Site deploy is Alchemy (`alchemy.run.ts`); the first live apply provisions D1 named `dollar-holler` (this beta cannot adopt by UUID).
+3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` reconciles `Cloudflare.D1.Database` locally (Alchemy `migrations:`, persist `.alchemy/local/d1`). Remote apply uses the D1 HTTP API and `CLOUDFLARE_D1_DATABASE_ID` from Varlock, and exits 1 if that id is the live UUID `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Site deploy is Alchemy (`alchemy.run.ts`); the first live apply provisions D1 named `dollar-holler` (this beta cannot adopt by UUID).
 
    ```bash
    # Generate Drizzle migrations and flatten for Alchemy D1
@@ -45,7 +45,7 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
    # Apply to local D1 (Alchemy persist `.alchemy/local/d1`)
    bun run db:migrate
 
-   # Apply to remote D1 (CLOUDFLARE_D1_DATABASE_ID from Varlock)
+   # Apply to remote D1 (CLOUDFLARE_D1_DATABASE_ID from Varlock; refuses live UUID)
    bun run db:migrate:remote
 
    # Optional: drizzle-kit push/studio via D1 HTTP (needs CLOUDFLARE_* vars)

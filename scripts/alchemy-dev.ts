@@ -9,7 +9,7 @@
  *
  * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). Live D1
  * `dolla-holla` is `bun run alchemy:deploy`, not `alchemy dev`. No adopt.
- * No custom domain.
+ * Public hostname is `dolla-holla.org` on the Website resource (deploy).
  *
  * If Cloudflare credentials are missing, a gitignored local-only profile
  * is written under `.alchemy/home` so local providers can start. That is
@@ -17,7 +17,10 @@
  */
 import { spawnSync } from "node:child_process";
 import { LIVE_PRODUCTION_D1_UUID } from "../alchemy.run.ts";
-import { ensureLocalAlchemyProfile } from "./alchemy-d1.ts";
+import {
+  applyLocalAlchemyD1Migrations,
+  ensureLocalAlchemyProfile,
+} from "./alchemy-d1.ts";
 
 export const ALCHEMY_DEV_COMMAND =
   "bun run panda:build && bun x varlock run -- bun x alchemy dev --stage dev";
@@ -37,6 +40,7 @@ if (remoteId === LIVE_PRODUCTION_D1_UUID) {
 }
 
 ensureLocalAlchemyProfile();
+await applyLocalAlchemyD1Migrations();
 if (process.env.ALCHEMY_HOME?.endsWith(".alchemy/home") === true) {
   console.warn(
     "No Cloudflare credentials. Using a local-only Alchemy profile under .alchemy/home. D1 stays on the local provider. If alchemy still asks for login, run that login, then:\n" +

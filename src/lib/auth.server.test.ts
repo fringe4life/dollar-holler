@@ -29,6 +29,7 @@ describe("Auth service", () => {
     expect(first.options.basePath).toBe("/api/auth");
     expect(first.options.allowedHosts).toContain("127.0.0.1:*");
     expect(first.options.trustedOrigins).toContain("http://127.0.0.1:5173");
+    expect(first.options.trustedOrigins).toContain("https://dolla-holla.org");
   });
 
   it("pairs localhost and 127.0.0.1 origins", () => {

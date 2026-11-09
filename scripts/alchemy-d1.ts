@@ -60,7 +60,7 @@ export const assertLocalSimulatorD1Id = (databaseId: string): void => {
 export const assertRemoteD1DatabaseId = (databaseId: string): void => {
   if (databaseId === LIVE_PRODUCTION_D1_UUID) {
     throw new Error(
-      "Refusing D1 id of live database dolla-holla (LIVE_PRODUCTION_D1_UUID). Use bun run deploy -- --adopt, not db:seed:remote / db:migrate:remote."
+      "Refusing D1 id of live database dolla-holla (LIVE_PRODUCTION_D1_UUID). Use bun run alchemy:deploy:adopt, not db:seed:remote / db:migrate:remote."
     );
   }
 };
@@ -366,7 +366,7 @@ const openRemoteAlchemyD1 = (): {
 } => {
   const credentials = readRemoteD1Credentials();
   console.warn(
-    `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. Refuses LIVE_PRODUCTION_D1_UUID; live adopt is Cloudflare name dolla-holla via bun run deploy -- --adopt.`
+    `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. Refuses LIVE_PRODUCTION_D1_UUID; live adopt is Cloudflare name dolla-holla via bun run alchemy:deploy:adopt.`
   );
   return {
     env: { DB: makeHttpD1Database(credentials) },

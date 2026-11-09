@@ -8,7 +8,7 @@
  * `bun run dev` after `panda:build`.
  *
  * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). Live
- * `dolla-holla` adopt is `bun run deploy -- --adopt`, not `alchemy dev`.
+ * `dolla-holla` adopt is `bun run alchemy:deploy:adopt`, not `alchemy dev`.
  * No custom domain.
  *
  * If Cloudflare credentials are missing, a gitignored local-only profile

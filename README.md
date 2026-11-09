@@ -11,7 +11,7 @@ A modern invoice management application built with SvelteKit 3 and Svelte 5, fea
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (required)
-- [Cloudflare](https://developers.cloudflare.com/) account (Workers + D1) for deploy; local D1 uses Alchemy’s local provider (`.alchemy/local/d1`) without a remote database. Worker name is `dollar-holler`. D1 name is preexisting `dolla-holla` (adopt by name on `bun run deploy -- --adopt`; not by UUID). No custom domain.
+- [Cloudflare](https://developers.cloudflare.com/) account (Workers + D1) for deploy; local D1 uses Alchemy’s local provider (`.alchemy/local/d1`) without a remote database. Worker name is `dollar-holler`. D1 name is preexisting `dolla-holla` (adopt by name on `bun run alchemy:deploy:adopt`; not by UUID). No custom domain.
 
 ## CI
 
@@ -104,6 +104,8 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run fonts:subset-money` - Rebuild Space Mono 400/700 woff2s (money glyphs only) and `src/lib/fonts/money/money.css`
 - `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (Worker `dollar-holler`, D1 `dolla-holla`; refuses `prod`)
 - `bun run deploy:project` - same Alchemy deploy
+- `bun run alchemy:deploy` - same as `deploy`
+- `bun run alchemy:deploy:adopt` - same as `alchemy:deploy` plus `--adopt` (rebind preexisting D1 `dolla-holla`)
 - `bun run alchemy:plan` - Local Alchemy plan with Varlock test env (never applies)
 - `bun run audit:deps` - `bun audit --prod --audit-level=moderate` (lint-staged + CI)
 - `bun run dedupe` - `bun dedupe` (lint-staged when `package.json` / `bun.lock` staged)
@@ -226,10 +228,10 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application deploys with `bun run deploy -- --adopt` (`package.json` `deploy` is `varlock run -- bun x alchemy deploy --stage dev`, so Bun prepends `node_modules/.bin`). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler` and D1 `dolla-holla`, binds `DB` on that database, and adopts the preexisting Cloudflare D1 of that name. Do not seed. There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
+The application deploys with `bun run alchemy:deploy:adopt` (`package.json` script is `varlock run -- bun x alchemy deploy --stage dev --adopt`, so Bun prepends `node_modules/.bin`). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler` and D1 `dolla-holla`, binds `DB` on that database, and adopts the preexisting Cloudflare D1 of that name. Do not seed. There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
 
 ```bash
-bun run deploy -- --adopt
+bun run alchemy:deploy:adopt
 ```
 
 - **Platform env:** `varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735). `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.

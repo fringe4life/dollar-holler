@@ -15,7 +15,10 @@
  * `dollar-hollar`, no `AdoptPolicy`, and no UUID adopt of
  * `LIVE_PRODUCTION_D1_UUID`. First live apply (not this PR) provisions
  * named D1 `dolla-holla`. Leftover empty Cloudflare D1s are out of this
- * graph. No custom domain (`dolla-holla.org` is not attached).
+ * graph. Custom domain is `dolla-holla.org` (same hostname Wrangler used
+ * before `alchemy deploy --adopt`). `workersDev` stays off. `ORIGIN` and
+ * `PUBLIC_BASE_URL` are `Cloudflare.Worker.URL` so they follow that host
+ * on deploy and the Vite URL under `alchemy dev`.
  *
  * Local `alchemy dev` / `db:migrate` use the local provider and persist
  * under `.alchemy/local/d1`. They do not call Cloudflare.
@@ -50,6 +53,12 @@ export const APP_NAME = "dollar-holler";
 /** Cloudflare D1 name. The only D1 resource Alchemy declares. */
 export const D1_NAME = "dolla-holla";
 
+/** Public hostname. Worker custom domain; Better Auth / Kit CSRF origin. */
+export const PUBLIC_SITE_HOST = "dolla-holla.org";
+
+/** Canonical public origin. */
+export const PUBLIC_SITE_URL = `https://${PUBLIC_SITE_HOST}`;
+
 /** Flattened SQL from `scripts/flatten-d1-migrations.ts`. Applied on Alchemy deploy and local Database reconcile. */
 export const D1_MIGRATIONS_DIR = "src/lib/server/db/d1";
 
@@ -73,13 +82,17 @@ export const Database = Cloudflare.D1.Database("Database", {
  * SvelteKit site. Compatibility date is `COMPATIBILITY_DATE`. No explicit
  * `nodejs_compat` flag (default-on at this date).
  * `BITWARDEN_ACCESS_TOKEN` is secret-zero for Varlock on the deploy
- * machine and is not a Worker binding. No `dolla-holla.org` route.
- * Worker `dollar-holler` stays that physical name. `env.DB` is Database.
- * Domain is still not attached.
+ * machine and is not a Worker binding. Worker `dollar-holler` stays
+ * that physical name. `env.DB` is Database. Custom domain is
+ * `PUBLIC_SITE_HOST` so cookies, CSRF, and Better Auth match
+ * https://dolla-holla.org/. Omitting `domain` after adopt left the
+ * Wrangler custom domain unmanaged and `Worker.URL` unset while
+ * `workersDev` was already false.
  */
 export const Website = Cloudflare.Website.SvelteKit("Website", {
   name: APP_NAME,
   workersDev: false,
+  domain: PUBLIC_SITE_HOST,
   dev: {
     host: "127.0.0.1",
     port: 5173,
@@ -92,8 +105,8 @@ export const Website = Cloudflare.Website.SvelteKit("Website", {
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     OGYGIA_SECRET: Config.Redacted("OGYGIA_SECRET"),
     SENTRY_AUTH_TOKEN: Config.Redacted("SENTRY_AUTH_TOKEN"),
-    PUBLIC_BASE_URL: Config.String("PUBLIC_BASE_URL"),
-    ORIGIN: Config.String("ORIGIN"),
+    PUBLIC_BASE_URL: Cloudflare.Worker.URL,
+    ORIGIN: Cloudflare.Worker.URL,
     VARLOCK_ENV: Config.String("VARLOCK_ENV"),
   },
 });

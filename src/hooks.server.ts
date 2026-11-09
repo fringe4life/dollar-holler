@@ -29,6 +29,14 @@ const localsHandler: Handle = async ({ event, resolve }) => {
     event.locals.user = result.user;
   }
 
+  // svelteKitHandler's isAuthPath compares request origin to string baseURL.
+  // Alchemy/Vite listen on 127.0.0.1 while PUBLIC_BASE_URL is localhost
+  // (and production Host is dolla-holla.org). Dispatch by path so Host
+  // twins still hit Better Auth instead of a Kit HTML 404.
+  if (event.url.pathname.startsWith("/api/auth")) {
+    return auth.handler(event.request);
+  }
+
   return svelteKitHandler({
     auth,
     building,

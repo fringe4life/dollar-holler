@@ -55,6 +55,8 @@ const createAuth = (env: {
     ],
     appName: "Dollar Holler",
     basePath: "/api/auth",
+    // String fallback for cookies; allowedHosts covers Host. svelteKitHandler
+    // still compares request origin to this string, so hooks dispatch `/api/auth`.
     baseURL: env.PUBLIC_BASE_URL,
     database: drizzleAdapter(db, {
       provider: "sqlite",
@@ -73,9 +75,13 @@ const createAuth = (env: {
         maxAge: 5 * 60,
       },
     },
-    trustedOrigins: twinOrigin
-      ? [env.PUBLIC_BASE_URL, twinOrigin]
-      : [env.PUBLIC_BASE_URL],
+    trustedOrigins: [
+      ...new Set([
+        env.PUBLIC_BASE_URL,
+        "https://dolla-holla.org",
+        ...(twinOrigin === undefined ? [] : [twinOrigin]),
+      ]),
+    ],
   });
 };
 

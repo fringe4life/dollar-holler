@@ -48,15 +48,25 @@ export const config = Config.all({
    */
   "SENTRY_AUTH_TOKEN": redactErrors(Config.map(Config.String("SENTRY_AUTH_TOKEN"), Redacted.make), "SENTRY_AUTH_TOKEN"),
   /**
-   * Optional. Needed for drizzle-kit studio/push against remote D1 (HTTP API).
+   * Remote D1 HTTP (db:seed:remote, db:migrate:remote, drizzle-kit studio/push).
+   * Varlock resolves these via Bitwarden; never commit the values. Local D1
+   * persist does not read them. Required outside VARLOCK_ENV=test so `varlock run`
+   * fails instead of injecting empty strings. .env.test supplies CI dummies.
+   * Bitwarden secret id 5b4a4abc-5174-4f51-b6ac-b482005cc07a — keep this schema key.
    * Docs: https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/ | Cloudflare account ID for D1 HTTP (drizzle-kit)
    */
   "CLOUDFLARE_ACCOUNT_ID": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_ACCOUNT_ID"), Redacted.make)), "CLOUDFLARE_ACCOUNT_ID"),
   /**
-   * Docs: https://developers.cloudflare.com/d1/get-started/ | D1 database UUID (wrangler d1 create / dashboard)
+   * Alchemy D1 named dolla-holla. Update the vault *value* of this secret to that
+   * database UUID after alchemy deploy. Never leftover 08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185.
+   * Bitwarden secret id f31e55fa-53d9-4232-a66f-b4a6002e5581 — schema key CLOUDFLARE_D1_DATABASE_ID.
+   * Docs: https://developers.cloudflare.com/d1/get-started/ | Alchemy D1 UUID for dolla-holla (Bitwarden; not committed)
    */
   "CLOUDFLARE_D1_DATABASE_ID": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_D1_DATABASE_ID"), Redacted.make)), "CLOUDFLARE_D1_DATABASE_ID"),
   /**
+   * Create a Secrets Manager item for a D1-edit API token, then set this line to
+   * bitwarden("<item-uuid>"). Do not put the token in git or chat. Stays optional
+   * so local alchemy dev can boot without Cloudflare; remote CLI still refuses empty.
    * Docs: https://developers.cloudflare.com/fundamentals/api/get-started/create-token/ | Cloudflare API token with D1 edit (drizzle-kit d1-http)
    */
   "CLOUDFLARE_API_TOKEN": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_API_TOKEN"), Redacted.make)), "CLOUDFLARE_API_TOKEN"),

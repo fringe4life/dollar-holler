@@ -14,6 +14,7 @@ import {
   assertRemoteD1DatabaseId,
   migrationSqlStatements,
   parseD1RawResults,
+  parseRemoteD1Credentials,
   serializeD1HttpQueryBody,
 } from "./alchemy-d1.ts";
 
@@ -27,6 +28,25 @@ describe("alchemy local D1", () => {
   it("refuses the live UUID for remote migrate and seed", () => {
     expect(() => assertRemoteD1DatabaseId(LIVE_PRODUCTION_D1_UUID)).toThrow(
       /Refusing D1 id of leftover database/
+    );
+    expect(() =>
+      parseRemoteD1Credentials({
+        accountId: "acct",
+        databaseId: LIVE_PRODUCTION_D1_UUID,
+        apiToken: "tok",
+      })
+    ).toThrow(/Refusing D1 id of leftover database/);
+  });
+
+  it("requires the three Varlock schema keys for remote D1", () => {
+    expect(() =>
+      parseRemoteD1Credentials({
+        accountId: "",
+        databaseId: "",
+        apiToken: "",
+      })
+    ).toThrow(
+      /CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_D1_DATABASE_ID, CLOUDFLARE_API_TOKEN/
     );
   });
 

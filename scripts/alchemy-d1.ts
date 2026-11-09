@@ -28,6 +28,7 @@ import * as Effect from "effect/Effect";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { homedir } from "node:os";
 import { join } from "node:path";
+import { ENV } from "varlock/env";
 import {
   APP_NAME,
   D1_MIGRATIONS_DIR,
@@ -139,10 +140,36 @@ const openLocalAlchemyD1 = async () => {
   });
 };
 
-type RemoteD1Credentials = {
+export type RemoteD1Credentials = {
   accountId: string;
   databaseId: string;
   apiToken: string;
+};
+
+const schemaEnvString = (value: unknown): string =>
+  typeof value === "string" ? value.trim() : "";
+
+/** Remote D1 HTTP creds from Varlock schema keys (Bitwarden). No UUID in git. */
+export const parseRemoteD1Credentials = (source: {
+  accountId: string;
+  databaseId: string;
+  apiToken: string;
+}): RemoteD1Credentials => {
+  const accountId = source.accountId.trim();
+  const databaseId = source.databaseId.trim();
+  const apiToken = source.apiToken.trim();
+  const missing = [
+    accountId.length === 0 ? "CLOUDFLARE_ACCOUNT_ID" : undefined,
+    databaseId.length === 0 ? "CLOUDFLARE_D1_DATABASE_ID" : undefined,
+    apiToken.length === 0 ? "CLOUDFLARE_API_TOKEN" : undefined,
+  ].filter((key): key is string => key !== undefined);
+  if (missing.length > 0) {
+    throw new Error(
+      `Remote D1 needs ${missing.join(", ")} from the Varlock schema (Bitwarden or documented @required items). Update schema key CLOUDFLARE_D1_DATABASE_ID / Bitwarden secret f31e55fa-53d9-4232-a66f-b4a6002e5581 to the Alchemy D1 named dolla-holla. Set CLOUDFLARE_API_TOKEN=bitwarden("<item-uuid>") after creating that secret. No database id is committed. Never leftover UUID 08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185.`
+    );
+  }
+  assertRemoteD1DatabaseId(databaseId);
+  return { accountId, databaseId, apiToken };
 };
 
 type D1HttpQueryBody =
@@ -343,27 +370,32 @@ const makeHttpD1Database = (credentials: RemoteD1Credentials): D1Database => {
   } as unknown as D1Database;
 };
 
-const readRemoteD1Credentials = (): RemoteD1Credentials => {
-  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? "";
-  const databaseId = process.env.CLOUDFLARE_D1_DATABASE_ID?.trim() ?? "";
-  const apiToken = process.env.CLOUDFLARE_API_TOKEN?.trim() ?? "";
-  if (
-    accountId.length === 0 ||
-    databaseId.length === 0 ||
-    apiToken.length === 0
-  ) {
+const requireVarlock = (command: string): void => {
+  if (process.env.__VARLOCK_RUN !== "1") {
     throw new Error(
-      "Remote D1 needs CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_D1_DATABASE_ID, and CLOUDFLARE_API_TOKEN from Varlock. No database id is committed."
+      `${command} requires \`varlock run\` so alchemy.run.ts Config sees the schema (__VARLOCK_RUN is unset).`
     );
   }
-  assertRemoteD1DatabaseId(databaseId);
-  return { accountId, databaseId, apiToken };
 };
+
+const readRemoteD1Credentials = (): RemoteD1Credentials =>
+  parseRemoteD1Credentials({
+    accountId:
+      schemaEnvString(ENV.CLOUDFLARE_ACCOUNT_ID) ||
+      (process.env.CLOUDFLARE_ACCOUNT_ID?.trim() ?? ""),
+    databaseId:
+      schemaEnvString(ENV.CLOUDFLARE_D1_DATABASE_ID) ||
+      (process.env.CLOUDFLARE_D1_DATABASE_ID?.trim() ?? ""),
+    apiToken:
+      schemaEnvString(ENV.CLOUDFLARE_API_TOKEN) ||
+      (process.env.CLOUDFLARE_API_TOKEN?.trim() ?? ""),
+  });
 
 const openRemoteAlchemyD1 = (): {
   env: { DB: D1Database };
   dispose: () => Promise<void>;
 } => {
+  requireVarlock("db:seed:remote");
   const credentials = readRemoteD1Credentials();
   console.warn(
     `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. Refuses LIVE_PRODUCTION_D1_UUID. Alchemy D1 name is dolla-holla (no adopt).`
@@ -426,14 +458,6 @@ const makeHttpMigrationExecutor = (
       });
     },
   });
-
-const requireVarlock = (command: string): void => {
-  if (process.env.__VARLOCK_RUN !== "1") {
-    throw new Error(
-      `${command} requires \`varlock run\` so alchemy.run.ts Config sees the schema (__VARLOCK_RUN is unset).`
-    );
-  }
-};
 
 const makeD1BindingMigrationExecutor = (d1: D1Database): SqlExecutor =>
   makeSqlExecutor({

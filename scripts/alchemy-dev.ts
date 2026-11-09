@@ -2,13 +2,13 @@
  * Local `alchemy dev` so Vite SSR gets Cloudflare bindings.
  *
  * Exact command:
- *   bun run panda:build && varlock run -- bun x alchemy dev --stage dev
+ *   bun run panda:build && bun x varlock run -- bun x alchemy dev --stage dev
  *
  * `bun vite dev` alone is Node SSR with no Worker env. This wrapper is
  * `bun run dev` after `panda:build`.
  *
- * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). Live
- * `dolla-holla` adopt is `bun run alchemy:deploy:adopt`, not `alchemy dev`.
+ * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). Live D1
+ * `dolla-holla` is `bun run alchemy:deploy`, not `alchemy dev`. No adopt.
  * No custom domain.
  *
  * If Cloudflare credentials are missing, a gitignored local-only profile
@@ -20,7 +20,7 @@ import { LIVE_PRODUCTION_D1_UUID } from "../alchemy.run.ts";
 import { ensureLocalAlchemyProfile } from "./alchemy-d1.ts";
 
 export const ALCHEMY_DEV_COMMAND =
-  "bun run panda:build && varlock run -- bun x alchemy dev --stage dev";
+  "bun run panda:build && bun x varlock run -- bun x alchemy dev --stage dev";
 
 if (process.env.__VARLOCK_RUN !== "1") {
   console.error(

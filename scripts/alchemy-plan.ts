@@ -6,7 +6,7 @@
  * A Cloudflare HTTP request aborts the process.
  *
  * Run: `bun run alchemy:plan`
- * (`VARLOCK_ENV=test varlock run -- bun ./scripts/alchemy-plan.ts`).
+ * (`VARLOCK_ENV=test bun x varlock run -- bun ./scripts/alchemy-plan.ts`).
  */
 import { mkdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";

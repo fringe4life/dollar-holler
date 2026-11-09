@@ -11,8 +11,11 @@
  * Worker physical name is `dollar-holler`. D1 physical name is
  * `dolla-holla` (preexisting UUID `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`).
  * Alchemy matches Cloudflare D1 by that name (`AdoptPolicy.adopt(true)`);
- * it cannot adopt by UUID. `Website.env.DB` binds this Database. An empty
- * D1 named `dollar-holler` is not declared. No custom domain
+ * it cannot adopt by UUID. `Website.env.DB` binds this Database. This
+ * resource does not set `migrations:` so adopt/rebind does not replay SQL
+ * onto live data. `RemovalPolicy.retain()` so a name-change replace (state
+ * still pointing at empty `dollar-holler` D1) does not delete either
+ * database. Empty `dollar-holler` D1 is not declared. No custom domain
  * (`dolla-holla.org` is not attached).
  *
  * Local `alchemy dev` / `db:migrate` use the local provider and persist
@@ -51,7 +54,10 @@ export const APP_NAME = "dollar-holler";
  */
 export const D1_NAME = "dolla-holla";
 
-/** Flattened SQL from `scripts/flatten-d1-migrations.ts`. Applied on Alchemy deploy and local Database reconcile. */
+/**
+ * Flattened SQL from `scripts/flatten-d1-migrations.ts`. Used by local
+ * `db:migrate` scripts. Not passed on the live Database resource.
+ */
 export const D1_MIGRATIONS_DIR = "src/lib/server/db/d1";
 
 /**
@@ -61,14 +67,14 @@ export const D1_MIGRATIONS_DIR = "src/lib/server/db/d1";
 export const LIVE_PRODUCTION_D1_UUID = "08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185";
 
 /**
- * App D1 `dolla-holla`. Local `alchemy dev` uses the local provider
- * (persist under `.alchemy/local/d1`). Live apply looks up this name and
- * adopts UUID `LIVE_PRODUCTION_D1_UUID`. No custom domain.
+ * App D1 `dolla-holla`. Live apply looks up this name and adopts
+ * `LIVE_PRODUCTION_D1_UUID`. No `migrations:` (do not CREATE TABLE on
+ * populated dolla-holla). Retain physical D1s if Alchemy replaces the
+ * previous empty `dollar-holler` generation. No custom domain.
  */
 export const Database = Cloudflare.D1.Database("Database", {
   name: D1_NAME,
-  migrations: D1_MIGRATIONS_DIR,
-}).pipe(Alchemy.AdoptPolicy.adopt(true));
+}).pipe(Alchemy.AdoptPolicy.adopt(true), Alchemy.RemovalPolicy.retain());
 
 /**
  * SvelteKit site. Compatibility date is `COMPATIBILITY_DATE`. No explicit

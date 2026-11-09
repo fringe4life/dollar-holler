@@ -8,6 +8,7 @@ import {
   resetPasswordSchema,
   signupSchema,
 } from "#features/auth/schemas.ts";
+import { authApiHeaders } from "#features/auth/auth-request-headers.ts";
 import { getAuth } from "#lib/auth.server.ts";
 import { tryCatch } from "#lib/utils/try-catch.ts";
 
@@ -37,7 +38,7 @@ export const login = form(loginSchema, async (data) => {
         email: data.email,
         password: data._password,
       },
-      headers: request.headers,
+      headers: authApiHeaders(request),
     })
   );
 
@@ -58,19 +59,15 @@ export const signup = form(signupSchema, async (data) => {
         name: data.name,
         password: data._password,
       },
-      headers: request.headers,
+      headers: authApiHeaders(request),
     })
   );
 
-  if (!result?.user) {
+  if (error || !result?.user) {
     invalid("Signup failed");
   }
 
-  if (error) {
-    invalid("Something went wrong please try again later");
-  }
-
-  redirect(303, resolve("login"));
+  redirect(303, resolve("invoices"));
 }).preflight(signupSchema);
 
 export const forgotPassword = form(forgotPasswordSchema, async (data) => {
@@ -79,7 +76,7 @@ export const forgotPassword = form(forgotPasswordSchema, async (data) => {
   const { data: passwordReset, error } = await tryCatch(() =>
     getAuth().api.requestPasswordReset({
       body: { email: data.email },
-      headers: request.headers,
+      headers: authApiHeaders(request),
     })
   );
 
@@ -99,7 +96,7 @@ export const resetPassword = form(resetPasswordSchema, async (data) => {
         newPassword: data._newPassword,
         token: data.token,
       },
-      headers: request.headers,
+      headers: authApiHeaders(request),
     })
   );
 
@@ -113,7 +110,7 @@ export const resetPassword = form(resetPasswordSchema, async (data) => {
 export const logout = form(async () => {
   const { request } = getRequestEvent();
   const { error } = await tryCatch(() =>
-    getAuth().api.signOut({ headers: request.headers })
+    getAuth().api.signOut({ headers: authApiHeaders(request) })
   );
   if (error) {
     invalid("Logout failed");
@@ -130,7 +127,7 @@ export const changePassword = form(changePasswordSchema, async (data) => {
         currentPassword: data._currentPassword,
         newPassword: data._newPassword,
       },
-      headers: request.headers,
+      headers: authApiHeaders(request),
     })
   );
 

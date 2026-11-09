@@ -102,9 +102,9 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run oracle:sql-list` - Check those SQL shapes against the golden oracle
 - `bun run oracle:sql-list:write` - Rewrite the sql-list oracle golden fixture
 - `bun run fonts:subset-money` - Rebuild Space Mono 400/700 woff2s (money glyphs only) and `src/lib/fonts/money/money.css`
-- `bun run deploy` - `bun x varlock run -- bun x alchemy deploy --stage dev` (Worker `dollar-holler`, one D1 `dolla-holla`; refuses `prod`)
+- `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (Worker `dollar-holler`, one D1 `dolla-holla`; refuses `prod`)
 - `bun run deploy:project` - same Alchemy deploy
-- `bun run alchemy:deploy` - same as `deploy` (`bun x varlock` so `varlock` need not be on PATH)
+- `bun run alchemy:deploy` - same as `deploy` (`bun run` puts local `varlock` on PATH)
 - `bun run alchemy:plan` - Local Alchemy plan with Varlock test env (never applies)
 - `bun run audit:deps` - `bun audit --prod --audit-level=moderate` (lint-staged + CI)
 - `bun run dedupe` - `bun dedupe` (lint-staged when `package.json` / `bun.lock` staged)
@@ -227,13 +227,13 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application deploys with `bun run alchemy:deploy` (`package.json` uses `bun x varlock run -- bun x alchemy deploy --stage dev`, so `varlock` need not be on PATH). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler` and declares one `Cloudflare.D1.Database` with Cloudflare name `dolla-holla`. `Website.env.DB` binds that resource. There is no `AdoptPolicy`, no second D1 named `dollar-holler` or `dollar-hollar`, and leftover UUID `08d44dec-…` is not adopted. Empty extra Cloudflare D1s are out of this graph (delete them in the dashboard if you still have them). Custom domain is `dolla-holla.org`. `PUBLIC_BASE_URL` and `ORIGIN` on the Worker are `Cloudflare.Worker.URL` (that hostname on deploy; Vite URL under `alchemy dev`). Varlock does not upload `__VARLOCK_ENV` on this path.
+The application deploys with `bun run alchemy:deploy` (`package.json` uses `varlock run -- bun x alchemy deploy --stage dev`; `bun run` puts `node_modules/.bin` on PATH, so nested `bun x varlock` is not used). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler` and declares one `Cloudflare.D1.Database` with Cloudflare name `dolla-holla`. `Website.env.DB` binds that resource. There is no `AdoptPolicy`, no second D1 named `dollar-holler` or `dollar-hollar`, and leftover UUID `08d44dec-…` is not adopted. Empty extra Cloudflare D1s are out of this graph (delete them in the dashboard if you still have them). Custom domain is `dolla-holla.org`. `PUBLIC_BASE_URL` and `ORIGIN` on the Worker are `Cloudflare.Worker.URL` (that hostname on deploy; Vite URL under `alchemy dev`). Varlock does not upload `__VARLOCK_ENV` on this path.
 
 ```bash
 bun run alchemy:deploy
 ```
 
-- **Platform env:** `bun x varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735). `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.
+- **Platform env:** `varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735). `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.
 
 ## Notes
 

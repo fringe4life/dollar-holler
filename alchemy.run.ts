@@ -2,8 +2,9 @@
  * Alchemy deploy graph for the SvelteKit Worker.
  *
  * `bun run alchemy:deploy` is
- * `bun x varlock run -- bun x alchemy deploy --stage dev` (no PATH
- * `varlock`). Varlock resolves `.env.schema` into `process.env`. The
+ * `varlock run -- bun x alchemy deploy --stage dev` (`bun run` puts
+ * `node_modules/.bin` on PATH; nested `bun x varlock` breaks Varlock).
+ * Varlock resolves `.env.schema` into `process.env`. The
  * `env` block below binds those values on the Worker (`Config.Redacted`
  * → `secret_text`, `Config.String` → plain text). There is no
  * `__VARLOCK_ENV` binding: Varlock does not yet build one for
@@ -13,8 +14,9 @@
  * D1: logical `Database`, Cloudflare name `dolla-holla`. `Website.env.DB`
  * binds that resource. There is no second D1 named `dollar-holler` or
  * `dollar-hollar`, no `AdoptPolicy`, and no UUID adopt of
- * `LIVE_PRODUCTION_D1_UUID`. First live apply (not this PR) provisions
- * named D1 `dolla-holla`. Leftover empty Cloudflare D1s are out of this
+ * `LIVE_PRODUCTION_D1_UUID`. Cloudflare already has named D1
+ * `dolla-holla`; a later `alchemy:deploy` binds the Worker to it. Do not
+ * create another D1. Leftover empty Cloudflare D1s are out of this
  * graph. Custom domain is `dolla-holla.org` (same hostname Wrangler used
  * before `alchemy deploy --adopt`). `workersDev` stays off. `ORIGIN` and
  * `PUBLIC_BASE_URL` are `Cloudflare.Worker.URL` so they follow that host
@@ -70,8 +72,8 @@ export const LIVE_PRODUCTION_D1_UUID = "08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185";
 
 /**
  * App D1 `dolla-holla`. Local `alchemy dev` uses the local provider
- * (persist under `.alchemy/local/d1`). First live apply (not this PR)
- * provisions the named database. No adopt, no UUID.
+ * (persist under `.alchemy/local/d1`). Live named D1 already exists;
+ * do not declare a second database. No adopt, no UUID.
  */
 export const Database = Cloudflare.D1.Database("Database", {
   name: D1_NAME,

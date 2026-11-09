@@ -11,7 +11,7 @@ A modern invoice management application built with SvelteKit 3 and Svelte 5, fea
 ## Prerequisites
 
 - [Bun](https://bun.sh/) (required)
-- [Cloudflare](https://developers.cloudflare.com/) account (Workers + D1) for deploy; local D1 uses Alchemy’s local provider (`.alchemy/local/d1`) without a remote database. Worker and D1 names are `dollar-holler`. This beta cannot adopt an existing D1 by UUID; the first real `alchemy deploy` provisions D1 named `dollar-holler`. No custom domain.
+- [Cloudflare](https://developers.cloudflare.com/) account (Workers + D1) for deploy; local D1 uses Alchemy’s local provider (`.alchemy/local/d1`) without a remote database. Worker name is `dollar-holler`. D1 name is preexisting `dolla-holla` (adopt by name on `bun run alchemy:deploy:adopt`; not by UUID). No custom domain.
 
 ## CI
 
@@ -36,7 +36,7 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 
    The app resolves configuration from Varlock (`import { ENV } from "varlock/env"`) for Drizzle Kit ([`drizzle.config.ts`](./drizzle.config.ts)) and auth ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Runtime D1 uses Alchemy/Kit `platform.env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)), not env URLs. Bare `vite dev` does not inject that binding.
 
-3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` reconciles `Cloudflare.D1.Database` locally (Alchemy `migrations:`, persist `.alchemy/local/d1`). Remote apply uses the D1 HTTP API and `CLOUDFLARE_D1_DATABASE_ID` from Varlock, and exits 1 if that id is the live UUID `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Site deploy is Alchemy (`alchemy.run.ts`); the first live apply provisions D1 named `dollar-holler` (this beta cannot adopt by UUID).
+3. **Set up the database:** Drizzle Kit generates SQL under `./src/lib/server/db/migrations`; [`scripts/flatten-d1-migrations.ts`](./scripts/flatten-d1-migrations.ts) copies those into numbered files under `./src/lib/server/db/d1`. `bun run db:migrate` applies those files locally (persist `.alchemy/local/d1`). Remote apply uses the D1 HTTP API and `CLOUDFLARE_D1_DATABASE_ID` from Varlock, and exits 1 if that id is the live UUID `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Site deploy is Alchemy (`alchemy.run.ts`); live D1 is preexisting `dolla-holla` (adopt by Cloudflare name, not UUID). Do not `db:seed:remote` or `db:migrate:remote` that database.
 
    ```bash
    # Generate Drizzle migrations and flatten for Alchemy D1
@@ -102,8 +102,10 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run oracle:sql-list` - Check those SQL shapes against the golden oracle
 - `bun run oracle:sql-list:write` - Rewrite the sql-list oracle golden fixture
 - `bun run fonts:subset-money` - Rebuild Space Mono 400/700 woff2s (money glyphs only) and `src/lib/fonts/money/money.css`
-- `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (Worker + D1 named `dollar-holler`; refuses `prod`)
+- `bun run deploy` - `varlock run -- bun x alchemy deploy --stage dev` (Worker `dollar-holler`, D1 `dolla-holla`; refuses `prod`)
 - `bun run deploy:project` - same Alchemy deploy
+- `bun run alchemy:deploy` - same as `deploy`
+- `bun run alchemy:deploy:adopt` - same as `alchemy:deploy` plus `--adopt` (rebind preexisting D1 `dolla-holla`)
 - `bun run alchemy:plan` - Local Alchemy plan with Varlock test env (never applies)
 - `bun run audit:deps` - `bun audit --prod --audit-level=moderate` (lint-staged + CI)
 - `bun run dedupe` - `bun dedupe` (lint-staged when `package.json` / `bun.lock` staged)
@@ -226,10 +228,10 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application deploys with `varlock run -- bun x alchemy deploy --stage dev`. [`alchemy.run.ts`](./alchemy.run.ts) names the Worker and D1 `dollar-holler` and binds `DB` on that database. This Alchemy beta cannot adopt an existing D1 by UUID, so the first real apply provisions D1 named `dollar-holler` (seed data is replaceable). There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
+The application deploys with `bun run alchemy:deploy:adopt` (`package.json` script is `varlock run -- bun x alchemy deploy --stage dev --adopt`, so Bun prepends `node_modules/.bin`). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler`. Live D1 is logical id `DollaHolla` (Cloudflare name `dolla-holla`); `Website.env.DB` binds that resource. Existing logical `Database` stays in the stack as empty `dollar-holler` with `RemovalPolicy.retain()` so Alchemy does not delete it, and so leftover `Database` state cannot block adopt-by-name. Neither D1 sets `migrations:` (adopt does not replay SQL). Do not seed, migrate, or destroy `dolla-holla`. There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
 
 ```bash
-bun run deploy
+bun run alchemy:deploy:adopt
 ```
 
 - **Platform env:** `varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735). `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.

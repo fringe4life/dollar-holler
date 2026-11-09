@@ -87,10 +87,11 @@ export default defineConfig(({ mode }) => ({
     svelteDevtools(),
     DevTools(),
     devToolsJson(),
-    // Cloudflare adapter detected → runtime loader via @varlock/cloudflare-integration
-    // (do not force ssrInjectMode: "resolved-env"; plugin rejects that on CF builds).
+    // Alchemy adapter is not `@sveltejs/adapter-cloudflare`, so this stays
+    // init-only (no baked resolved-env, no `__VARLOCK_ENV` loader).
     varlockVitePlugin(),
-    // After varlock so `\0varlock-ssr-init` exists; restores UA guard (see script).
+    // After varlock so `\0varlock-ssr-init` exists: UA guard + skip Worker
+    // init when there is no env blob (Alchemy `varlock run` on the host).
     varlockSsrUaGuard(),
     sentrySvelteKit({
       // Dummy .env.test token must not upload or fail CI builds (#148).

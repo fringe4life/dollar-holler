@@ -233,7 +233,7 @@ The application deploys with `bun run alchemy:deploy` (`package.json` uses `varl
 bun run alchemy:deploy
 ```
 
-- **Platform env:** `varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735). `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.
+- **Platform env:** `varlock run` puts resolved schema values in `process.env`. Alchemy binds `Config.Redacted` as secrets and `Config.String` as plain vars. There is no `__VARLOCK_ENV` binding until [varlock#735](https://github.com/dmno-dev/varlock/issues/735); Worker boot skips in-worker Varlock init when that blob is absent. `BITWARDEN_ACCESS_TOKEN` stays on the deploy machine. PR CI uses `VARLOCK_ENV=test` + [`.env.test`](./.env.test) only.
 
 ## Notes
 

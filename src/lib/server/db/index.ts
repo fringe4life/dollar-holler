@@ -26,7 +26,7 @@ export const getDb = (): AppDatabase => {
   const d1 = tryGetD1();
   if (!d1) {
     throw new Error(
-      "D1 binding DB missing from platform.env. Use `bun run dev` (`varlock run -- bun x alchemy dev --stage dev`), not bare `vite dev`. Local persist is `.alchemy/local/d1`."
+      "D1 binding DB missing from platform.env. Use `bun run dev` (`bun x varlock run -- bun x alchemy dev --stage dev`), not bare `vite dev`. Local persist is `.alchemy/local/d1`."
     );
   }
   const cached = cache.get(d1);

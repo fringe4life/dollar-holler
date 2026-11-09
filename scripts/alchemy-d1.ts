@@ -5,8 +5,8 @@
  * binds). Remote uses the Cloudflare D1 HTTP API against
  * `CLOUDFLARE_D1_DATABASE_ID`, and refuses live UUID
  * `LIVE_PRODUCTION_D1_UUID` (`08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`)
- * (`db:seed:remote` / `db:migrate:remote` exit 1). Alchemy live adopt is
- * by D1 name `dolla-holla` in `alchemy.run.ts`, not this CLI.
+ * (`db:seed:remote` / `db:migrate:remote` exit 1). Alchemy declares one
+ * D1 named `dolla-holla` and does not adopt that UUID.
  */
 import { D1 } from "@alchemy.run/cloudflare-runtime/core/bindings";
 import { getPlatformProxy } from "@alchemy.run/cloudflare-runtime/core/platform-proxy";
@@ -60,7 +60,7 @@ export const assertLocalSimulatorD1Id = (databaseId: string): void => {
 export const assertRemoteD1DatabaseId = (databaseId: string): void => {
   if (databaseId === LIVE_PRODUCTION_D1_UUID) {
     throw new Error(
-      "Refusing D1 id of live database dolla-holla (LIVE_PRODUCTION_D1_UUID). Use bun run alchemy:deploy:adopt, not db:seed:remote / db:migrate:remote."
+      "Refusing D1 id of leftover database 08d44dec (LIVE_PRODUCTION_D1_UUID). Alchemy does not adopt it. Point CLOUDFLARE_D1_DATABASE_ID at the Alchemy-managed D1 named dolla-holla."
     );
   }
 };
@@ -366,7 +366,7 @@ const openRemoteAlchemyD1 = (): {
 } => {
   const credentials = readRemoteD1Credentials();
   console.warn(
-    `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. Refuses LIVE_PRODUCTION_D1_UUID; live adopt is Cloudflare name dolla-holla via bun run alchemy:deploy:adopt.`
+    `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. Refuses LIVE_PRODUCTION_D1_UUID. Alchemy D1 name is dolla-holla (no adopt).`
   );
   return {
     env: { DB: makeHttpD1Database(credentials) },

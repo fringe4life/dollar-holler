@@ -8,15 +8,15 @@
  * Varlock does not yet build one for non-Wrangler deploys
  * (https://github.com/dmno-dev/varlock/issues/735).
  *
- * Worker physical name is `dollar-holler`. D1 physical name is
- * `dolla-holla` (preexisting UUID `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`).
- * Alchemy matches Cloudflare D1 by that name (`AdoptPolicy.adopt(true)`);
- * it cannot adopt by UUID. `Website.env.DB` binds this Database. This
- * resource does not set `migrations:` so adopt/rebind does not replay SQL
- * onto live data. `RemovalPolicy.retain()` so a name-change replace (state
- * still pointing at empty `dollar-holler` D1) does not delete either
- * database. Empty `dollar-holler` D1 is not declared. No custom domain
- * (`dolla-holla.org` is not attached).
+ * Worker physical name is `dollar-holler`. Live D1 is preexisting
+ * `dolla-holla` (`08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`), adopted by
+ * Cloudflare name on a new logical id (`DollaHolla`) so existing
+ * `Database` state (empty `dollar-holler` D1) cannot block name lookup.
+ * `Website.env.DB` binds `DollaHolla`. Neither D1 resource sets
+ * `migrations:`. Both use `RemovalPolicy.retain()`. Logical `Database`
+ * stays in the stack (name `dollar-holler`) so Alchemy does not orphan-
+ * delete the empty D1. No custom domain (`dolla-holla.org` is not
+ * attached).
  *
  * Local `alchemy dev` / `db:migrate` use the local provider and persist
  * under `.alchemy/local/d1`. They do not call Cloudflare.
@@ -54,25 +54,36 @@ export const APP_NAME = "dollar-holler";
  */
 export const D1_NAME = "dolla-holla";
 
+/** Logical id for the live D1 resource (fresh adopt-by-name). */
+export const DOLLA_HOLLA_LOGICAL_ID = "DollaHolla";
+
 /**
  * Flattened SQL from `scripts/flatten-d1-migrations.ts`. Used by local
- * `db:migrate` scripts. Not passed on the live Database resource.
+ * `db:migrate` scripts. Not passed on either D1 resource.
  */
 export const D1_MIGRATIONS_DIR = "src/lib/server/db/d1";
 
 /**
- * Preexisting live D1 UUID for `dolla-holla`. Not passed on the Database
+ * Preexisting live D1 UUID for `dolla-holla`. Not passed on the D1
  * resource (adopt is by Cloudflare name). Seed/migrate CLI still refuses it.
  */
 export const LIVE_PRODUCTION_D1_UUID = "08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185";
 
 /**
- * App D1 `dolla-holla`. Live apply looks up this name and adopts
- * `LIVE_PRODUCTION_D1_UUID`. No `migrations:` (do not CREATE TABLE on
- * populated dolla-holla). Retain physical D1s if Alchemy replaces the
- * previous empty `dollar-holler` generation. No custom domain.
+ * Empty D1 Alchemy already created as `dollar-holler`. Same logical id as
+ * #302 state. Retain so it is not deleted when live data moves to
+ * `DollaHolla`. No `migrations:`.
  */
 export const Database = Cloudflare.D1.Database("Database", {
+  name: APP_NAME,
+}).pipe(Alchemy.RemovalPolicy.retain());
+
+/**
+ * Preexisting live `dolla-holla`. New logical id so adopt is a name
+ * lookup (no prior state on this id). No `migrations:`. Retain so destroy
+ * does not wipe production data.
+ */
+export const DollaHolla = Cloudflare.D1.Database(DOLLA_HOLLA_LOGICAL_ID, {
   name: D1_NAME,
 }).pipe(Alchemy.AdoptPolicy.adopt(true), Alchemy.RemovalPolicy.retain());
 
@@ -81,8 +92,8 @@ export const Database = Cloudflare.D1.Database("Database", {
  * `nodejs_compat` flag (default-on at this date).
  * `BITWARDEN_ACCESS_TOKEN` is secret-zero for Varlock on the deploy
  * machine and is not a Worker binding. No `dolla-holla.org` route.
- * Worker `dollar-holler` stays that physical name. `env.DB` is Database
- * (`dolla-holla`). Domain is still not attached.
+ * Worker `dollar-holler` stays that physical name. `env.DB` is DollaHolla.
+ * Domain is still not attached.
  */
 export const Website = Cloudflare.Website.SvelteKit("Website", {
   name: APP_NAME,
@@ -95,7 +106,7 @@ export const Website = Cloudflare.Website.SvelteKit("Website", {
     date: COMPATIBILITY_DATE,
   },
   env: {
-    DB: Database,
+    DB: DollaHolla,
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     OGYGIA_SECRET: Config.Redacted("OGYGIA_SECRET"),
     SENTRY_AUTH_TOKEN: Config.Redacted("SENTRY_AUTH_TOKEN"),
@@ -118,10 +129,11 @@ export default Alchemy.Stack(
     if (FORBIDDEN_STAGES.has(stage)) {
       return yield* Effect.die(
         new Error(
-          `alchemy stack refuses stage "${stage}". Deploy with --stage dev. Worker name stays ${APP_NAME}; D1 name stays ${D1_NAME}.`
+          `alchemy stack refuses stage "${stage}". Deploy with --stage dev. Worker name stays ${APP_NAME}; live D1 name stays ${D1_NAME}.`
         )
       );
     }
+    yield* Database;
     const site = yield* Website;
     return { url: site.url };
   })

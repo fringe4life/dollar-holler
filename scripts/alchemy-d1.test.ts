@@ -1,5 +1,10 @@
 import { describe, expect, it } from "bun:test";
-import { APP_NAME, D1_NAME, LIVE_PRODUCTION_D1_UUID } from "../alchemy.run.ts";
+import {
+  APP_NAME,
+  D1_NAME,
+  DOLLA_HOLLA_LOGICAL_ID,
+  LIVE_PRODUCTION_D1_UUID,
+} from "../alchemy.run.ts";
 import {
   alchemyDatabaseStatePath,
   ALCHEMY_LOCAL_PERSIST_DIR,
@@ -26,6 +31,7 @@ describe("alchemy local D1", () => {
   it("keeps simulator persist under .alchemy/local", () => {
     expect(APP_NAME).toBe("dollar-holler");
     expect(D1_NAME).toBe("dolla-holla");
+    expect(DOLLA_HOLLA_LOGICAL_ID).toBe("DollaHolla");
     expect(ALCHEMY_LOCAL_PERSIST_DIR.endsWith(".alchemy/local")).toBe(true);
     expect(alchemyDatabaseStatePath()).toContain(APP_NAME);
     expect(alchemyDatabaseStatePath()).toContain("Database.json");

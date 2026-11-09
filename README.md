@@ -228,7 +228,7 @@ The application uses Drizzle's relations v2 (`defineRelations`) to simplify nest
 
 ## Deployment
 
-The application deploys with `bun run alchemy:deploy:adopt` (`package.json` script is `varlock run -- bun x alchemy deploy --stage dev --adopt`, so Bun prepends `node_modules/.bin`). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler` and D1 `dolla-holla`, binds `DB` on that database, and adopts the preexisting Cloudflare D1 of that name. The Database resource has no `migrations:` (adopt does not replay SQL). `RemovalPolicy.retain()` keeps Cloudflare D1s if Alchemy replaces a previously tracked empty `dollar-holler` database. Do not seed, migrate, or destroy `dolla-holla`. There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
+The application deploys with `bun run alchemy:deploy:adopt` (`package.json` script is `varlock run -- bun x alchemy deploy --stage dev --adopt`, so Bun prepends `node_modules/.bin`). [`alchemy.run.ts`](./alchemy.run.ts) names the Worker `dollar-holler`. Live D1 is logical id `DollaHolla` (Cloudflare name `dolla-holla`); `Website.env.DB` binds that resource. Existing logical `Database` stays in the stack as empty `dollar-holler` with `RemovalPolicy.retain()` so Alchemy does not delete it, and so leftover `Database` state cannot block adopt-by-name. Neither D1 sets `migrations:` (adopt does not replay SQL). Do not seed, migrate, or destroy `dolla-holla`. There is no custom domain (`dolla-holla.org` is not attached). Varlock does not upload `__VARLOCK_ENV` on this path.
 
 ```bash
 bun run alchemy:deploy:adopt

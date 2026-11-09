@@ -6,9 +6,9 @@
  * `node_modules/.bin` on PATH; nested `bun x varlock` breaks Varlock).
  * Varlock resolves `.env.schema` into `process.env`. The
  * `env` block below binds those values on the Worker (`Config.Redacted`
- * → `secret_text`, `Config.String` → plain text). There is no
- * `__VARLOCK_ENV` binding: Varlock does not yet build one for
- * non-Wrangler deploys (https://github.com/dmno-dev/varlock/issues/735).
+ * → `secret_text`, `Config.String` → plain text). Community Alchemy path
+ * until `@varlock/alchemy-integration`: no Vite Varlock plugin, no
+ * `__VARLOCK_ENV` blob (https://github.com/dmno-dev/varlock/issues/735).
  *
  * Worker physical name is `dollar-holler`. Alchemy manages exactly one
  * D1: logical `Database`, Cloudflare name `dolla-holla`. `Website.env.DB`

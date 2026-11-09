@@ -8,10 +8,9 @@
  * `.svelte-kit/output/client` (what BundleWatch measures) plus
  * `.svelte-kit/cloudflare`.
  *
- * Alchemy's adapter is not `@sveltejs/adapter-cloudflare`, so Varlock does
- * not inject the `__VARLOCK_ENV` loader. Deploy is host `varlock run` plus
- * Worker bindings (varlock#735). In-worker init is skipped when the blob
- * is absent.
+ * Deploy is host `varlock run` plus Alchemy Worker bindings. There is no
+ * Varlock Vite plugin and no `__VARLOCK_ENV` blob (varlock#735 / community
+ * Alchemy path until `@varlock/alchemy-integration`).
  *
  * This process is the Bun host (`bun run build`). `@effect/platform-bun` is
  * only the FileSystem/Path layer for that host. The deployed Worker is

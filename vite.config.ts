@@ -7,7 +7,6 @@ import { FontaineTransform } from "fontaine";
 import { devtools as ogygiaDevtools } from "@ogygia/devtools/vite";
 import { ogygia } from "ogygia/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
-import { varlockVitePlugin } from "@varlock/vite-integration";
 import { DevTools } from "@vitejs/devtools";
 import { visualizer } from "rollup-plugin-visualizer";
 import { svelteSitemap } from "svelte-sitemap/vite";
@@ -17,7 +16,6 @@ import { svelteDevtools } from "vite-devtools-svelte";
 // (Vite/Rolldown UI + vite-devtools-svelte panels). See https://devtools.vite.dev/guide
 import devToolsJson from "vite-plugin-devtools-json";
 import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts";
-import { varlockSsrUaGuard } from "./scripts/varlock-ssr-ua-guard.ts";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -87,12 +85,6 @@ export default defineConfig(({ mode }) => ({
     svelteDevtools(),
     DevTools(),
     devToolsJson(),
-    // Alchemy adapter is not `@sveltejs/adapter-cloudflare`, so this stays
-    // init-only (no baked resolved-env, no `__VARLOCK_ENV` loader).
-    varlockVitePlugin(),
-    // After varlock so `\0varlock-ssr-init` exists: UA guard + skip Worker
-    // init when there is no env blob (Alchemy `varlock run` on the host).
-    varlockSsrUaGuard(),
     sentrySvelteKit({
       // Dummy .env.test token must not upload or fail CI builds (#148).
       autoUploadSourceMaps: process.env.VARLOCK_ENV !== "test",

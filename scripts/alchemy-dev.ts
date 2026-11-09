@@ -7,15 +7,16 @@
  * `bun vite dev` alone is Node SSR with no Worker env. This wrapper is
  * `bun run dev` after `panda:build`.
  *
- * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). The existing
- * live UUID is not adopted. No custom domain.
+ * D1 stays on Alchemy's local provider (`.alchemy/local/d1`). Live
+ * `dolla-holla` adopt is `alchemy deploy --adopt`, not `alchemy dev`.
+ * No custom domain.
  *
  * If Cloudflare credentials are missing, a gitignored local-only profile
  * is written under `.alchemy/home` so local providers can start. That is
  * not a deploy login.
  */
 import { spawnSync } from "node:child_process";
-import { EXISTING_D1_DATABASE_ID } from "../alchemy.run.ts";
+import { LIVE_PRODUCTION_D1_UUID } from "../alchemy.run.ts";
 import { ensureLocalAlchemyProfile } from "./alchemy-d1.ts";
 
 export const ALCHEMY_DEV_COMMAND =
@@ -29,9 +30,9 @@ if (process.env.__VARLOCK_RUN !== "1") {
 }
 
 const remoteId = process.env.CLOUDFLARE_D1_DATABASE_ID?.trim() ?? "";
-if (remoteId === EXISTING_D1_DATABASE_ID) {
+if (remoteId === LIVE_PRODUCTION_D1_UUID) {
   console.warn(
-    "CLOUDFLARE_D1_DATABASE_ID is the existing live dollar-holler UUID. Local alchemy dev ignores it and uses `.alchemy/local/d1`."
+    "CLOUDFLARE_D1_DATABASE_ID is LIVE_PRODUCTION_D1_UUID (dolla-holla). Local alchemy dev ignores it and uses `.alchemy/local/d1`."
   );
 }
 

@@ -4,10 +4,9 @@
  * Local persist is `.alchemy/local/d1` (the same simulator `alchemy dev`
  * binds). Remote uses the Cloudflare D1 HTTP API against
  * `CLOUDFLARE_D1_DATABASE_ID`, and refuses live UUID
- * `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185` (`db:seed:remote` /
- * `db:migrate:remote` exit 1). The Database resource in `alchemy.run.ts`
- * names D1 `dollar-holler` and does not pass that UUID (this beta cannot
- * adopt by id).
+ * `LIVE_PRODUCTION_D1_UUID` (`08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`)
+ * (`db:seed:remote` / `db:migrate:remote` exit 1). Alchemy live adopt is
+ * by D1 name `dolla-holla` in `alchemy.run.ts`, not this CLI.
  */
 import { D1 } from "@alchemy.run/cloudflare-runtime/core/bindings";
 import { getPlatformProxy } from "@alchemy.run/cloudflare-runtime/core/platform-proxy";
@@ -32,7 +31,7 @@ import { join } from "node:path";
 import {
   APP_NAME,
   D1_MIGRATIONS_DIR,
-  EXISTING_D1_DATABASE_ID,
+  LIVE_PRODUCTION_D1_UUID,
 } from "../alchemy.run.ts";
 
 const ALCHEMY_STAGE = "dev";
@@ -48,7 +47,7 @@ export const alchemyDatabaseStatePath = (stage = ALCHEMY_STAGE): string =>
 /** Local simulator rows are `dev:` ids. The existing live UUID is never a local persist key. */
 export const assertLocalSimulatorD1Id = (databaseId: string): void => {
   if (
-    databaseId === EXISTING_D1_DATABASE_ID ||
+    databaseId === LIVE_PRODUCTION_D1_UUID ||
     !databaseId.startsWith("dev:")
   ) {
     throw new Error(
@@ -59,9 +58,9 @@ export const assertLocalSimulatorD1Id = (databaseId: string): void => {
 
 /** Remote CLI must not hit the pre-Alchemy live UUID. No override flag. */
 export const assertRemoteD1DatabaseId = (databaseId: string): void => {
-  if (databaseId === EXISTING_D1_DATABASE_ID) {
+  if (databaseId === LIVE_PRODUCTION_D1_UUID) {
     throw new Error(
-      "Refusing D1 id of live database dollar-holler. Alchemy does not adopt it."
+      "Refusing D1 id of live database dolla-holla (LIVE_PRODUCTION_D1_UUID). Use alchemy deploy --adopt, not db:seed:remote / db:migrate:remote."
     );
   }
 };
@@ -367,7 +366,7 @@ const openRemoteAlchemyD1 = (): {
 } => {
   const credentials = readRemoteD1Credentials();
   console.warn(
-    `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. First live alchemy deploy provisions named D1 ${APP_NAME} (this beta does not adopt by UUID).`
+    `Opening remote D1 ${credentials.databaseId} over Cloudflare HTTP. Refuses LIVE_PRODUCTION_D1_UUID; live adopt is Cloudflare name dolla-holla via alchemy deploy --adopt.`
   );
   return {
     env: { DB: makeHttpD1Database(credentials) },

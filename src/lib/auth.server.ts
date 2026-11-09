@@ -9,6 +9,27 @@ import { Env } from "#lib/server/effect/env.ts";
 import { createId } from "./server/utils/create-id";
 
 /**
+ * `alchemy dev` / Vite listen on `127.0.0.1` while `PUBLIC_BASE_URL` is
+ * typically `http://localhost:5173`. Better Auth keys `/api/auth` off the
+ * Host header, so the IP twin must be allowed or those routes 404.
+ */
+export const loopbackTwinOrigin = (baseURL: string): string | undefined => {
+  try {
+    const url = new URL(baseURL);
+    if (url.hostname === "localhost") {
+      url.hostname = "127.0.0.1";
+      return url.origin;
+    }
+    if (url.hostname === "127.0.0.1") {
+      url.hostname = "localhost";
+      return url.origin;
+    }
+  } catch {
+    return undefined;
+  }
+};
+
+/**
  * Better Auth instance. Built on first use, then cached for the isolate.
  * `drizzleAdapter` reads `db._` at construct, and `db` reads `env.DB`, so
  * this must not run at module import.
@@ -16,8 +37,9 @@ import { createId } from "./server/utils/create-id";
 const createAuth = (env: {
   PUBLIC_BASE_URL: string;
   BETTER_AUTH_SECRET: Redacted.Redacted<string>;
-}) =>
-  betterAuth({
+}) => {
+  const twinOrigin = loopbackTwinOrigin(env.PUBLIC_BASE_URL);
+  return betterAuth({
     advanced: {
       database: {
         generateId: createId,
@@ -26,6 +48,7 @@ const createAuth = (env: {
     },
     allowedHosts: [
       "localhost:*",
+      "127.0.0.1:*",
       "*.workers.dev",
       "*.pages.dev",
       "dolla-holla.org",
@@ -50,8 +73,11 @@ const createAuth = (env: {
         maxAge: 5 * 60,
       },
     },
-    trustedOrigins: [env.PUBLIC_BASE_URL],
+    trustedOrigins: twinOrigin
+      ? [env.PUBLIC_BASE_URL, twinOrigin]
+      : [env.PUBLIC_BASE_URL],
   });
+};
 
 type AuthInstance = ReturnType<typeof createAuth>;
 

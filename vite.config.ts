@@ -140,6 +140,10 @@ export default defineConfig(({ mode }) => ({
             ? undefined
             : true,
       },
+      csrf: {
+        trustedOrigins:
+          mode === "production" ? [] : ["http://127.0.0.1:5173"],
+      },
       experimental: {
         remoteFunctions: true,
       },

@@ -44,6 +44,30 @@
 
   afterNavigate(() => navElement?.hidePopover());
 
+  /**
+   * Workaround: remote `form()` redirects use Kit `_goto` and ignore
+   * `data-sveltekit-reload` on the form. Auth is prerendered `csr = false`
+   * ogygia; SPA from the dashboard leaves the login island dead until a hard
+   * refresh. Mirror the logo link (`data-sveltekit-reload`) then force a
+   * native replace after a successful logout.
+   *
+   * @remarks
+   * Still required on `@sveltejs/kit@3.1.1` + `ogygia@0.12.2`.
+   * Drop when remote redirects honor `data-sveltekit-reload`; re-verify
+   * logout → login without a manual refresh.
+   *
+   * @see https://github.com/sveltejs/kit/issues/14802 — open: adjacent, remote form state after nav
+   * @see https://ogygiajs.dev/docs/data-state/remote-functions — ogygia treats invalidateAll as a soft seed refresh (no island remount)
+   * @see https://github.com/fringe4life/dollar-holler/issues/309 — tracking
+   */
+  const submitLogout: Parameters<typeof logout.enhance>[0] = async (form) => {
+    if (!(await form.submit())) {
+      toast.error("Logout failed");
+      return;
+    }
+    location.replace(resolve("login"));
+  };
+
   const navLayer = css({
     blockSize: "100dvh",
     display: { base: "none", md: "flex" },
@@ -144,11 +168,8 @@
         {/each}
         <li class={navItemLiClass}>
           <form
-            {...logout.enhance(async (form) => {
-              if (!(await form.submit())) {
-                toast.error("Logout failed");
-              }
-            })}
+            {...logout.enhance(submitLogout)}
+            data-sveltekit-reload
             data-sveltekit-replacestate
           >
             <button

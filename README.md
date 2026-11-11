@@ -31,7 +31,11 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
    - **Bun:** [`bunfig.toml`](./bunfig.toml) sets `env = false` and `preload = ["varlock/auto-load"]` so Bun does not load `.env` on its own before Varlock (see [Varlock + Bun](https://varlock.dev/integrations/bun/)). Isolated `linker`, 3-day `minimumReleaseAge`; `minimumReleaseAgeExcludes` is empty now that Kit 3 and Panda 2.2 are stable.
    - **Vite / SvelteKit / Cloudflare:** No `@varlock/vite-integration`. Bun preloads `varlock/auto-load`; deploy is `varlock run -- bun x alchemy deploy --stage dev`. Alchemy binds schema values on the Worker. There is no `__VARLOCK_ENV` blob ([non-Wrangler deploys](https://varlock.dev/integrations/cloudflare/), [varlock#735](https://github.com/dmno-dev/varlock/issues/735)).
    - **Bitwarden:** Install the app deps (already in `package.json`), then in Bitwarden Secrets Manager create a **machine account**, copy its **access token** once, and grant it read access to the secrets you need. Put the token in a **gitignored** file such as `.env.local` as `BITWARDEN_ACCESS_TOKEN=...`. In `.env.schema`, replace the placeholder UUIDs in `bitwarden("...")` with your real secret IDs ([Bitwarden plugin](https://varlock.dev/plugins/bitwarden/)).
-   - **Without Bitwarden (e.g. quick local setup):** Set `BETTER_AUTH_SECRET`, `PUBLIC_BASE_URL`, `ORIGIN` (Kit CSRF; same URL as the public site), `OGYGIA_SECRET` (≥16 bytes, stable across deploys for PPR holes), and `SENTRY_AUTH_TOKEN` (Sentry auth token used by the Vite plugin for releases when `mode !== "development"`) in `.env` or `.env.local` with literal values instead of `bitwarden(...)` where applicable. Host and CI variables still override resolved values when set. Optional `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_D1_DATABASE_ID`, and `CLOUDFLARE_API_TOKEN` are only for drizzle-kit `studio` / `push` against remote D1.
+   - **Without Bitwarden (e.g. quick local setup):** Set `BETTER_AUTH_SECRET`, `PUBLIC_BASE_URL`, `ORIGIN` (Kit CSRF; same URL as the public site), `OGYGIA_SECRET` (≥16 bytes, stable across deploys for PPR holes), and `SENTRY_AUTH_TOKEN` (Sentry auth token used by the Vite plugin for releases when `mode !== "development"`) in `.env` or `.env.local` with literal values instead of `bitwarden(...)` where applicable. Host and CI variables still override resolved values when set. Do not commit Cloudflare tokens or the Alchemy D1 UUID.
+   - **Remote D1 credentials (Varlock / Bitwarden):** `forEnv` cannot mean “remote CLI” (`bun run dev` is still `VARLOCK_ENV=development`). Remote scripts set `CLOUDFLARE_D1_HTTP=true` so the three Cloudflare keys are `@required=eq($CLOUDFLARE_D1_HTTP, true)` at schema load. Local alchemy leaves the flag false. Never leftover UUID `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Update the vault, not chat:
+     1. **`CLOUDFLARE_ACCOUNT_ID`** — already `bitwarden("5b4a4abc-5174-4f51-b6ac-b482005cc07a")`. Leave the schema key; grant the machine account **Can read** if resolution is empty.
+     2. **`CLOUDFLARE_D1_DATABASE_ID`** — schema key stays `bitwarden("f31e55fa-53d9-4232-a66f-b4a6002e5581")`. In Secrets Manager, edit **that item’s value** to the Alchemy D1 named `dolla-holla` (Cloudflare dashboard → D1 → `dolla-holla` → database ID, or after `bun run alchemy:deploy`). Do not use `08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185`. Do not commit the new UUID.
+     3. **`CLOUDFLARE_API_TOKEN`** — create a Secrets Manager secret (token with D1 edit). Copy the **item UUID** (not the token) into `.env.schema` as `CLOUDFLARE_API_TOKEN=bitwarden("<item-uuid>")`, then `bun run env:typegen` if types change. Grant the machine account **Can read**. `.env.test` keeps a dummy for CI.
    - **Types:** After changing `.env.schema`, run `bun run env:typegen` to refresh [`src/env-varlock.d.ts`](./src/env-varlock.d.ts).
 
    Drizzle Kit reads `ENV` from `varlock/env` ([`drizzle.config.ts`](./drizzle.config.ts)). Auth reads Effect `Config` from process env ([`src/lib/auth.server.ts`](./src/lib/auth.server.ts)). Runtime D1 uses Alchemy/Kit `platform.env.DB` ([`src/lib/server/db/index.ts`](./src/lib/server/db/index.ts)). Bare `vite dev` does not inject that binding.
@@ -55,7 +59,7 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
    # Seed local D1 via Alchemy platform proxy (create users via Better Auth first)
    bun run db:seed
 
-   # Seed remote Cloudflare D1 over HTTP (same wipe of clients/invoices/line items/settings)
+   # Seed remote Cloudflare D1 over HTTP (Alchemy dolla-holla via Varlock; refuses leftover UUID)
    bun run db:seed:remote
    ```
 
@@ -93,11 +97,11 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations and flatten into Alchemy D1 SQL
 - `bun run db:migrate` - Apply D1 migrations locally via Alchemy (`migrations:` on `.alchemy/local/d1`)
-- `bun run db:migrate:remote` - Apply D1 migrations remotely (D1 HTTP + Alchemy bookkeeping)
+- `bun run db:migrate:remote` - Apply D1 migrations remotely (`CLOUDFLARE_D1_HTTP=true`, D1 HTTP)
 - `bun run db:seed` - Seed local Alchemy D1 (Varlock `run`)
-- `bun run db:seed:remote` - Seed remote Cloudflare D1 over HTTP (Varlock `run`)
-- `bun run db:studio` - Open Drizzle Studio (D1 HTTP; needs `CLOUDFLARE_*`)
-- `bun run db:push` - Push schema to remote D1 (D1 HTTP; needs `CLOUDFLARE_*`)
+- `bun run db:seed:remote` - Seed remote D1 (`CLOUDFLARE_D1_HTTP=true`, Varlock `run`)
+- `bun run db:studio` - Open Drizzle Studio (`CLOUDFLARE_D1_HTTP=true`)
+- `bun run db:push` - Push schema to remote D1 (`CLOUDFLARE_D1_HTTP=true`)
 - `bun run bench:sql-list` - Time local D1 invoice and client list SQL (throwaway harness)
 - `bun run oracle:sql-list` - Check those SQL shapes against the golden oracle
 - `bun run oracle:sql-list:write` - Rewrite the sql-list oracle golden fixture

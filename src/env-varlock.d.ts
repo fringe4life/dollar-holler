@@ -57,7 +57,9 @@ export type CoercedEnvSchema = {
   
   /**
    * **CLOUDFLARE_ACCOUNT_ID** 🔐 _sensitive_  
-   * Optional. Needed for drizzle-kit studio/push against remote D1 (HTTP API).  
+   * Remote D1 HTTP. Bitwarden; never commit values. Required when CLOUDFLARE_D1_HTTP is true  
+   * (`@required=eq`, not forEnv — remote CLI is still VARLOCK_ENV=development).  
+   * Bitwarden secret id 5b4a4abc-5174-4f51-b6ac-b482005cc07a — keep this schema key.  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
    *   
    * 📚 {@link https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/ | Cloudflare account ID for D1 HTTP (drizzle-kit)}  
@@ -66,14 +68,19 @@ export type CoercedEnvSchema = {
   
   /**
    * **CLOUDFLARE_D1_DATABASE_ID** 🔐 _sensitive_  
+   * Alchemy D1 named dolla-holla. Update the vault *value* of this secret to that  
+   * database UUID after alchemy deploy. Never leftover 08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185.  
+   * Bitwarden secret id f31e55fa-53d9-4232-a66f-b4a6002e5581 — schema key CLOUDFLARE_D1_DATABASE_ID.  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
    *   
-   * 📚 {@link https://developers.cloudflare.com/d1/get-started/ | D1 database UUID (wrangler d1 create / dashboard)}  
+   * 📚 {@link https://developers.cloudflare.com/d1/get-started/ | Alchemy D1 UUID for dolla-holla (Bitwarden; not committed)}  
    */
   CLOUDFLARE_D1_DATABASE_ID?: string;
   
   /**
    * **CLOUDFLARE_API_TOKEN** 🔐 _sensitive_  
+   * Create a Secrets Manager item for a D1-edit API token, then set this line to  
+   * bitwarden("<item-uuid>"). Do not put the token in git or chat.  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
    *   
    * 📚 {@link https://developers.cloudflare.com/fundamentals/api/get-started/create-token/ | Cloudflare API token with D1 edit (drizzle-kit d1-http)}  

@@ -34,7 +34,7 @@ function d1InsertChunkSize(table: Table): number {
 async function createSeedProxy() {
   if (useRemote) {
     console.warn(
-      "Seeding REMOTE Cloudflare D1 over HTTP. Wipes clients, invoices, line_items, and settings. Auth users are kept."
+      "Seeding REMOTE Cloudflare D1 over HTTP (Alchemy dolla-holla via Varlock). Refuses leftover UUID 08d44dec. Wipes clients, invoices, line_items, and settings. Auth users are kept."
     );
   }
   return openAlchemyD1(useRemote);

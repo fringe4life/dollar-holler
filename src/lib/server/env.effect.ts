@@ -48,15 +48,22 @@ export const config = Config.all({
    */
   "SENTRY_AUTH_TOKEN": redactErrors(Config.map(Config.String("SENTRY_AUTH_TOKEN"), Redacted.make), "SENTRY_AUTH_TOKEN"),
   /**
-   * Optional. Needed for drizzle-kit studio/push against remote D1 (HTTP API).
+   * Remote D1 HTTP. Bitwarden; never commit values. Required when CLOUDFLARE_D1_HTTP is true
+   * (`@required=eq`, not forEnv — remote CLI is still VARLOCK_ENV=development).
+   * Bitwarden secret id 5b4a4abc-5174-4f51-b6ac-b482005cc07a — keep this schema key.
    * Docs: https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/ | Cloudflare account ID for D1 HTTP (drizzle-kit)
    */
   "CLOUDFLARE_ACCOUNT_ID": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_ACCOUNT_ID"), Redacted.make)), "CLOUDFLARE_ACCOUNT_ID"),
   /**
-   * Docs: https://developers.cloudflare.com/d1/get-started/ | D1 database UUID (wrangler d1 create / dashboard)
+   * Alchemy D1 named dolla-holla. Update the vault *value* of this secret to that
+   * database UUID after alchemy deploy. Never leftover 08d44dec-3fb0-4ddc-bd6e-9d0b8aa8a185.
+   * Bitwarden secret id f31e55fa-53d9-4232-a66f-b4a6002e5581 — schema key CLOUDFLARE_D1_DATABASE_ID.
+   * Docs: https://developers.cloudflare.com/d1/get-started/ | Alchemy D1 UUID for dolla-holla (Bitwarden; not committed)
    */
   "CLOUDFLARE_D1_DATABASE_ID": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_D1_DATABASE_ID"), Redacted.make)), "CLOUDFLARE_D1_DATABASE_ID"),
   /**
+   * Create a Secrets Manager item for a D1-edit API token, then set this line to
+   * bitwarden("<item-uuid>"). Do not put the token in git or chat.
    * Docs: https://developers.cloudflare.com/fundamentals/api/get-started/create-token/ | Cloudflare API token with D1 edit (drizzle-kit d1-http)
    */
   "CLOUDFLARE_API_TOKEN": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_API_TOKEN"), Redacted.make)), "CLOUDFLARE_API_TOKEN"),

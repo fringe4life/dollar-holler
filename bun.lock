@@ -40,7 +40,7 @@
         "@pandacss/preset-panda": "2.5.0",
         "@pandacss/vite": "2.5.0",
         "@sveltejs/kit": "3.1.1",
-        "@sveltejs/mcp": "0.1.29",
+        "@sveltejs/mcp": "0.1.30",
         "@sveltejs/vite-plugin-svelte": "7.3.1",
         "@types/bun": "1.4.4",
         "@types/node": "26.6.6",
@@ -631,7 +631,7 @@
 
     "@sveltejs/load-config": ["@sveltejs/load-config@0.2.3", "", {}, "sha512-VT3qmUb8pRV2QrZjd8iAmtg8lf4W0TIjZbvXtz5MKei/q96teWZgGJyyidJzOjzZzvdq616eSRVeMYIQChUTAQ=="],
 
-    "@sveltejs/mcp": ["@sveltejs/mcp@0.1.29", "", { "dependencies": { "eslint": "^9.36.0", "sade": "1.8.1", "tmcp": "^1.20.0" }, "bin": { "svelte-mcp": "dist/index.mjs" } }, "sha512-qZt3xisxxR64LmTMGC0BTWpbProMpvKbb2f3MssEZ/fFtGEAFJkCwww/hXASGN4Zsr/G3XhYz+x5WoNsux8XYA=="],
+    "@sveltejs/mcp": ["@sveltejs/mcp@0.1.30", "", { "dependencies": { "eslint": "^9.36.0", "sade": "1.8.1", "tmcp": "^1.20.0" }, "bin": { "svelte-mcp": "dist/index.mjs" } }, "sha512-0fi9syGJyrg8/WBAKOyIBxGgHIjj/j4O7CWA0huzng8F/4xIsy/8rVojxK2RkDgz8jIw4eZJCzTwIqKphhZo9Q=="],
 
     "@sveltejs/vite-plugin-svelte": ["@sveltejs/vite-plugin-svelte@7.3.1", "", { "dependencies": { "deepmerge": "^4.3.1", "magic-string": "^1.0.0", "obug": "^2.1.0", "vitefu": "^1.1.2" }, "peerDependencies": { "svelte": "^5.46.4", "vite": "^8.0.0-beta.7 || ^8.0.0" } }, "sha512-ZPsLN8B1e/En+Ak5s4V7srFDT532oS0qieLsQwu63NGKsS+iAjoO2Js1BochlHlglcU+Pt7WAO3C5Ee+4f6gVA=="],
 

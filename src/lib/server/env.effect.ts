@@ -49,9 +49,10 @@ export const config = Config.all({
   "SENTRY_AUTH_TOKEN": redactErrors(Config.map(Config.String("SENTRY_AUTH_TOKEN"), Redacted.make), "SENTRY_AUTH_TOKEN"),
   /**
    * Remote D1 HTTP (db:seed:remote, db:migrate:remote, drizzle-kit studio/push).
-   * Varlock resolves these via Bitwarden; never commit the values. Local D1
-   * persist does not read them. Required outside VARLOCK_ENV=test so `varlock run`
-   * fails instead of injecting empty strings. .env.test supplies CI dummies.
+   * Varlock resolves these via Bitwarden; never commit the values. Stay @optional
+   * so local `varlock run` (dev, migrate, seed, generate) and a first Alchemy
+   * deploy still start before the vault has a dolla-holla UUID. Remote CLI still
+   * requires all three in parseRemoteD1Credentials. .env.test supplies CI dummies.
    * Bitwarden secret id 5b4a4abc-5174-4f51-b6ac-b482005cc07a — keep this schema key.
    * Docs: https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/ | Cloudflare account ID for D1 HTTP (drizzle-kit)
    */

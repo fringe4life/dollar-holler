@@ -26,7 +26,7 @@
         "@alchemy.run/cloudflare-runtime": "2.0.0-beta.85",
         "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
         "@alchemy.run/sql": "2.0.0-beta.85",
-        "@cloudflare/workers-types": "5.20261104.1",
+        "@cloudflare/workers-types": "5.20261107.1",
         "@effect/platform-bun": "4.1.2",
         "@eslint/js": "10.0.1",
         "@eslint/mcp": "0.3.16",
@@ -157,7 +157,7 @@
 
     "@cloudflare/workerd-windows-64": ["@cloudflare/workerd-windows-64@1.20261026.1", "", { "os": "win32", "cpu": "x64" }, "sha512-7T6udxUWajK0NIpLkmX5FU7i7MnoFYWA3CXmywvO1SmWdabuNCqcB4Wc+88QBIbYhbmAbW+7yfIe7No2nmdoSA=="],
 
-    "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20261104.1", "", {}, "sha512-XSPcK88JXnW/oC82wuXvaP7vgyk2myydugbgOd/RcLKwqkwW0cP09Ozp9ItACa4IAZ7uKtMIfxZpUTXajYVd1Q=="],
+    "@cloudflare/workers-types": ["@cloudflare/workers-types@5.20261107.1", "", {}, "sha512-Q23LVprqgqdoxBYaH3YyTrtmeJZMzVarvcTZjZC6FnQIqrr+Vm/ASdWtezOQ+oq3FvhoGr1Xe7BAU3XZfkqUQw=="],
 
     "@csstools/css-calc": ["@csstools/css-calc@3.4.3", "", { "peerDependencies": { "@csstools/css-parser-algorithms": "^4.0.2", "@csstools/css-tokenizer": "^4.0.2" } }, "sha512-iex20d8CHVkyvg6B7UKV7uHnI2Bqo9g+EFfT9E0y+GvTvhZ/DwONJ+9aKb1dlqm0ZiGsL5RXjp0fCoJYnkeDjA=="],
 

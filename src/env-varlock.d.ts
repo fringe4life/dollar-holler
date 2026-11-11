@@ -57,11 +57,8 @@ export type CoercedEnvSchema = {
   
   /**
    * **CLOUDFLARE_ACCOUNT_ID** 🔐 _sensitive_  
-   * Remote D1 HTTP (db:seed:remote, db:migrate:remote, drizzle-kit studio/push).  
-   * Varlock resolves these via Bitwarden; never commit the values. Stay @optional  
-   * so local `varlock run` (dev, migrate, seed, generate) and a first Alchemy  
-   * deploy still start before the vault has a dolla-holla UUID. Remote CLI still  
-   * requires all three in parseRemoteD1Credentials. .env.test supplies CI dummies.  
+   * Remote D1 HTTP. Bitwarden; never commit values. Required when CLOUDFLARE_D1_HTTP is true  
+   * (`@required=eq`, not forEnv — remote CLI is still VARLOCK_ENV=development).  
    * Bitwarden secret id 5b4a4abc-5174-4f51-b6ac-b482005cc07a — keep this schema key.  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
    *   
@@ -83,8 +80,7 @@ export type CoercedEnvSchema = {
   /**
    * **CLOUDFLARE_API_TOKEN** 🔐 _sensitive_  
    * Create a Secrets Manager item for a D1-edit API token, then set this line to  
-   * bitwarden("<item-uuid>"). Do not put the token in git or chat. Stays optional  
-   * so local alchemy dev can boot without Cloudflare; remote CLI still refuses empty.  
+   * bitwarden("<item-uuid>"). Do not put the token in git or chat.  
    * ![icon](data:image/svg+xml;utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2032%2032%22%3E%3Cpath%20fill%3D%22%23808080%22%20d%3D%22M29%2022h-5a2.003%202.003%200%200%201-2-2v-6a2%202%200%200%201%202-2h5v2h-5v6h5ZM18%2012h-4V8h-2v14h6a2.003%202.003%200%200%200%202-2v-6a2%202%200%200%200-2-2m-4%208v-6h4v6Zm-6-8H3v2h5v2H4a2%202%200%200%200-2%202v2a2%202%200%200%200%202%202h6v-8a2%202%200%200%200-2-2m0%208H4v-2h4Z%22%2F%3E%3C%2Fsvg%3E)   
    *   
    * 📚 {@link https://developers.cloudflare.com/fundamentals/api/get-started/create-token/ | Cloudflare API token with D1 edit (drizzle-kit d1-http)}  

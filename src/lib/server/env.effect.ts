@@ -48,11 +48,8 @@ export const config = Config.all({
    */
   "SENTRY_AUTH_TOKEN": redactErrors(Config.map(Config.String("SENTRY_AUTH_TOKEN"), Redacted.make), "SENTRY_AUTH_TOKEN"),
   /**
-   * Remote D1 HTTP (db:seed:remote, db:migrate:remote, drizzle-kit studio/push).
-   * Varlock resolves these via Bitwarden; never commit the values. Stay @optional
-   * so local `varlock run` (dev, migrate, seed, generate) and a first Alchemy
-   * deploy still start before the vault has a dolla-holla UUID. Remote CLI still
-   * requires all three in parseRemoteD1Credentials. .env.test supplies CI dummies.
+   * Remote D1 HTTP. Bitwarden; never commit values. Required when CLOUDFLARE_D1_HTTP is true
+   * (`@required=eq`, not forEnv — remote CLI is still VARLOCK_ENV=development).
    * Bitwarden secret id 5b4a4abc-5174-4f51-b6ac-b482005cc07a — keep this schema key.
    * Docs: https://developers.cloudflare.com/fundamentals/account/find-account-and-zone-ids/ | Cloudflare account ID for D1 HTTP (drizzle-kit)
    */
@@ -66,8 +63,7 @@ export const config = Config.all({
   "CLOUDFLARE_D1_DATABASE_ID": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_D1_DATABASE_ID"), Redacted.make)), "CLOUDFLARE_D1_DATABASE_ID"),
   /**
    * Create a Secrets Manager item for a D1-edit API token, then set this line to
-   * bitwarden("<item-uuid>"). Do not put the token in git or chat. Stays optional
-   * so local alchemy dev can boot without Cloudflare; remote CLI still refuses empty.
+   * bitwarden("<item-uuid>"). Do not put the token in git or chat.
    * Docs: https://developers.cloudflare.com/fundamentals/api/get-started/create-token/ | Cloudflare API token with D1 edit (drizzle-kit d1-http)
    */
   "CLOUDFLARE_API_TOKEN": redactErrors(Config.option(Config.map(Config.String("CLOUDFLARE_API_TOKEN"), Redacted.make)), "CLOUDFLARE_API_TOKEN"),

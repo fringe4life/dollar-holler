@@ -149,7 +149,8 @@ export type RemoteD1Credentials = {
 const schemaEnvString = (value: unknown): string =>
   typeof value === "string" ? value.trim() : "";
 
-/** Remote D1 HTTP creds from Varlock schema keys (Bitwarden). No UUID in git. */
+/** Remote D1 HTTP creds from Varlock schema keys (Bitwarden). No UUID in git.
+ * `db:*:remote` sets CLOUDFLARE_D1_HTTP so schema `@required=eq` runs first. */
 export const parseRemoteD1Credentials = (source: {
   accountId: string;
   databaseId: string;

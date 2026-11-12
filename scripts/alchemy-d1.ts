@@ -66,6 +66,31 @@ export const assertRemoteD1DatabaseId = (databaseId: string): void => {
   }
 };
 
+/**
+ * D1 HTTP CLI keys (Varlock / Bitwarden). Alchemy treats
+ * `CLOUDFLARE_API_TOKEN` as deploy credentials and then ignores
+ * `alchemy profile`. The D1-edit token is not a Workers token.
+ */
+const ALCHEMY_D1_HTTP_ENV_KEYS = [
+  "CLOUDFLARE_API_TOKEN",
+  "CLOUDFLARE_ACCOUNT_ID",
+  "CLOUDFLARE_D1_DATABASE_ID",
+] as const;
+
+/** Copy env without D1 HTTP keys so Alchemy uses the CLI profile. */
+export const alchemyProfileOnlyEnv = (
+  env: NodeJS.ProcessEnv = process.env
+): NodeJS.ProcessEnv => {
+  const next = { ...env };
+  for (const key of ALCHEMY_D1_HTTP_ENV_KEYS) {
+    delete next[key];
+  }
+  return next;
+};
+
+export const alchemyDeployArgvRefusesAdopt = (argv: string[]): boolean =>
+  argv.some((arg) => arg === "--adopt" || arg === "adopt");
+
 /** Dummy Cloudflare profile so local providers start without a deploy login. */
 export const ensureLocalAlchemyProfile = (): void => {
   const token = process.env.CLOUDFLARE_API_TOKEN?.trim() ?? "";

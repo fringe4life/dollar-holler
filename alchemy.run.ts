@@ -2,12 +2,14 @@
  * Alchemy deploy graph for the SvelteKit Worker.
  *
  * `bun run alchemy:deploy` is
- * `varlock run -- bun x alchemy deploy --stage dev` (`bun run` puts
+ * `varlock run -- bun ./scripts/alchemy-deploy.ts` (`bun run` puts
  * `node_modules/.bin` on PATH; nested `bun x varlock` breaks Varlock).
- * Varlock resolves `.env.schema` into `process.env`. The
- * `env` block below binds those values on the Worker (`Config.Redacted`
- * → `secret_text`, `Config.String` → plain text). Community Alchemy path
- * until `@varlock/alchemy-integration`: no Vite Varlock plugin, no
+ * Varlock resolves Worker secrets into `process.env`. The wrapper
+ * unsets `CLOUDFLARE_API_TOKEN` / `CLOUDFLARE_ACCOUNT_ID` so Alchemy
+ * uses the CLI profile, not the D1-edit token. The `env` block below
+ * binds schema values on the Worker (`Config.Redacted` → `secret_text`,
+ * `Config.String` → plain text). Community Alchemy path until
+ * `@varlock/alchemy-integration`: no Vite Varlock plugin, no
  * `__VARLOCK_ENV` blob (https://github.com/dmno-dev/varlock/issues/735).
  *
  * Worker physical name is `dollar-holler`. Alchemy manages exactly one

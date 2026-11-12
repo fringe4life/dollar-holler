@@ -46,7 +46,7 @@ Relevant Svelte APIs ([`@attach`](https://svelte.dev/docs/svelte/@attach), [`bin
 
 ## Grammar vs invoice markdown
 
-Server path: `marked` → `sanitize-html` with tags including `strong`, `em`, `del`, `code`, `a`, lists, headings, `blockquote`, `pre` (`markdown.server.ts`).
+Server path: `marked` → `xss` with tags including `strong`, `em`, `del`, `code`, `a`, lists, headings, `blockquote`, `pre` (`markdown.server.ts`).
 
 MicroLighter markdown grammar ([`src/grammars/markdown.js`](https://raw.githubusercontent.com/davatron5000/microlighter/main/src/grammars/markdown.js)), VS Code–derived, patterns:
 

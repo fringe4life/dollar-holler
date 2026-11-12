@@ -1,7 +1,9 @@
-// biome-ignore lint/performance/noNamespaceImport: way to use sentry
-import * as Sentry from "@sentry/sveltekit";
 import { redirect } from "@sveltejs/kit";
-import { type Handle, sequence } from "@sveltejs/kit/hooks";
+import {
+  type Handle,
+  type HandleServerError,
+  sequence,
+} from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { building } from "$app/env";
 import { getAuth } from "#lib/auth.server.ts";
@@ -10,9 +12,6 @@ import { shouldPreloadAsset } from "#lib/fonts/preload.ts";
 import { THEME_COOKIE_NAME, parseStoredTheme } from "#lib/theme/schema.ts";
 import { stampHtmlTheme } from "#lib/theme/theme.ts";
 import { handle as ogygiaHandle } from "ogygia/server";
-
-const SENTRY_DSN =
-  "https://09af8526419b32d328f0c046d2ee5d09@o4511356309536768.ingest.us.sentry.io/4511356313010176";
 
 // get session from better auth and populate locals
 const localsHandler: Handle = async ({ event, resolve }) => {
@@ -93,14 +92,9 @@ const fontPreloadHandler: Handle = async ({ event, resolve }) =>
     preload: (input) => shouldPreloadAsset(input, event.url.pathname),
   });
 
-// Order: Sentry instruments the request first; session/locals before auth; preload last on resolve.
+// Order: session/locals before auth; preload last on resolve.
 // ogygia is last so /__ogygia__ still receives the session and theme cookie, then serves the island.
 export const handle: Handle = sequence(
-  Sentry.initCloudflareSentryHandle({
-    dsn: SENTRY_DSN,
-    tracesSampleRate: 1,
-  }),
-  Sentry.sentryHandle(),
   localsHandler,
   authGuard,
   themeHandler,
@@ -108,4 +102,7 @@ export const handle: Handle = sequence(
   ogygiaHandle()
 );
 
-export const handleError = Sentry.handleErrorWithSentry();
+/** Cloudflare Issues groups `console.error` / uncaught / Worker 5xx. */
+export const handleError: HandleServerError = ({ error }) => {
+  console.error(error);
+};

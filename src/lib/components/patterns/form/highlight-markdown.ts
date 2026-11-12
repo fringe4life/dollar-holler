@@ -13,18 +13,10 @@ import type {
 } from "prismjs/components/prism-core.js";
 import "prismjs/components/prism-markup.js";
 import "prismjs/components/prism-markdown.js";
-
-/** `<pre>` drops a trailing empty line; a space keeps wrap/scroll aligned. */
-const EMPTY_LAST_LINE = " ";
+import { escapeOverlayHtml, sourceForOverlay } from "./overlay-plaintext.ts";
 
 /** Prism token type / alias used as a class segment (`code-snippet`, `language-yaml`). */
 const SAFE_TOKEN_CLASS = /^[A-Za-z][\w-]*$/;
-
-const escapeHtml = (text: string): string =>
-  text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
-
-const sourceForOverlay = (source: string): string =>
-  source.endsWith("\n") ? `${source}${EMPTY_LAST_LINE}` : source;
 
 const isToken = (node: string | PrismToken): node is PrismToken =>
   typeof node === "object" && node !== null && typeof node.type === "string";
@@ -51,7 +43,7 @@ const stringifySafe = (
   node: string | PrismToken | PrismTokenStream
 ): string => {
   if (typeof node === "string") {
-    return escapeHtml(node);
+    return escapeOverlayHtml(node);
   }
   if (Array.isArray(node)) {
     return node.map(stringifySafe).join("");
@@ -66,7 +58,7 @@ export const highlightMarkdown = (source: string): string => {
   const prepared = sourceForOverlay(source);
   const grammar = Prism.languages.markdown;
   if (!grammar) {
-    return escapeHtml(prepared);
+    return escapeOverlayHtml(prepared);
   }
   return stringifySafe(Prism.tokenize(prepared, grammar));
 };

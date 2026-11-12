@@ -10,6 +10,8 @@ import * as alchemyRun from "../alchemy.run.ts";
 import {
   alchemyDatabaseStatePath,
   ALCHEMY_LOCAL_PERSIST_DIR,
+  alchemyDeployArgvRefusesAdopt,
+  alchemyProfileOnlyEnv,
   assertLocalSimulatorD1Id,
   assertRemoteD1DatabaseId,
   migrationSqlStatements,
@@ -36,6 +38,28 @@ describe("alchemy local D1", () => {
         apiToken: "tok",
       })
     ).toThrow(/Refusing D1 id of leftover database/);
+  });
+
+  it("drops D1 HTTP keys so Alchemy uses the CLI profile", () => {
+    const env = alchemyProfileOnlyEnv({
+      ...process.env,
+      CLOUDFLARE_API_TOKEN: "d1-only",
+      CLOUDFLARE_ACCOUNT_ID: "acct",
+      CLOUDFLARE_D1_DATABASE_ID: "db",
+      BETTER_AUTH_SECRET: "keep",
+      __VARLOCK_RUN: "1",
+    });
+    expect(env.CLOUDFLARE_API_TOKEN).toBeUndefined();
+    expect(env.CLOUDFLARE_ACCOUNT_ID).toBeUndefined();
+    expect(env.CLOUDFLARE_D1_DATABASE_ID).toBeUndefined();
+    expect(env.BETTER_AUTH_SECRET).toBe("keep");
+    expect(env.__VARLOCK_RUN).toBe("1");
+  });
+
+  it("refuses adopt argv on alchemy:deploy", () => {
+    expect(alchemyDeployArgvRefusesAdopt(["--stage", "dev"])).toBe(false);
+    expect(alchemyDeployArgvRefusesAdopt(["--adopt"])).toBe(true);
+    expect(alchemyDeployArgvRefusesAdopt(["adopt"])).toBe(true);
   });
 
   it("requires the three Varlock schema keys for remote D1", () => {

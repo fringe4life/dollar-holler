@@ -5,8 +5,26 @@
   import type { Attachment } from "svelte/attachments";
   import { on } from "svelte/events";
   import type { HTMLTextareaAttributes } from "svelte/elements";
+  import { onMount } from "svelte";
   import Textarea from "#lib/components/primitives/textarea/Textarea.svelte";
-  import { highlightMarkdown } from "./highlight-markdown.ts";
+
+  /** Match `highlight-markdown.ts` plaintext escape (`&`, then `<`). */
+  const escapeHtml = (text: string): string =>
+    text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
+
+  let highlightMarkdown = $state<((source: string) => string) | undefined>();
+
+  onMount(() => {
+    let cancelled = false;
+    void import("./highlight-markdown.ts").then((mod) => {
+      if (!cancelled) {
+        highlightMarkdown = mod.highlightMarkdown;
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  });
 
   /**
    * Match `Textarea.svelte` box (p, border, font) so wrap/scroll stay aligned.
@@ -108,10 +126,11 @@
     ...rest
   }: Omit<HTMLTextareaAttributes, "class"> & { class?: string } = $props();
 
-  /** Serializer in `highlightMarkdown`: escaped text + `span.token` only. */
-  const highlightedHtml = $derived(
-    highlightMarkdown(value == null ? "" : String(value))
-  );
+  /** First paint: escaped plaintext (SSR + hydrate). Tokens after mount. */
+  const highlightedHtml = $derived.by(() => {
+    const source = value == null ? "" : String(value);
+    return highlightMarkdown ? highlightMarkdown(source) : escapeHtml(source);
+  });
 </script>
 
 <div class={wrapperClass}>

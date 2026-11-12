@@ -92,7 +92,7 @@ GitHub Actions proof gates (lint, typecheck, test, dependency audit, production 
 - `bun run typecheck` - `panda:build` then `svelte-check` (CI typecheck; generates gitignored `styled-system/`)
 - `bun run tsc` - Type-check with native TypeScript 7 preview (`@typescript/native`)
 - `bun run tsc6` - Type-check with TypeScript 6
-- `bun run test` - Run Bun unit tests (`*.test.ts`); [`bunfig.toml`](./bunfig.toml) `[test].preload` mocks `$app/env` via [`src/test/app-env-preload.ts`](./src/test/app-env-preload.ts)
+- `bun run test` - Run Bun unit tests (`*.test.ts`); [`bunfig.toml`](./bunfig.toml) `[test].preload` mocks `$app/env` via [`scripts/app-env-preload.ts`](./scripts/app-env-preload.ts)
 - `bun run fix` - `lint:fix`, `format`, and Stylelint with `--fix`
 - `bun run env:typegen` - Regenerate types from `.env.schema` (Varlock)
 - `bun run db:generate` - Generate Drizzle migrations and flatten into Alchemy D1 SQL

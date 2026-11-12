@@ -1,5 +1,7 @@
+import { readdirSync } from "node:fs";
 import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
@@ -16,6 +18,7 @@ import { svelteDevtools } from "vite-devtools-svelte";
 // (Vite/Rolldown UI + vite-devtools-svelte panels). See https://devtools.vite.dev/guide
 import devToolsJson from "vite-plugin-devtools-json";
 import { ogygiaNodeImportsBridge } from "./scripts/ogygia-node-imports-bridge.ts";
+import { workerEmptyStubs } from "./scripts/worker-empty-stubs-plugin.ts";
 
 /** Public site origin used in robots.txt and the build-time sitemap. */
 const SITE_ORIGIN = "https://dolla-holla.org";
@@ -38,11 +41,38 @@ const resolveFontainePath = (id: string): string | URL => {
 
 const FILE_REGEX = /[/\\]/;
 
+/** Absolute path to a Worker-only empty stub (Rolldown `resolve.alias`). */
+const workerEmptyStub = (file: string): string =>
+  fileURLToPath(new URL(`./scripts/worker-empty-stubs/${file}`, import.meta.url));
+
+const drizzleAdapterDist = dirname(
+  dirname(require.resolve("@better-auth/drizzle-adapter/relations-v2"))
+);
+const generateSchemaStub = workerEmptyStub("generate-drizzle-schema.ts");
+const generateSchemaAliases = readdirSync(drizzleAdapterDist)
+  .filter((name) => name.startsWith("generate-drizzle-schema"))
+  .map((name) => ({
+    find: join(drizzleAdapterDist, name),
+    replacement: generateSchemaStub,
+  }));
+
+const cssfilterStub = workerEmptyStub("cssfilter.ts");
+const xssRoot = dirname(dirname(require.resolve("xss")));
+const cssfilterMain = require.resolve("cssfilter", { paths: [xssRoot] });
+
 export default defineConfig(({ mode }) => ({
   build: {
     rolldownOptions: {
       // Enable Rolldown build-analysis metadata for Vite DevTools panels
       devtools: {},
+      // Vite 8: top-level resolve.alias is not always forwarded to Rolldown
+      // (vitejs/vite#22377). Record form is what InputOptions.resolve.alias accepts.
+      resolve: {
+        alias: {
+          "@better-auth/memory-adapter": workerEmptyStub("memory-adapter.ts"),
+          cssfilter: cssfilterStub,
+        },
+      },
       output: {
         minify: {
           // Keep console.error so Cloudflare Issues can group handled
@@ -122,6 +152,7 @@ export default defineConfig(({ mode }) => ({
      * @see https://github.com/fringe4life/dollar-holler/issues/208 — related Kit 3 env rename
      */
     ogygiaNodeImportsBridge(),
+    workerEmptyStubs(),
     // Before sveltekit so island import attributes are rewritten first.
     // Feature plugins list beside ogygia() (not as ogygia({ plugins })) — 0.11 split.
     ogygia(),
@@ -148,6 +179,9 @@ export default defineConfig(({ mode }) => ({
         remoteFunctions: true,
       },
       preprocess: [vitePreprocess()],
+      // Keep off so Kit never `import("@opentelemetry/api")` into the Worker.
+      // Do not add a Vite plugin that stubs OTel — Better Auth's optional
+      // import stays a leftover unless the package is unresolvable.
       tracing: {
         server: false,
       },
@@ -187,7 +221,39 @@ export default defineConfig(({ mode }) => ({
     port: 5173,
   },
   resolve: {
+    alias: [
+      ...generateSchemaAliases,
+      {
+        // Match the whole specifier. Replacing only the filename leaves `../`
+        // and Rolldown warns: rewrote to `..//absolute/stub` (UNLOADABLE).
+        find: /(?:\.\.\/)*generate-drizzle-schema-[^/]+\.mjs$/,
+        replacement: generateSchemaStub,
+      },
+      {
+        find: "@better-auth/memory-adapter",
+        replacement: workerEmptyStub("memory-adapter.ts"),
+      },
+      {
+        find: "cssfilter",
+        replacement: cssfilterStub,
+      },
+      {
+        find: cssfilterMain,
+        replacement: cssfilterStub,
+      },
+    ],
     tsconfigPaths: true,
+  },
+  // Vite SSR was leaving these as bare imports; Alchemy then rebundled the
+  // real packages without aliases (cssfilter / createSchema). noExternal
+  // forces Vite to apply aliases first (Workers SSR docs; vite ssr.noExternal).
+  ssr: {
+    noExternal: [
+      "@better-auth/drizzle-adapter",
+      "@better-auth/memory-adapter",
+      "cssfilter",
+      "xss",
+    ],
   },
   server: {
     forwardConsole: true,

@@ -45,10 +45,12 @@ export default defineConfig(({ mode }) => ({
       devtools: {},
       output: {
         minify: {
-          compress: { dropConsole: true },
+          // Keep console.error so Cloudflare Issues can group handled
+          // Worker errors after the Sentry SDK left the isolate.
+          compress: { dropConsole: false },
           // Oxc mangling re-enabled: SSR crash was Wrangler/esbuild
           // `alwaysStrict` + Annex B hoisting (see tsconfig.wrangler.json / #114),
-          // not Oxc itself. Keep compress/dropConsole.
+          // not Oxc itself.
         },
       },
     },
@@ -86,6 +88,9 @@ export default defineConfig(({ mode }) => ({
     DevTools(),
     devToolsJson(),
     sentrySvelteKit({
+      // Client handleError stays in hooks.client.ts. Do not wrap load
+      // functions — universal load wrappers would re-import Sentry into SSR.
+      autoInstrument: false,
       // Dummy .env.test token must not upload or fail CI builds (#148).
       autoUploadSourceMaps: process.env.VARLOCK_ENV !== "test",
       authToken: process.env.SENTRY_AUTH_TOKEN,
@@ -144,7 +149,7 @@ export default defineConfig(({ mode }) => ({
       },
       preprocess: [vitePreprocess()],
       tracing: {
-        server: true,
+        server: false,
       },
     }),
     // After sveltekit so the Cloudflare adapt output exists under outDir.

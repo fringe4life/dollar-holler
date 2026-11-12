@@ -102,11 +102,18 @@ export const Website = Cloudflare.Website.SvelteKit("Website", {
   compatibility: {
     date: COMPATIBILITY_DATE,
   },
+  // Logs default on; traces and Issues must be set or the next deploy
+  // turns them off. SENTRY_AUTH_TOKEN is host-only (Vite source maps).
+  observability: {
+    enabled: true,
+    issues: { enabled: true },
+    logs: { enabled: true, invocationLogs: true },
+    traces: { enabled: true },
+  },
   env: {
     DB: Database,
     BETTER_AUTH_SECRET: Config.Redacted("BETTER_AUTH_SECRET"),
     OGYGIA_SECRET: Config.Redacted("OGYGIA_SECRET"),
-    SENTRY_AUTH_TOKEN: Config.Redacted("SENTRY_AUTH_TOKEN"),
     PUBLIC_BASE_URL: Cloudflare.Worker.URL,
     ORIGIN: Cloudflare.Worker.URL,
     VARLOCK_ENV: Config.String("VARLOCK_ENV"),

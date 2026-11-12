@@ -29,7 +29,7 @@ const requiredString = (key: BoundString): string => {
   );
 };
 
-export const readAppEnv = (): AppEnv => ({
+const readAppEnv = (): AppEnv => ({
   BETTER_AUTH_SECRET: Redacted.make(requiredString("BETTER_AUTH_SECRET")),
   OGYGIA_SECRET: Redacted.make(requiredString("OGYGIA_SECRET")),
   ORIGIN: requiredString("ORIGIN"),

@@ -4,7 +4,7 @@
  */
 
 /** `<pre>` drops a trailing empty line; a space keeps wrap/scroll aligned. */
-export const EMPTY_LAST_LINE = " ";
+const EMPTY_LAST_LINE = " ";
 
 export const escapeOverlayHtml = (text: string): string =>
   text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");

@@ -1,3 +1,4 @@
+// fallow-ignore-file unused-file -- Vite resolve.alias / worker-empty-stubs plugin load this into the Worker graph; fallow does not follow alias strings.
 /**
  * Better Auth drizzle-adapter `createSchema` is CLI codegen. It dynamically
  * imports this module (`node:fs` / `node:path`) even though the Worker never

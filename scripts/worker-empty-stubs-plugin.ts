@@ -26,6 +26,12 @@ const isCssfilter = (id: string): boolean => {
   );
 };
 
+/** Bun unit-test preload / `bun:test` must not enter the Worker graph. */
+const isBunTest = (id: string): boolean => {
+  const path = posixId(id);
+  return path === "bun:test" || path.endsWith("/app-env-preload.ts");
+};
+
 /**
  * Stub unused Better Auth codegen and xss cssfilter in the Worker graph.
  *
@@ -42,9 +48,14 @@ export const workerEmptyStubs = (): Plugin => ({
   enforce: "pre",
   name: "worker-empty-stubs",
   resolveId: {
-    filter: { id: /generate-drizzle-schema|cssfilter/ },
+    filter: {
+      id: /generate-drizzle-schema|cssfilter|^bun:test$|app-env-preload/,
+    },
     handler(source: string) {
       const id = posixId(source);
+      if (isBunTest(id)) {
+        return "\0worker-empty:bun-test";
+      }
       if (isCssfilter(id)) {
         return stubFile("cssfilter.ts");
       }
@@ -55,8 +66,13 @@ export const workerEmptyStubs = (): Plugin => ({
     },
   },
   load: {
-    filter: { id: /generate-drizzle-schema|cssfilter/ },
+    filter: {
+      id: /generate-drizzle-schema|cssfilter|^bun:test$|app-env-preload|\0worker-empty:bun-test/,
+    },
     handler(id: string) {
+      if (isBunTest(id) || id === "\0worker-empty:bun-test") {
+        return "export {}";
+      }
       if (isGenerateSchema(id)) {
         return GENERATE_SCHEMA_STUB;
       }

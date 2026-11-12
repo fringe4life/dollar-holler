@@ -17,5 +17,6 @@ preload = ["varlock/auto-load"]
 
 # `bun test` ignores the runtime preload and only uses this list.
 # Varlock must run after VARLOCK_ENV is set (see app-env-preload).
+# Keep this file outside `src/` so Vite/Alchemy SSR never walks `bun:test`.
 [test]
-preload = ["./src/test/app-env-preload.ts", "varlock/auto-load"]
+preload = ["./scripts/app-env-preload.ts", "varlock/auto-load"]

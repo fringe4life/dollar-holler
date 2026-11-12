@@ -6,7 +6,7 @@
  * Invoice writes go through `invoice-notes-terms-html.server.ts`; insert/update schemas
  * omit `notesHtml` / `termsHtml` so clients never post raw HTML.
  */
-import { FilterXSS, safeAttrValue } from "xss";
+import { FilterXSS, friendlyAttrValue, safeAttrValue } from "xss";
 import { marked } from "marked";
 import { parse } from "valibot";
 import type { Maybe } from "#lib/types.ts";
@@ -47,27 +47,30 @@ const MARKDOWN_WHITE_LIST: Record<string, string[]> = Object.fromEntries(
   ALLOWED_TAGS.map((tag) => [tag, tag === "a" ? ["href", "class"] : ["class"]])
 );
 
-const hrefAttrValue = (value: string): string => {
-  const trimmed = value.trim();
+const hrefMatchesAllowlist = (decoded: string): boolean => {
+  const trimmed = decoded.trim();
   if (trimmed.length === 0 || trimmed.startsWith("//")) {
-    return "";
+    return false;
   }
   const scheme = /^([a-zA-Z][a-zA-Z+.-]*):/.exec(trimmed);
   if (scheme === null) {
-    return trimmed;
+    return true;
   }
-  const protocol = `${scheme[1].toLowerCase()}:`;
-  return ALLOWED_HREF_SCHEMES.has(protocol) ? trimmed : "";
+  return ALLOWED_HREF_SCHEMES.has(`${scheme[1].toLowerCase()}:`);
 };
 
 const markdownXss = new FilterXSS({
   allowCommentTag: false,
   css: false,
   safeAttrValue: (tag, name, value, cssFilter) => {
-    if (name === "href") {
-      return hrefAttrValue(value);
+    const escaped = safeAttrValue(tag, name, value, cssFilter);
+    if (name !== "href") {
+      return escaped;
     }
-    return safeAttrValue(tag, name, value, cssFilter);
+    if (escaped === "" || !hrefMatchesAllowlist(friendlyAttrValue(value))) {
+      return "";
+    }
+    return escaped;
   },
   stripIgnoreTag: true,
   stripIgnoreTagBody: ["script", "style"],

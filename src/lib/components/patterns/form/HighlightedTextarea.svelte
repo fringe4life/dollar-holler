@@ -7,10 +7,7 @@
   import type { HTMLTextareaAttributes } from "svelte/elements";
   import { onMount } from "svelte";
   import Textarea from "#lib/components/primitives/textarea/Textarea.svelte";
-
-  /** Match `highlight-markdown.ts` plaintext escape (`&`, then `<`). */
-  const escapeHtml = (text: string): string =>
-    text.replaceAll("&", "&amp;").replaceAll("<", "&lt;");
+  import { overlayPlainHtml } from "./overlay-plaintext.ts";
 
   let highlightMarkdown = $state<((source: string) => string) | undefined>();
 
@@ -129,7 +126,9 @@
   /** First paint: escaped plaintext (SSR + hydrate). Tokens after mount. */
   const highlightedHtml = $derived.by(() => {
     const source = value == null ? "" : String(value);
-    return highlightMarkdown ? highlightMarkdown(source) : escapeHtml(source);
+    return highlightMarkdown
+      ? highlightMarkdown(source)
+      : overlayPlainHtml(source);
   });
 </script>
 

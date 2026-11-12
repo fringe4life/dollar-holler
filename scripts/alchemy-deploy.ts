@@ -15,8 +15,7 @@ import {
   alchemyProfileOnlyEnv,
 } from "./alchemy-d1.ts";
 
-export const ALCHEMY_DEPLOY_COMMAND =
-  "varlock run -- bun ./scripts/alchemy-deploy.ts";
+const ALCHEMY_DEPLOY_COMMAND = "varlock run -- bun ./scripts/alchemy-deploy.ts";
 
 if (alchemyDeployArgvRefusesAdopt(process.argv.slice(2))) {
   console.error(
@@ -41,6 +40,13 @@ const result = spawnSync(
 if (result.error) {
   console.error(result.error.message);
   console.error(`Exact command: ${ALCHEMY_DEPLOY_COMMAND}`);
+  process.exit(1);
+}
+
+if (result.signal !== null && result.signal !== undefined) {
+  console.error(
+    `alchemy deploy terminated by signal ${result.signal}.\nExact command: ${ALCHEMY_DEPLOY_COMMAND}`
+  );
   process.exit(1);
 }
 

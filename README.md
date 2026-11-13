@@ -15,7 +15,7 @@ A modern invoice management application built with SvelteKit 3 and Svelte 5, fea
 
 ## CI
 
-GitHub Actions proof gates (lint, typecheck, test, dependency audit, production build + BundleWatch / Panda fingerprint) run with `VARLOCK_ENV=test` — no Bitwarden or Cloudflare secrets in Actions. Deploy stays local (`bun run deploy`). See [docs/ci.md](./docs/ci.md).
+GitHub Actions proof gates (lint, typecheck, test, dependency audit, production build + BundleWatch / Panda fingerprint) run with `VARLOCK_ENV=test` — no Bitwarden or Cloudflare secrets in Actions. Deploy stays local (`bun run deploy`). Jobs use `ubuntu-24.04-firewall` with Phase 1 egress `mode: log` (see [`.github/workflows/README.md`](./.github/workflows/README.md)). See [docs/ci.md](./docs/ci.md).
 
 ## Getting Started
 

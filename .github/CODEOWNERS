@@ -1,0 +1,5 @@
+# Egress allowlist/mode is repo-editable; require owner review so a PR cannot
+# silently widen policy without a human look (native org ceiling not in preview).
+# Own CODEOWNERS itself so a collaborator cannot drop the owner rule first.
+.github/CODEOWNERS @fringe4life
+.github/egress-firewall.yaml @fringe4life

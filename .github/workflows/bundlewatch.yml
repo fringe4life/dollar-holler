@@ -17,7 +17,7 @@ concurrency:
 
 jobs:
   bundlewatch:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-firewall
     timeout-minutes: 7
     env:
       # Test env + .env.test — no Bitwarden / Cloudflare / Sentry deploy secrets

@@ -1,0 +1,46 @@
+# Native Actions egress firewall (technical preview).
+# Docs: https://github.com/github-early-access/actions-native-egress-firewall
+#
+# Phase 1 (this file): mode: log — record outbound DNS/HTTP(S); do not deny.
+# Install/build jobs remain network-open until a follow-up sets mode: enforce
+# with an allowlist built from CI summaries/artifacts.
+#
+# Phase 2 candidate hosts (this repo's workflows — Bun, Varlock, Fallow,
+# BundleWatch, zizmor; no live alchemy:deploy). Do not enable until
+# firewall-decisions-* artifacts confirm. Defaults already cover github.com,
+# codeload.github.com, *actions.githubusercontent.com, *blob.core.windows.net.
+#
+#   # Package registries / language tooling (bun install, bun audit, Fallow)
+#   - registry.npmjs.org
+#
+#   # GitHub APIs / assets beyond defaults (setup-bun, zizmor, GH APIs)
+#   - api.github.com
+#   - release-assets.githubusercontent.com
+#   - pkg.github.com
+#   - uploads.github.com
+#
+#   # BundleWatch results service (bundlewatch.yml)
+#   - service.bundlewatch.io
+#
+#   # Varlock GitHub Action (setup-app; VARLOCK_ENV=test + .env.test).
+#   # Do not add Bitwarden hosts unless artifacts show a test-env call —
+#   # CI must not use a Bitwarden machine account.
+#   - ph.varlock.dev
+#
+#   # Cloudflare (only if artifacts show a non-deploy job hitting them).
+#   # Proof gates do not run alchemy:deploy.
+#   - sparrow.cloudflare.com
+#   - workers.cloudflare.com
+#
+#   # Sentry (only if bun run build / Vite plugin phones home without secrets)
+#   - "*.ingest.us.sentry.io"
+#
+# This file is repo-editable. .github/CODEOWNERS requires @fringe4life review
+# on changes. Technical preview has no org/enterprise egress ceiling yet —
+# review + branch protection is the repo-side control (PR refs can still run
+# with a widened policy until merge; tracked separately).
+#
+# Jobs need permissions.contents: read so the runner can load this file.
+# Path is fixed: .github/egress-firewall.yaml (not under workflows/).
+mode: log
+allow: []

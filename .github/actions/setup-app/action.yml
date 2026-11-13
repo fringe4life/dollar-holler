@@ -10,14 +10,30 @@ inputs:
 runs:
   using: composite
   steps:
-    - uses: oven-sh/setup-bun@v2
+    - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       with:
-        bun-version: latest
+        bun-version-file: .bun-version
+
+    # Registry tarballs only (not Varlock secrets). Restore on every event;
+    # save only off pull_request so PRs cannot poison the default-branch cache
+    # (#238 CD can restore the same bun.lock key after a trusted save).
+    - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      with:
+        path: ~/.bun/install/cache
+        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
+        restore-keys: |
+          bun-${{ runner.os }}-
 
     # Install first so @varlock/bitwarden-plugin is available.
     # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
     - run: bun install --frozen-lockfile --ignore-scripts
       shell: bash
+
+    - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      if: github.event_name != 'pull_request'
+      with:
+        path: ~/.bun/install/cache
+        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
     - name: Load environment variables
       # Pin to commit (Sonar: avoid floating tag installs).

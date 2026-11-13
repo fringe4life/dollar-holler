@@ -1,17 +1,21 @@
-# Version updates on day-of-month */3 at 09:00 UTC (~every 3 days).
-# Ecosystems: Bun (package.json + bun.lock) and GitHub Actions.
+# Daily version updates. Ecosystems: Bun (package.json + bun.lock) and GitHub Actions.
 version: 2
 updates:
   - package-ecosystem: bun
     directory: /
     schedule:
-      interval: cron
-      cronjob: "0 9 */3 * *"
+      interval: daily
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 10
 
+  # SHA-pinned `uses: owner/action@<commit> # vX.Y.Z` stay SHA-to-SHA; Dependabot
+  # also rewrites the trailing version comment. There is no public dependabot.yml
+  # key to *convert* tags to SHAs — pin in YAML first (this repo does).
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: cron
-      cronjob: "0 9 */3 * *"
+      interval: daily
+    cooldown:
+      default-days: 3
     open-pull-requests-limit: 5

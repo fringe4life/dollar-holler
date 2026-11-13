@@ -41,7 +41,7 @@
     "@typescript/native": "npm:typescript@7.0.2",
     "@vitejs/devtools": "0.8.2",
     "alchemy": "2.0.0-beta.85",
-    "bundlewatch": "1.1.0",
+    "bundlewatch": "1.2.0",
     "drizzle-kit": "1.0.0-rc.5",
     "eslint": "10.14.0",
     "eslint-config-prettier": "10.1.8",

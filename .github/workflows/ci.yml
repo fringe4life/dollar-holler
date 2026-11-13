@@ -12,20 +12,27 @@ on:
 permissions:
   contents: read
 
+# PRs restore bun install cache; only trusted events save it (future #238 CD
+# can reuse bun.lock-keyed tarballs, never PR/test-env build artifacts).
+cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
+
 concurrency:
   # Include event_name so Monday cron does not cancel a simultaneous push to main
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }}
 
 jobs:
   lint:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    timeout-minutes: 7
     env:
       # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
       VARLOCK_ENV: test
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup app
         uses: ./.github/actions/setup-app
@@ -44,10 +51,13 @@ jobs:
   typecheck:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    timeout-minutes: 7
     env:
       VARLOCK_ENV: test
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup app
         uses: ./.github/actions/setup-app
@@ -59,10 +69,13 @@ jobs:
   test:
     if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
+    timeout-minutes: 7
     env:
       VARLOCK_ENV: test
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup app
         uses: ./.github/actions/setup-app
@@ -72,12 +85,15 @@ jobs:
 
   audit:
     runs-on: ubuntu-latest
+    timeout-minutes: 7
     steps:
-      - uses: actions/checkout@v7
-
-      - uses: oven-sh/setup-bun@v2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          bun-version: latest
+          persist-credentials: false
+
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version-file: .bun-version
 
       # bun.lock only — no install / Varlock needed
       - name: Lockfile dedupe check

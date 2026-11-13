@@ -8,6 +8,8 @@ on:
 permissions:
   contents: read
 
+cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
+
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -15,14 +17,16 @@ concurrency:
 jobs:
   boundaries:
     runs-on: ubuntu-latest
+    timeout-minutes: 7
     env:
       # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
       VARLOCK_ENV: test
     steps:
       # Full history so fallow audit can resolve the pull request base.
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: Setup app
         uses: ./.github/actions/setup-app

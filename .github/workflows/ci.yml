@@ -12,10 +12,6 @@ on:
 permissions:
   contents: read
 
-# PRs restore bun install cache; only trusted events save it (future #238 CD
-# can reuse bun.lock-keyed tarballs, never PR/test-env build artifacts).
-cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
-
 concurrency:
   # Include event_name so Monday cron does not cancel a simultaneous push to main
   group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}

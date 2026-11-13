@@ -14,9 +14,10 @@ runs:
       with:
         bun-version-file: .bun-version
 
-    # Registry tarball cache (not secrets). Keyed on bun.lock so #238 CD can
-    # restore the same tree without promoting PR/test-env *build* artifacts.
-    - uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+    # Registry tarballs only (not Varlock secrets). Restore on every event;
+    # save only off pull_request so PRs cannot poison the default-branch cache
+    # (#238 CD can restore the same bun.lock key after a trusted save).
+    - uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
       with:
         path: ~/.bun/install/cache
         key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
@@ -27,6 +28,12 @@ runs:
     # --ignore-scripts skips prepare (svelte-kit sync) until env is loaded.
     - run: bun install --frozen-lockfile --ignore-scripts
       shell: bash
+
+    - uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      if: github.event_name != 'pull_request'
+      with:
+        path: ~/.bun/install/cache
+        key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
 
     - name: Load environment variables
       # Pin to commit (Sonar: avoid floating tag installs).

@@ -8,8 +8,6 @@ on:
 permissions:
   contents: read
 
-cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
-
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

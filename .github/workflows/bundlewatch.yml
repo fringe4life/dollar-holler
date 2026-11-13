@@ -11,8 +11,6 @@ permissions:
   contents: read
   statuses: write
 
-cache-mode: ${{ github.event_name == 'pull_request' && 'read' || 'write' }}
-
 concurrency:
   group: bundlewatch-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

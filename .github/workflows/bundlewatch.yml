@@ -28,7 +28,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup app
-        uses: ./.github/actions/setup-app
+        uses: $/.github/actions/setup-app
 
       - name: Build
         run: bun run build

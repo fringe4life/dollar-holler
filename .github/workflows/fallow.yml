@@ -27,7 +27,7 @@ jobs:
           persist-credentials: false
 
       - name: Setup app
-        uses: ./.github/actions/setup-app
+        uses: $/.github/actions/setup-app
 
       - name: Architecture boundaries
         run: bun run fallow:boundary-violations

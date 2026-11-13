@@ -20,7 +20,7 @@ concurrency:
 jobs:
   lint:
     if: github.event_name != 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-firewall
     timeout-minutes: 7
     env:
       # Use test env + .env.test dummy literals — no Bitwarden machine account in CI
@@ -46,7 +46,7 @@ jobs:
 
   typecheck:
     if: github.event_name != 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-firewall
     timeout-minutes: 7
     env:
       VARLOCK_ENV: test
@@ -64,7 +64,7 @@ jobs:
 
   test:
     if: github.event_name != 'schedule'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-firewall
     timeout-minutes: 7
     env:
       VARLOCK_ENV: test
@@ -80,7 +80,7 @@ jobs:
         run: bun run test
 
   audit:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-firewall
     timeout-minutes: 7
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1

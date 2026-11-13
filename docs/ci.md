@@ -15,7 +15,7 @@ Proof gates only — **no deploy from GitHub Actions** yet. Ship stays local (`b
 | [`.github/workflows/bundlewatch.yml`](../.github/workflows/bundlewatch.yml) | PR, push to `main` | `bun run build` → Panda `createSerializeCss` fingerprint → BundleWatch |
 | [`.github/workflows/fallow.yml`](../.github/workflows/fallow.yml) | PR, push | Fallow boundaries + advisory audit |
 
-Shared setup: [`.github/actions/setup-app`](../.github/actions/setup-app/action.yml) (Bun, frozen install, Varlock test env).
+Shared setup: [`.github/actions/setup-app`](../.github/actions/setup-app/action.yml) (Bun, frozen install, Varlock test env). Jobs use `ubuntu-24.04-firewall` with [`.github/egress-firewall.yaml`](../.github/egress-firewall.yaml) in Phase 1 `mode: log` — see [`.github/workflows/README.md`](../.github/workflows/README.md).
 
 ## BundleWatch
 

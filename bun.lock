@@ -46,7 +46,7 @@
         "@typescript/native": "npm:typescript@7.0.2",
         "@vitejs/devtools": "0.8.2",
         "alchemy": "2.0.0-beta.85",
-        "bundlewatch": "1.1.0",
+        "bundlewatch": "1.2.0",
         "drizzle-kit": "1.0.0-rc.5",
         "eslint": "10.14.0",
         "eslint-config-prettier": "10.1.8",
@@ -764,7 +764,7 @@
 
     "bundle-name": ["bundle-name@4.1.1", "", { "dependencies": { "run-applescript": "^7.0.0" } }, "sha512-DdH81/zPLVS11EUgWq3tEu/xn+EzljlMYooDNdzWEnFha3R3NBMpMV1UqYIpjYHV/SgpFKMIX1Oh7o06SjM/oA=="],
 
-    "bundlewatch": ["bundlewatch@1.1.0", "", { "dependencies": { "glob": "^7.2.3", "jsonpack": "^1.1.5" }, "bin": { "bundlewatch": "dist/cli.js" } }, "sha512-O4ChnssjV5Ok/b7v3h30Jw4e5cy16NgTxi2CspTq2L/fmu1W11zwb/M+KUuNAlW55vVI7IQyrw/w/z8NpAsdXA=="],
+    "bundlewatch": ["bundlewatch@1.2.0", "", { "dependencies": { "glob": "^7.2.3", "jsonpack": "^1.1.5" }, "bin": { "bundlewatch": "dist/cli.js" } }, "sha512-lVRgs6Qk+GHwbnb2WPsnvq8vmBwzr4ZTos9w/dcOhkQ81eRxbrPoD+sMd582DlOd1oukX1M0Mfvp48GeXK6vAg=="],
 
     "bytes": ["bytes@3.1.2", "", {}, "sha512-/Nf7TyzTx6S3yRJObOAV7956r8cr2+Oj8AC5dt8wSP3BQAoeX58NoHyCU8P8zGkNXStjTSi6fzO6F0pBdcYbEg=="],
 

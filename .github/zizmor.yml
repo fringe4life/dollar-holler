@@ -1,0 +1,6 @@
+# Dependabot cooldown: GitHub's implicit default is 3 days.
+# zizmor's default gate is 7; accept 3 to match this repo.
+rules:
+  dependabot-cooldown:
+    config:
+      days: 3

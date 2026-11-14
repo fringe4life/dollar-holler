@@ -59,7 +59,7 @@ const cssfilterStub = workerEmptyStub("cssfilter.ts");
 const xssRoot = dirname(dirname(require.resolve("xss")));
 const cssfilterMain = require.resolve("cssfilter", { paths: [xssRoot] });
 
-export default defineConfig(async ({ command, mode }) => ({
+export default defineConfig(async ({ mode }) => ({
   build: {
     rolldownOptions: {
       // Enable Rolldown build-analysis metadata for Vite DevTools panels
@@ -156,11 +156,11 @@ export default defineConfig(async ({ command, mode }) => ({
     // Feature plugins list beside ogygia() (not as ogygia({ plugins })) — 0.11 split.
     ogygia(),
     // Dynamic: svelte-kit sync / panda:build resolve this file with
-    // command "build" + mode "production". A static import still loads
-    // @ogygia/devtools, which needs @ogygia/core `./internal/messages`
-    // (ogygia ≥ 0.13). Mismatched Dependabot checkouts then fail with
+    // mode "production". A static import still loads @ogygia/devtools,
+    // which needs @ogygia/core `./internal/messages` (ogygia ≥ 0.13).
+    // Mismatched Dependabot checkouts then fail with
     // "failed to load config from …/vite.config.ts".
-    ...(command === "serve" && mode !== "production"
+    ...(mode !== "production"
       ? [
           (await import("@ogygia/devtools/vite")).devtools({
             profiler: true,

@@ -6,7 +6,6 @@ import pandacss from "@pandacss/vite";
 import { sentrySvelteKit } from "@sentry/sveltekit/vite";
 import { sveltekit } from "@sveltejs/kit/vite";
 import { FontaineTransform } from "fontaine";
-import { devtools as ogygiaDevtools } from "@ogygia/devtools/vite";
 import { ogygia } from "ogygia/vite";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 import { DevTools } from "@vitejs/devtools";
@@ -60,7 +59,7 @@ const cssfilterStub = workerEmptyStub("cssfilter.ts");
 const xssRoot = dirname(dirname(require.resolve("xss")));
 const cssfilterMain = require.resolve("cssfilter", { paths: [xssRoot] });
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(async ({ command, mode }) => ({
   build: {
     rolldownOptions: {
       // Enable Rolldown build-analysis metadata for Vite DevTools panels
@@ -156,8 +155,17 @@ export default defineConfig(({ mode }) => ({
     // Before sveltekit so island import attributes are rewritten first.
     // Feature plugins list beside ogygia() (not as ogygia({ plugins })) — 0.11 split.
     ogygia(),
-    ...(mode !== "production"
-      ? [ogygiaDevtools({ profiler: true })]
+    // Dynamic: svelte-kit sync / panda:build resolve this file with
+    // command "build" + mode "production". A static import still loads
+    // @ogygia/devtools, which needs @ogygia/core `./internal/messages`
+    // (ogygia ≥ 0.13). Mismatched Dependabot checkouts then fail with
+    // "failed to load config from …/vite.config.ts".
+    ...(command === "serve" && mode !== "production"
+      ? [
+          (await import("@ogygia/devtools/vite")).devtools({
+            profiler: true,
+          }),
+        ]
       : []),
     sveltekit({
       compilerOptions: {

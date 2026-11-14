@@ -8,13 +8,32 @@ updates:
     cooldown:
       default-days: 3
     open-pull-requests-limit: 10
-    # ogygia and @ogygia/* share @ogygia/core. Separate PRs (#327 then #343)
-    # left svelte-kit sync unable to load vite.config until both landed.
+    # Families that share a core or an exact/peer version line. Split PRs
+    # (#327 then #343) left svelte-kit sync unable to load vite.config.
     groups:
       ogygia:
         patterns:
           - "ogygia"
           - "@ogygia/*"
+      better-auth:
+        patterns:
+          - "better-auth"
+          - "@better-auth/*"
+      alchemy:
+        patterns:
+          - "alchemy"
+          - "@alchemy.run/*"
+      pandacss:
+        patterns:
+          - "@pandacss/*"
+      effect:
+        patterns:
+          - "effect"
+          - "@effect/*"
+      drizzle:
+        patterns:
+          - "drizzle-orm"
+          - "drizzle-kit"
 
   # SHA-pinned `uses: owner/action@<commit> # vX.Y.Z` stay SHA-to-SHA; Dependabot
   # also rewrites the trailing version comment. There is no public dependabot.yml

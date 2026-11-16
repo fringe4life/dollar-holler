@@ -15,10 +15,10 @@
     "xss": "1.0.17"
   },
   "devDependencies": {
-    "@alchemy.run/cloudflare": "2.0.0-beta.85",
-    "@alchemy.run/cloudflare-runtime": "2.0.0-beta.85",
-    "@alchemy.run/frontend-frameworks": "2.0.0-beta.85",
-    "@alchemy.run/sql": "2.0.0-beta.85",
+    "@alchemy.run/cloudflare": "2.0.0-beta.87",
+    "@alchemy.run/cloudflare-runtime": "2.0.0-beta.87",
+    "@alchemy.run/frontend-frameworks": "2.0.0-beta.87",
+    "@alchemy.run/sql": "2.0.0-beta.87",
     "@cloudflare/workers-types": "5.20261110.1",
     "@effect/platform-bun": "4.1.4",
     "@eslint/js": "10.0.1",
@@ -40,7 +40,7 @@
     "@types/node": "26.6.6",
     "@typescript/native": "npm:typescript@7.0.2",
     "@vitejs/devtools": "0.8.2",
-    "alchemy": "2.0.0-beta.85",
+    "alchemy": "2.0.0-beta.87",
     "bundlewatch": "1.2.0",
     "drizzle-kit": "1.0.0-rc.5",
     "eslint": "10.14.0",

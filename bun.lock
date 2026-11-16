@@ -7,7 +7,7 @@
       "dependencies": {
         "@better-auth/drizzle-adapter": "1.7.23",
         "@sentry/sveltekit": "11.12.0",
-        "@varlock/bitwarden-plugin": "2.0.2",
+        "@varlock/bitwarden-plugin": "2.0.3",
         "better-auth": "1.7.23",
         "drizzle-orm": "1.0.0-rc.5",
         "effect": "4.1.4",
@@ -710,7 +710,7 @@
 
     "@typescript/typescript-win32-x64": ["@typescript/typescript-win32-x64@7.0.2", "", { "os": "win32", "cpu": "x64" }, "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g=="],
 
-    "@varlock/bitwarden-plugin": ["@varlock/bitwarden-plugin@2.0.2", "", { "peerDependencies": { "varlock": "^1.22.0" } }, "sha512-oY6d7MInabo4SCMOeswipFp0N1Au9881cdLvXVsAbZALbjwGEWym7lzs8Zw9yKuART4nI5V2KJuMzcIb70wVsw=="],
+    "@varlock/bitwarden-plugin": ["@varlock/bitwarden-plugin@2.0.3", "", { "peerDependencies": { "varlock": "^1.25.0" } }, "sha512-FcR6diZJcYxGp6oHAf1xzvxODHBMKbvlkyZvY77/dHIIvf/eCfEtS0tv8L6xKdguprf1WEtcVOIIHDzM7Q8tTA=="],
 
     "@varlock/native-helper-darwin": ["@varlock/native-helper-darwin@1.24.0", "", { "os": "darwin" }, "sha512-/uMRBzTZxdtlwyszdPbamFojDfRQYTNY0l20SoX8UoTXrI+Kq7B3tt2ZDP0WfOhb9EAP1egAewBuGLj8NzemMQ=="],
 

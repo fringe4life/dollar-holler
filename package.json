@@ -2,7 +2,7 @@
   "dependencies": {
     "@better-auth/drizzle-adapter": "1.7.23",
     "@sentry/sveltekit": "11.12.0",
-    "@varlock/bitwarden-plugin": "2.0.2",
+    "@varlock/bitwarden-plugin": "2.0.3",
     "better-auth": "1.7.23",
     "drizzle-orm": "1.0.0-rc.5",
     "effect": "4.1.4",

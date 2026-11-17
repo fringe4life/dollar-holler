@@ -43,7 +43,7 @@
     "alchemy": "2.0.0-beta.87",
     "bundlewatch": "1.2.0",
     "drizzle-kit": "1.0.0-rc.5",
-    "eslint": "10.14.0",
+    "eslint": "10.15.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-svelte": "3.24.1",
     "fallow": "3.42.0",

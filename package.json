@@ -46,7 +46,7 @@
     "eslint": "10.15.0",
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-svelte": "3.24.1",
-    "fallow": "3.43.1",
+    "fallow": "3.43.2",
     "fontaine": "1.0.3",
     "globals": "17.14.0",
     "husky": "9.1.7",

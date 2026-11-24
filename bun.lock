@@ -12,7 +12,7 @@
         "drizzle-orm": "1.0.0-rc.5",
         "effect": "4.1.5",
         "marked": "18.2.1",
-        "ogygia": "0.14.3",
+        "ogygia": "0.14.4",
         "prismjs": "1.30.0",
         "uuidv7": "1.2.1",
         "valibot": "1.5.0",
@@ -422,7 +422,7 @@
 
     "@ogygia/compiler": ["@ogygia/compiler@0.14.2", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "@ogygia/machine": "^0.14.0", "devalue": "^5.9.3", "estree-walker": "^3.0.3", "magic-string": "^1.4.5", "tinyglobby": "^0.2.17" }, "peerDependencies": { "@ogygia/core": "^0.14.1", "@sveltejs/kit": ">=2.70.2 <4", "rolldown": ">=1.0.0", "svelte": "^5.56.8", "vite": "^8.2.4" }, "optionalPeers": ["rolldown"] }, "sha512-SE9B4YMzWdgreCiRE3hQ1bTjENGCDg3FKm0Rm4UDLEC3S2p17M/1tR0seOE6MMUMZxLWkLuT01H6wTnqMGMxlg=="],
 
-    "@ogygia/core": ["@ogygia/core@0.14.3", "", { "dependencies": { "@ogygia/machine": "^0.14.0", "devalue": "^5.9.3", "esm-env": "^1.2.2" }, "peerDependencies": { "@sveltejs/kit": ">=2.70.2 <4", "rolldown": ">=1.0.0", "svelte": "^5.56.8", "vite": "^8.2.4" }, "optionalPeers": ["rolldown"] }, "sha512-Pw7snf/S/DPSLnggfcCZAfKYmrxvKw2lJV4V1fkf+vhOuM8xxpePjfyB+o5Nvc9Qv+xRhP0H9t5i+fByiiXC5A=="],
+    "@ogygia/core": ["@ogygia/core@0.14.4", "", { "dependencies": { "@ogygia/machine": "^0.14.0", "devalue": "^5.9.3", "esm-env": "^1.2.2" }, "peerDependencies": { "@sveltejs/kit": ">=2.70.2 <4", "rolldown": ">=1.0.0", "svelte": "^5.56.8", "vite": "^8.2.4" }, "optionalPeers": ["rolldown"] }, "sha512-uEVrbP+AN5BsRTpg4OtqZ3Qk1oQ6PG+FpayvIoZmc9GNUJustySkO0zGrGSZpsvTLIIlhCLBq4MLQX8wHRb3Tw=="],
 
     "@ogygia/devtools": ["@ogygia/devtools@0.14.1", "", { "dependencies": { "@neodrag/svelte": "3.0.0-next.12", "@ogygia/insights": "^0.14.0", "@ogygia/machine": "^0.14.0", "@ogygia/router": "^0.14.0", "devalue": "^5.9.3" }, "peerDependencies": { "@ogygia/compiler": "^0.14.1", "@ogygia/core": "^0.14.1", "@sveltejs/kit": ">=2.70.2 <4", "svelte": "^5.56.8", "vite": "^8.2.4" } }, "sha512-2EisUUFO2oO7a9s2x/4LXvsfHL5NEr6ovM1OW/JkhQgPp0zhZ29LpMfIXSkq+pPjk1b7VNVkttkp5KSEvu/B8g=="],
 
@@ -1184,7 +1184,7 @@
 
     "obug": ["obug@2.2.1", "", {}, "sha512-XrsrhT5sybtKI6wakr2SPOlGZWWYbUXZ7a0jT8/QOeAPau+1X/bSegNe5YR75oJmEZQbKningirmGOEJCIk61Q=="],
 
-    "ogygia": ["ogygia@0.14.3", "", { "dependencies": { "@ogygia/compiler": "0.14.2", "@ogygia/core": "0.14.3" }, "peerDependencies": { "@sveltejs/kit": ">=2.70.2 <4", "rolldown": ">=1.0.0", "svelte": "^5.56.8", "vite": "^8.2.4" }, "optionalPeers": ["rolldown"], "bin": { "ogygia": "./dist/cli.mjs" } }, "sha512-0/rQ2TBAMhQIWQ4Qho2HzWykYAUoekEHq2fglEvLt4e1mIFS2wOyHRzblIyFBVfS/VnQk17mMrSgbOqUV7iXLQ=="],
+    "ogygia": ["ogygia@0.14.4", "", { "dependencies": { "@ogygia/compiler": "0.14.2", "@ogygia/core": "0.14.4" }, "peerDependencies": { "@sveltejs/kit": ">=2.70.2 <4", "rolldown": ">=1.0.0", "svelte": "^5.56.8", "vite": "^8.2.4" }, "optionalPeers": ["rolldown"], "bin": { "ogygia": "./dist/cli.mjs" } }, "sha512-M/Yb/saQuVEfvLZBLJ2GKv8e2IskIeN+8ryHCSPWqOY1dy3j3pGpCLfzJmlmLB3OVJlbgwqUHKOdTFwVNI/ppA=="],
 
     "on-finished": ["on-finished@2.4.2", "", { "dependencies": { "ee-first": "1.1.1" } }, "sha512-ATWUv387i+nLD49EiDoOft5scf32Vsdz3ktrQJG9bi7jRFmaXTssvyvj1EmeKVVgvesbqUtvQQvaS2TpTukAZQ=="],
 

@@ -27,7 +27,7 @@
         "@cloudflare/workers-types": "5.20261121.1",
         "@effect/platform-bun": "4.1.5",
         "@eslint/js": "10.0.1",
-        "@eslint/mcp": "0.3.16",
+        "@eslint/mcp": "0.3.17",
         "@fontsource-variable/source-sans-3": "5.3.1",
         "@fontsource/kalam": "5.3.0",
         "@fontsource/space-mono": "5.3.0",
@@ -284,7 +284,7 @@
 
     "@eslint/js": ["@eslint/js@10.0.1", "", { "peerDependencies": { "eslint": "^10.0.0" }, "optionalPeers": ["eslint"] }, "sha512-zeR9k5pd4gxjZ0abRoIaxdc7I3nDktoXZk2qOv9gCNWx3mVwEn32VRhyLaRsDiJjTs0xq/T8mfPtyuXu7GWBcA=="],
 
-    "@eslint/mcp": ["@eslint/mcp@0.3.16", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.26.0", "eslint": "^10.14.0", "zod": "^4.1.13" }, "bin": { "mcp": "src/mcp-cli.js" } }, "sha512-mGNBEEIJ2FBMdFXE6NW6VB6dxM1vqTjOz9u217UvjXPbT66/hzyY6XpGG6hdHBKHNtfZ26/6zOs0CXNYa22G2g=="],
+    "@eslint/mcp": ["@eslint/mcp@0.3.17", "", { "dependencies": { "@modelcontextprotocol/sdk": "^1.26.0", "eslint": "^10.15.0", "zod": "^4.1.13" }, "bin": { "mcp": "src/mcp-cli.js" } }, "sha512-1lekTAXOvbpD4knT3YMTJSvW4tTsHP587VaENOeacNOJG/87KexXw7SyW1V41yqJ5e3/LKOrz6dd1O9FxPG4lA=="],
 
     "@eslint/object-schema": ["@eslint/object-schema@3.0.5", "", {}, "sha512-vqTaUEgxzm+YDSdElad6PiRoX4t8VGDjCtt05zn4nU810UIx/uNEV7/lZJ6KwFThKZOzOxzXy48da+No7HZaMw=="],
 
